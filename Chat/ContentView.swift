@@ -16,6 +16,9 @@ struct ContentView: View {
 
     var body: some View {
         ChatView(messages: messages) { message in
+            var message = message
+            message.isCurrentUser = true
+            message.id = messages.count + 1
             messages.append(message)
         }
         .onAppear {

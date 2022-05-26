@@ -11,13 +11,13 @@ import UniformTypeIdentifiers
 import MobileCoreServices
 
 import PhotosUI
-import SwiftUI
 
 struct ImagePicker: UIViewControllerRepresentable {
 
     var sourceType = UIImagePickerController.SourceType.camera
 
     @Binding var image: UIImage?
+    @Binding var url: URL?
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let pickerController = UIImagePickerController()
@@ -69,6 +69,10 @@ struct ImagePicker: UIViewControllerRepresentable {
 
                 if let originalImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
                     parent.image = originalImage
+                }
+                
+                if let url = info[UIImagePickerController.InfoKey.imageURL] as? URL {
+                    parent.url = url
                 }
 
             case UTType.video.identifier:

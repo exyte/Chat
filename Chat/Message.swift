@@ -11,7 +11,8 @@ struct Message: Equatable {
 
     var id: Int
 
-    var text: String?
+    var text: String = ""
+
     var imagesURLs: [URL] = []
     var videosURLs: [URL] = []
 
