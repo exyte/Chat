@@ -4,69 +4,24 @@
 
 import Foundation
 import Photos
-import UIKit
-
-struct PHFetchResultCollection: RandomAccessCollection, Equatable {
-    typealias Element = PHAsset
-    typealias Index = Int
-
-    let fetchResult: PHFetchResult<PHAsset>
-
-    var endIndex: Int { fetchResult.count - 1 }
-    var startIndex: Int { 0 }
-
-    subscript(position: Int) -> PHAsset {
-        fetchResult.object(at: reverseIndex(index: position))
-    }
-    
-    private func reverseIndex(index: Int) -> Int {
-        fetchResult.count - index - 1
-    }
-}
-
-struct Album: Identifiable {
-    let id = UUID()
-    let title: String?
-    let cover: UIImage?
-    
-    fileprivate let smart: Bool
-    
-    internal init(title: String? = nil, cover: UIImage? = nil, smart: Bool = false) {
-        self.title = title
-        self.cover = cover
-        self.smart = smart
-    }
-}
 
 public final class PhotoProviderService: ObservableObject {
-    @Published var photos: [UIImage] = []
+    @Published var photos: [Asset] = []
     @Published var albums: [Album] = []
+    
+    @Published var selectedAssetIds: [String] = []
     
     private var allPhotos = PHFetchResult<PHAsset>()
     private var smartAlbums = PHFetchResult<PHAssetCollection>()
     private var userCollections = PHFetchResult<PHAssetCollection>()
     
-    public init() {
-        
-    }
+    public init() {}
     
     public func fetchAllPhotos() async {
         fetchAllPhotosAssets()
-        if allPhotos.count == 0 {
-            return
-        }
-
-        let collection = PHFetchResultCollection(fetchResult: allPhotos)
-        
-        var images: [UIImage] = []
-        for index in collection.startIndex...collection.endIndex {
-            let asset = collection[index]
-            if let image = await self.loadImage(from: asset) {
-                images.append(image)
-            }
-        }
-        DispatchQueue.main.async { [images] in
-            self.photos = images
+        let assets = await assets(from: allPhotos)
+        DispatchQueue.main.async { [assets] in
+            self.photos = assets
         }
     }
     
@@ -78,78 +33,66 @@ public final class PhotoProviderService: ObservableObject {
             self.albums = albums
         }
     }
-    
-    private func getAllPhotoAlmub() async -> [Album] {
-        fetchAllPhotosAssets()
-        
-        var cover: UIImage?
-        if let asset = allPhotos.firstObject {
-            cover = await self.loadImage(from: asset)
-        }
-        
-        return [Album(title: "All Photos", cover: cover, smart: false)]
-    }
-    
-    private func getSmartAlmubs() async -> [Album] {
+}
+
+// MARK: - Support methods
+private extension PhotoProviderService {
+    func getSmartAlmubs() async -> [Album] {
         fetchSmartAlbums()
-        
-        if smartAlbums.count == 0 {
-            return []
-        }
-        var albums: [Album] = []
-        for index in 0...(smartAlbums.count - 1) {
-            let collection = smartAlbums[index]
-            let assets = PHAsset.fetchAssets(in: collection, options: nil)
-            var cover: UIImage?
-            if let asset = assets.firstObject {
-                cover = await self.loadImage(from: asset)
-            }
-
-            let album = Album(title: collection.localizedTitle, cover: cover, smart: true)
-            albums.append(album)
-        }
-        return albums
+        return await albums(from: smartAlbums)
     }
     
-    private func getUserAlmubs() async -> [Album] {
+    func getUserAlmubs() async -> [Album] {
         fetchUserCollections()
-        
-        if userCollections.count == 0 {
-            return []
-        }
-        var albums: [Album] = []
-        for index in 0...(userCollections.count - 1) {
-            let collection = userCollections[index]
-            let assets = PHAsset.fetchAssets(in: collection, options: nil)
-            var cover: UIImage?
-            if let asset = assets.firstObject {
-                cover = await self.loadImage(from: asset)
-            }
-
-            let album = Album(title: collection.localizedTitle, cover: cover, smart: true)
-            albums.append(album)
-        }
-        return albums
+        return await albums(from: userCollections)
     }
 }
 
+// MARK: - Utils methods
+// FIXME: Create some utils class with static func or enum namespace. After that update `Data` to calculated properties for optimization.
 private extension PhotoProviderService {
-    func loadImage(from asset: PHAsset) async -> UIImage? {
-        return await withCheckedContinuation { continuation in
-            PHImageManager.default().requestImage(
-                for: asset,
-                targetSize: CGSize(width: 100, height: 100),
-                contentMode: .aspectFit,
-                options: nil) { image, _ in
-                    guard let image = image else {
-                        continuation.resume(with: .success(nil))
-                        return
-                    }
-                    continuation.resume(with: .success(image))
-                }
+    func assets(from fetchResult: PHFetchResult<PHAsset>) async -> [Asset] {
+        var assets: [Asset] = []
+        
+        if fetchResult.count == 0 {
+            return assets
+        }
+
+        for index in 0...(fetchResult.count - 1) {
+            let asset = fetchResult[index]
+            // FIXME: When preview is nil, make placeholder
+            if let preview = await self.loadData(from: asset) {
+                assets.append(Asset(source: asset, preview: preview))
+            }
+        }
+        return assets
+    }
+    
+    func preview(from fetchResult: PHFetchResult<PHAsset>) async -> Data? {
+        if let asset = fetchResult.firstObject {
+            return await self.loadData(from: asset)
+        } else {
+            return nil
         }
     }
     
+    func albums(from fetchResult: PHFetchResult<PHAssetCollection>) async -> [Album] {
+        if fetchResult.count == 0 {
+            return []
+        }
+        var albums: [Album] = []
+        for index in 0...(fetchResult.count - 1) {
+            let collection = fetchResult[index]
+            let fetchResult = PHAsset.fetchAssets(in: collection, options: nil)
+            let preview = await preview(from: fetchResult)
+            let assets = await assets(from: fetchResult)
+
+            let album = Album(assets: assets, source: collection, preview: preview)
+            albums.append(album)
+        }
+        return albums
+    }
+
     func loadData(from asset: PHAsset) async -> Data? {
         return await withCheckedContinuation { continuation in
             PHImageManager.default().requestImageDataAndOrientation(
