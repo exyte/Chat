@@ -1,9 +1,19 @@
 <img src="https://github.com/exyte/Macaw/blob/master/header.png">
 <img align="right" src="https://raw.githubusercontent.com/exyte/Macaw/master/demo.gif" width="480" />
 
-<p><h1 align="left">Macaw</h1></p>
 
-<p><h4>Powerful and easy-to-use vector graphics Swift library with SVG support</h4></p>
+# Chat
+## Description for component
+
+--- 
+
+### TODO
+- [ ] Create images/video picker for attaching to message
+    - [ ] Multiple choice
+    - [ ] First cell is "camera". Just image
+        - [ ] \* Live preview for camera
+    - [ ] Mix photo and video to single grid
+    - [ ] Switch between photos/albums (on top of view)
 
 ___
 

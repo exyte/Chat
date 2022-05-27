@@ -6,20 +6,18 @@
 //
 
 import SwiftUI
+import AssetsPicker
 
 struct InputView: View {
     var didSendMessage: (Message) -> Void
     
+    @State private var message: Message = Message(id: 0)
+    
     @State private var textSize: CGRect = .zero
+    @State private var isOpenPicker = false
     
-    @State private var showingImageModePicker = false
-    @State private var selectedImageMode: UIImagePickerController.SourceType = .camera
-    
-    @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
     @State private var selectedImageUrl: URL?
-    
-    @State private var message: Message = Message(id: 0)
     
     var body: some View {
         VStack {
@@ -50,39 +48,39 @@ struct InputView: View {
             }
             
             HStack {
-                Button("Pick") {
-                    showingImageModePicker = true
+                Button {
+                    isOpenPicker = true
+                } label: {
+                    Text("Pick")
                 }
                 textView()
-                Button("Send") {
+                Button {
                     didSendMessage(message)
                     message = Message(id: 0)
+                } label: {
+                    Text("Send")
                 }
             }
             .padding(5)
         }
         .background(Color(hex: "EEEEEE"))
-        .actionSheet(isPresented: $showingImageModePicker) {
-            ActionSheet(
-                title: Text(""),
-                message: .none,
-                buttons: makeImageModePickerButtons()
-            )
+        .sheet(isPresented: $isOpenPicker) {
+            AssetPicker(openPicker: $isOpenPicker)
         }
-        .fullScreenCover(isPresented: $showingImagePicker) {
-            ImagePicker(
-                sourceType: selectedImageMode,
-                image: $selectedImage,
-                url: $selectedImageUrl
-            )
-        }
-        .onChange(of: selectedImageUrl) { newValue in
-            if let selectedImageUrl = selectedImageUrl {
-                message.imagesURLs.append(selectedImageUrl)
-                self.selectedImageUrl = nil
-                self.selectedImage = nil
-            }
-        }
+//        .fullScreenCover(isPresented: $showingImagePicker) {
+//            ImagePicker(
+//                sourceType: selectedImageMode,
+//                image: $selectedImage,
+//                url: $selectedImageUrl
+//            )
+//        }
+//        .onChange(of: selectedImageUrl) { newValue in
+//            if let selectedImageUrl = selectedImageUrl {
+//                message.imagesURLs.append(selectedImageUrl)
+//                self.selectedImageUrl = nil
+//                self.selectedImage = nil
+//            }
+//        }
     }
 }
 
@@ -111,27 +109,27 @@ private extension InputView {
         }
     }
     
-    func makeImageModePickerButtons() -> [ActionSheet.Button] {
-        var result: [ActionSheet.Button] = []
-        
-#if targetEnvironment(simulator)
-        result.append(.default(Text("Camera [unavailible on simulator]")) {})
-        
-#else
-        result.append(.default(Text("Camera")) {
-            selectedImageMode = .camera
-            showingImagePicker = true
-        })
-#endif
-        result.append(contentsOf: [
-            .default(Text("Gallery")) {
-                selectedImageMode = .photoLibrary
-                showingImagePicker = true
-            },
-            .cancel()
-        ])
-        return result
-    }
+//    func makeImageModePickerButtons() -> [ActionSheet.Button] {
+//        var result: [ActionSheet.Button] = []
+//
+//#if targetEnvironment(simulator)
+//        result.append(.default(Text("Camera [unavailible on simulator]")) {})
+//
+//#else
+//        result.append(.default(Text("Camera")) {
+//            selectedImageMode = .camera
+//            showingImagePicker = true
+//        })
+//#endif
+//        result.append(contentsOf: [
+//            .default(Text("Gallery")) {
+//                selectedImageMode = .photoLibrary
+//                showingImagePicker = true
+//            },
+//            .cancel()
+//        ])
+//        return result
+//    }
 }
 
 struct InputView_Previews: PreviewProvider {

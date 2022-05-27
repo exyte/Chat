@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1302738D283E44D00044F5D9 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1302738C283E44D00044F5D9 /* MessageView.swift */; };
 		1302738F283E456F0044F5D9 /* InputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1302738E283E456F0044F5D9 /* InputView.swift */; };
+		1379E0972840C2F2008D218B /* AssetsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 1379E0962840C2F2008D218B /* AssetsPicker */; };
 		5B41BFED28324C7100B181D8 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 5B41BFEC28324C7100B181D8 /* Introspect */; };
 		5B511E4F2816AF9800A615F8 /* FrameGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B511E4E2816AF9800A615F8 /* FrameGetter.swift */; };
 		5B846A70281004E1005835BB /* ChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B846A6F281004E1005835BB /* ChatApp.swift */; };
@@ -24,6 +25,9 @@
 /* Begin PBXFileReference section */
 		1302738C283E44D00044F5D9 /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		1302738E283E456F0044F5D9 /* InputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputView.swift; sourceTree = "<group>"; };
+		1379E0942840C1B1008D218B /* AssetsPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AssetsPicker; path = Components/AssetsPicker; sourceTree = "<group>"; };
+		1379E0992840CE21008D218B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		1379E09A2840CE21008D218B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		5B511E4E2816AF9800A615F8 /* FrameGetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FrameGetter.swift; sourceTree = "<group>"; };
 		5B846A6C281004E1005835BB /* Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B846A6F281004E1005835BB /* ChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatApp.swift; sourceTree = "<group>"; };
@@ -42,17 +46,45 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B41BFED28324C7100B181D8 /* Introspect in Frameworks */,
+				1379E0972840C2F2008D218B /* AssetsPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1379E0932840C1B1008D218B /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				1379E0942840C1B1008D218B /* AssetsPicker */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		1379E0952840C2F2008D218B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1379E0982840CDF5008D218B /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				1379E09A2840CE21008D218B /* .gitignore */,
+				1379E0992840CE21008D218B /* README.md */,
+			);
+			name = Files;
+			sourceTree = "<group>";
+		};
 		5B846A63281004E1005835BB = {
 			isa = PBXGroup;
 			children = (
+				1379E0982840CDF5008D218B /* Files */,
+				1379E0932840C1B1008D218B /* Packages */,
 				5B846A6E281004E1005835BB /* Chat */,
 				5B846A6D281004E1005835BB /* Products */,
+				1379E0952840C2F2008D218B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +140,7 @@
 			name = Chat;
 			packageProductDependencies = (
 				5B41BFEC28324C7100B181D8 /* Introspect */,
+				1379E0962840C2F2008D218B /* AssetsPicker */,
 			);
 			productName = Chat;
 			productReference = 5B846A6C281004E1005835BB /* Chat.app */;
@@ -394,6 +427,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1379E0962840C2F2008D218B /* AssetsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AssetsPicker;
+		};
 		5B41BFEC28324C7100B181D8 /* Introspect */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5B41BFEB28324C7100B181D8 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;

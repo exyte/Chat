@@ -43,28 +43,6 @@ struct ChatView: View {
     }
 }
 
-struct HideOption: ViewModifier {
-    @Binding var isHidden: Bool
-    
-    func body(content: Content) -> some View {
-        if isHidden {
-            content
-                .hidden()
-        } else {
-            content
-        }
-    }
-}
-
-extension View {
-    func hidden(state: Binding<Bool>) {
-        ModifiedContent(
-            content: self,
-            modifier: HideOption(isHidden: state)
-        )
-    }
-}
-
 struct ChatView_Preview: PreviewProvider {
     static var previews: some View {
         ChatView(
