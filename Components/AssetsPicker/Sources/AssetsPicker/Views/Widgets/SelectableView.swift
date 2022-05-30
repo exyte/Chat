@@ -9,13 +9,29 @@ struct SelectableView<Content>: View where Content: View {
     let onTap: () -> Void
     @ViewBuilder let content: () -> Content
     
+    @Environment(\.assetSelectionStyle) private var assetSelectionStyle
+    
     var body: some View {
-        content()
-            .onTapGesture(perform: onTap)
-            .overlay(
-                SelectIndicatorView(index: selected)
-                    .padding(2),
-                alignment: .topTrailing
-            )
+        Button {
+            onTap()
+        } label: {
+            content()
+                .overlay(
+                    SelectIndicatorView(index: selected)
+                        .padding(2),
+                    alignment: selectionAlignment
+                )
+        }
+    }
+}
+
+private extension SelectableView {
+    var selectionAlignment: Alignment {
+        switch assetSelectionStyle {
+        case .checkmark:
+            return .bottomTrailing
+        case .count:
+            return .topTrailing
+        }
     }
 }

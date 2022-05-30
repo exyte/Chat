@@ -8,12 +8,12 @@ import Photos
 struct Album {
     var assets: [Asset]
     let source: PHAssetCollection
-    let preview: Data?
+    let thumbnail: Thumbnail?
 
-    init(assets: [Asset], source: PHAssetCollection, preview: Data? = nil) {
+    init(assets: [Asset], source: PHAssetCollection, thumbnail: Thumbnail? = nil) {
         self.assets = assets
         self.source = source
-        self.preview = preview
+        self.thumbnail = thumbnail
     }
 }
 

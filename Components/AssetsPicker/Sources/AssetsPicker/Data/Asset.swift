@@ -5,18 +5,24 @@
 import Foundation
 import Photos
 
-struct Asset {
-    let preview: Data
-    let source: PHAsset
+public struct Asset {
+    let thumbnail: Thumbnail
+    public let source: PHAsset
     
-    init(source: PHAsset, preview: Data) {
+    init(source: PHAsset, thumbnail: Thumbnail) {
         self.source = source
-        self.preview = preview
+        self.thumbnail = thumbnail
     }
 }
 
 extension Asset: Identifiable {
-    var id: String {
+    public var id: String {
         source.localIdentifier
+    }
+}
+
+extension Asset: Equatable {
+    public static func == (lhs: Asset, rhs: Asset) -> Bool {
+        lhs.id == rhs.id
     }
 }

@@ -25,29 +25,45 @@ enum AssetPickerMode: Int, CaseIterable, Identifiable {
 }
 
 public struct AssetPicker: View {
+    // MARK: - Types
+    public typealias SelectClosure = ([Asset]) -> Void
+    
+    // MARK: - Initial values
     @Binding public var openPicker: Bool
+    let onSelect: SelectClosure
     
-    @StateObject var provider = PhotoProviderService()
+    // MARK: - Public immutable values
     
+    // MARK: - Private values
+    @StateObject var provider = AssetsService()
     @State private var mode: AssetPickerMode = .photos
-    
-    public init(openPicker: Binding<Bool>) {
+    @State private var isSended = false
+
+    // MARK: - Object life cycle
+    public init(openPicker: Binding<Bool>, onSelect: @escaping SelectClosure) {
         self._openPicker = openPicker
+        self.onSelect = onSelect
     }
-    
+
+    // MARK: - SwiftUI View implementation
     public var body: some View {
         NavigationView {
             Group {
                 switch mode {
                 case .photos:
                     AlbumView(
+                        onTapCamera: {
+                            debugPrint("Open camera")
+                        },
                         assets: provider.photos,
-                        selected: $provider.selectedAssetIds
+                        selected: $provider.selectedAssets,
+                        isSended: $isSended
                     )
                 case .albums:
                     AlbumsView(
                         albums: provider.albums,
-                        selected: $provider.selectedAssetIds
+                        selected: $provider.selectedAssets,
+                        isSended: $isSended
                     )
                 }
             }
@@ -70,6 +86,11 @@ public struct AssetPicker: View {
                 await provider.fetchAllPhotos()
                 await provider.fetchAlbums()
             }
+        }
+        .onChange(of: isSended) { flag in
+            guard flag else { return }
+            openPicker = false
+            onSelect(provider.selectedAssets)
         }
     }
 }

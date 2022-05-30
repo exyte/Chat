@@ -6,13 +6,23 @@ import SwiftUI
 
 struct AlbumView: View {
     let title: String?
+    let onTapCamera: (() -> Void)?
     let assets: [Asset]
-    @Binding var selected: [String]
+    @Binding var selected: [Asset]
+    @Binding var isSended: Bool
     
-    init(title: String? = nil, assets: [Asset], selected: Binding<[String]>) {
+    @Environment(\.assetSelectionLimit) private var assetSelectionLimit
+    
+    init(title: String? = nil,
+         onTapCamera: (() -> Void)? = nil,
+         assets: [Asset],
+         selected: Binding<[Asset]>,
+         isSended: Binding<Bool>) {
         self.title = title
+        self.onTapCamera = onTapCamera
         self.assets = assets
         self._selected = selected
+        self._isSended = isSended
     }
     
     var body: some View {
@@ -37,15 +47,28 @@ private extension AlbumView {
                     ProgressView()
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
+                        if let onTapCamera  = onTapCamera {
+                            Button {
+                                onTapCamera()
+                            } label: {
+                                Rectangle()
+                                    .fill(.black)
+                                    .aspectRatio(1.0, contentMode: .fit)
+                                    .overlay(
+                                        Image(systemName: "camera")
+                                            .foregroundColor(.white))
+                            }
+                        }
+                        
                         ForEach(assets) { asset in
-                            SelectableView(
-                                selected: selected.firstIndex(of: asset.id)) {
-                                    toggleSelection(for: asset.id)
-                                } content: {
-                                    AssetPreview(asset: asset)
-                                }
-                                .padding(2)
-                            
+                            let index = selected.firstIndex(of: asset)
+                            SelectableView(selected: index) {
+                                toggleSelection(for: asset)
+                            } content: {
+                                AssetThumbnailView(asset: asset)
+                            }
+                            .padding(2)
+                            .disabled(selected.count >= assetSelectionLimit && index == nil)
                         }
                     }
                 }
@@ -55,16 +78,20 @@ private extension AlbumView {
             .padding(.horizontal)
         }
         .navigationBarItems(
-            trailing: Button("Send") {}
+            trailing: Button("Send") {
+                isSended = true
+            }
                 .disabled(selected.isEmpty)
         )
     }
     
-    func toggleSelection(for assetId: String) {
-        if let index = selected.firstIndex(of: assetId) {
+    func toggleSelection(for asset: Asset) {
+        if let index = selected.firstIndex(of: asset) {
             selected.remove(at: index)
         } else {
-            selected.append(assetId)
+            if selected.count < assetSelectionLimit {
+                selected.append(asset)
+            }
         }
     }
 }

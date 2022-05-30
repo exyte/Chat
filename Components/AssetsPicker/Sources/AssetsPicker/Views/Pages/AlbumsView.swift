@@ -6,7 +6,8 @@ import SwiftUI
 
 struct AlbumsView: View {
     let albums: [Album]
-    @Binding var selected: [String]
+    @Binding var selected: [Asset]
+    @Binding var isSended: Bool
     
     private var columns: [GridItem] {
         [GridItem(.adaptive(minimum: 100), spacing: 0, alignment: .top)]
@@ -28,10 +29,11 @@ struct AlbumsView: View {
                                 AlbumView(
                                     title: album.title,
                                     assets: album.assets,
-                                    selected: $selected
+                                    selected: $selected,
+                                    isSended: $isSended
                                 )
                             } label: {
-                                AssetPreview(album: album)
+                                AlbumThumbnailView(album: album)
                                     .padding(cellPadding)
                             }
                         }
@@ -42,7 +44,9 @@ struct AlbumsView: View {
             .padding(.horizontal)
         }
         .navigationBarItems(
-            trailing: Button("Send") {}
+            trailing: Button("Send") {
+                isSended = true
+            }
                 .disabled(selected.isEmpty)
         )
     }

@@ -65,22 +65,12 @@ struct InputView: View {
         }
         .background(Color(hex: "EEEEEE"))
         .sheet(isPresented: $isOpenPicker) {
-            AssetPicker(openPicker: $isOpenPicker)
+            AssetPicker(openPicker: $isOpenPicker) { assets in
+                debugPrint(assets)
+            }
+            .countAssetSelection()
+            .assetSelectionLimit(2)
         }
-//        .fullScreenCover(isPresented: $showingImagePicker) {
-//            ImagePicker(
-//                sourceType: selectedImageMode,
-//                image: $selectedImage,
-//                url: $selectedImageUrl
-//            )
-//        }
-//        .onChange(of: selectedImageUrl) { newValue in
-//            if let selectedImageUrl = selectedImageUrl {
-//                message.imagesURLs.append(selectedImageUrl)
-//                self.selectedImageUrl = nil
-//                self.selectedImage = nil
-//            }
-//        }
     }
 }
 
@@ -89,15 +79,14 @@ private extension InputView {
         ZStack {
             Text(message.text)
                 .font(.system(.body))
-                .foregroundColor(.clear)
                 .padding(5)
                 .frameGetter($textSize)
+                .hidden()
             
             VStack {
                 TextEditor(text: $message.text)
-                    .frame(height: textSize.height)
                     .frame(minHeight: 35)
-                    .background(Color.white)
+                    .frame(height: textSize.height)
                     .padding(5)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
@@ -108,28 +97,6 @@ private extension InputView {
             }
         }
     }
-    
-//    func makeImageModePickerButtons() -> [ActionSheet.Button] {
-//        var result: [ActionSheet.Button] = []
-//
-//#if targetEnvironment(simulator)
-//        result.append(.default(Text("Camera [unavailible on simulator]")) {})
-//
-//#else
-//        result.append(.default(Text("Camera")) {
-//            selectedImageMode = .camera
-//            showingImagePicker = true
-//        })
-//#endif
-//        result.append(contentsOf: [
-//            .default(Text("Gallery")) {
-//                selectedImageMode = .photoLibrary
-//                showingImagePicker = true
-//            },
-//            .cancel()
-//        ])
-//        return result
-//    }
 }
 
 struct InputView_Previews: PreviewProvider {
