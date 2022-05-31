@@ -7,7 +7,7 @@ import SwiftUI
 struct ThumbnailPlaceholder: View {
     var body: some View {
         Rectangle()
-            .fill(.gray.opacity(0.6))
+            .fill(.gray.opacity(0.3))
             .aspectRatio(1, contentMode: .fill)
     }
 }

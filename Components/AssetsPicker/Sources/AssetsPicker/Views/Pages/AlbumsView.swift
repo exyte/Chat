@@ -5,9 +5,9 @@
 import SwiftUI
 
 struct AlbumsView: View {
-    let albums: [Album]
-    @Binding var selected: [Asset]
-    @Binding var isSended: Bool
+    let albums: [AlbumModel]
+    @Binding var selected: [MediaModel]
+    @Binding var isSent: Bool
     
     private var columns: [GridItem] {
         [GridItem(.adaptive(minimum: 100), spacing: 0, alignment: .top)]
@@ -28,12 +28,12 @@ struct AlbumsView: View {
                             NavigationLink {
                                 AlbumView(
                                     title: album.title,
-                                    assets: album.assets,
+                                    medias: album.medias,
                                     selected: $selected,
-                                    isSended: $isSended
+                                    isSent: $isSent
                                 )
                             } label: {
-                                AlbumThumbnailView(album: album)
+                                AlbumCell(album: album)
                                     .padding(cellPadding)
                             }
                         }
@@ -45,7 +45,7 @@ struct AlbumsView: View {
         }
         .navigationBarItems(
             trailing: Button("Send") {
-                isSended = true
+                isSent = true
             }
                 .disabled(selected.isEmpty)
         )

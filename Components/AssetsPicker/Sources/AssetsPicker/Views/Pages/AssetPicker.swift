@@ -6,7 +6,9 @@
 //
 
 import SwiftUI
-import UIKit
+#if os(iOS)
+import UIKit.UIImage
+#endif
 
 enum AssetPickerMode: Int, CaseIterable, Identifiable {
     case photos = 1
@@ -26,23 +28,27 @@ enum AssetPickerMode: Int, CaseIterable, Identifiable {
 
 public struct AssetPicker: View {
     // MARK: - Types
-    public typealias SelectClosure = ([Asset]) -> Void
+    public typealias CompletionClosure = ([MediaItem]) -> Void
     
     // MARK: - Initial values
     @Binding public var openPicker: Bool
-    let onSelect: SelectClosure
+    let completion: CompletionClosure
     
     // MARK: - Public immutable values
     
     // MARK: - Private values
     @StateObject var provider = AssetsService()
     @State private var mode: AssetPickerMode = .photos
-    @State private var isSended = false
+    @State private var isSent = false
+#if os(iOS)
+    @State private var showCamera = false
+    @State private var cameraImage: URL?
+#endif
 
     // MARK: - Object life cycle
-    public init(openPicker: Binding<Bool>, onSelect: @escaping SelectClosure) {
+    public init(openPicker: Binding<Bool>, completion: @escaping CompletionClosure) {
         self._openPicker = openPicker
-        self.onSelect = onSelect
+        self.completion = completion
     }
 
     // MARK: - SwiftUI View implementation
@@ -53,17 +59,17 @@ public struct AssetPicker: View {
                 case .photos:
                     AlbumView(
                         onTapCamera: {
-                            debugPrint("Open camera")
+                            showCamera = true
                         },
-                        assets: provider.photos,
-                        selected: $provider.selectedAssets,
-                        isSended: $isSended
+                        medias: provider.photos,
+                        selected: $provider.selectedMedias,
+                        isSent: $isSent
                     )
                 case .albums:
                     AlbumsView(
                         albums: provider.albums,
-                        selected: $provider.selectedAssets,
-                        isSended: $isSended
+                        selected: $provider.selectedMedias,
+                        isSent: $isSent
                     )
                 }
             }
@@ -81,17 +87,35 @@ public struct AssetPicker: View {
                 leading: Button("Cancel") { openPicker = false }
             )
         }
+        
+#if targetEnvironment(simulator)
+        .sheet(isPresented: $showCamera) {
+            CameraStubView(isShow: $showCamera)
+        }
+#elseif os(iOS)
+        .sheet(isPresented: $showCamera) {
+            CameraView(url: $cameraImage, isShown: $showCamera)
+        }
+#endif
         .onAppear {
             Task {
                 await provider.fetchAllPhotos()
                 await provider.fetchAlbums()
             }
         }
-        .onChange(of: isSended) { flag in
+        .onChange(of: isSent) { flag in
             guard flag else { return }
             openPicker = false
-            onSelect(provider.selectedAssets)
+            completion(provider.selectedItems)
         }
+#if os(iOS)
+        .onChange(of: cameraImage) { newValue in
+            guard let url = newValue
+            else { return }
+            openPicker = false
+            completion([MediaItem(source: .url(url))])
+        }
+#endif
     }
 }
 

@@ -5,31 +5,35 @@
 import Foundation
 import Photos
 
-public final class AssetsService: ObservableObject {
-    @Published var photos: [Asset] = []
-    @Published var albums: [Album] = []
-    @Published var selectedAssets: [Asset] = []
+final class AssetsService: ObservableObject {
+    @Published var photos: [MediaModel] = []
+    @Published var albums: [AlbumModel] = []
+    @Published var selectedMedias: [MediaModel] = []
+    
+    var selectedItems: [MediaItem] {
+        selectedMedias.map { MediaItem(source: .media($0)) }
+    }
     
     let skipEmptyAlbums: Bool
 
-    public init(skipEmptyAlbums: Bool = false) {
+    init(skipEmptyAlbums: Bool = false) {
         self.skipEmptyAlbums = skipEmptyAlbums
     }
     
-    public func fetchAllPhotos() async {
+    func fetchAllPhotos() async {
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.sortDescriptors = [
             NSSortDescriptor(key: "creationDate", ascending: false)
         ]
         let allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
-        let assets = await AssetUtils.assets(from: allPhotos)
+        let assets = await AssetUtils.medias(from: allPhotos)
         
         DispatchQueue.main.async { [assets] in
             self.photos = assets
         }
     }
     
-    public func fetchAlbums() async {
+    func fetchAlbums() async {
         var albums = await getSmartAlmubs()
         albums += await getUserAlmubs()
         DispatchQueue.main.async { [albums] in
@@ -40,7 +44,7 @@ public final class AssetsService: ObservableObject {
 
 // MARK: - Support methods
 private extension AssetsService {
-    func getSmartAlmubs() async -> [Album] {
+    func getSmartAlmubs() async -> [AlbumModel] {
         let smartAlbums = PHAssetCollection.fetchAssetCollections(
             with: .smartAlbum,
             subtype: .albumRegular,
@@ -49,7 +53,7 @@ private extension AssetsService {
         return await AssetUtils.albums(from: smartAlbums)
     }
     
-    func getUserAlmubs() async -> [Album] {
+    func getUserAlmubs() async -> [AlbumModel] {
         let userCollections = PHAssetCollection.fetchAssetCollections(
             with: .album,
             subtype: .albumRegular,

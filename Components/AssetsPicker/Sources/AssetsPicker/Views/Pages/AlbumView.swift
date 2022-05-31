@@ -7,22 +7,22 @@ import SwiftUI
 struct AlbumView: View {
     let title: String?
     let onTapCamera: (() -> Void)?
-    let assets: [Asset]
-    @Binding var selected: [Asset]
-    @Binding var isSended: Bool
+    let medias: [MediaModel]
+    @Binding var selected: [MediaModel]
+    @Binding var isSent: Bool
     
     @Environment(\.assetSelectionLimit) private var assetSelectionLimit
     
     init(title: String? = nil,
          onTapCamera: (() -> Void)? = nil,
-         assets: [Asset],
-         selected: Binding<[Asset]>,
-         isSended: Binding<Bool>) {
+         medias: [MediaModel],
+         selected: Binding<[MediaModel]>,
+         isSent: Binding<Bool>) {
         self.title = title
         self.onTapCamera = onTapCamera
-        self.assets = assets
+        self.medias = medias
         self._selected = selected
-        self._isSended = isSended
+        self._isSent = isSent
     }
     
     var body: some View {
@@ -43,7 +43,7 @@ private extension AlbumView {
     var content: some View {
         ScrollView {
             VStack {
-                if assets.isEmpty {
+                if medias.isEmpty {
                     ProgressView()
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
@@ -60,12 +60,12 @@ private extension AlbumView {
                             }
                         }
                         
-                        ForEach(assets) { asset in
-                            let index = selected.firstIndex(of: asset)
+                        ForEach(medias) { media in
+                            let index = selected.firstIndex(of: media)
                             SelectableView(selected: index) {
-                                toggleSelection(for: asset)
+                                toggleSelection(for: media)
                             } content: {
-                                AssetThumbnailView(asset: asset)
+                                MediaCell(media: media)
                             }
                             .padding(2)
                             .disabled(selected.count >= assetSelectionLimit && index == nil)
@@ -79,13 +79,13 @@ private extension AlbumView {
         }
         .navigationBarItems(
             trailing: Button("Send") {
-                isSended = true
+                isSent = true
             }
                 .disabled(selected.isEmpty)
         )
     }
     
-    func toggleSelection(for asset: Asset) {
+    func toggleSelection(for asset: MediaModel) {
         if let index = selected.firstIndex(of: asset) {
             selected.remove(at: index)
         } else {

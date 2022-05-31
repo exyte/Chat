@@ -65,8 +65,19 @@ struct InputView: View {
         }
         .background(Color(hex: "EEEEEE"))
         .sheet(isPresented: $isOpenPicker) {
-            AssetPicker(openPicker: $isOpenPicker) { assets in
-                debugPrint(assets)
+            AssetPicker(openPicker: $isOpenPicker) { items in
+                debugPrint(items)
+                Task {
+                    var urls: [URL] = []
+                    for item in items {
+                        let url = await item.getUrl()
+                        if let url = url {
+                            urls.append(url)
+                        }
+                    }
+                    // FIXME: Separate images/videos or create identifier for media type
+                    self.message.imagesURLs = urls
+                }
             }
             .countAssetSelection()
             .assetSelectionLimit(2)
