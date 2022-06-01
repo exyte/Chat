@@ -55,10 +55,16 @@ struct ImagePicker: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        func imagePickerController(_ picker: UIImagePickerController,
+                                   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            defer {
+                picker.dismiss(animated: true, completion: nil)
+            }
 
             // Check for the media type
-            let mediaType = info[UIImagePickerController.InfoKey.mediaType] as! String
+            guard let mediaType = info[UIImagePickerController.InfoKey.mediaType] as? String
+            else { return }
+            
             switch mediaType {
             case UTType.image.identifier:
                 // Handle image selection result
@@ -78,13 +84,13 @@ struct ImagePicker: UIViewControllerRepresentable {
             case UTType.video.identifier:
                 // Handle video selection result
                 print("Selected media is video")
-                let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as! URL
-
+                guard let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as? URL
+                else { return }
+                // FIXME: Use video url
+                debugPrint(videoUrl)
             default:
                 print("Mismatched type: \(mediaType)")
             }
-
-            picker.dismiss(animated: true, completion: nil)
         }
     }
 }
@@ -108,7 +114,7 @@ class FooDemoImagePickerViewController: UIViewController {
         pickerController.allowsEditing = true
 
         // Part 5: For callback of user selection / cancellation
-        //pickerController.delegate = self
+//        pickerController.delegate = self
 
         // Part 6: Present the UIImagePickerViewController
         present(pickerController, animated: true, completion: nil)

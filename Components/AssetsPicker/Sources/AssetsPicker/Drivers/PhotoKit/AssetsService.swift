@@ -10,8 +10,8 @@ final class AssetsService: ObservableObject {
     @Published var albums: [AlbumModel] = []
     @Published var selectedMedias: [MediaModel] = []
     
-    var selectedItems: [MediaItem] {
-        selectedMedias.map { MediaItem(source: .media($0)) }
+    var pickedMedias: [Media] {
+        selectedMedias.map { Media(source: .media($0)) }
     }
     
     let skipEmptyAlbums: Bool
@@ -34,8 +34,8 @@ final class AssetsService: ObservableObject {
     }
     
     func fetchAlbums() async {
-        var albums = await getSmartAlmubs()
-        albums += await getUserAlmubs()
+        var albums = await getSmartAlbums()
+        albums += await getUserAlbums()
         DispatchQueue.main.async { [albums] in
             self.albums = albums
         }
@@ -44,7 +44,7 @@ final class AssetsService: ObservableObject {
 
 // MARK: - Support methods
 private extension AssetsService {
-    func getSmartAlmubs() async -> [AlbumModel] {
+    func getSmartAlbums() async -> [AlbumModel] {
         let smartAlbums = PHAssetCollection.fetchAssetCollections(
             with: .smartAlbum,
             subtype: .albumRegular,
@@ -53,7 +53,7 @@ private extension AssetsService {
         return await AssetUtils.albums(from: smartAlbums)
     }
     
-    func getUserAlmubs() async -> [AlbumModel] {
+    func getUserAlbums() async -> [AlbumModel] {
         let userCollections = PHAssetCollection.fetchAssetCollections(
             with: .album,
             subtype: .albumRegular,

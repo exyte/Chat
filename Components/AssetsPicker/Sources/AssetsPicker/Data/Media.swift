@@ -4,40 +4,40 @@
 
 import Foundation
 
-public struct MediaItem {
+public struct Media {
     internal let source: Source
 }
 
 // MARK: - Public methods for get data from MediaItem
-public extension MediaItem {
-    func getData(complition: @escaping (Data?) -> Void) {
+public extension Media {
+    func getData(completion: @escaping (Data?) -> Void) {
         switch source {
         case .media(let media):
             AssetUtils.data(from: media.source) { data in
-                complition(data)
+                completion(data)
             }
         case .url(let url):
             do {
                 let data = try Data(contentsOf: url)
-                complition(data)
+                completion(data)
             } catch {
-                complition(nil)
+                completion(nil)
             }
         }
     }
     
-    func getUrl(complition: @escaping (URL?) -> Void) {
+    func getUrl(completion: @escaping (URL?) -> Void) {
         switch source {
         case .url(let url):
-            complition(url)
+            completion(url)
         case .media(let media):
-            media.source.getURL(completion: complition)
+            media.source.getURL(completion: completion)
         }
     }
 }
 
 // MARK: - Async -//-
-public extension MediaItem {
+public extension Media {
     func getData() async -> Data? {
         return await withCheckedContinuation { continuation in
             getData { data in
@@ -55,7 +55,7 @@ public extension MediaItem {
     }
 }
 
-extension MediaItem {
+extension Media {
     enum Source {
         case media(MediaModel)
         case url(URL)

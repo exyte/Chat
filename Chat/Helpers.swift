@@ -23,13 +23,12 @@ extension Color {
         default:
             (a, r, g, b) = (1, 1, 1, 0)
         }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue:  Double(b) / 255,
-            opacity: Double(a) / 255
+        
+        self.init(.sRGB,
+                  red: Double(r) / 255,
+                  green: Double(g) / 255,
+                  blue: Double(b) / 255,
+                  opacity: Double(a) / 255
         )
     }
 }

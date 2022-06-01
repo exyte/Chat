@@ -41,12 +41,3 @@ private extension AlbumCell {
     }
 }
 #endif
-
-//#if os(<#OS#>)
-//private extension AlbumCell {
-//    @ViewBuilder
-//    var thumbnail: some View {
-//        // FIXME: Create implementation for OS
-//    }
-//}
-//#endif

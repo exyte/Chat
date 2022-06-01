@@ -10,7 +10,7 @@ import Introspect
 
 struct ChatView: View {
     var messages: [Message]
-    var didSendMessage: (Message)->()
+    var didSendMessage: (Message) -> Void
     
     @State private var scrollView: UIScrollView?
 

@@ -28,7 +28,7 @@ enum AssetPickerMode: Int, CaseIterable, Identifiable {
 
 public struct AssetPicker: View {
     // MARK: - Types
-    public typealias CompletionClosure = ([MediaItem]) -> Void
+    public typealias CompletionClosure = ([Media]) -> Void
     
     // MARK: - Initial values
     @Binding public var openPicker: Bool
@@ -106,14 +106,14 @@ public struct AssetPicker: View {
         .onChange(of: isSent) { flag in
             guard flag else { return }
             openPicker = false
-            completion(provider.selectedItems)
+            completion(provider.pickedMedias)
         }
 #if os(iOS)
         .onChange(of: cameraImage) { newValue in
             guard let url = newValue
             else { return }
             openPicker = false
-            completion([MediaItem(source: .url(url))])
+            completion([Media(source: .url(url))])
         }
 #endif
     }
@@ -133,7 +133,7 @@ struct AssetPicker_Previews: PreviewProvider {
                 .tabItem {
                     HStack {
                         Image(systemName: "folder")
-                        Text("Almubs")
+                        Text("Albums")
                     }
                 }
         }

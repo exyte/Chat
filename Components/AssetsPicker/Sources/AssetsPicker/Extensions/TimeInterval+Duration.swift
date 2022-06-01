@@ -8,7 +8,7 @@
 import Foundation
 
 extension TimeInterval {
-    func readableDuration(locale: Locale = .current) -> String? {
+    func formatted(locale: Locale = .current) -> String? {
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = .abbreviated
         formatter.zeroFormattingBehavior = .dropAll

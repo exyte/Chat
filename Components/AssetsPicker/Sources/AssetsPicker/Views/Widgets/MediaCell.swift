@@ -24,7 +24,7 @@ struct MediaCell: View {
                 // FIXME: Create preview for image/video for other platforms
 #endif
             }
-            if let duration = media.source.readableDuration {
+            if let duration = media.source.formattedDuration {
                 VStack {
                     Spacer()
                     Rectangle()

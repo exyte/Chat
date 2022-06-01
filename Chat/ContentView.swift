@@ -37,39 +37,3 @@ struct ContentView: View {
         }
     }
 }
-
-//struct MessageListView: View {
-//    var messages = (1...100).map { "Message number: \($0)" }
-//
-//    var body: some View {
-//        ScrollView {
-//            LazyVStack {
-//                ForEach(messages, id:\.self) { message in
-//                    Text(message)
-//                    AsyncImage(url: URL(string: "https://placeimg.com/640/480/sepia")!)
-//                    Divider()
-//                }
-//            }
-//        }
-//    }
-//}
-//struct ContentView: View {
-//    @State var search: String = ""
-//
-//    var body: some View {
-//        ScrollViewReader { scrollView in
-//            VStack {
-//                MessageListView()
-//                Divider()
-//                HStack {
-//                    TextField("Number to search", text: $search)
-//                    Button("Go") {
-//                        withAnimation {
-//                            scrollView.scrollTo("Message number: \(search)")
-//                        }
-//                    }
-//                }.padding(.horizontal, 16)
-//            }
-//        }
-//    }
-//}

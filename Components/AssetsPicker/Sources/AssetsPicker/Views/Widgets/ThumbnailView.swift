@@ -23,10 +23,8 @@ struct ThumbnailView: View {
 private extension ThumbnailView {
     func fetchPreview(size: CGSize) {
         if image == nil {
-            // FIXME: Use Task { ... } with async method crash application:
-            // Error about "you try make second call `continuation`"
-            AssetUtils.image(from: asset, size: size) { image in
-                self.image = image
+            Task {
+                self.image = await AssetUtils.image(from: asset, size: size)
             }
         }
     }
@@ -54,22 +52,3 @@ private extension ThumbnailView {
     }
 }
 #endif
-
-/* FIXME: Uncomment this section and write support for other platforms
-// MARK: - <#OS#> thumbnail
-#if os(<#OS#>)
-private extension ThumbnailView {
-    func fetchPreview() {
-        
-    }
-    
-    @ViewBuilder
-    var content: some View {
-        if <#havePreview#> {
-        } else {
-            ThumbnailPlaceholder()
-        }
-    }
-}
-#endif
-*/

@@ -27,8 +27,7 @@ struct AlbumView: View {
     
     var body: some View {
         if let title = title {
-            content
-                .navigationTitle(title)
+            content.navigationTitle(title)
         } else {
             content
         }
@@ -47,16 +46,15 @@ private extension AlbumView {
                     ProgressView()
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
-                        if let onTapCamera  = onTapCamera {
+                        if let onTapCamera = onTapCamera {
                             Button {
                                 onTapCamera()
                             } label: {
-                                Rectangle()
-                                    .fill(.black)
-                                    .aspectRatio(1.0, contentMode: .fit)
-                                    .overlay(
-                                        Image(systemName: "camera")
-                                            .foregroundColor(.white))
+                                Rectangle().fill(.black)
+                                           .aspectRatio(1.0, contentMode: .fit)
+                                           .overlay(
+                                               Image(systemName: "camera")
+                                               .foregroundColor(.white))
                             }
                         }
                         

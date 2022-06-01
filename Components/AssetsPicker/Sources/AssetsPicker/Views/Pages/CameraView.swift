@@ -36,7 +36,7 @@ private class CameraCoordinator: NSObject, CameraCoordinatorProtocol {
     }
     
     func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         defer {
             isShown = false
         }
@@ -49,8 +49,8 @@ private class CameraCoordinator: NSObject, CameraCoordinatorProtocol {
             do {
                 try data.write(to: fileUrl)
                 self.url = fileUrl
-            } catch let catched {
-                debugPrint(catched)
+            } catch let exception {
+                debugPrint(exception)
             }
         }
     }

@@ -10,7 +10,7 @@ final class TimeIntervalTests: XCTestCase {
     
     func testReadableFewSeconds() throws {
         let interval = TimeInterval(seconds: 3)
-        let readable = interval.readableDuration(locale: testLocale)
+        let readable = interval.formatted(locale: testLocale)
         
         XCTAssertNotNil(readable)
         XCTAssertEqual(readable, "3s")
@@ -18,7 +18,7 @@ final class TimeIntervalTests: XCTestCase {
     
     func testReadableHalfMinute() throws {
         let interval = TimeInterval(seconds: 30)
-        let readable = interval.readableDuration(locale: testLocale)
+        let readable = interval.formatted(locale: testLocale)
         
         XCTAssertNotNil(readable)
         XCTAssertEqual(readable, "30s")
@@ -26,7 +26,7 @@ final class TimeIntervalTests: XCTestCase {
     
     func testReadableFewMinutes() throws {
         let interval = TimeInterval(minutes: 8, seconds: 44)
-        let readable = interval.readableDuration(locale: testLocale)
+        let readable = interval.formatted(locale: testLocale)
         
         XCTAssertNotNil(readable)
         XCTAssertEqual(readable, "8m 44s")
@@ -34,7 +34,7 @@ final class TimeIntervalTests: XCTestCase {
     
     func testReadableFewHoursRoundHalfMinuteWithoutOneToDown() throws {
         let interval = TimeInterval(hours: 3, minutes: 44, seconds: 29)
-        let readable = interval.readableDuration(locale: testLocale)
+        let readable = interval.formatted(locale: testLocale)
         
         XCTAssertNotNil(readable)
         XCTAssertEqual(readable, "3h 44m")
@@ -42,7 +42,7 @@ final class TimeIntervalTests: XCTestCase {
     
     func testReadableFewHoursRoundHalfMinuteToUp() throws {
         let interval = TimeInterval(hours: 3, minutes: 44, seconds: 30)
-        let readable = interval.readableDuration(locale: testLocale)
+        let readable = interval.formatted(locale: testLocale)
         
         XCTAssertNotNil(readable)
         XCTAssertEqual(readable, "3h 45m")

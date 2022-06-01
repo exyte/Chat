@@ -12,12 +12,12 @@ extension PHAsset {
     func getURL(completion: @escaping (URL?) -> Void) {
         if mediaType == .image {
             let options = PHContentEditingInputRequestOptions()
-            options.canHandleAdjustmentData = { (adjustmeta: PHAdjustmentData) -> Bool in
+            options.canHandleAdjustmentData = { _ -> Bool in
                 return true
             }
             requestContentEditingInput(
                 with: options,
-                completionHandler: { (contentEditingInput, info) in
+                completionHandler: { (contentEditingInput, _) in
                     completion(contentEditingInput?.fullSizeImageURL)
                 }
             )
@@ -28,7 +28,7 @@ extension PHAsset {
                 .requestAVAsset(
                     forVideo: self,
                     options: options,
-                    resultHandler: { (asset, audioMix, info) in
+                    resultHandler: { (asset, _, _) in
                         if let urlAsset = asset as? AVURLAsset {
                             completion(urlAsset.url)
                         } else {
@@ -39,11 +39,11 @@ extension PHAsset {
         }
     }
     
-    var readableDuration: String? {
+    var formattedDuration: String? {
         guard mediaType == .video || mediaType == .audio else {
             return nil
         }
-        return duration.readableDuration()
+        return duration.formatted()
     }
 }
 

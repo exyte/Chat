@@ -59,7 +59,7 @@ extension AssetUtils {
         PHImageManager.default().requestImageDataAndOrientation(
             for: asset,
             options: nil,
-            resultHandler: { data, string, orientation, dict in
+            resultHandler: { data, _, _, _ in
                 completion(data)
             }
         )
@@ -68,14 +68,17 @@ extension AssetUtils {
 #if os(iOS)
     static func image(from asset: PHAsset?, size: CGSize = CGSize(width: 100, height: 100), completion: @escaping (UIImage?) -> Void) {
         guard let asset = asset else {
-            return completion(nil)
+            completion(nil)
+            return
         }
+        let options = PHImageRequestOptions()
+        options.isSynchronous = true
         PHImageManager.default().requestImage(
             for: asset,
             targetSize: size,
             contentMode: .aspectFill,
-            options: nil,
-            resultHandler: { image, dict in
+            options: options,
+            resultHandler: { image, _ in
                 completion(image)
             }
         )
