@@ -10,12 +10,9 @@ struct AssetsLibraryActionView: View {
     @State private var showSheet = false
     
     var body: some View {
-        HStack {
-            Spacer()
-            content
-                .padding()
-            Spacer()
-        }
+        content
+        .frame(maxWidth: .infinity)
+        .padding()
         .foregroundColor(.white)
         .background(Color.red.opacity(0.6))
         .cornerRadius(5)

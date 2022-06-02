@@ -8,7 +8,8 @@ struct AlbumsView: View {
     let albums: [AlbumModel]
     @Binding var selected: [MediaModel]
     @Binding var isSent: Bool
-    @Binding var action: AssetsLibraryAction?
+    var assetsAction: AssetsLibraryAction?
+    var cameraAction: CameraAction?
     
     private var columns: [GridItem] {
         [GridItem(.adaptive(minimum: 100), spacing: 0, alignment: .top)]
@@ -21,8 +22,8 @@ struct AlbumsView: View {
     var body: some View {
         ScrollView {
             VStack {
-                if let action = action {
-                    AssetsLibraryActionView(action: action)
+                if let assetsAction = assetsAction {
+                    AssetsLibraryActionView(action: assetsAction)
                 }
                 if albums.isEmpty {
                     ProgressView()
@@ -36,8 +37,8 @@ struct AlbumsView: View {
                                     medias: album.medias,
                                     selected: $selected,
                                     isSent: $isSent,
-                                    action: $action
-                                )
+                                    assetsAction: assetsAction,
+                                    cameraAction: cameraAction)
                             } label: {
                                 AlbumCell(album: album)
                                     .padding(cellPadding)

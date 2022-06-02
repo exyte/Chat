@@ -22,7 +22,6 @@ final class AssetsService: NSObject, ObservableObject {
     @Published var albums: [AlbumModel] = []
     @Published var selectedMedias: [MediaModel] = []
     @Published var action: AssetsLibraryAction? = nil
-    // FIXME: Create values for authorization status
     
     // MARK: Calculated property
     var pickedMedias: [Media] {

@@ -37,7 +37,9 @@ public struct AssetPicker: View {
     // MARK: - Public immutable values
     
     // MARK: - Private values
-    @StateObject var provider = AssetsService()
+    @StateObject var assetsService = AssetsService()
+    @StateObject var cameraService = CameraService()
+
     @State private var mode: AssetPickerMode = .photos
     @State private var isSent = false
 #if os(iOS)
@@ -62,17 +64,19 @@ public struct AssetPicker: View {
                         onTapCamera: {
                             showCamera = true
                         },
-                        medias: provider.photos,
-                        selected: $provider.selectedMedias,
+                        medias: assetsService.photos,
+                        selected: $assetsService.selectedMedias,
                         isSent: $isSent,
-                        action: $provider.action
+                        assetsAction: assetsService.action,
+                        cameraAction: cameraService.action
                     )
                 case .albums:
                     AlbumsView(
-                        albums: provider.albums,
-                        selected: $provider.selectedMedias,
+                        albums: assetsService.albums,
+                        selected: $assetsService.selectedMedias,
                         isSent: $isSent,
-                        action: $provider.action
+                        assetsAction: assetsService.action,
+                        cameraAction: cameraService.action
                     )
                 }
             }
@@ -104,7 +108,7 @@ public struct AssetPicker: View {
         .onChange(of: isSent) { flag in
             guard flag else { return }
             openPicker = false
-            completion(provider.pickedMedias)
+            completion(assetsService.pickedMedias)
         }
 #if os(iOS)
         .onChange(of: cameraImage) { newValue in

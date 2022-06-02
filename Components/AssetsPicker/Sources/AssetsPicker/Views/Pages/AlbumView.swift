@@ -10,21 +10,10 @@ struct AlbumView: View {
     let medias: [MediaModel]
     @Binding var selected: [MediaModel]
     @Binding var isSent: Bool
-    @Binding var action: AssetsLibraryAction?
-    
+    var assetsAction: AssetsLibraryAction?
+    var cameraAction: CameraAction?
+
     @Environment(\.assetSelectionLimit) private var assetSelectionLimit
-    
-//    init(title: String? = nil,
-//         onTapCamera: (() -> Void)? = nil,
-//         medias: [MediaModel],
-//         selected: Binding<[MediaModel]>,
-//         isSent: Binding<Bool>) {
-//        self.title = title
-//        self.onTapCamera = onTapCamera
-//        self.medias = medias
-//        self._selected = selected
-//        self._isSent = isSent
-//    }
     
     var body: some View {
         if let title = title {
@@ -43,14 +32,32 @@ private extension AlbumView {
     var content: some View {
         ScrollView {
             VStack {
-                if let action = action {
-                    AssetsLibraryActionView(action: action)
+                if let assetsAction = assetsAction {
+                    AssetsLibraryActionView(action: assetsAction)
+                }
+                
+                if cameraAction != nil {
+                    Button {
+                        guard let url = URL(string: UIApplication.openSettingsURLString)
+                        else { return }
+                        if UIApplication.shared.canOpenURL(url) {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        Text("Need camera permission")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.red.opacity(0.6))
+                    .cornerRadius(5)
+                    .padding(.horizontal, 20)
                 }
                 if medias.isEmpty {
                     ProgressView()
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
-                        if let onTapCamera = onTapCamera {
+                        if cameraAction == nil, let onTapCamera = onTapCamera {
                             Button {
                                 onTapCamera()
                             } label: {
