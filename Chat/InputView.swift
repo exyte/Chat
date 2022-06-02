@@ -12,6 +12,7 @@ struct InputView: View {
     var didSendMessage: (Message) -> Void
     
     @State private var message: Message = Message(id: 0)
+    @State private var mediasForSend: [Media]?
     
     @State private var textSize: CGRect = .zero
     @State private var isOpenPicker = false
@@ -21,32 +22,10 @@ struct InputView: View {
     
     var body: some View {
         VStack {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(message.imagesURLs, id: \.self) { url in
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxHeight: 70)
-                        } placeholder: {
-                            Text("Loading")
-                        }
-                        .frame(maxHeight: 70)
-                        .padding()
-                        .overlay(alignment: .topTrailing) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                                .padding(4.0)
-                                .background(.gray.opacity(0.6))
-                                .onTapGesture {
-                                    message.imagesURLs.removeAll { $0 == url }
-                                }
-                        }
-                    }
-                }
+            if let mediasForSend = mediasForSend {
+                MediaSendPreview(medias: mediasForSend)
             }
-            
+
             HStack {
                 Button {
                     isOpenPicker = true
@@ -65,19 +44,9 @@ struct InputView: View {
         }
         .background(Color(hex: "EEEEEE"))
         .sheet(isPresented: $isOpenPicker) {
-            AssetPicker(openPicker: $isOpenPicker) { items in
-                debugPrint(items)
-                Task {
-                    var urls: [URL] = []
-                    for item in items {
-                        let url = await item.getUrl()
-                        if let url = url {
-                            urls.append(url)
-                        }
-                    }
-                    // FIXME: Separate images/videos or create identifier for media type
-                    self.message.imagesURLs = urls
-                }
+            AssetPicker(openPicker: $isOpenPicker) { medias in
+                // FIXME: AssetPicker sholdn't return empty array
+                mediasForSend = medias.isEmpty ? nil : medias
             }
             .countAssetSelection()
             .assetSelectionLimit(2)
@@ -106,6 +75,30 @@ private extension InputView {
                     )
                     .padding(8)
             }
+        }
+    }
+    
+    func mapMediasToMessage() {
+        guard let medias = mediasForSend
+        else { return }
+        
+        Task { [medias] in
+            var images: [URL] = []
+            var videos: [URL] = []
+
+            for item in medias {
+                let url = await item.getUrl()
+                if let url = url {
+                    switch item.type {
+                    case .image:
+                        images.append(url)
+                    case .video:
+                        videos.append(url)
+                    }
+                }
+            }
+            self.message.imagesURLs = images
+            self.message.videosURLs = videos
         }
     }
 }

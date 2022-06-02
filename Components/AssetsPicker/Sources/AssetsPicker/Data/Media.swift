@@ -4,8 +4,14 @@
 
 import Foundation
 
+public enum MediaType {
+    case image
+    case video
+}
+
 public struct Media {
     internal let source: Source
+    public let type: MediaType
 }
 
 // MARK: - Public methods for get data from MediaItem
@@ -55,6 +61,19 @@ public extension Media {
     }
 }
 
+// MARK: - Media+Identifiable
+extension Media: Identifiable {
+    public var id: String {
+        switch source {
+        case .url(let url):
+            return url.absoluteString
+        case .media(let media):
+            return media.id
+        }
+    }
+}
+
+// MARK: - Inner types
 extension Media {
     enum Source {
         case media(MediaModel)

@@ -54,22 +54,25 @@ public struct AssetPicker: View {
     // MARK: - SwiftUI View implementation
     public var body: some View {
         NavigationView {
-            Group {
+            VStack {
                 switch mode {
                 case .photos:
                     AlbumView(
+                        title: nil,
                         onTapCamera: {
                             showCamera = true
                         },
                         medias: provider.photos,
                         selected: $provider.selectedMedias,
-                        isSent: $isSent
+                        isSent: $isSent,
+                        action: $provider.action
                     )
                 case .albums:
                     AlbumsView(
                         albums: provider.albums,
                         selected: $provider.selectedMedias,
-                        isSent: $isSent
+                        isSent: $isSent,
+                        action: $provider.action
                     )
                 }
             }
@@ -86,6 +89,7 @@ public struct AssetPicker: View {
             .navigationBarItems(
                 leading: Button("Cancel") { openPicker = false }
             )
+            .navigationBarTitleDisplayMode(.inline)
         }
         
 #if targetEnvironment(simulator)
@@ -97,12 +101,6 @@ public struct AssetPicker: View {
             CameraView(url: $cameraImage, isShown: $showCamera)
         }
 #endif
-        .onAppear {
-            Task {
-                await provider.fetchAllPhotos()
-                await provider.fetchAlbums()
-            }
-        }
         .onChange(of: isSent) { flag in
             guard flag else { return }
             openPicker = false
@@ -113,7 +111,7 @@ public struct AssetPicker: View {
             guard let url = newValue
             else { return }
             openPicker = false
-            completion([Media(source: .url(url))])
+            completion([Media(source: .url(url), type: .image)])
         }
 #endif
     }

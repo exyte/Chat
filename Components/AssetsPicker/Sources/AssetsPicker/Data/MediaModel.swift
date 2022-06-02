@@ -9,6 +9,19 @@ struct MediaModel {
     let source: PHAsset
 }
 
+extension MediaModel {
+    var mediaType: MediaType? {
+        switch source.mediaType {
+        case .image:
+            return .image
+        case .video:
+            return .video
+        default:
+            return nil
+        }
+    }
+}
+
 extension MediaModel: Identifiable {
     var id: String {
         source.localIdentifier

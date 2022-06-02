@@ -10,20 +10,21 @@ struct AlbumView: View {
     let medias: [MediaModel]
     @Binding var selected: [MediaModel]
     @Binding var isSent: Bool
+    @Binding var action: AssetsLibraryAction?
     
     @Environment(\.assetSelectionLimit) private var assetSelectionLimit
     
-    init(title: String? = nil,
-         onTapCamera: (() -> Void)? = nil,
-         medias: [MediaModel],
-         selected: Binding<[MediaModel]>,
-         isSent: Binding<Bool>) {
-        self.title = title
-        self.onTapCamera = onTapCamera
-        self.medias = medias
-        self._selected = selected
-        self._isSent = isSent
-    }
+//    init(title: String? = nil,
+//         onTapCamera: (() -> Void)? = nil,
+//         medias: [MediaModel],
+//         selected: Binding<[MediaModel]>,
+//         isSent: Binding<Bool>) {
+//        self.title = title
+//        self.onTapCamera = onTapCamera
+//        self.medias = medias
+//        self._selected = selected
+//        self._isSent = isSent
+//    }
     
     var body: some View {
         if let title = title {
@@ -42,6 +43,9 @@ private extension AlbumView {
     var content: some View {
         ScrollView {
             VStack {
+                if let action = action {
+                    AssetsLibraryActionView(action: action)
+                }
                 if medias.isEmpty {
                     ProgressView()
                 } else {
