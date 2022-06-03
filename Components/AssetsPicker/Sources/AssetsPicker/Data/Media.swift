@@ -19,9 +19,19 @@ public extension Media {
     func getData(completion: @escaping (Data?) -> Void) {
         switch source {
         case .media(let media):
-            AssetUtils.data(from: media.source) { data in
-                completion(data)
-            }
+            completion(nil)
+            // FIXME: Rewrite this to Combine
+//            var data: Data?
+//            AssetUtils.data(from: media.source)
+//                .sink { result in
+//                    if result == .finished {
+//                        completion(data)
+//                    } else {
+//                        completion(nil)
+//                    }
+//                } receiveValue: { [&data] input in
+//                    data = input
+//                }
         case .url(let url):
             do {
                 let data = try Data(contentsOf: url)

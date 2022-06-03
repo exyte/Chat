@@ -40,8 +40,10 @@ struct AlbumsView: View {
                                     assetsAction: assetsAction,
                                     cameraAction: cameraAction)
                             } label: {
-                                AlbumCell(album: album)
-                                    .padding(cellPadding)
+                                AlbumCell(
+                                    viewModel: AlbumViewModel(album: album)
+                                )
+                                .padding(cellPadding)
                             }
                         }
                     }

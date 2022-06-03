@@ -74,7 +74,9 @@ private extension AlbumView {
                             SelectableView(selected: index) {
                                 toggleSelection(for: media)
                             } content: {
-                                MediaCell(media: media)
+                                MediaCell(
+                                    viewModel: MediaViewModel(media: media)
+                                )
                             }
                             .padding(2)
                             .disabled(selected.count >= assetSelectionLimit && index == nil)

@@ -8,23 +8,15 @@
 import SwiftUI
 
 struct MediaCell: View {
-    let media: MediaModel
-#if os(iOS)
-    @State private var image: UIImage?
-#else
-    // FIXME: Create preview for image/video for other platforms
-#endif
+    @StateObject var viewModel: MediaViewModel
     
     var body: some View {
         ZStack {
             Group {
-#if os(iOS)
-                ThumbnailView(asset: media.source, image: $image)
-#else
-                // FIXME: Create preview for image/video for other platforms
-#endif
+                ThumbnailView(preview: viewModel.preview)
+                    .aspectRatio(1, contentMode: .fill)
             }
-            if let duration = media.source.formattedDuration {
+            if let duration = viewModel.media.source.formattedDuration {
                 VStack {
                     Spacer()
                     Rectangle()
@@ -42,6 +34,9 @@ struct MediaCell: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            viewModel.fetchPreview()
         }
     }
 }

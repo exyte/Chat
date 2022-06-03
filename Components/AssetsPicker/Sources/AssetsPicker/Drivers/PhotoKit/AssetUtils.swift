@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 import Photos
 
 #if os(iOS)
@@ -51,58 +52,57 @@ extension AssetUtils {
 
 // MARK: - Data/UIImage from PHAsset
 extension AssetUtils {
-    static func data(from asset: PHAsset?, completion: @escaping (Data?) -> Void) {
+    static func data(from asset: PHAsset?) -> AnyPublisher<Data?, Never> {
         guard let asset = asset else {
-            completion(nil)
-            return
+            return Just(nil)
+                .eraseToAnyPublisher()
         }
-        PHImageManager.default().requestImageDataAndOrientation(
+        let passthroughSubject = PassthroughSubject<Data?, Never>()
+        
+        let options = PHImageRequestOptions()
+        options.isNetworkAccessAllowed = true
+        
+        PHCachingImageManager.default().requestImageDataAndOrientation(
             for: asset,
-            options: nil,
-            resultHandler: { data, _, _, _ in
-                completion(data)
+            options: options,
+            resultHandler: { [passthroughSubject] data, _, _, info in
+                passthroughSubject.send(data)
+                if info?.keys.contains(PHImageResultIsDegradedKey) == false {
+                    passthroughSubject.send(completion: .finished)
+                }
             }
         )
+        
+        return passthroughSubject
+            .eraseToAnyPublisher()
     }
     
 #if os(iOS)
-    static func image(from asset: PHAsset?, size: CGSize = CGSize(width: 100, height: 100), completion: @escaping (UIImage?) -> Void) {
+    static func image(from asset: PHAsset?, size: CGSize = CGSize(width: 100, height: 100)) -> AnyPublisher<UIImage?, Never> {
         guard let asset = asset else {
-            completion(nil)
-            return
+            return Just(nil)
+                .eraseToAnyPublisher()
         }
+        let passthroughSubject = PassthroughSubject<UIImage?, Never>()
+        
         let options = PHImageRequestOptions()
-        options.isSynchronous = true
-        PHImageManager.default().requestImage(
+        options.isNetworkAccessAllowed = true
+        
+        PHCachingImageManager.default().requestImage(
             for: asset,
             targetSize: size,
             contentMode: .aspectFill,
             options: options,
-            resultHandler: { image, _ in
-                completion(image)
+            resultHandler: { [passthroughSubject] image, info in
+                passthroughSubject.send(image)
+                if info?.keys.contains(PHImageResultIsDegradedKey) == false {
+                    passthroughSubject.send(completion: .finished)
+                }
             }
         )
-    }
-#endif
-}
-
-// MARK: - Async Data/UIImage from PHAsset
-extension AssetUtils {
-    static func data(from asset: PHAsset?) async -> Data? {
-        return await withCheckedContinuation { continuation in
-            data(from: asset) { data in
-                continuation.resume(returning: data)
-            }
-        }
-    }
-    
-#if os(iOS)
-    static func image(from asset: PHAsset?, size: CGSize = CGSize(width: 100, height: 100)) async -> UIImage? {
-        return await withCheckedContinuation { continuation in
-            image(from: asset, size: size) { image in
-                continuation.resume(returning: image)
-            }
-        }
+        
+        return passthroughSubject
+            .eraseToAnyPublisher()
     }
 #endif
 }
