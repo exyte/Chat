@@ -8,6 +8,7 @@ struct AlbumView: View {
     let title: String?
     let onTapCamera: (() -> Void)?
     let medias: [MediaModel]
+    let isLoading: Bool
     @Binding var selected: [MediaModel]
     @Binding var isSent: Bool
     var assetsAction: AssetsLibraryAction?
@@ -53,8 +54,11 @@ private extension AlbumView {
                     .cornerRadius(5)
                     .padding(.horizontal, 20)
                 }
-                if medias.isEmpty {
+                if isLoading {
                     ProgressView()
+                } else if medias.isEmpty {
+                    Text("Empty data")
+                        .font(.title3)
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
                         if cameraAction == nil, let onTapCamera = onTapCamera {

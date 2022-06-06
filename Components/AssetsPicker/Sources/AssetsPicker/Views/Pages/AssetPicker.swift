@@ -65,6 +65,7 @@ public struct AssetPicker: View {
                             showCamera = true
                         },
                         medias: assetsService.photos,
+                        isLoading: assetsService.isLoading,
                         selected: $assetsService.selectedMedias,
                         isSent: $isSent,
                         assetsAction: assetsService.action,
@@ -73,6 +74,7 @@ public struct AssetPicker: View {
                 case .albums:
                     AlbumsView(
                         albums: assetsService.albums,
+                        isLoading: assetsService.isLoading,
                         selected: $assetsService.selectedMedias,
                         isSent: $isSent,
                         assetsAction: assetsService.action,

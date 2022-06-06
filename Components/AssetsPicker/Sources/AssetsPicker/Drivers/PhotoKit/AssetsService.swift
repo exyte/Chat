@@ -12,12 +12,14 @@ enum AssetsLibraryAction {
     case unknown
 }
 
+@MainActor
 final class AssetsService: NSObject, ObservableObject {
     // MARK: - Public values
     // MARK: Injected (on init)
     let skipEmptyAlbums: Bool
 
     // MARK: Published
+    @Published var isLoading = true
     @Published var photos: [MediaModel] = []
     @Published var albums: [AlbumModel] = []
     @Published var selectedMedias: [MediaModel] = []
@@ -49,6 +51,7 @@ final class AssetsService: NSObject, ObservableObject {
         task = Task {
             await fetchAllPhotos()
             await fetchAlbums()
+            isLoading = false
         }
     }
     

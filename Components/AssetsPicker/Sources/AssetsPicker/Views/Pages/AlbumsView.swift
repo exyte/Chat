@@ -6,6 +6,7 @@ import SwiftUI
 
 struct AlbumsView: View {
     let albums: [AlbumModel]
+    let isLoading: Bool
     @Binding var selected: [MediaModel]
     @Binding var isSent: Bool
     var assetsAction: AssetsLibraryAction?
@@ -25,8 +26,11 @@ struct AlbumsView: View {
                 if let assetsAction = assetsAction {
                     AssetsLibraryActionView(action: assetsAction)
                 }
-                if albums.isEmpty {
+                if isLoading {
                     ProgressView()
+                } else if albums.isEmpty {
+                    Text("Empty data")
+                        .font(.title3)
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
                         ForEach(albums) { album in
@@ -35,6 +39,7 @@ struct AlbumsView: View {
                                     title: album.title,
                                     onTapCamera: nil,
                                     medias: album.medias,
+                                    isLoading: isLoading,
                                     selected: $selected,
                                     isSent: $isSent,
                                     assetsAction: assetsAction,
