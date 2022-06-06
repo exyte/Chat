@@ -13,15 +13,29 @@ struct AlbumView: View {
     @Binding var isSent: Bool
     var assetsAction: AssetsLibraryAction?
     var cameraAction: CameraAction?
-
+    
+    @State private var fullscreenItem: MediaModel?
+    @Namespace private var assetNamespace
+    
     @Environment(\.assetSelectionLimit) private var assetSelectionLimit
     
     var body: some View {
-        if let title = title {
-            content.navigationTitle(title)
-        } else {
-            content
-        }
+//        ZStack {
+            if let title = title {
+                content.navigationTitle(title)
+            } else {
+                content
+            }
+            
+//            if let item = fullscreenItem {
+//                FullscreenView(model: item, assetNamespace: assetNamespace)
+//                    .onTapGesture {
+//                        withAnimation {
+//                            fullscreenItem = nil
+//                        }
+//                    }
+//            }
+//        }
     }
 }
 
@@ -30,74 +44,63 @@ private extension AlbumView {
         [GridItem(.adaptive(minimum: 100), spacing: 0)]
     }
     
+    @ViewBuilder
     var content: some View {
-        ScrollView {
-            VStack {
-                if let assetsAction = assetsAction {
-                    AssetsLibraryActionView(action: assetsAction)
-                }
-                
-                if cameraAction != nil {
-                    Button {
-                        guard let url = URL(string: UIApplication.openSettingsURLString)
-                        else { return }
-                        if UIApplication.shared.canOpenURL(url) {
-                            UIApplication.shared.open(url)
-                        }
-                    } label: {
-                        Text("Need camera permission")
+            ScrollView {
+                VStack {
+                    if let action = assetsAction {
+                        PermissionsActionView(action: .library(action))
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(Color.red.opacity(0.6))
-                    .cornerRadius(5)
-                    .padding(.horizontal, 20)
-                }
-                if isLoading {
-                    ProgressView()
-                } else if medias.isEmpty {
-                    Text("Empty data")
-                        .font(.title3)
-                } else {
-                    LazyVGrid(columns: columns, spacing: 0) {
-                        if cameraAction == nil, let onTapCamera = onTapCamera {
-                            Button {
-                                onTapCamera()
-                            } label: {
-                                Rectangle().fill(.black)
-                                           .aspectRatio(1.0, contentMode: .fit)
-                                           .overlay(
-                                               Image(systemName: "camera")
-                                               .foregroundColor(.white))
+                    if onTapCamera != nil, let action = cameraAction {
+                        PermissionsActionView(action: .camera(action))
+                    }
+                    if isLoading {
+                        ProgressView()
+                    } else if medias.isEmpty {
+                        Text("Empty data")
+                            .font(.title3)
+                    } else {
+                        AssetsGrid(medias) {
+                            if cameraAction == nil, let onTapCamera = onTapCamera {
+                                CameraCell(action: onTapCamera)
+                            } else {
+                                EmptyView()
                             }
-                        }
-                        
-                        ForEach(medias) { media in
+                        } content: { media in
                             let index = selected.firstIndex(of: media)
-                            SelectableView(selected: index) {
-                                toggleSelection(for: media)
-                            } content: {
-                                MediaCell(
-                                    viewModel: MediaViewModel(media: media)
-                                )
+                            Button {
+                                withAnimation {
+                                    fullscreenItem = media
+                                }
+                            } label: {
+                                SelectableView(selected: index) {
+                                    toggleSelection(for: media)
+                                } content: {
+                                    MediaCell(viewModel: MediaViewModel(media: media))
+                                }
+                                .disabled(selected.count >= assetSelectionLimit && index == nil)
                             }
                             .padding(2)
-                            .disabled(selected.count >= assetSelectionLimit && index == nil)
                         }
                     }
+                    
+                    Spacer()
                 }
-                
-                Spacer()
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
-        }
-        .navigationBarItems(
-            trailing: Button("Send") {
-                isSent = true
+            .navigationBarItems(
+                trailing: Button("Send") {
+                    isSent = true
+                }
+                    .disabled(selected.isEmpty)
+            )
+            .sheet(item: $fullscreenItem) { item in
+                FullscreenContainer(
+                    medias: medias,
+                    index: medias.firstIndex(of: item) ?? 0,
+                    selected: $selected
+                )
             }
-                .disabled(selected.isEmpty)
-        )
     }
     
     func toggleSelection(for asset: MediaModel) {

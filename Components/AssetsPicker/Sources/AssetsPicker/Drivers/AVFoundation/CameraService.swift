@@ -9,6 +9,7 @@ import Foundation
 import AVFoundation
 
 enum CameraAction {
+    case authorize
     case unavailable
     case unknown
 }
@@ -40,8 +41,10 @@ private extension CameraService {
             AVCaptureDevice.requestAccess(for: .video) { [weak self] _ in
                 self?.checkAuthorizationStatus()
             }
-        case .restricted, .denied:
+        case .restricted:
             action = .unavailable
+        case .denied:
+            action = .authorize
         case .authorized:
             print("All right! Go shot yourself!")
         @unknown default:

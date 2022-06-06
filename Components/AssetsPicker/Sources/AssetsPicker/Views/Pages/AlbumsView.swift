@@ -23,8 +23,8 @@ struct AlbumsView: View {
     var body: some View {
         ScrollView {
             VStack {
-                if let assetsAction = assetsAction {
-                    AssetsLibraryActionView(action: assetsAction)
+                if let action = assetsAction {
+                    PermissionsActionView(action: .library(action))
                 }
                 if isLoading {
                     ProgressView()

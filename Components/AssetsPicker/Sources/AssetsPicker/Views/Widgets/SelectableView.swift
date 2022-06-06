@@ -6,22 +6,23 @@ import SwiftUI
 
 struct SelectableView<Content>: View where Content: View {
     let selected: Int?
-    let onTap: () -> Void
+    let onSelect: () -> Void
     @ViewBuilder let content: () -> Content
     
     @Environment(\.assetSelectionStyle) private var assetSelectionStyle
     
     var body: some View {
-        Button {
-            onTap()
-        } label: {
-            content()
-                .overlay(
+        content()
+            .overlay(
+                Button {
+                    onSelect()
+                }
+                label: {
                     SelectIndicatorView(index: selected)
-                        .padding(2),
-                    alignment: selectionAlignment
-                )
-        }
+                        .padding(2)
+                },
+                alignment: selectionAlignment
+            )
     }
 }
 
