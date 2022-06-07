@@ -1,7 +1,4 @@
 //
-//  File.swift
-//  
-//
 //  Created by Alex.M on 27.05.2022.
 //
 
@@ -36,7 +33,10 @@ struct MediaCell: View {
             }
         }
         .onAppear {
-            viewModel.fetchPreview()
+            viewModel.onStart()
+        }
+        .onDisappear {
+            viewModel.onStop()
         }
     }
 }

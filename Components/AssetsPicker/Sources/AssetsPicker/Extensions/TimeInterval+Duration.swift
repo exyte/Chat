@@ -1,7 +1,4 @@
 //
-//  File.swift
-//  
-//
 //  Created by Alex.M on 31.05.2022.
 //
 

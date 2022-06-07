@@ -2,12 +2,15 @@
 //  Created by Alex.M on 03.06.2022.
 //
 
+import Combine
 #if os(iOS)
 import UIKit.UIImage
 #endif
 
 class MediaViewModel: ObservableObject {
     let media: MediaModel
+    
+    private var subscriptions = Set<AnyCancellable>()
     
     init(media: MediaModel) {
         self.media = media
@@ -19,13 +22,16 @@ class MediaViewModel: ObservableObject {
     // FIXME: Create preview for image/video for other platforms
 #endif
     
-    func fetchPreview() {
-        guard preview == nil
-        else { return }
-        let side = 100.0 * UIScreen.main.scale * 2
-        let size = CGSize(width: side, height: side)
+    func onStart() {
         AssetUtils
-            .image(from: media.source, size: size)
-            .assign(to: &$preview)
+            .image(from: media.source)
+            .sink {
+                self.preview = $0
+            }
+            .store(in: &subscriptions)
+    }
+    
+    func onStop() {
+        subscriptions.cancelAll()
     }
 }

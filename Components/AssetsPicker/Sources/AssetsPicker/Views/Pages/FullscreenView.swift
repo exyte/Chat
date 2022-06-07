@@ -49,11 +49,10 @@ final class FullscreenViewModel: ObservableObject {
     
     @Published var preview: UIImage? = nil
     @Published var player: AVPlayer? = nil
-    var bag = Set<AnyCancellable>()
+    var subsriptions = Set<AnyCancellable>()
     
     init(media: MediaModel) {
         self.media = media
-        onStart()
     }
     
     func onStart() {
@@ -69,15 +68,18 @@ final class FullscreenViewModel: ObservableObject {
         }
     }
     
+    func onStop() {
+        subsriptions.cancelAll()
+    }
+    
     private func fetchImage() {
         let size = CGSize(width: media.source.pixelWidth, height: media.source.pixelHeight)
         AssetUtils
             .image(from: media.source, size: size)
-            .print("AssetUtils.image")
             .sink { [weak self] in
                 self?.preview = $0
             }
-            .store(in: &bag)
+            .store(in: &subsriptions)
     }
     
     private func fetchVideo() async {
@@ -93,15 +95,23 @@ struct FullscreenView: View {
     @StateObject var viewModel: FullscreenViewModel
     
     var body: some View {
-        if let preview = viewModel.preview {
-            Image(uiImage: preview)
-                .resizable()
-                .scaledToFit()
-        } else if let player = viewModel.player {
-            VideoPlayer(player: player)
-                .padding()
-        } else {
-            ProgressView()
+        Group {
+            if let preview = viewModel.preview {
+                Image(uiImage: preview)
+                    .resizable()
+                    .scaledToFit()
+            } else if let player = viewModel.player {
+                VideoPlayer(player: player)
+                    .padding()
+            } else {
+                ProgressView()
+            }
+        }
+        .onAppear {
+            viewModel.onStart()
+        }
+        .onDisappear {
+            viewModel.onStop()
         }
     }
 }

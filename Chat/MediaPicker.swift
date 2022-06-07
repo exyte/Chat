@@ -68,7 +68,6 @@ struct ImagePicker: UIViewControllerRepresentable {
             switch mediaType {
             case UTType.image.identifier:
                 // Handle image selection result
-                print("Selected media is image")
                 if let editedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
                     parent.image = editedImage
                 }
@@ -83,7 +82,6 @@ struct ImagePicker: UIViewControllerRepresentable {
 
             case UTType.video.identifier:
                 // Handle video selection result
-                print("Selected media is video")
                 guard let videoUrl = info[UIImagePickerController.InfoKey.mediaURL] as? URL
                 else { return }
                 // FIXME: Use video url

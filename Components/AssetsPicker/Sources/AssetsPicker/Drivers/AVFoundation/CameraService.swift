@@ -1,7 +1,4 @@
 //
-//  File.swift
-//  
-//
 //  Created by Alex.M on 02.06.2022.
 //
 
@@ -46,7 +43,8 @@ private extension CameraService {
         case .denied:
             action = .authorize
         case .authorized:
-            print("All right! Go shot yourself!")
+            // Do nothing
+            break
         @unknown default:
             action = .unknown
         }

@@ -1,7 +1,4 @@
 //
-//  File.swift
-//  
-//
 //  Created by Alex.M on 30.05.2022.
 //
 
@@ -83,23 +80,30 @@ extension AssetUtils {
             return Just(nil)
                 .eraseToAnyPublisher()
         }
+        let requestSize = CGSize(width: size.width * UIScreen.main.scale, height: size.height * UIScreen.main.scale)
         let passthroughSubject = PassthroughSubject<UIImage?, Never>()
         
-        let options = PHImageRequestOptions()
-        options.isNetworkAccessAllowed = true
-        
-        PHCachingImageManager.default().requestImage(
-            for: asset,
-            targetSize: size,
-            contentMode: .aspectFill,
-            options: options,
-            resultHandler: { [passthroughSubject] image, info in
-                passthroughSubject.send(image)
-                if info?.keys.contains(PHImageResultIsDegradedKey) == false {
-                    passthroughSubject.send(completion: .finished)
+        Task { [passthroughSubject] in
+            let options = PHImageRequestOptions()
+            options.isNetworkAccessAllowed = true
+            options.deliveryMode = .opportunistic
+
+            // TODO: Cancel `requestImage` when returned Publisher is canceled
+            PHCachingImageManager.default().requestImage(
+                for: asset,
+                targetSize: requestSize,
+                contentMode: .aspectFill,
+                options: options,
+                resultHandler: { [passthroughSubject] image, info in
+                    DispatchQueue.main.async { [image, info] in
+                        passthroughSubject.send(image)
+                        if info?.keys.contains(PHImageResultIsDegradedKey) == false {
+                            passthroughSubject.send(completion: .finished)
+                        }
+                    }
                 }
-            }
-        )
+            )
+        }
         
         return passthroughSubject
             .eraseToAnyPublisher()
