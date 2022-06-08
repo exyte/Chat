@@ -17,7 +17,7 @@ struct MediaSendPreview: View {
             HStack {
                 ForEach(medias) { media in
 
-                    // TODO: Uncommect from here
+                    // TODO: Uncomment from here
 //                    AsyncImage(url: url) { image in
 //                        image
 //                            .resizable()

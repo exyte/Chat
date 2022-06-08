@@ -23,8 +23,8 @@ class MediaViewModel: ObservableObject {
 #endif
     
     func onStart() {
-        AssetUtils
-            .image(from: media.source)
+        media.source
+            .image()
             .sink {
                 self.preview = $0
             }

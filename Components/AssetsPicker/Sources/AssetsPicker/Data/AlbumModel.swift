@@ -6,7 +6,7 @@ import Foundation
 import Photos
 
 struct AlbumModel {
-    let medias: [MediaModel]
+    let preview: MediaModel?
     let source: PHAssetCollection
 }
 

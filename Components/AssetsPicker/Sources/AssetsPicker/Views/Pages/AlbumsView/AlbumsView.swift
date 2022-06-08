@@ -3,15 +3,16 @@
 //
 
 import SwiftUI
+import Combine
 
 struct AlbumsView: View {
-    let albums: [AlbumModel]
-    let isLoading: Bool
-    @Binding var selected: [MediaModel]
     @Binding var isSent: Bool
-    var assetsAction: AssetsLibraryAction?
-    var cameraAction: CameraAction?
-    
+    @Binding var isShowCamera: Bool
+    @StateObject var viewModel: AlbumsViewModel
+
+    @EnvironmentObject private var selectionService: SelectionService
+    @EnvironmentObject private var permissionsService: PermissionsService
+
     private var columns: [GridItem] {
         [GridItem(.adaptive(minimum: 100), spacing: 0, alignment: .top)]
     }
@@ -23,30 +24,30 @@ struct AlbumsView: View {
     var body: some View {
         ScrollView {
             VStack {
-                if let action = assetsAction {
+                if let action = permissionsService.photoLibraryAction {
                     PermissionsActionView(action: .library(action))
                 }
-                if isLoading {
+                if viewModel.isLoading {
                     ProgressView()
-                } else if albums.isEmpty {
+                } else if viewModel.albums.isEmpty {
                     Text("Empty data")
                         .font(.title3)
                 } else {
                     LazyVGrid(columns: columns, spacing: 0) {
-                        ForEach(albums) { album in
+                        ForEach(viewModel.albums) { album in
                             NavigationLink {
                                 AlbumView(
-                                    title: album.title,
-                                    onTapCamera: nil,
-                                    medias: album.medias,
-                                    isLoading: isLoading,
-                                    selected: $selected,
                                     isSent: $isSent,
-                                    assetsAction: assetsAction,
-                                    cameraAction: cameraAction)
+                                    isShowCamera: $isShowCamera,
+                                    viewModel: AlbumViewModel(
+                                        mediasProvider: AlbumMediasProvider(
+                                            album: album
+                                        )
+                                    )
+                                )
                             } label: {
                                 AlbumCell(
-                                    viewModel: AlbumViewModel(album: album)
+                                    viewModel: AlbumCellViewModel(album: album)
                                 )
                                 .padding(cellPadding)
                             }
@@ -55,13 +56,18 @@ struct AlbumsView: View {
                 }
                 Spacer()
             }
-            .padding(.horizontal)
         }
         .navigationBarItems(
             trailing: Button("Send") {
                 isSent = true
             }
-                .disabled(selected.isEmpty)
+                .disabled(!selectionService.canSendSelected)
         )
+        .onAppear {
+            viewModel.onStart()
+        }
+        .onDisappear {
+            viewModel.onStop()
+        }
     }
 }

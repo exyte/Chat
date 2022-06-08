@@ -44,8 +44,8 @@ struct InputView: View {
         }
         .background(Color(hex: "EEEEEE"))
         .sheet(isPresented: $isOpenPicker) {
-            AssetPicker(openPicker: $isOpenPicker) { medias in
-                // FIXME: AssetPicker sholdn't return empty array
+            AssetsPicker(openPicker: $isOpenPicker) { medias in
+                // FIXME: AssetPicker shouldn't return empty array
                 mediasForSend = medias.isEmpty ? nil : medias
             }
             .countAssetSelection()

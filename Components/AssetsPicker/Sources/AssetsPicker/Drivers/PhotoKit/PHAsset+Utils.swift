@@ -3,7 +3,13 @@
 //
 
 import Foundation
+import Combine
 import Photos
+
+#if os(iOS)
+import UIKit.UIImage
+import UIKit.UIScreen
+#endif
 
 extension PHAsset {
     func getURL(completion: @escaping (URL?) -> Void) {
@@ -53,3 +59,37 @@ extension PHAsset {
         }
     }
 }
+
+#if os(iOS)
+extension PHAsset {
+    func image(size: CGSize = CGSize(width: 100, height: 100)) -> AnyPublisher<UIImage?, Never> {
+        let requestSize = CGSize(width: size.width * UIScreen.main.scale, height: size.height * UIScreen.main.scale)
+        let passthroughSubject = PassthroughSubject<UIImage?, Never>()
+        
+        Task { [passthroughSubject] in
+            let options = PHImageRequestOptions()
+            options.isNetworkAccessAllowed = true
+            options.deliveryMode = .opportunistic
+
+            // TODO: Cancel `requestImage` when returned Publisher is canceled
+            PHCachingImageManager.default().requestImage(
+                for: self,
+                targetSize: requestSize,
+                contentMode: .aspectFill,
+                options: options,
+                resultHandler: { [passthroughSubject] image, info in
+                    DispatchQueue.main.async { [image, info] in
+                        passthroughSubject.send(image)
+                        if info?.keys.contains(PHImageResultIsDegradedKey) == false {
+                            passthroughSubject.send(completion: .finished)
+                        }
+                    }
+                }
+            )
+        }
+        
+        return passthroughSubject
+            .eraseToAnyPublisher()
+    }
+}
+#endif

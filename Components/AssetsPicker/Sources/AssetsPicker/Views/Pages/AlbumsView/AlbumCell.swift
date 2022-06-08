@@ -5,7 +5,7 @@
 import SwiftUI
 
 struct AlbumCell: View {
-    @StateObject var viewModel: AlbumViewModel
+    @StateObject var viewModel: AlbumCellViewModel
     
     var body: some View {
         VStack {

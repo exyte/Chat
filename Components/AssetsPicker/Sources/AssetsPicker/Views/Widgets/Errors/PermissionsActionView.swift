@@ -13,7 +13,7 @@ struct PermissionsActionView: View {
     var body: some View {
         ZStack {
             if showSheet {
-                LimitedLibraryPicker(isPresented: $showSheet)
+                LimitedLibraryPickerProxyView(isPresented: $showSheet)
                     .frame(width: 1, height: 1)
             }
             
@@ -29,7 +29,7 @@ struct PermissionsActionView: View {
 
 private extension PermissionsActionView {
     @ViewBuilder
-    func buildLibraryAction(_ action: AssetsLibraryAction) -> some View {
+    func buildLibraryAction(_ action: PermissionsService.PhotoLibraryAction) -> some View {
         switch action {
         case .selectMore:
             PermissionsErrorView(text: "Button 'select more assets'") {
@@ -45,7 +45,7 @@ private extension PermissionsActionView {
     }
     
     @ViewBuilder
-    func buildCameraAction(_ action: CameraAction) -> some View {
+    func buildCameraAction(_ action: PermissionsService.CameraAction) -> some View {
         switch action {
         case .authorize:
             goToSettingsButton(text: "Enable camera access in settings")
@@ -72,7 +72,7 @@ private extension PermissionsActionView {
 
 extension PermissionsActionView {
     enum Action {
-        case library(AssetsLibraryAction)
-        case camera(CameraAction)
+        case library(PermissionsService.PhotoLibraryAction)
+        case camera(PermissionsService.CameraAction)
     }
 }

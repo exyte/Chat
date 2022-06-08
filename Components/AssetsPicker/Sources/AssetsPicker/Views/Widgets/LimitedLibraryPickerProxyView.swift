@@ -6,7 +6,7 @@ import SwiftUI
 import UIKit
 import PhotosUI
 
-struct LimitedLibraryPicker: UIViewControllerRepresentable {
+struct LimitedLibraryPickerProxyView: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     
     func makeUIViewController(context: Context) -> UIViewController {

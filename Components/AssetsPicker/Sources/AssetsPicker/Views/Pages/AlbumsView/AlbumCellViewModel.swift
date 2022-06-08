@@ -6,7 +6,7 @@
 import UIKit.UIImage
 #endif
 
-class AlbumViewModel: ObservableObject {
+class AlbumCellViewModel: ObservableObject {
     let album: AlbumModel
     
     init(album: AlbumModel) {
@@ -24,8 +24,8 @@ class AlbumViewModel: ObservableObject {
         else { return }
         let side = 100.0 * UIScreen.main.scale * 2
         let size = CGSize(width: side, height: side)
-        AssetUtils
-            .image(from: album.medias.first?.source, size: size)
+        album.preview?.source
+            .image(size: size)
             .assign(to: &$preview)
     }
 }
