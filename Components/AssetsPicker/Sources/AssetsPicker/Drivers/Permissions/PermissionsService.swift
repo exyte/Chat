@@ -10,20 +10,18 @@ import Photos
 final class PermissionsService: ObservableObject {
     @Published var cameraAction: CameraAction?
     @Published var photoLibraryAction: PhotoLibraryAction?
-    
+
     private var subscriptions = Set<AnyCancellable>()
-    
-    private var changeNotifier = PhotoLibraryChangeNotifier()
-    
+
     init() {
-        changeNotifier.notifier
+        photoLibraryChangePermissionPublisher
             .sink { [weak self] in
                 self?.reload()
             }
             .store(in: &subscriptions)
         reload()
     }
-    
+
     func reload() {
         checkCameraAuthorizationStatus()
         checkPhotoLibraryAuthorizationStatus()
@@ -35,7 +33,7 @@ private extension PermissionsService {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         handle(camera: status)
     }
-    
+
     func handle(camera status: AVAuthorizationStatus) {
         var result: CameraAction?
 #if targetEnvironment(simulator)
@@ -44,7 +42,7 @@ private extension PermissionsService {
         switch status {
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] _ in
-                self?.checkAuthorizationStatus()
+                self?.checkCameraAuthorizationStatus()
             }
         case .restricted:
             result = .unavailable
@@ -61,12 +59,12 @@ private extension PermissionsService {
             self?.cameraAction = result
         }
     }
-    
+
     func checkPhotoLibraryAuthorizationStatus() {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         handle(photoLibrary: status)
     }
-    
+
     func handle(photoLibrary status: PHAuthorizationStatus) {
         var result: PhotoLibraryAction?
         switch status {
@@ -87,7 +85,7 @@ private extension PermissionsService {
         @unknown default:
             result = .unknown
         }
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.photoLibraryAction = result
         }
@@ -100,7 +98,7 @@ extension PermissionsService {
         case unavailable
         case unknown
     }
-    
+
     enum PhotoLibraryAction {
         case selectMore
         case authorize

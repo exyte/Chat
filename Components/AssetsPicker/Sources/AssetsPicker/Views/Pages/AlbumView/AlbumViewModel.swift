@@ -27,7 +27,7 @@ final class AlbumViewModel: ObservableObject {
         self.mediasProvider = mediasProvider
     }
     
-    // MARK: - Public methdos
+    // MARK: - Public methods
     func onStart() {
         mediasProvider.medias
             .assign(to: \.medias, on: self)
@@ -39,9 +39,4 @@ final class AlbumViewModel: ObservableObject {
     func onStop() {
         subscriptions.cancelAll()
     }
-}
-
-// MARK: - Private methods
-private extension AlbumViewModel {
-    
 }

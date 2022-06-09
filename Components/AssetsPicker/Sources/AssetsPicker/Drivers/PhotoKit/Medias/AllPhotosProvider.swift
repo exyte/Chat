@@ -9,23 +9,22 @@ import Photos
 import Combine
 
 final class AllPhotosProvider: MediasProviderProtocol {
+    
     private var subject = CurrentValueSubject<[MediaModel], Never>([])
     private var subscriptions = Set<AnyCancellable>()
-    
-    private var changeNotifier = PhotoLibraryChangeNotifier()
-    
+
     var medias: AnyPublisher<[MediaModel], Never> {
         subject.eraseToAnyPublisher()
     }
-    
+
     init() {
-        changeNotifier.notifier
+        photoLibraryChangePermissionPublisher
             .sink { [weak self] in
                 self?.reload()
             }
             .store(in: &subscriptions)
     }
-    
+
     func reload() {
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.sortDescriptors = [
@@ -33,7 +32,7 @@ final class AllPhotosProvider: MediasProviderProtocol {
         ]
         let allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
         let assets = map(fetchResult: allPhotos)
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.subject.send(assets)
         }

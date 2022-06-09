@@ -38,6 +38,7 @@ struct AlbumsView: View {
                             NavigationLink {
                                 AlbumView(
                                     isSent: $isSent,
+                                    shouldShowCamera: false,
                                     isShowCamera: $isShowCamera,
                                     viewModel: AlbumViewModel(
                                         mediasProvider: AlbumMediasProvider(

@@ -7,18 +7,18 @@ import SwiftUI
 
 extension View {
     func cameraSheet(isShow: Binding<Bool>, image: Binding<URL?>) -> some View {
-        
+
 #if targetEnvironment(simulator)
-        self.sheet(isPresented: isShow) {
+        self.fullScreenCover(isPresented: isShow) {
             CameraStubView(isShow: isShow)
         }
 #elseif os(iOS)
-        self.sheet(isPresented: isShow) {
+        self.fullScreenCover(isPresented: isShow) {
             CameraView(url: image, isShown: isShow)
         }
 #endif
     }
-    
+
     func assetsPickerToolbar(mode: Binding<AssetsPickerMode>) -> some View {
         self.toolbar {
             ToolbarItem(placement: .principal) {
@@ -27,11 +27,11 @@ extension View {
                         Text(mode.name).tag(mode)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                    .pickerStyle(SegmentedPickerStyle())
             }
         }
     }
-    
+
     func assetsPickerNavigationBar(mode: Binding<AssetsPickerMode>, close: @escaping () -> Void) -> some View {
         self
             .assetsPickerToolbar(mode: mode)

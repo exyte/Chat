@@ -13,15 +13,16 @@ import UIKit.UIImage
     Used solution (with adapt for new iOs version): https://medium.com/ios-os-x-development/ios-camera-frames-extraction-d2c0f80ed05a
 */
 class LiveCameraViewModel: NSObject, ObservableObject {
+    
     private let position = AVCaptureDevice.Position.back
     private let quality = AVCaptureSession.Preset.medium
-    
+
     private let sessionQueue = DispatchQueue(label: "LiveCameraQueue")
     private let captureSession = AVCaptureSession()
     private let context = CIContext()
-    
+
     @Published public var capturedImage: UIImage = UIImage()
-    
+
     override init() {
         super.init()
         sessionQueue.async { [unowned self] in
@@ -29,11 +30,11 @@ class LiveCameraViewModel: NSObject, ObservableObject {
             self.captureSession.startRunning()
         }
     }
-    
+
     deinit {
         self.captureSession.stopRunning()
     }
-    
+
     private func configureSession() {
         captureSession.sessionPreset = quality
         guard let captureDevice = selectCaptureDevice() else { return }
@@ -50,7 +51,7 @@ class LiveCameraViewModel: NSObject, ObservableObject {
         connection.videoOrientation = AVCaptureVideoOrientation.portrait
         connection.isVideoMirrored = position == .front
     }
-    
+
     private func selectCaptureDevice() -> AVCaptureDevice? {
         let session = AVCaptureDevice.DiscoverySession(
             deviceTypes: [
@@ -66,7 +67,7 @@ class LiveCameraViewModel: NSObject, ObservableObject {
             position: position)
         return session.devices.first
     }
-    
+
     private func imageFromSampleBuffer(sampleBuffer: CMSampleBuffer) -> UIImage? {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
         let ciImage = CIImage(cvPixelBuffer: imageBuffer)

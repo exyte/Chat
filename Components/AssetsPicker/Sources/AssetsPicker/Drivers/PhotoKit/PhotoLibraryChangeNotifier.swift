@@ -9,23 +9,26 @@ import Foundation
 import Combine
 import Photos
 
-final class PhotoLibraryChangeNotifier: NSObject, PHPhotoLibraryChangeObserver {
-    public var notifier: AnyPublisher<Void, Never> {
-        shared.eraseToAnyPublisher()
-    }
-    private var subject = PassthroughSubject<Void, Never>()
-    private lazy var shared = subject.share()
-    
+let photoLibraryChangePermissionNotification = Notification.Name(rawValue: "PhotoLibraryChangePermissionNotification")
+
+let photoLibraryChangePermissionPublisher = NotificationCenter.default
+    .publisher(for: photoLibraryChangePermissionNotification)
+    .map { _ in }
+    .share()
+
+final class PhotoLibraryChangePermissionWatcher: NSObject, PHPhotoLibraryChangeObserver {
     override init() {
         super.init()
         PHPhotoLibrary.shared().register(self)
     }
-    
+
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
-    
+
     func photoLibraryDidChange(_ changeInstance: PHChange) {
-        subject.send()
+        NotificationCenter.default.post(
+            name: photoLibraryChangePermissionNotification,
+            object: nil)
     }
 }

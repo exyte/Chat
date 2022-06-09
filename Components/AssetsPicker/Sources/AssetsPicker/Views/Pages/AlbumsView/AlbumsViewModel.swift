@@ -21,7 +21,7 @@ final class AlbumsViewModel: ObservableObject {
         self.albumsProvider = albumsProvider
     }
     
-    // MARK: - Public methdos
+    // MARK: - Public methods
     func onStart() {
         isLoading = true
         albumsProvider.albums

@@ -7,26 +7,25 @@ import Combine
 import Photos
 
 final class AlbumMediasProvider: MediasProviderProtocol {
+    
     private var subject = CurrentValueSubject<[MediaModel], Never>([])
     private var subscriptions = Set<AnyCancellable>()
-    
-    private var changeNotifier = PhotoLibraryChangeNotifier()
-    
+
     let album: AlbumModel
-    
+
     var medias: AnyPublisher<[MediaModel], Never> {
         subject.eraseToAnyPublisher()
     }
-    
+
     init(album: AlbumModel) {
         self.album = album
-        changeNotifier.notifier
+        photoLibraryChangePermissionPublisher
             .sink { [weak self] in
                 self?.reload()
             }
             .store(in: &subscriptions)
     }
-    
+
     func reload() {
         let fetchResult = PHAsset.fetchAssets(in: album.source, options: nil)
         if fetchResult.count == 0 {

@@ -6,10 +6,10 @@ import SwiftUI
 
 struct AlbumView: View {
     @Binding var isSent: Bool
+    var shouldShowCamera: Bool
     @Binding var isShowCamera: Bool
     @StateObject var viewModel: AlbumViewModel
-    
-    @State var shouldShowCamera: Bool = false
+
     @State private var fullscreenItem: MediaModel?
     
     @EnvironmentObject private var selectionService: SelectionService
@@ -92,13 +92,5 @@ private extension AlbumView {
         .onDisappear {
             viewModel.onStop()
         }
-    }
-}
-
-extension AlbumView {
-    func showCamera() -> AlbumView {
-        let view = self
-        view.shouldShowCamera = true
-        return view
     }
 }

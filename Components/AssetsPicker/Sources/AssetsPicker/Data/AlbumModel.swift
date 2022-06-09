@@ -14,7 +14,7 @@ extension AlbumModel: Identifiable {
     var id: String {
         source.localIdentifier
     }
-    
+
     var title: String? {
         source.localizedTitle
     }

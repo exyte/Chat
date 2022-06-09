@@ -28,12 +28,12 @@ public struct AssetsPicker: View {
                 case .photos:
                     AlbumView(
                         isSent: $viewModel.isSent,
+                        shouldShowCamera: true,
                         isShowCamera: $viewModel.showCamera,
                         viewModel: AlbumViewModel(
                             mediasProvider: AllPhotosProvider()
                         )
                     )
-                    .showCamera()
                 case .albums:
                     AlbumsView(
                         isSent: $viewModel.isSent,
@@ -48,6 +48,7 @@ public struct AssetsPicker: View {
                 openPicker = false
             }
         }
+        .navigationViewStyle(.stack)
         .environmentObject(selectionService)
         .environmentObject(permissionService)
         .onAppear {

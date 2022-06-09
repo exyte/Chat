@@ -87,7 +87,7 @@ private extension InputView {
             var videos: [URL] = []
 
             for item in medias {
-                let url = await item.getUrl()
+                let url = await item.getUrl().value
                 if let url = url {
                     switch item.type {
                     case .image:

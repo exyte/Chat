@@ -10,6 +10,7 @@ struct MediaModel {
 }
 
 extension MediaModel {
+
     var mediaType: MediaType? {
         switch source.mediaType {
         case .image:
@@ -29,7 +30,7 @@ extension MediaModel: Identifiable {
 }
 
 extension MediaModel: Equatable {
-    static func == (lhs: MediaModel, rhs: MediaModel) -> Bool {
+    static func ==(lhs: MediaModel, rhs: MediaModel) -> Bool {
         lhs.id == rhs.id
     }
 }

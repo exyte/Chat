@@ -11,7 +11,7 @@ extension TimeInterval {
         formatter.zeroFormattingBehavior = .dropAll
         formatter.allowedUnits = [.day, .hour, .minute, .second]
         formatter.maximumUnitCount = 2
-        
+
         formatter.calendar = Calendar.current
         formatter.calendar?.locale = locale
 

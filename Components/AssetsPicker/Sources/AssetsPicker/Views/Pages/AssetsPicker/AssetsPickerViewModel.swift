@@ -15,6 +15,8 @@ final class AssetsPickerViewModel: ObservableObject {
     @Published var showCamera = false
     @Published var cameraImage: URL?
 #endif
+
+    private let watcher = PhotoLibraryChangePermissionWatcher()
     
     // MARK: Calculated property
 

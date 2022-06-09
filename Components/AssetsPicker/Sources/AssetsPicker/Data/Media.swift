@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Combine
 
 public enum MediaType {
     case image
@@ -16,56 +17,35 @@ public struct Media {
 
 // MARK: - Public methods for get data from MediaItem
 public extension Media {
-    func getData(completion: @escaping (Data?) -> Void) {
-        switch source {
-        case .media(let media):
-            completion(nil)
-            // FIXME: Rewrite this to Combine
-//            var data: Data?
-//            AssetUtils.data(from: media.source)
-//                .sink { result in
-//                    if result == .finished {
-//                        completion(data)
-//                    } else {
-//                        completion(nil)
-//                    }
-//                } receiveValue: { [&data] input in
-//                    data = input
-//                }
-        case .url(let url):
-            do {
-                let data = try Data(contentsOf: url)
-                completion(data)
-            } catch {
-                completion(nil)
-            }
-        }
-    }
-    
-    func getUrl(completion: @escaping (URL?) -> Void) {
-        switch source {
-        case .url(let url):
-            completion(url)
-        case .media(let media):
-            media.source.getURL(completion: completion)
-        }
-    }
-}
 
-// MARK: - Async -//-
-public extension Media {
-    func getData() async -> Data? {
-        return await withCheckedContinuation { continuation in
-            getData { data in
-                continuation.resume(returning: data)
+    func getData() -> Future<Data?, Never> {
+        return Future { promise in
+            switch source {
+            case .media(let media):
+                Task {
+                    let data = await media.source.data()
+                    promise(.success(data))
+                }
+            case .url(let url):
+                do {
+                    let data = try Data(contentsOf: url)
+                    promise(.success(data))
+                } catch {
+                    promise(.success(nil))
+                }
             }
         }
     }
-    
-    func getUrl() async -> URL? {
-        return await withCheckedContinuation { continuation in
-            getUrl { url in
-                continuation.resume(returning: url)
+
+    func getUrl() -> Future<URL?, Never> {
+        return Future { promise in
+            switch source {
+            case .url(let url):
+                promise(.success(url))
+            case .media(let media):
+                media.source.getURL { url in
+                    promise(.success(url))
+                }
             }
         }
     }
