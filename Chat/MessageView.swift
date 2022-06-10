@@ -52,13 +52,13 @@ struct MessageView: View {
     
     func text() -> some View {
         VStack(alignment: .leading) {
-            if let text = message.text {
+            if let text = message.text, !text.isEmpty {
                 Text(text)
                     .padding(.horizontal, 15)
                     .padding(.vertical, 8)
             }
+
             if !message.imagesURLs.isEmpty {
-                
                 let columns = message.imagesURLs.count > 1 ?
                 [GridItem(.flexible()), GridItem(.flexible())] :
                 [GridItem(.flexible())]

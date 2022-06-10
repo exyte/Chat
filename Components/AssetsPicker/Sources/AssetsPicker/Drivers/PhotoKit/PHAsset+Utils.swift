@@ -106,7 +106,7 @@ extension PHAsset {
                 for: self,
                 options: options,
                 resultHandler: { data, _, _, info in
-                    guard info?.keys.contains(PHImageResultIsDegradedKey) == false
+                    guard info?.keys.contains(PHImageResultIsDegradedKey) == true
                     else { fatalError("PHImageManager with `options.isSynchronous = true` should call result ONE time.") }
                     continuation.resume(returning: data)
                 }
