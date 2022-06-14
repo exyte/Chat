@@ -40,7 +40,11 @@ struct AttachmentsView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(viewModel.attachments) { media in
-                        MediaCell(media: media)
+                        MediaCell(media: media) {
+                            withAnimation {
+                                viewModel.delete(media)
+                            }
+                        }
                     }
                 }
                 .background(

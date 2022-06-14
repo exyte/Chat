@@ -7,7 +7,7 @@ import Combine
 import AssetsPicker
 
 final class AttachmentsViewModel: ObservableObject {
-    let attachments: [Media]
+    @Published var attachments: [Media]
     let sendMessageClosure: (Message) -> Void
 
     @Published var message = Message(id: 0)
@@ -22,48 +22,48 @@ final class AttachmentsViewModel: ObservableObject {
     }
 
     func onTapSendMessage() {
-        let allMediasPublisher = attachments
+        attachments
             .publisher
             .receive(on: DispatchQueue.global())
             .flatMap { media in
                 media.getUrl()
                     .map { url in (media, url) }
             }
-            .share()
-
-        let imagesPublisher = allMediasPublisher
-            .filter { $0.0.type == .image }
-            .compactMap { $0.1 }
+            .compactMap { (media, url) -> (Media, URL)? in
+                guard let url = url else { return nil }
+                return (media, url)
+            }
+            .map { (media, url) -> any Attachment in
+                switch media.type {
+                case .image:
+                    return ImageAttachment(url: url)
+                case .video:
+                    return VideoAttachment(url: url)
+                }
+            }
             .collect()
             .handleEvents(
                 receiveOutput: { [weak self] in
-                    self?.message.imagesURLs = $0
-                }
-            )
-            .map { _ in }
-
-        let videosPublisher = allMediasPublisher
-            .filter { $0.0.type == .video }
-            .compactMap { $0.1 }
-            .collect()
-            .handleEvents(
-                receiveOutput: { [weak self] in
-                    self?.message.videosURLs = $0
-                }
-            )
-            .map { _ in }
-
-        imagesPublisher
-            .merge(with: videosPublisher)
-            .sink(
+                    self?.message.attachments = $0
+                },
                 receiveCompletion: { [weak self] completion in
                     guard completion == .finished
                     else { fatalError("Publisher with Never faiture type shouldn't ever get error") }
+
                     self?.sendMessage()
-                },
-                receiveValue: { _ in }
+                }
             )
+            .sink { _ in }
             .store(in: &subscriptions)
+    }
+
+    func delete(_ media: Media) {
+        attachments.removeAll { item in
+            item.id == media.id
+        }
+        if attachments.isEmpty {
+            isShown = false
+        }
     }
 }
 

@@ -16,13 +16,8 @@ struct ChatView: View {
     @State private var scrollView: UIScrollView?
 
     @State private var message = Message(id: 0)
-#if DEBUG
-    @State private var isShownAttachments = true
-    @State private var attachments: [Media]? = (0...44).map({ _ in .random })
-#else
     @State private var isShownAttachments = false
     @State private var attachments: [Media]?
-#endif
 
     var body: some View {
         ZStack {
@@ -69,6 +64,11 @@ struct ChatView: View {
         .onChange(of: attachments) { newValue in
             isShownAttachments = newValue != nil
         }
+        .onChange(of: isShownAttachments) { newValue in
+            if !newValue {
+                attachments = nil
+            }
+        }
     }
 }
 
@@ -93,9 +93,10 @@ struct ChatView_Preview: PreviewProvider {
             messages: [
                 Message(id: 0, text: "Text 1", isCurrentUser: false),
                 Message(id: 1, text: "Text 2", isCurrentUser: true),
-                Message(id: 5, imagesURLs: [
-                    URL(string: "https://picsum.photos/200/300")!
+                Message(id: 5, attachments: [
+                    ImageAttachment(url: URL(string: "https://picsum.photos/200/300")!)
                 ]),
+                Message(id: 6, text: "Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"),
             ],
             didSendMessage: handleSendMessage
         )

@@ -11,6 +11,7 @@ import AssetsPicker
 
 struct MediaCell: View {
     let media: Media
+    let onDelete: () -> Void
 
     @State var url: URL?
     @State var image: UIImage?
@@ -20,8 +21,7 @@ struct MediaCell: View {
         content
             .overlay(alignment: .topTrailing) {
                 Button {
-                    // TODO: Delete item from message.
-                    debugPrint("TODO: Delete item from message.")
+                    onDelete()
                 } label: {
                     Image(systemName: "trash")
                         .padding(8)
@@ -81,8 +81,8 @@ struct MediaCell_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
             Spacer()
-            MediaCell(media: .random)
-            MediaCell(media: .random)
+            MediaCell(media: .random, onDelete: {})
+            MediaCell(media: .random, onDelete: {})
             Spacer()
         }
     }
