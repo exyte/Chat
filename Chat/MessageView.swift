@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct MessageView: View {
-    
-    let myColor = Color(hex: "ADD8E6")
-    let friendColor = Color(hex: "DDDDDD")
-    
     let imageSize = 30.0
     
     let message: Message
@@ -83,7 +79,7 @@ struct MessageView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 15)
-                .foregroundColor(message.isCurrentUser ? myColor : friendColor)
+                .foregroundColor(message.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
         )
     }
 }

@@ -6,17 +6,13 @@
 //
 
 import SwiftUI
+import Combine
 import AssetsPicker
 
 struct AttachmentsView: View {
     @Binding var isShown: Bool
-
-    let attachments: Attachments
-    let currentMessage: String?
-
-    var onSend: (Message) -> Void
-
-    @State var message = Message(id: 0)
+    @StateObject var viewModel: AttachmentsViewModel
+    
     @State var imagesHeight: CGFloat = 80
 
     private var columns: [GridItem] {
@@ -36,14 +32,14 @@ struct AttachmentsView: View {
                 }
                 Spacer()
                 Button("Send") {
-                    sendMessage()
+                    viewModel.onTapSendMessage()
                 }
             }
             .padding(.bottom)
 
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(attachments.medias) { media in
+                    ForEach(viewModel.attachments) { media in
                         MediaCell(media: media)
                     }
                 }
@@ -57,47 +53,20 @@ struct AttachmentsView: View {
             }
             .frame(maxHeight: imagesHeight)
 
-            TextInputView(text: $message.text)
+            TextInputView(text: $viewModel.message.text)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 20)
-        .background(Color(hex: "EEEEEE"))
-        .onAppear {
-            message.text = currentMessage ?? ""
-        }
-    }
-}
-
-private extension AttachmentsView {
-    func sendMessage() {
-        Task { [attachments] in
-            var images: [URL] = []
-            var videos: [URL] = []
-
-            for item in attachments.medias {
-                let url = await item.getUrl().value
-                if let url = url {
-                    switch item.type {
-                    case .image:
-                        images.append(url)
-                    case .video:
-                        videos.append(url)
-                    }
-                }
-            }
-            self.message.imagesURLs = images
-            self.message.videosURLs = videos
-
-            DispatchQueue.main.async { [message] in
+        .background(Colors.background)
+        .onChange(of: viewModel.isShown) { newValue in
+            guard !newValue else { return }
+            withAnimation {
                 self.isShown = false
-                onSend(message)
-                self.message = Message(id: 0)
             }
         }
     }
 }
 
-#if DEBUG
 struct AttachmentsView_Previews: PreviewProvider {
     static var previews: some View {
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 mini"))
@@ -113,13 +82,13 @@ struct AttachmentsView_Previews: PreviewProvider {
             .overlay {
                 AttachmentsView(
                     isShown: .constant(true),
-                    attachments: Attachments(medias: [.random, .random, .random, .random, .random, .random]),
-                    currentMessage: nil,
-                    onSend: { _ in }
+                    viewModel: AttachmentsViewModel(
+                        attachments: [.random, .random, .random, .random, .random, .random],
+                        onSend: { _ in }
+                    )
                 )
                 .cornerRadius(20)
                 .padding(.horizontal, 20)
             }
     }
 }
-#endif

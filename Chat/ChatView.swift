@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Introspect
+import AssetsPicker
 
 struct ChatView: View {
     var messages: [Message]
@@ -17,10 +18,10 @@ struct ChatView: View {
     @State private var message = Message(id: 0)
 #if DEBUG
     @State private var isShownAttachments = true
-    @State private var attachments: Attachments? = Attachments(medias: (0...44).map { _ in .random })
+    @State private var attachments: [Media]? = (0...44).map({ _ in .random })
 #else
     @State private var isShownAttachments = false
-    @State private var attachments: Attachments?
+    @State private var attachments: [Media]?
 #endif
 
     var body: some View {
@@ -52,11 +53,13 @@ struct ChatView: View {
                     .overlay {
                         AttachmentsView(
                             isShown: $isShownAttachments,
-                            attachments: attachments,
-                            currentMessage: message.text,
-                            onSend: { message in
-                                sendMessage(message)
-                            }
+                            viewModel: AttachmentsViewModel(
+                                attachments: attachments,
+                                message: message.text,
+                                onSend: { message in
+                                    sendMessage(message)
+                                }
+                            )
                         )
                         .cornerRadius(20)
                         .padding(.horizontal, 20)
@@ -84,7 +87,6 @@ private extension ChatView {
     }
 }
 
-#if DEBUG
 struct ChatView_Preview: PreviewProvider {
     static var previews: some View {
         ChatView(
@@ -103,4 +105,3 @@ struct ChatView_Preview: PreviewProvider {
         print(message)
     }
 }
-#endif

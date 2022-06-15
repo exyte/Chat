@@ -18,7 +18,6 @@ struct MediaCell: View {
 
     var body: some View {
         content
-        //            .aspectRatio(1.0, contentMode: .fit)
             .overlay(alignment: .topTrailing) {
                 Button {
                     // TODO: Delete item from message.
@@ -78,7 +77,6 @@ struct MediaCell: View {
     }
 }
 
-#if DEBUG
 struct MediaCell_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
@@ -89,4 +87,3 @@ struct MediaCell_Previews: PreviewProvider {
         }
     }
 }
-#endif

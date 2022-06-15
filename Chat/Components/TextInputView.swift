@@ -28,7 +28,7 @@ struct TextInputView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
             Rectangle()
-                .fill(Color(hex: "EEEEEE"))
+                .fill(Colors.background)
                 .ignoresSafeArea()
 
             TextInputView(text: $text)

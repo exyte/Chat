@@ -8,14 +8,9 @@
 import SwiftUI
 import AssetsPicker
 
-struct Attachments: Identifiable, Equatable {
-    let id = UUID()
-    let medias: [Media]
-}
-
 struct InputView: View {
     @Binding var message: Message
-    @Binding var attachments: Attachments?
+    @Binding var attachments: [Media]?
     var didSendMessage: (Message) -> Void
 
     @State private var isOpenPicker = false
@@ -40,26 +35,25 @@ struct InputView: View {
             }
             .padding(5)
         }
-        .background(Color(hex: "EEEEEE"))
+        .background(Colors.background)
         .sheet(isPresented: $isOpenPicker) {
             AssetsPicker(openPicker: $isOpenPicker) { medias in
                 // FIXME: AssetPicker shouldn't return empty array
                 guard !medias.isEmpty else {
                     return
                 }
-                attachments = Attachments(medias: medias)
+                self.attachments = medias
             }
             .countAssetSelection()
-            .assetSelectionLimit(2)
+            .assetSelectionLimit(Configuration.assetsPickerLimit)
         }
     }
 }
 
-#if DEBUG
 struct InputView_Previews: PreviewProvider {
     @State static private var showingImageModePicker = false
     @State static private var selectedImage: UIImage?
-    @State static private var attachments: Attachments?
+    @State static private var attachments: [Media]?
 
     @State static private var message = Message(id: 0)
     
@@ -69,4 +63,3 @@ struct InputView_Previews: PreviewProvider {
         }
     }
 }
-#endif

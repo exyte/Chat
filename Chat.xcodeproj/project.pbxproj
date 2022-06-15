@@ -13,6 +13,9 @@
 		13452C4628586FE300F4EA70 /* TextInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13452C4528586FE300F4EA70 /* TextInputView.swift */; };
 		13452C4828588D7000F4EA70 /* MediaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13452C4728588D7000F4EA70 /* MediaCell.swift */; };
 		1379E0972840C2F2008D218B /* AssetsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 1379E0962840C2F2008D218B /* AssetsPicker */; };
+		13AD59E12859C144009DE654 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E02859C144009DE654 /* Colors.swift */; };
+		13AD59E32859C7FF009DE654 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E22859C7FF009DE654 /* Configuration.swift */; };
+		13AD59E72859D680009DE654 /* AttachmentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E62859D680009DE654 /* AttachmentsViewModel.swift */; };
 		5B41BFED28324C7100B181D8 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 5B41BFEC28324C7100B181D8 /* Introspect */; };
 		5B846A70281004E1005835BB /* ChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B846A6F281004E1005835BB /* ChatApp.swift */; };
 		5B846A72281004E1005835BB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B846A71281004E1005835BB /* ContentView.swift */; };
@@ -32,6 +35,9 @@
 		1379E0942840C1B1008D218B /* AssetsPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AssetsPicker; path = Components/AssetsPicker; sourceTree = "<group>"; };
 		1379E0992840CE21008D218B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1379E09A2840CE21008D218B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		13AD59E02859C144009DE654 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		13AD59E22859C7FF009DE654 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		13AD59E62859D680009DE654 /* AttachmentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentsViewModel.swift; sourceTree = "<group>"; };
 		5B846A6C281004E1005835BB /* Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B846A6F281004E1005835BB /* ChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatApp.swift; sourceTree = "<group>"; };
 		5B846A71281004E1005835BB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -82,12 +88,30 @@
 		1394047228478DAD0062D4CF /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				13452C4328585D1C00F4EA70 /* AttachmentsView.swift */,
+				13AD59E42859D5BC009DE654 /* Attachments */,
 				1302738E283E456F0044F5D9 /* InputView.swift */,
 				13452C4728588D7000F4EA70 /* MediaCell.swift */,
 				13452C4528586FE300F4EA70 /* TextInputView.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		13AD59DF2859C137009DE654 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				13AD59E02859C144009DE654 /* Colors.swift */,
+				13AD59E22859C7FF009DE654 /* Configuration.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		13AD59E42859D5BC009DE654 /* Attachments */ = {
+			isa = PBXGroup;
+			children = (
+				13452C4328585D1C00F4EA70 /* AttachmentsView.swift */,
+				13AD59E62859D680009DE654 /* AttachmentsViewModel.swift */,
+			);
+			path = Attachments;
 			sourceTree = "<group>";
 		};
 		5B846A63281004E1005835BB = {
@@ -112,6 +136,7 @@
 		5B846A6E281004E1005835BB /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				13AD59DF2859C137009DE654 /* Data */,
 				1394047228478DAD0062D4CF /* Components */,
 				1302738C283E44D00044F5D9 /* MessageView.swift */,
 				5B846A6F281004E1005835BB /* ChatApp.swift */,
@@ -211,10 +236,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B846A802810070C005835BB /* ChatView.swift in Sources */,
+				13AD59E12859C144009DE654 /* Colors.swift in Sources */,
 				5B846A72281004E1005835BB /* ContentView.swift in Sources */,
 				5B846A7E281005ED005835BB /* Message.swift in Sources */,
 				1302738D283E44D00044F5D9 /* MessageView.swift in Sources */,
 				5B846A8228101CC1005835BB /* Helpers.swift in Sources */,
+				13AD59E72859D680009DE654 /* AttachmentsViewModel.swift in Sources */,
+				13AD59E32859C7FF009DE654 /* Configuration.swift in Sources */,
 				1302738F283E456F0044F5D9 /* InputView.swift in Sources */,
 				5B846A70281004E1005835BB /* ChatApp.swift in Sources */,
 				13452C4428585D1C00F4EA70 /* AttachmentsView.swift in Sources */,
