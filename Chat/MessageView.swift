@@ -15,13 +15,13 @@ struct MessageView: View {
     var body: some View {
         HStack(alignment: .bottom) {
             if message.isCurrentUser {
-                Spacer()
+                Spacer(minLength: 40)
                 text()
                 avatar()
             } else {
                 avatar()
                 text()
-                Spacer()
+                Spacer(minLength: 40)
             }
         }
         .padding(.horizontal, 8)
@@ -54,24 +54,8 @@ struct MessageView: View {
                     .padding(.vertical, 8)
             }
 
-            if !message.imagesURLs.isEmpty {
-                let columns = message.imagesURLs.count > 1 ?
-                [GridItem(.flexible()), GridItem(.flexible())] :
-                [GridItem(.flexible())]
-                
-                LazyVGrid(columns: columns) {
-                    ForEach(message.imagesURLs, id: \.self) { url in
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            RoundedRectangle(cornerRadius: 15)
-                                .foregroundColor(Color.gray)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
+            if !message.attachments.isEmpty {
+                AttachmentsGrid(attachments: message.attachments)
             }
         }
         .mask {
@@ -103,8 +87,13 @@ struct MessageView_Previews: PreviewProvider {
         MessageView(
             message: Message(
                 id: 0,
-                imagesURLs: [
-                    URL(string: "https://picsum.photos/200/300")!
+                attachments: [
+                    ImageAttachment(
+                        id: UUID().uuidString,
+                        thumbnail: URL(string: "https://picsum.photos/200/300")!,
+                        full: URL(string: "https://picsum.photos/200/300")!,
+                        name: nil
+                    )
                 ],
                 isCurrentUser: false
             )

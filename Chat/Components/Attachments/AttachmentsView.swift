@@ -40,7 +40,11 @@ struct AttachmentsView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(viewModel.attachments) { media in
-                        MediaCell(media: media)
+                        MediaCell(media: media) {
+                            withAnimation {
+                                viewModel.delete(media)
+                            }
+                        }
                     }
                 }
                 .background(
@@ -67,6 +71,7 @@ struct AttachmentsView: View {
     }
 }
 
+#if DEBUG
 struct AttachmentsView_Previews: PreviewProvider {
     static var previews: some View {
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 mini"))
@@ -92,3 +97,4 @@ struct AttachmentsView_Previews: PreviewProvider {
             }
     }
 }
+#endif
