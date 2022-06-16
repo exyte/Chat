@@ -39,6 +39,7 @@ struct AttachmentsGrid: View {
     }
 }
 
+#if DEBUG
 struct AttachmentsGrid_Preview: PreviewProvider {
     private static let examples = [1, 2, 3, 5, 10]
 
@@ -57,7 +58,6 @@ struct AttachmentsGrid_Preview: PreviewProvider {
     }
 }
 
-#if DEBUG
 extension Array where Element == any Attachment {
     static func random(count: Int) -> [any Attachment] {
         return Swift.Array(repeating: 0, count: count)

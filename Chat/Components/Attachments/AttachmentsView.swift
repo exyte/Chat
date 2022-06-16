@@ -71,6 +71,7 @@ struct AttachmentsView: View {
     }
 }
 
+#if DEBUG
 struct AttachmentsView_Previews: PreviewProvider {
     static var previews: some View {
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 mini"))
@@ -96,3 +97,4 @@ struct AttachmentsView_Previews: PreviewProvider {
             }
     }
 }
+#endif
