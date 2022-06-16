@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct MessageView: View {
-    
-    let myColor = Color(hex: "ADD8E6")
-    let friendColor = Color(hex: "DDDDDD")
-    
     let imageSize = 30.0
     
     let message: Message
@@ -19,13 +15,13 @@ struct MessageView: View {
     var body: some View {
         HStack(alignment: .bottom) {
             if message.isCurrentUser {
-                Spacer()
+                Spacer(minLength: 40)
                 text()
                 avatar()
             } else {
                 avatar()
                 text()
-                Spacer()
+                Spacer(minLength: 40)
             }
         }
         .padding(.horizontal, 8)
@@ -52,30 +48,14 @@ struct MessageView: View {
     
     func text() -> some View {
         VStack(alignment: .leading) {
-            if let text = message.text {
+            if let text = message.text, !text.isEmpty {
                 Text(text)
                     .padding(.horizontal, 15)
                     .padding(.vertical, 8)
             }
-            if !message.imagesURLs.isEmpty {
-                
-                let columns = message.imagesURLs.count > 1 ?
-                [GridItem(.flexible()), GridItem(.flexible())] :
-                [GridItem(.flexible())]
-                
-                LazyVGrid(columns: columns) {
-                    ForEach(message.imagesURLs, id: \.self) { url in
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            RoundedRectangle(cornerRadius: 15)
-                                .foregroundColor(Color.gray)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
+
+            if !message.attachments.isEmpty {
+                AttachmentsGrid(attachments: message.attachments)
             }
         }
         .mask {
@@ -83,7 +63,7 @@ struct MessageView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 15)
-                .foregroundColor(message.isCurrentUser ? myColor : friendColor)
+                .foregroundColor(message.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
         )
     }
 }
@@ -107,8 +87,13 @@ struct MessageView_Previews: PreviewProvider {
         MessageView(
             message: Message(
                 id: 0,
-                imagesURLs: [
-                    URL(string: "https://picsum.photos/200/300")!
+                attachments: [
+                    ImageAttachment(
+                        id: UUID().uuidString,
+                        thumbnail: URL(string: "https://picsum.photos/200/300")!,
+                        full: URL(string: "https://picsum.photos/200/300")!,
+                        name: nil
+                    )
                 ],
                 isCurrentUser: false
             )

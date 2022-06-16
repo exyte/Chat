@@ -18,6 +18,14 @@ public struct Media {
 // MARK: - Public methods for get data from MediaItem
 public extension Media {
 
+#if DEBUG
+    static var random: Media {
+        let randomMediaType = [MediaType.video, .image].randomElement() ?? .image
+        let randomSize = (300...600).randomElement() ?? 300
+        return Media(source: .url(URL(string: "https://picsum.photos/\(randomSize)")!), type: randomMediaType)
+    }
+#endif
+
     func getData() -> Future<Data?, Never> {
         return Future { promise in
             switch source {
@@ -27,11 +35,13 @@ public extension Media {
                     promise(.success(data))
                 }
             case .url(let url):
-                do {
-                    let data = try Data(contentsOf: url)
-                    promise(.success(data))
-                } catch {
-                    promise(.success(nil))
+                DispatchQueue.global().async {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        promise(.success(data))
+                    } catch {
+                        promise(.success(nil))
+                    }
                 }
             }
         }
@@ -60,6 +70,12 @@ extension Media: Identifiable {
         case .media(let media):
             return media.id
         }
+    }
+}
+
+extension Media: Equatable {
+    public static func == (lhs: Media, rhs: Media) -> Bool {
+        lhs.id == rhs.id
     }
 }
 

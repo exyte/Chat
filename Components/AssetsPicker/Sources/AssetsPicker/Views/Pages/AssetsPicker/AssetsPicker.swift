@@ -62,6 +62,9 @@ public struct AssetsPicker: View {
             openPicker = false
             completion(selectionService.mapToMedia())
         }
+        .onDisappear {
+            // TODO: Call ``completion`` here. Wait when allert will be close.
+        }
 #if os(iOS)
         .onChange(of: viewModel.cameraImage) { newValue in
             guard let url = newValue

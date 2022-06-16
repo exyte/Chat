@@ -7,17 +7,22 @@
 
 import SwiftUI
 
-struct Message: Equatable {
+struct Message {
 
     var id: Int
 
     var text: String = ""
 
-    var imagesURLs: [URL] = []
-    var videosURLs: [URL] = []
+    var attachments: [any Attachment] = []
 
     var createdAt: Date = Date()
     
     var avatarURL: URL?
     var isCurrentUser: Bool = false
+}
+
+extension Message: Equatable {
+    static func == (lhs: Message, rhs: Message) -> Bool {
+        lhs.id == rhs.id
+    }
 }
