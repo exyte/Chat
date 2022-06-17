@@ -1,7 +1,4 @@
 //
-//  Helpers.swift
-//  Chat
-//
 //  Created by Alisa Mylnikova on 20.04.2022.
 //
 

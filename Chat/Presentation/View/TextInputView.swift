@@ -1,7 +1,4 @@
 //
-//  TextInputView.swift
-//  Chat
-//
 //  Created by Alex.M on 14.06.2022.
 //
 

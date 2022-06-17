@@ -7,22 +7,17 @@ import Combine
 import AssetsPicker
 
 final class AttachmentsViewModel: ObservableObject {
-    @Published var attachments: [Media]
-    let sendMessageClosure: (Message) -> Void
-
-    @Published var message = Message(id: 0)
+    var draftViewModel: DraftViewModel
     @Published var isShown = true
 
     private var subscriptions = Set<AnyCancellable>()
 
-    init(attachments: [Media], message: String? = nil, onSend: @escaping (Message) -> Void) {
-        self.attachments = attachments
-        self.sendMessageClosure = onSend
-        self.message.text = message ?? ""
+    init(draftViewModel: DraftViewModel) {
+        self.draftViewModel = draftViewModel
     }
 
     func onTapSendMessage() {
-        attachments
+        draftViewModel.attachments
             .publisher
             .receive(on: DispatchQueue.global())
             .flatMap { media in
@@ -44,7 +39,7 @@ final class AttachmentsViewModel: ObservableObject {
             .collect()
             .handleEvents(
                 receiveOutput: { [weak self] in
-                    self?.message.attachments = $0
+                    self?.draftViewModel.processed = $0
                 },
                 receiveCompletion: { [weak self] completion in
                     guard completion == .finished
@@ -57,20 +52,18 @@ final class AttachmentsViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
+    func cancel() {
+        draftViewModel.reset()
+    }
+
     func delete(_ media: Media) {
-        attachments.removeAll { item in
-            item.id == media.id
-        }
-        if attachments.isEmpty {
-            isShown = false
-        }
+        draftViewModel.remove(attachment: media)
     }
 }
 
 private extension AttachmentsViewModel {
     func sendMessage() {
-        sendMessageClosure(message)
-        message = Message(id: 0)
+        draftViewModel.send()
         isShown = false
     }
 }
