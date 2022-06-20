@@ -16,12 +16,18 @@ struct ChatView: View {
     @State private var scrollView: UIScrollView?
     @StateObject private var draftViewModel = DraftViewModel()
 
+    // TODO: Inject parser from outside of library
+    @StateObject private var messageViewModel: MessageViewModel = MessageViewModel()
+
     var body: some View {
         ZStack {
             VStack {
                 ScrollView {
                     ForEach(messages, id: \.id) { message in
-                        MessageView(message: message)
+                        MessageView(
+                            viewModel: messageViewModel,
+                            message: message
+                        )
                     }
                     .listRowSeparator(.hidden)
                 }

@@ -7,14 +7,26 @@
 
 import SwiftUI
 
+final class MessageViewModel: ObservableObject {
+    var parser: any MessageParser = DefaultMessageParser()
+
+    func text(from message: String) -> Text {
+        parser.text(from: message)
+    }
+}
+
 struct MessageView: View {
+    @ObservedObject var viewModel: MessageViewModel
     let message: Message
+
+    @Environment(\.messageParser) var messageParser
 
     var body: some View {
         MessageContainer(author: message.author) {
             VStack(alignment: .leading) {
                 if !message.text.isEmpty {
-                    Text(message.text)
+                    messageParser.text(from: message.text)
+//                    viewModel.text(from: message.text)
                         .padding(.horizontal, 15)
                         .padding(.vertical, 8)
                 }
@@ -24,12 +36,19 @@ struct MessageView: View {
                 }
             }
         }
+//        .onAppear {
+//            viewModel .
+//        }
     }
 }
 
 struct MessageView_Previews: PreviewProvider {
+    @StateObject static var markdownMessageViewModel: MessageViewModel = MessageViewModel()
+    @StateObject static var defaultMessageViewModel: MessageViewModel = MessageViewModel()
+
     static var previews: some View {
         MessageView(
+            viewModel: defaultMessageViewModel,
             message: Message(
                 id: 0,
                 author: .tim,
@@ -37,13 +56,15 @@ struct MessageView_Previews: PreviewProvider {
             )
         )
         MessageView(
+            viewModel: markdownMessageViewModel,
             message: Message(
                 id: 0,
                 author: .steve,
-                text: "Example text"
+                text: "*Example* **markdown** _text_"
             )
         )
         MessageView(
+            viewModel: defaultMessageViewModel,
             message: Message(
                 id: 0,
                 author: .steve,

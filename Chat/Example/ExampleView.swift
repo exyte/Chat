@@ -18,15 +18,16 @@ struct ExampleView: View {
             )
             messages.append(message)
         }
+        .chatUseMessageParser(MarkdownExampleMessageParser())
         .onAppear {
             messages =
             [
-                Message(id: 1, author: .tim, text: "Hey"),
+                Message(id: 1, author: .tim, text: "**Hey**"),
                 Message(id: 2, author: .steve, text: "Yeah sure, gimme 5"),
                 Message(id: 3, author: .steve, text: "Okay ready when you are"),
-                Message(id: 4, author: .tim, text: "Awesome 😁"),
+                Message(id: 4, author: .tim, text: "**Awesome** 😁"),
                 Message(id: 5, author: .tim, text: "Ugh, gotta sit through these two"),
-                Message(id: 6, author: .steve, text: "Every. Single. Time. Every. Single. Time. Every. Single. Time. Every. Single. Time."),
+                Message(id: 6, author: .steve, text: "*Every. Single. Time.* Every. Single. Time. Every. Single. Time. Every. Single. Time."),
                 Message(
                     id: 7,
                     author: .steve,

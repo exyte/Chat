@@ -12,6 +12,7 @@
 		1337F6B1285C3412005FEE50 /* Draft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1337F6B0285C3412005FEE50 /* Draft.swift */; };
 		13452C4428585D1C00F4EA70 /* AttachmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13452C4328585D1C00F4EA70 /* AttachmentsView.swift */; };
 		13452C4828588D7000F4EA70 /* MediaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13452C4728588D7000F4EA70 /* MediaCell.swift */; };
+		13578C3C285CADFB00C7430C /* MarkdownExampleMessageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13578C3B285CADFB00C7430C /* MarkdownExampleMessageParser.swift */; };
 		1379E0972840C2F2008D218B /* AssetsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 1379E0962840C2F2008D218B /* AssetsPicker */; };
 		13AD59E12859C144009DE654 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E02859C144009DE654 /* Colors.swift */; };
 		13AD59E32859C7FF009DE654 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E22859C7FF009DE654 /* Configuration.swift */; };
@@ -21,6 +22,7 @@
 		13AF0349285C4A1700EF4F1B /* AttachmentsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AF0343285C4A1700EF4F1B /* AttachmentsGrid.swift */; };
 		13AF0350285C4B9600EF4F1B /* MessageContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AF034F285C4B9600EF4F1B /* MessageContainer.swift */; };
 		13AF0352285C4BF000EF4F1B /* Author.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AF0351285C4BF000EF4F1B /* Author.swift */; };
+		13AF037F285C9C0B00EF4F1B /* MessageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AF037E285C9C0B00EF4F1B /* MessageParser.swift */; };
 		13BC42DD285AFC7E003BB495 /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BC42DB285AFC7E003BB495 /* Attachment.swift */; };
 		13BC42DE285AFC7E003BB495 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BC42DC285AFC7E003BB495 /* Message.swift */; };
 		5B41BFED28324C7100B181D8 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 5B41BFEC28324C7100B181D8 /* Introspect */; };
@@ -38,6 +40,7 @@
 		1337F6B0285C3412005FEE50 /* Draft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Draft.swift; sourceTree = "<group>"; };
 		13452C4328585D1C00F4EA70 /* AttachmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentsView.swift; sourceTree = "<group>"; };
 		13452C4728588D7000F4EA70 /* MediaCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaCell.swift; sourceTree = "<group>"; };
+		13578C3B285CADFB00C7430C /* MarkdownExampleMessageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExampleMessageParser.swift; sourceTree = "<group>"; };
 		1379E0942840C1B1008D218B /* AssetsPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AssetsPicker; path = Components/AssetsPicker; sourceTree = "<group>"; };
 		1379E0992840CE21008D218B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1379E09A2840CE21008D218B /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -49,6 +52,7 @@
 		13AF0344285C4A1700EF4F1B /* AttachmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentCell.swift; sourceTree = "<group>"; };
 		13AF034F285C4B9600EF4F1B /* MessageContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageContainer.swift; sourceTree = "<group>"; };
 		13AF0351285C4BF000EF4F1B /* Author.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Author.swift; sourceTree = "<group>"; };
+		13AF037E285C9C0B00EF4F1B /* MessageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageParser.swift; sourceTree = "<group>"; };
 		13BC42D8285AF9FD003BB495 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
 		13BC42DB285AFC7E003BB495 /* Attachment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
 		13BC42DC285AFC7E003BB495 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
@@ -150,6 +154,7 @@
 			children = (
 				13AD59E02859C144009DE654 /* Colors.swift */,
 				13AD59E22859C7FF009DE654 /* Configuration.swift */,
+				13AF037E285C9C0B00EF4F1B /* MessageParser.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -197,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				5B846A71281004E1005835BB /* ExampleView.swift */,
+				13578C3B285CADFB00C7430C /* MarkdownExampleMessageParser.swift */,
 			);
 			path = Example;
 			sourceTree = "<group>";
@@ -353,6 +359,8 @@
 				5B846A72281004E1005835BB /* ExampleView.swift in Sources */,
 				13BC42DD285AFC7E003BB495 /* Attachment.swift in Sources */,
 				13AF0346285C4A1700EF4F1B /* AttachmentCell.swift in Sources */,
+				13578C3C285CADFB00C7430C /* MarkdownExampleMessageParser.swift in Sources */,
+				13AF037F285C9C0B00EF4F1B /* MessageParser.swift in Sources */,
 				1302738D283E44D00044F5D9 /* MessageView.swift in Sources */,
 				5B846A8228101CC1005835BB /* Color+Hex.swift in Sources */,
 				13AD59E72859D680009DE654 /* AttachmentsViewModel.swift in Sources */,
