@@ -21,7 +21,9 @@ struct ChatView: View {
             VStack {
                 ScrollView {
                     ForEach(messages, id: \.id) { message in
-                        MessageView(message: message)
+                        MessageView(message: message) { attachment in
+                            viewModel.attachmentsFullscreenState.showFullscreen.value = attachment
+                        }
                     }
                 }
                 .introspectScrollView { scrollView in
@@ -52,6 +54,17 @@ struct ChatView: View {
                         .cornerRadius(20)
                         .padding(.horizontal, 20)
                     }
+            }
+            if viewModel.showAttachmentsView {
+                let attachments = messages.flatMap { $0.attachments }
+                let index = attachments.firstIndex { $0.id == viewModel.attachmentsFullscreenState.showFullscreen.value?.id }
+                AttachmentsPages(
+                    attachments: attachments,
+                    index: index ?? 0,
+                    onClose: {
+                        viewModel.attachmentsFullscreenState.showFullscreen.value = nil
+                    }
+                )
             }
         }
         .onAppear {

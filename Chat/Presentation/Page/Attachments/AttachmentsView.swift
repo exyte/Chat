@@ -65,7 +65,7 @@ struct AttachmentsView: View {
 
 #if DEBUG
 struct AttachmentsView_Previews: PreviewProvider {
-    private static var draftMessageService = DraftMessageService()
+    private static var draftMessageService = DraftComposeState()
 
     static var previews: some View {
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 mini"))

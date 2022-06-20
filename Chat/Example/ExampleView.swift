@@ -53,15 +53,24 @@ struct ExampleView: View {
                     id: 10,
                     user: .tim,
                     attachments: [
-                        VideoAttachment(url: URL(string: "https://placeimg.com/640/480/animal")!)
+                        VideoAttachment(
+                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg")!,
+                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")!
+                        )
                     ]),
                 Message(
                     id: 11,
                     user: .tim,
                     attachments: [
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
-                        VideoAttachment(url: URL(string: "https://placeimg.com/640/480/arch")!),
-                        VideoAttachment(url: URL(string: "https://placeimg.com/640/480/animal")!),
+                        VideoAttachment(
+                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4")!,
+                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg")!
+                        ),
+                        VideoAttachment(
+                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")!,
+                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg")!
+                        ),
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/arch")!),
                     ]),

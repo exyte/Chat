@@ -46,7 +46,7 @@ struct InputView: View {
 
 struct InputView_Previews: PreviewProvider {
     @StateObject private static var viewModel = InputViewModel(
-        draftMessageService: DraftMessageService()
+        draftMessageService: DraftComposeState()
     )
     
     static var previews: some View {

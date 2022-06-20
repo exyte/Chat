@@ -7,14 +7,14 @@ import Combine
 import AssetsPicker
 
 final class AttachmentsViewModel: ObservableObject {
-    let draftMessageService: DraftMessageService
+    let draftMessageService: DraftComposeState
 
     @Published var text: String = ""
     @Published var medias: [Media] = []
 
     private var subscriptions = Set<AnyCancellable>()
 
-    init(draftMessageService: DraftMessageService) {
+    init(draftMessageService: DraftComposeState) {
         self.draftMessageService = draftMessageService
 
         self.text = draftMessageService.text.value

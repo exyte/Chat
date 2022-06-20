@@ -11,25 +11,27 @@ struct AttachmentCell: View {
     let attachment: any Attachment
 
     var body: some View {
-        if attachment is ImageAttachment {
-            content
-        } else if attachment is VideoAttachment {
-            content
-                .overlay {
-                    Image(systemName: "play.fill")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background {
-                            Circle()
-                                .fill(.black)
-                                .opacity(0.72)
-                        }
-                }
-        } else {
-            content
-                .overlay {
-                    Text("Unknown")
-                }
+        Group {
+            if attachment is ImageAttachment {
+                content
+            } else if attachment is VideoAttachment {
+                content
+                    .overlay {
+                        Image(systemName: "play.fill")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background {
+                                Circle()
+                                    .fill(.black)
+                                    .opacity(0.72)
+                            }
+                    }
+            } else {
+                content
+                    .overlay {
+                        Text("Unknown")
+                    }
+            }
         }
     }
 

@@ -8,6 +8,7 @@ public protocol Attachment: Equatable, Identifiable {
     var id: String { get }
 
     var thumbnail: URL { get }
+    var full: URL { get }
 }
 
 public struct ImageAttachment: Attachment {
