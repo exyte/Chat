@@ -11,7 +11,6 @@ final class MediaCellViewModel: ObservableObject {
     let media: Media
     let onDelete: () -> Void
 
-    @Published var url: URL?
     @Published var image: UIImage?
 
     var showProgress: Bool {
