@@ -10,18 +10,13 @@ import Combine
 import AssetsPicker
 
 struct MediaCell: View {
-    let media: Media
-    let onDelete: () -> Void
-
-    @State var url: URL?
-    @State var image: UIImage?
-    @State private var subscriptions = Set<AnyCancellable>()
+    @StateObject var viewModel: MediaCellViewModel
 
     var body: some View {
         content
             .overlay(alignment: .topTrailing) {
                 Button {
-                    onDelete()
+                    viewModel.delete()
                 } label: {
                     Image(systemName: "trash")
                         .padding(8)
@@ -32,7 +27,7 @@ struct MediaCell: View {
                 .padding(6)
             }
             .overlay {
-                if media.type == .video && image != nil {
+                if viewModel.showVideoOverlay {
                     Image(systemName: "play.fill")
                         .foregroundColor(.white)
                         .padding()
@@ -44,27 +39,22 @@ struct MediaCell: View {
                 }
             }
             .overlay {
-                if image == nil {
+                if viewModel.showProgress {
                     ProgressView()
                         .tint(.white)
                 }
             }
             .onAppear {
-                media.getData()
-                    .sink { data in
-                        guard let data = data else { return }
-                        self.image = UIImage(data: data)
-                    }
-                    .store(in: &subscriptions)
+                viewModel.onStart()
             }
             .onDisappear {
-                subscriptions.removeAll()
+                viewModel.onStop()
             }
     }
 
     @ViewBuilder
     var content: some View {
-        if let image = image {
+        if let image = viewModel.image {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFit()
@@ -82,8 +72,8 @@ struct MediaCell_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
             Spacer()
-            MediaCell(media: .random, onDelete: {})
-            MediaCell(media: .random, onDelete: {})
+            MediaCell(viewModel: MediaCellViewModel(media: .random, onDelete: {}))
+            MediaCell(viewModel: MediaCellViewModel(media: .random, onDelete: {}))
             Spacer()
         }
     }

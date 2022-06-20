@@ -23,7 +23,6 @@ struct ChatView: View {
                     ForEach(messages, id: \.id) { message in
                         MessageView(message: message)
                     }
-                    .listRowSeparator(.hidden)
                 }
                 .introspectScrollView { scrollView in
                     self.scrollView = scrollView

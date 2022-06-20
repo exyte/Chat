@@ -12,7 +12,7 @@ import AssetsPicker
 struct AttachmentsView: View {
     @StateObject var viewModel: AttachmentsViewModel
 
-    @State var imagesHeight: CGFloat = 80
+    @State var size = CGSize(width: 0, height: 80)
 
     private var columns: [GridItem] {
         [
@@ -39,22 +39,21 @@ struct AttachmentsView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(viewModel.medias) { media in
-                        MediaCell(media: media) {
-                            withAnimation {
-                                viewModel.delete(media)
-                            }
-                        }
+                        MediaCell(
+                            viewModel: MediaCellViewModel(
+                                media: media,
+                                onDelete: {
+                                    withAnimation {
+                                        viewModel.delete(media)
+                                    }
+                                }
+                            )
+                        )
                     }
                 }
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            imagesHeight = proxy.size.height
-                        }
-                    }
-                )
+                .watchSize($size)
             }
-            .frame(maxHeight: imagesHeight)
+            .frame(maxHeight: size.height)
 
             TextInputView(text: $viewModel.text)
         }
