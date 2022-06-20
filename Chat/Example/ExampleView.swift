@@ -11,39 +11,39 @@ struct ExampleView: View {
         ChatView(messages: messages) { draft in
             let message = Message(
                 id: messages.count + 1,
-                author: .tim,
+                user: .tim,
                 text: draft.text,
                 attachments: draft.attachments,
-                createdAt: draft.createAt
+                createdAt: draft.createdAt
             )
             messages.append(message)
         }
-        .chatUseMessageParser(MarkdownExampleMessageParser())
+        .chatMessageUseMarkdown()
         .onAppear {
             messages =
             [
-                Message(id: 1, author: .tim, text: "**Hey**"),
-                Message(id: 2, author: .steve, text: "Yeah sure, gimme 5"),
-                Message(id: 3, author: .steve, text: "Okay ready when you are"),
-                Message(id: 4, author: .tim, text: "**Awesome** 😁"),
-                Message(id: 5, author: .tim, text: "Ugh, gotta sit through these two"),
-                Message(id: 6, author: .steve, text: "*Every. Single. Time.* Every. Single. Time. Every. Single. Time. Every. Single. Time."),
+                Message(id: 1, user: .tim, text: "**Hey**"),
+                Message(id: 2, user: .steve, text: "Yeah sure, gimme 5"),
+                Message(id: 3, user: .steve, text: "Okay ready when you are"),
+                Message(id: 4, user: .tim, text: "**Awesome** 😁"),
+                Message(id: 5, user: .tim, text: "Ugh, gotta sit through these two"),
+                Message(id: 6, user: .steve, text: "*Every. Single. Time.* Every. Single. Time. Every. Single. Time. Every. Single. Time."),
                 Message(
                     id: 7,
-                    author: .steve,
+                    user: .steve,
                     attachments: [
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!)
                     ]),
                 Message(
                     id: 8,
-                    author: .steve,
+                    user: .steve,
                     text: "Hey",
                     attachments: [
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!)
                     ]),
                 Message(
                     id: 9,
-                    author: .steve,
+                    user: .steve,
                     attachments: [
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/arch")!),
@@ -51,13 +51,13 @@ struct ExampleView: View {
                     ]),
                 Message(
                     id: 10,
-                    author: .tim,
+                    user: .tim,
                     attachments: [
                         VideoAttachment(url: URL(string: "https://placeimg.com/640/480/animal")!)
                     ]),
                 Message(
                     id: 11,
-                    author: .tim,
+                    user: .tim,
                     attachments: [
                         ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
                         VideoAttachment(url: URL(string: "https://placeimg.com/640/480/arch")!),
@@ -70,12 +70,12 @@ struct ExampleView: View {
     }
 }
 
-extension Author {
-    static let tim = Author(
+extension User {
+    static let tim = User(
         avatarURL: URL(string: "https://placeimg.com/640/480/animal"),
         isCurrentUser: true
     )
-    static let steve = Author(
+    static let steve = User(
         avatarURL: URL(string: "https://placeimg.com/640/480/arch"),
         isCurrentUser: false
     )

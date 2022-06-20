@@ -38,7 +38,7 @@ struct AttachmentsView: View {
 
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(viewModel.draftViewModel.attachments) { media in
+                    ForEach(viewModel.medias) { media in
                         MediaCell(media: media) {
                             withAnimation {
                                 viewModel.delete(media)
@@ -56,7 +56,7 @@ struct AttachmentsView: View {
             }
             .frame(maxHeight: imagesHeight)
 
-            TextInputView(text: $viewModel.draftViewModel.text)
+            TextInputView(text: $viewModel.text)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 20)
@@ -66,6 +66,8 @@ struct AttachmentsView: View {
 
 #if DEBUG
 struct AttachmentsView_Previews: PreviewProvider {
+    private static var draftMessageService = DraftMessageService()
+
     static var previews: some View {
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 mini"))
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 Pro Max"))
@@ -80,13 +82,14 @@ struct AttachmentsView_Previews: PreviewProvider {
             .overlay {
                 AttachmentsView(
                     viewModel: AttachmentsViewModel(
-                        draftViewModel: DraftViewModel(
-                            attachments: [.random, .random, .random, .random, .random, .random]
-                        )
+                        draftMessageService: draftMessageService
                     )
                 )
                 .cornerRadius(20)
                 .padding(.horizontal, 20)
+            }
+            .onAppear {
+                draftMessageService.select(medias: [.random, .random, .random, .random, .random, .random])
             }
     }
 }

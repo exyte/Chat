@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Message {
     var id: Int
-    var author: Author
+    var user: User
 
     var text: String = ""
 

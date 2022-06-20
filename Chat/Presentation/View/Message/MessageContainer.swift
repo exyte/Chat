@@ -5,14 +5,14 @@
 import SwiftUI
 
 struct MessageContainer<Content>: View where Content: View {
-    let author: Author
+    let user: User
     @ViewBuilder var content: () -> Content
 
     let imageSize = 30.0 // TODO: Create config for avatar size
 
     var body: some View {
         HStack(alignment: .bottom) {
-            if author.isCurrentUser {
+            if user.isCurrentUser {
                 Spacer(minLength: 40)
                 contentView
                 avatar
@@ -26,7 +26,7 @@ struct MessageContainer<Content>: View where Content: View {
     }
 
     var avatar: some View {
-        AsyncImage(url: author.avatarURL) { image in
+        AsyncImage(url: user.avatarURL) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: imageSize, height: imageSize)
@@ -46,7 +46,7 @@ struct MessageContainer<Content>: View where Content: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: 15)
-                    .foregroundColor(author.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
+                    .foregroundColor(user.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
             )
     }
 }

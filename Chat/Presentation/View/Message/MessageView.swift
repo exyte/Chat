@@ -10,15 +10,22 @@ import SwiftUI
 struct MessageView: View {
     let message: Message
 
-    @Environment(\.messageParser) var messageParser
+    @Environment(\.messageUseMarkdown) var messageUseMarkdown
 
     var body: some View {
-        MessageContainer(author: message.author) {
+        MessageContainer(user: message.user) {
             VStack(alignment: .leading) {
                 if !message.text.isEmpty {
-                    messageParser.text(from: message.text)
-                        .padding(.horizontal, 15)
-                        .padding(.vertical, 8)
+                    Group {
+                        if messageUseMarkdown,
+                           let attributed = try? AttributedString(markdown: message.text) {
+                            Text(attributed)
+                        } else {
+                            Text(message.text)
+                        }
+                    }
+                    .padding(.horizontal, 15)
+                    .padding(.vertical, 8)
                 }
 
                 if !message.attachments.isEmpty {
@@ -34,23 +41,23 @@ struct MessageView_Previews: PreviewProvider {
         MessageView(
             message: Message(
                 id: 0,
-                author: .tim,
+                user: .tim,
                 text: "Example text"
             )
         )
         MessageView(
             message: Message(
                 id: 0,
-                author: .steve,
+                user: .steve,
                 text: "*Example* **markdown** _text_"
             )
         )
-        .environment(\.messageParser, MarkdownExampleMessageParser())
+        .chatMessageUseMarkdown()
 
         MessageView(
             message: Message(
                 id: 0,
-                author: .steve,
+                user: .steve,
                 attachments: [
                     ImageAttachment(
                         id: UUID().uuidString,

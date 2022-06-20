@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct Author {
+struct User {
     let avatarURL: URL?
     let isCurrentUser: Bool
 

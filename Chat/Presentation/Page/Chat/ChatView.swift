@@ -14,7 +14,7 @@ struct ChatView: View {
     var didSendMessage: (DraftMessage) -> Void
 
     @State private var scrollView: UIScrollView?
-    @StateObject private var draftViewModel = DraftViewModel()
+    @StateObject private var viewModel = ChatViewModel()
 
     var body: some View {
         ZStack {
@@ -29,12 +29,16 @@ struct ChatView: View {
                     self.scrollView = scrollView
                 }
 
-                InputView(draftViewModel: draftViewModel)
+                InputView(
+                    viewModel: InputViewModel(
+                        draftMessageService: viewModel.draftMessageService
+                    )
+                )
             }
             .onChange(of: messages) { _ in
                 scrollToBottom()
             }
-            if draftViewModel.isShownAttachments {
+            if viewModel.showMedias {
                 Rectangle()
                     .fill(Color.black)
                     .opacity(0.3)
@@ -43,7 +47,7 @@ struct ChatView: View {
                     .overlay {
                         AttachmentsView(
                             viewModel: AttachmentsViewModel(
-                                draftViewModel: draftViewModel
+                                draftMessageService: viewModel.draftMessageService
                             )
                         )
                         .cornerRadius(20)
@@ -52,7 +56,7 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            draftViewModel.didSendMessage = { [self] value in
+            viewModel.draftMessageService.didSendMessage = { [self] value in
                 self.didSendMessage(value)
                 self.scrollToBottom() // TODO: Make sure have no retain cycle
             }
@@ -72,12 +76,12 @@ struct ChatView_Preview: PreviewProvider {
     static var previews: some View {
         ChatView(
             messages: [
-                Message(id: 0, author: .steve, text: "Text 1"),
-                Message(id: 1, author: .tim),
-                Message(id: 5, author: .steve, attachments: [
+                Message(id: 0, user: .steve, text: "Text 1"),
+                Message(id: 1, user: .tim),
+                Message(id: 5, user: .steve, attachments: [
                     ImageAttachment(url: URL(string: "https://picsum.photos/200/300")!)
                 ]),
-                Message(id: 6, author: .tim, text: "Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"),
+                Message(id: 6, user: .tim, text: "Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"),
             ],
             didSendMessage: handleSendMessage
         )

@@ -1,16 +1,16 @@
 //
-//  Created by Alex.M on 15.06.2022.
+//  Created by Alex.M on 20.06.2022.
 //
 
 import Foundation
 import Combine
 import AssetsPicker
 
-final class AttachmentsViewModel: ObservableObject {
+final class InputViewModel: ObservableObject {
     let draftMessageService: DraftMessageService
 
     @Published var text: String = ""
-    @Published var medias: [Media] = []
+    @Published var showMedias: Bool = false
 
     private var subscriptions = Set<AnyCancellable>()
 
@@ -19,10 +19,20 @@ final class AttachmentsViewModel: ObservableObject {
 
         self.text = draftMessageService.text.value
 
-        draftMessageService.medias.assign(to: &$medias)
+        draftMessageService.medias
+            .map { !$0.isEmpty }
+            .assign(to: &$showMedias)
     }
 
-    func onTapSendMessage() {
+    func reset() {
+        draftMessageService.reset()
+    }
+
+    func remove(attachment: Media) {
+        draftMessageService.remove(media: attachment)
+    }
+
+    func send() {
         draftMessageService
             .sendMessage(text: text)
             .store(in: &subscriptions)
@@ -32,12 +42,7 @@ final class AttachmentsViewModel: ObservableObject {
         draftMessageService.update(text: text)
     }
 
-    func cancel() {
-        draftMessageService.reset()
-    }
-
-    func delete(_ media: Media) {
-        draftMessageService.update(text: text)
-        draftMessageService.remove(media: media)
+    func onSelect(medias: [Media]) {
+        draftMessageService.select(medias: medias)
     }
 }

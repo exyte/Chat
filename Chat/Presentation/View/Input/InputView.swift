@@ -9,7 +9,7 @@ import SwiftUI
 import AssetsPicker
 
 struct InputView: View {
-    @ObservedObject var draftViewModel: DraftViewModel
+    @ObservedObject var viewModel: InputViewModel
 
     @State private var isOpenPicker = false
     
@@ -17,15 +17,16 @@ struct InputView: View {
         VStack {
             HStack {
                 Button {
+                    viewModel.updateText()
                     isOpenPicker = true
                 } label: {
                     Text("Pick")
                 }
 
-                TextInputView(text: draftViewModel.isShownAttachments ? .constant("") : $draftViewModel.text)
+                TextInputView(text: viewModel.showMedias ? .constant("") : $viewModel.text)
 
                 Button {
-                    draftViewModel.send()
+                    viewModel.send()
                 } label: {
                     Text("Send")
                 }
@@ -35,7 +36,7 @@ struct InputView: View {
         .background(Colors.background)
         .sheet(isPresented: $isOpenPicker) {
             AssetsPicker(openPicker: $isOpenPicker) { medias in
-                draftViewModel.onSelect(medias: medias)
+                viewModel.onSelect(medias: medias)
             }
             .countAssetSelection()
             .assetSelectionLimit(Configuration.assetsPickerLimit)
@@ -44,9 +45,11 @@ struct InputView: View {
 }
 
 struct InputView_Previews: PreviewProvider {
-    @StateObject private static var draftViewModel = DraftViewModel()
+    @StateObject private static var viewModel = InputViewModel(
+        draftMessageService: DraftMessageService()
+    )
     
     static var previews: some View {
-        InputView(draftViewModel: draftViewModel)
+        InputView(viewModel: viewModel)
     }
 }
