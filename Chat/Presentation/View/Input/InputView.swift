@@ -9,26 +9,24 @@ import SwiftUI
 import AssetsPicker
 
 struct InputView: View {
-    @Binding var message: Message
-    @Binding var attachments: [Media]?
-    var didSendMessage: (Message) -> Void
+    @ObservedObject var viewModel: InputViewModel
 
     @State private var isOpenPicker = false
-    
-    @State private var selectedImage: UIImage?
-    @State private var selectedImageUrl: URL?
     
     var body: some View {
         VStack {
             HStack {
                 Button {
+                    viewModel.updateText()
                     isOpenPicker = true
                 } label: {
                     Text("Pick")
                 }
-                TextInputView(text: $message.text)
+
+                TextInputView(text: viewModel.showMedias ? .constant("") : $viewModel.text)
+
                 Button {
-                    didSendMessage(message)
+                    viewModel.send()
                 } label: {
                     Text("Send")
                 }
@@ -38,11 +36,7 @@ struct InputView: View {
         .background(Colors.background)
         .sheet(isPresented: $isOpenPicker) {
             AssetsPicker(openPicker: $isOpenPicker) { medias in
-                // FIXME: AssetPicker shouldn't return empty array
-                guard !medias.isEmpty else {
-                    return
-                }
-                self.attachments = medias
+                viewModel.onSelect(medias: medias)
             }
             .countAssetSelection()
             .assetSelectionLimit(Configuration.assetsPickerLimit)
@@ -51,15 +45,11 @@ struct InputView: View {
 }
 
 struct InputView_Previews: PreviewProvider {
-    @State static private var showingImageModePicker = false
-    @State static private var selectedImage: UIImage?
-    @State static private var attachments: [Media]?
-
-    @State static private var message = Message(id: 0)
+    @StateObject private static var viewModel = InputViewModel(
+        draftMessageService: DraftMessageService()
+    )
     
     static var previews: some View {
-        InputView(message: $message, attachments: $attachments) { message in
-            debugPrint(message)
-        }
+        InputView(viewModel: viewModel)
     }
 }

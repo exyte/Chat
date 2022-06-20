@@ -8,17 +8,14 @@
 import SwiftUI
 
 struct Message {
-
     var id: Int
+    var user: User
 
     var text: String = ""
 
     var attachments: [any Attachment] = []
 
     var createdAt: Date = Date()
-    
-    var avatarURL: URL?
-    var isCurrentUser: Bool = false
 }
 
 extension Message: Equatable {

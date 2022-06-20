@@ -1,7 +1,4 @@
 //
-//  TextInputView.swift
-//  Chat
-//
 //  Created by Alex.M on 14.06.2022.
 //
 
@@ -12,7 +9,7 @@ struct TextInputView: View {
 
     var body: some View {
         VStack {
-            TextField("", text: $text, axis: .vertical)
+            TextField("Message", text: $text, axis: .vertical)
                 .frame(minHeight: 35)
                 .padding(10)
                 .background(.white)

@@ -11,13 +11,10 @@ import AssetsPicker
 
 struct ChatView: View {
     var messages: [Message]
-    var didSendMessage: (Message) -> Void
-    
-    @State private var scrollView: UIScrollView?
+    var didSendMessage: (DraftMessage) -> Void
 
-    @State private var message = Message(id: 0)
-    @State private var isShownAttachments = false
-    @State private var attachments: [Media]?
+    @State private var scrollView: UIScrollView?
+    @StateObject private var viewModel = ChatViewModel()
 
     var body: some View {
         ZStack {
@@ -26,20 +23,21 @@ struct ChatView: View {
                     ForEach(messages, id: \.id) { message in
                         MessageView(message: message)
                     }
-                    .listRowSeparator(.hidden)
                 }
                 .introspectScrollView { scrollView in
                     self.scrollView = scrollView
                 }
 
-                InputView(message: $message, attachments: $attachments) { message in
-                    sendMessage(message)
-                }
+                InputView(
+                    viewModel: InputViewModel(
+                        draftMessageService: viewModel.draftMessageService
+                    )
+                )
             }
             .onChange(of: messages) { _ in
                 scrollToBottom()
             }
-            if isShownAttachments, let attachments = attachments {
+            if viewModel.showMedias {
                 Rectangle()
                     .fill(Color.black)
                     .opacity(0.3)
@@ -47,13 +45,8 @@ struct ChatView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .overlay {
                         AttachmentsView(
-                            isShown: $isShownAttachments,
                             viewModel: AttachmentsViewModel(
-                                attachments: attachments,
-                                message: message.text,
-                                onSend: { message in
-                                    sendMessage(message)
-                                }
+                                draftMessageService: viewModel.draftMessageService
                             )
                         )
                         .cornerRadius(20)
@@ -61,25 +54,16 @@ struct ChatView: View {
                     }
             }
         }
-        .onChange(of: attachments) { newValue in
-            isShownAttachments = newValue != nil
-        }
-        .onChange(of: isShownAttachments) { newValue in
-            if !newValue {
-                attachments = nil
+        .onAppear {
+            viewModel.draftMessageService.didSendMessage = { [self] value in
+                self.didSendMessage(value)
+                self.scrollToBottom() // TODO: Make sure have no retain cycle
             }
         }
     }
 }
 
 private extension ChatView {
-    func sendMessage(_ message: Message) {
-        didSendMessage(message)
-        scrollToBottom()
-        self.message = Message(id: 0)
-        self.attachments = nil
-    }
-
     func scrollToBottom() {
         if let scrollView = scrollView {
             scrollView.contentOffset = CGPoint(x: 0, y: scrollView.contentSize.height)
@@ -91,18 +75,18 @@ struct ChatView_Preview: PreviewProvider {
     static var previews: some View {
         ChatView(
             messages: [
-                Message(id: 0, text: "Text 1", isCurrentUser: false),
-                Message(id: 1, text: "Text 2", isCurrentUser: true),
-                Message(id: 5, attachments: [
+                Message(id: 0, user: .steve, text: "Text 1"),
+                Message(id: 1, user: .tim),
+                Message(id: 5, user: .steve, attachments: [
                     ImageAttachment(url: URL(string: "https://picsum.photos/200/300")!)
                 ]),
-                Message(id: 6, text: "Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"),
+                Message(id: 6, user: .tim, text: "Text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text"),
             ],
             didSendMessage: handleSendMessage
         )
     }
     
-    static func handleSendMessage(message: Message) {
+    static func handleSendMessage(message: DraftMessage) {
         print(message)
     }
 }

@@ -10,10 +10,9 @@ import Combine
 import AssetsPicker
 
 struct AttachmentsView: View {
-    @Binding var isShown: Bool
     @StateObject var viewModel: AttachmentsViewModel
-    
-    @State var imagesHeight: CGFloat = 80
+
+    @State var size = CGSize(width: 0, height: 80)
 
     private var columns: [GridItem] {
         [
@@ -27,7 +26,7 @@ struct AttachmentsView: View {
             HStack {
                 Button("Cancel") {
                     withAnimation {
-                        self.isShown = false
+                        viewModel.cancel()
                     }
                 }
                 Spacer()
@@ -39,40 +38,35 @@ struct AttachmentsView: View {
 
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(viewModel.attachments) { media in
-                        MediaCell(media: media) {
-                            withAnimation {
-                                viewModel.delete(media)
-                            }
-                        }
+                    ForEach(viewModel.medias) { media in
+                        MediaCell(
+                            viewModel: MediaCellViewModel(
+                                media: media,
+                                onDelete: {
+                                    withAnimation {
+                                        viewModel.delete(media)
+                                    }
+                                }
+                            )
+                        )
                     }
                 }
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            imagesHeight = proxy.size.height
-                        }
-                    }
-                )
+                .watchSize($size)
             }
-            .frame(maxHeight: imagesHeight)
+            .frame(maxHeight: size.height)
 
-            TextInputView(text: $viewModel.message.text)
+            TextInputView(text: $viewModel.text)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 20)
         .background(Colors.background)
-        .onChange(of: viewModel.isShown) { newValue in
-            guard !newValue else { return }
-            withAnimation {
-                self.isShown = false
-            }
-        }
     }
 }
 
 #if DEBUG
 struct AttachmentsView_Previews: PreviewProvider {
+    private static var draftMessageService = DraftMessageService()
+
     static var previews: some View {
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 mini"))
         content.previewDevice(PreviewDevice(stringLiteral: "iPhone 13 Pro Max"))
@@ -86,14 +80,15 @@ struct AttachmentsView_Previews: PreviewProvider {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay {
                 AttachmentsView(
-                    isShown: .constant(true),
                     viewModel: AttachmentsViewModel(
-                        attachments: [.random, .random, .random, .random, .random, .random],
-                        onSend: { _ in }
+                        draftMessageService: draftMessageService
                     )
                 )
                 .cornerRadius(20)
                 .padding(.horizontal, 20)
+            }
+            .onAppear {
+                draftMessageService.select(medias: [.random, .random, .random, .random, .random, .random])
             }
     }
 }
