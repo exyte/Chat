@@ -59,8 +59,10 @@ struct ChatView: View {
                 let attachments = messages.flatMap { $0.attachments }
                 let index = attachments.firstIndex { $0.id == viewModel.attachmentsFullscreenState.showFullscreen.value?.id }
                 AttachmentsPages(
-                    attachments: attachments,
-                    index: index ?? 0,
+                    viewModel: AttachmentsPagesViewModel(
+                        attachments: attachments,
+                        index: index ?? 0
+                    ),
                     onClose: {
                         viewModel.attachmentsFullscreenState.showFullscreen.value = nil
                     }

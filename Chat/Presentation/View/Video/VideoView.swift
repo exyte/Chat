@@ -12,20 +12,20 @@ struct VideoView: View {
     var body: some View {
         Group {
             if let player = viewModel.player {
-                if viewModel.hideAction {
-                    content(for: player)
-                        .onTapGesture {
-                            viewModel.showActions()
-                        }
-                } else {
-                    content(for: player)
-                }
+                content(for: player)
             } else {
                 ProgressView()
             }
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.showActions()
+        }
         .onAppear {
             viewModel.onStart()
+        }
+        .onDisappear {
+            viewModel.onStop()
         }
         .onChange(of: viewModel.hideAction) { hideActions in
             attachmentsPagesViewModel.showMinis = !hideActions
@@ -33,30 +33,28 @@ struct VideoView: View {
     }
 
     func content(for player: AVPlayer) -> some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.00000001))
-            .background {
-                VideoPlayer(player: player)
-            }
-            .overlay {
-                Color.clear
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .overlay {
-                if !viewModel.hideAction {
-                    Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background {
-                            Circle()
-                                .fill(.black)
-                                .opacity(0.72)
-                        }
-                        .onTapGesture {
-                            viewModel.togglePlay()
-                        }
+        Group {
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    VideoPlayer(player: player)
+                        .allowsHitTesting(false)
                 }
-            }
+                .overlay {
+                    if !viewModel.hideAction {
+                        Button {
+                            viewModel.togglePlay()
+                        } label: {
+                            Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                .resizable()
+                                .frame(width: 64, height: 64)
+                                .foregroundColor(.white)
+                        }
+                    } else {
+                        EmptyView()
+                    }
+                }
+        }
     }
 }
 
