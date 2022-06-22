@@ -10,46 +10,67 @@ import AssetsPicker
 
 struct InputView: View {
     @ObservedObject var viewModel: InputViewModel
+    var onTapAttach: (() -> Void)?
 
-    @State private var isOpenPicker = false
-    
     var body: some View {
-        VStack {
-            HStack {
-                Button {
-                    viewModel.updateText()
-                    isOpenPicker = true
-                } label: {
-                    Text("Pick")
-                }
-
-                TextInputView(text: viewModel.showMedias ? .constant("") : $viewModel.text)
-
-                Button {
-                    viewModel.send()
-                } label: {
-                    Text("Send")
-                }
+        HStack(spacing: 0) {
+            if onTapAttach != nil {
+                attachButton
+            } else {
+                attachButton
+                    .hidden()
             }
-            .padding(5)
+            TextInputView(text: $viewModel.text)
+            sendButton
+                .disabled(!viewModel.isAvailableSend)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 5)
         .background(Colors.background)
-        .sheet(isPresented: $isOpenPicker) {
-            AssetsPicker(openPicker: $isOpenPicker) { medias in
-                viewModel.onSelect(medias: medias)
+        .onChange(of: viewModel.text) { _ in
+            viewModel.validateDraft()
+        }
+        .onChange(of: viewModel.medias) { _ in
+            viewModel.validateDraft()
+        }
+        .onChange(of: viewModel.showPicker) { value in
+            if !value {
+                viewModel.medias = []
             }
-            .countAssetSelection()
-            .assetSelectionLimit(Configuration.assetsPickerLimit)
+            viewModel.validateDraft()
+        }
+    }
+
+    var attachButton: some View {
+        Button {
+            onTapAttach?()
+        } label: {
+            Image(systemName: "paperclip.circle")
+                .resizable()
+                .frame(width: 24, height: 24)
+                .padding(8)
+        }
+    }
+
+    var sendButton: some View {
+        Button {
+            viewModel.send()
+        } label: {
+            Image(systemName: "arrow.up.circle")
+                .resizable()
+                .frame(width: 24, height: 24)
+                .padding(8)
         }
     }
 }
 
 struct InputView_Previews: PreviewProvider {
-    @StateObject private static var viewModel = InputViewModel(
-        draftMessageService: DraftComposeState()
-    )
+    @StateObject private static var viewModel = InputViewModel()
     
     static var previews: some View {
-        InputView(viewModel: viewModel)
+        Group {
+            InputView(viewModel: viewModel, onTapAttach: {})
+            InputView(viewModel: viewModel, onTapAttach: nil)
+        }
     }
 }

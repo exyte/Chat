@@ -15,6 +15,7 @@ struct ChatView: View {
 
     @State private var scrollView: UIScrollView?
     @StateObject private var viewModel = ChatViewModel()
+    @StateObject private var inputViewModel = InputViewModel()
 
     var body: some View {
         ZStack {
@@ -31,29 +32,14 @@ struct ChatView: View {
                 }
 
                 InputView(
-                    viewModel: InputViewModel(
-                        draftMessageService: viewModel.draftMessageService
-                    )
+                    viewModel: inputViewModel,
+                    onTapAttach: {
+                        inputViewModel.showPicker = true
+                    }
                 )
             }
             .onChange(of: messages) { _ in
                 scrollToBottom()
-            }
-            if viewModel.showMedias {
-                Rectangle()
-                    .fill(Color.black)
-                    .opacity(0.3)
-                    .ignoresSafeArea()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .overlay {
-                        AttachmentsView(
-                            viewModel: AttachmentsViewModel(
-                                draftMessageService: viewModel.draftMessageService
-                            )
-                        )
-                        .cornerRadius(20)
-                        .padding(.horizontal, 20)
-                    }
             }
             if viewModel.showAttachmentsView {
                 let attachments = messages.flatMap { $0.attachments }
@@ -70,10 +56,14 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            viewModel.draftMessageService.didSendMessage = { [self] value in
+            inputViewModel.didSendMessage = { [self] value in
                 self.didSendMessage(value)
                 self.scrollToBottom() // TODO: Make sure have no retain cycle
             }
+        }
+        .sheet(isPresented: $inputViewModel.showPicker) {
+            AttachmentsEditor(viewModel: inputViewModel)
+                .presentationDetents([.medium, .large])
         }
     }
 }

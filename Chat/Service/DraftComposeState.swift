@@ -11,8 +11,6 @@ final class DraftComposeState {
     var text: CurrentValueSubject<String, Never> = CurrentValueSubject("")
     var didSendMessage: ((DraftMessage) -> Void)?
 
-    private(set) var attachments: [any Attachment] = []
-
     func mapAttachmentsForSend() -> AnyPublisher<[any Attachment], Never> {
         medias.value
             .publisher
@@ -43,7 +41,7 @@ final class DraftComposeState {
         }
     }
 
-    func sendMessage(text: String) -> AnyCancellable {
+    func sendMessage(text: String) -> AnyPublisher<Void, Never> {
         self.text.value = text
 
         return mapAttachmentsForSend()
@@ -54,27 +52,20 @@ final class DraftComposeState {
                     createdAt: Date()
                 )
             }
-            .sink { draft in
+            .handleEvents(receiveOutput: { draft in
                 DispatchQueue.main.async { [weak self, draft] in
                     self?.didSendMessage?(draft)
                     self?.reset()
                 }
-            }
+            })
+            .map { _ in }
+            .eraseToAnyPublisher()
     }
 
     func reset() {
         DispatchQueue.main.async { [weak self] in
             self?.text.value = ""
             self?.medias.value = []
-            self?.attachments = []
-        }
-    }
-
-    func remove(media: Media) {
-        DispatchQueue.main.async { [media, weak self] in
-            self?.medias.value.removeAll { item in
-                item.id == media.id
-            }
         }
     }
 

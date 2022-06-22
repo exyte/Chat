@@ -14,6 +14,7 @@ struct AlbumView: View {
     
     @EnvironmentObject private var selectionService: SelectionService
     @EnvironmentObject private var permissionsService: PermissionsService
+    @EnvironmentObject private var configurationState: ConfigurationState
     
     var body: some View {
         if let title = viewModel.title {
@@ -74,12 +75,7 @@ private extension AlbumView {
                 Spacer()
             }
         }
-        .navigationBarItems(
-            trailing: Button("Send") {
-                isSent = true
-            }
-                .disabled(!selectionService.canSendSelected)
-        )
+        .navigationBarItems(trailing: rightNavigaitonItem)
         .sheet(item: $fullscreenItem) { item in
             FullscreenContainer(
                 medias: viewModel.medias,
@@ -91,6 +87,19 @@ private extension AlbumView {
         }
         .onDisappear {
             viewModel.onStop()
+        }
+    }
+
+    @ViewBuilder
+    var rightNavigaitonItem: some View {
+        if configurationState.isStandalone {
+            Button("Send") {
+                isSent = true
+            }
+            .disabled(!selectionService.canSendSelected)
+        } else {
+            Button("Send") { }
+                .hidden()
         }
     }
 }

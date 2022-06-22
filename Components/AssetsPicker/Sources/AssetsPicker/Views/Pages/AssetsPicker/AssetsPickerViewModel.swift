@@ -5,8 +5,6 @@
 import Foundation
 import SwiftUI
 
-public typealias AssetsPickerCompletionClosure = ([Media]) -> Void
-
 @MainActor
 final class AssetsPickerViewModel: ObservableObject {
     @Published var mode: AssetsPickerMode = .photos
