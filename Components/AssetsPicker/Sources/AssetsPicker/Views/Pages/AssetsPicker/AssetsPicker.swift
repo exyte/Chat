@@ -16,7 +16,7 @@ public struct AssetsPicker: View {
     @StateObject private var configurationState = ConfigurationState()
     @StateObject private var permissionService = PermissionsService()
     
-    @Environment(\.assetSelectionLimit) private var assetSelectionLimit
+    @Environment(\.assetsSelectionLimit) private var assetsSelectionLimit
     @Environment(\.assetsPickerCompletion) private var assetsPickerCompletion
     @Environment(\.assetsPickerOnChange) private var assetsPickerOnChange
     
@@ -58,7 +58,7 @@ public struct AssetsPicker: View {
         .environmentObject(permissionService)
         .environmentObject(configurationState)
         .onAppear {
-            selectionService.assetSelectionLimit = assetSelectionLimit
+            selectionService.assetSelectionLimit = assetsSelectionLimit
             selectionService.onChangeClosure = assetsPickerOnChange
 
             configurationState.isStandalone = assetsPickerCompletion != nil

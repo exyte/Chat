@@ -6,16 +6,9 @@ import Foundation
 import Combine
 
 final class ChatViewModel: ObservableObject {
-    let attachmentsFullscreenState = AttachmentsFullscreenState()
-
-    @Published var showAttachmentsView: Bool = false
+    @Published var fullscreenAttachmentItem: Optional<any Attachment> = nil
 
     private var subscriptions = Set<AnyCancellable>()
 
-    init() {
-        attachmentsFullscreenState
-            .showFullscreen
-            .map { $0 != nil }
-            .assign(to: &$showAttachmentsView)
-    }
+    init() {}
 }

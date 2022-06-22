@@ -22,7 +22,7 @@ struct InputView: View {
             }
             TextInputView(text: $viewModel.text)
             sendButton
-                .disabled(!viewModel.isAvailableSend)
+                .disabled(!viewModel.canSend)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 5)

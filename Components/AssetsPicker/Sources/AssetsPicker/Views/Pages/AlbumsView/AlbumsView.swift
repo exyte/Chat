@@ -59,7 +59,7 @@ struct AlbumsView: View {
                 Spacer()
             }
         }
-        .navigationBarItems(trailing: rightNavigaitonItem)
+        .navigationBarItems(trailing: rightNavigationItem)
         .onAppear {
             viewModel.onStart()
         }
@@ -71,7 +71,7 @@ struct AlbumsView: View {
 
 private extension AlbumsView {
     @ViewBuilder
-    var rightNavigaitonItem: some View {
+    var rightNavigationItem: some View {
         if configurationState.isStandalone {
             Button("Send") {
                 isSent = true

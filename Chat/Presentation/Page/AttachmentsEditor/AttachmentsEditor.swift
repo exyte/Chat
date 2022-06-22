@@ -14,16 +14,17 @@ struct AttachmentsEditor: View {
     var body: some View {
         VStack {
             AssetsPicker(openPicker: $viewModel.showPicker)
+                .assetsPicker(selectionStyle: .count)
+                .assetsSelectionLimit(Configuration.assetsPickerLimit)
                 .assetsPickerOnChange { medias in
                     viewModel.medias = medias
                 }
+
             InputView(
                 viewModel: viewModel,
                 onTapAttach: nil
             )
         }
-        .countAssetSelection()
-        .assetSelectionLimit(Configuration.assetsPickerLimit)
     }
 }
 

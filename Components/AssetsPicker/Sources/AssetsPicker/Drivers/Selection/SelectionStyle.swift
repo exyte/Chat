@@ -4,28 +4,24 @@
 
 import SwiftUI
 
-public enum AssetSelectionStyle {
+public enum AssetsSelectionStyle {
     case checkmark
     case count
 }
 
-struct AssetSelectionStyleKey: EnvironmentKey {
-    static var defaultValue: AssetSelectionStyle = .checkmark
+struct AssetsSelectionStyleKey: EnvironmentKey {
+    static var defaultValue: AssetsSelectionStyle = .checkmark
 }
 
 extension EnvironmentValues {
-    var assetSelectionStyle: AssetSelectionStyle {
-        get { self[AssetSelectionStyleKey.self] }
-        set { self[AssetSelectionStyleKey.self] = newValue }
+    var assetsSelectionStyle: AssetsSelectionStyle {
+        get { self[AssetsSelectionStyleKey.self] }
+        set { self[AssetsSelectionStyleKey.self] = newValue }
     }
 }
 
 public extension View {
-    func checkmarkAssetSelection() -> some View {
-        self.environment(\.assetSelectionStyle, .checkmark)
-    }
-
-    func countAssetSelection() -> some View {
-        self.environment(\.assetSelectionStyle, .count)
+    func assetsPicker(selectionStyle: AssetsSelectionStyle) -> some View {
+        self.environment(\.assetsSelectionStyle, selectionStyle)
     }
 }

@@ -23,7 +23,7 @@ struct ChatView: View {
                 ScrollView {
                     ForEach(messages, id: \.id) { message in
                         MessageView(message: message) { attachment in
-                            viewModel.attachmentsFullscreenState.showFullscreen.value = attachment
+                            viewModel.fullscreenAttachmentItem = attachment
                         }
                     }
                 }
@@ -41,16 +41,16 @@ struct ChatView: View {
             .onChange(of: messages) { _ in
                 scrollToBottom()
             }
-            if viewModel.showAttachmentsView {
+            if viewModel.fullscreenAttachmentItem != nil {
                 let attachments = messages.flatMap { $0.attachments }
-                let index = attachments.firstIndex { $0.id == viewModel.attachmentsFullscreenState.showFullscreen.value?.id }
+                let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
                 AttachmentsPages(
                     viewModel: AttachmentsPagesViewModel(
                         attachments: attachments,
                         index: index ?? 0
                     ),
                     onClose: {
-                        viewModel.attachmentsFullscreenState.showFullscreen.value = nil
+                        viewModel.fullscreenAttachmentItem = nil
                     }
                 )
             }

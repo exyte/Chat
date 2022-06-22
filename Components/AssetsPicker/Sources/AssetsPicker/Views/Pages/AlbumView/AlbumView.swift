@@ -75,7 +75,7 @@ private extension AlbumView {
                 Spacer()
             }
         }
-        .navigationBarItems(trailing: rightNavigaitonItem)
+        .navigationBarItems(trailing: rightNavigationItem)
         .sheet(item: $fullscreenItem) { item in
             FullscreenContainer(
                 medias: viewModel.medias,
@@ -91,7 +91,7 @@ private extension AlbumView {
     }
 
     @ViewBuilder
-    var rightNavigaitonItem: some View {
+    var rightNavigationItem: some View {
         if configurationState.isStandalone {
             Button("Send") {
                 isSent = true

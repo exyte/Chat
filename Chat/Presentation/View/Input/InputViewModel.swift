@@ -11,7 +11,7 @@ final class InputViewModel: ObservableObject {
     @Published var medias: [Media] = []
     @Published var showPicker = false
 
-    @Published var isAvailableSend = false
+    @Published var canSend = false
 
     var didSendMessage: ((DraftMessage) -> Void)?
 
@@ -35,7 +35,7 @@ final class InputViewModel: ObservableObject {
     func validateDraft() {
         let notEmptyTextInChatWindow = !text.isEmpty && !showPicker
         let notEmptyMediasInPickerWindow = !medias.isEmpty && showPicker
-        isAvailableSend = notEmptyTextInChatWindow || notEmptyMediasInPickerWindow
+        canSend = notEmptyTextInChatWindow || notEmptyMediasInPickerWindow
     }
 }
 

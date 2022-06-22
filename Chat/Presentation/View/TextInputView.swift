@@ -7,6 +7,8 @@ import SwiftUI
 struct TextInputView: View {
     @Binding var text: String
 
+    @FocusState private var focused: Bool
+
     var body: some View {
         VStack {
             TextField("Message", text: $text, axis: .vertical)
@@ -15,6 +17,17 @@ struct TextInputView: View {
                 .background(.white)
                 .cornerRadius(10)
                 .padding(3)
+                .focused($focused, equals: true)
+        }
+        .toolbar {
+            ToolbarItem(placement: .keyboard) {
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        focused = false
+                    }
+                }
+            }
         }
     }
 }
