@@ -8,7 +8,9 @@ struct AttachmentsGrid: View {
     private let single: (any Attachment)?
     private let grid: [any Attachment]
 
-    init(attachments: [any Attachment]) {
+    let onTap: (any Attachment) -> Void
+
+    init(attachments: [any Attachment], onTap: @escaping (any Attachment) -> Void) {
         if attachments.count % 2 == 0 {
             single = nil
             grid = attachments
@@ -16,6 +18,7 @@ struct AttachmentsGrid: View {
             single = attachments.first
             grid = attachments.dropFirst().map { $0 }
         }
+        self.onTap = onTap
     }
 
     var columns: [GridItem] {
@@ -26,11 +29,17 @@ struct AttachmentsGrid: View {
         VStack {
             if let attachment = single {
                 AttachmentCell(attachment: attachment)
+                    .onTapGesture {
+                        onTap(attachment)
+                    }
             }
             if !grid.isEmpty {
                 LazyVGrid(columns: columns) {
                     ForEach(grid, id: \.id) { attachment in
                         AttachmentCell(attachment: attachment)
+                            .onTapGesture {
+                                onTap(attachment)
+                            }
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -47,7 +56,7 @@ struct AttachmentsGrid_Preview: PreviewProvider {
         Group {
             ForEach(examples, id: \.self) { count in
                 ScrollView {
-                    AttachmentsGrid(attachments: .random(count: count))
+                    AttachmentsGrid(attachments: .random(count: count), onTap: { _ in })
                         .padding()
                         .background(Color.white)
                 }

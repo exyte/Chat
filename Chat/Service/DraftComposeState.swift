@@ -6,7 +6,7 @@ import Foundation
 import Combine
 import AssetsPicker
 
-final class DraftMessageService: ObservableObject {
+final class DraftComposeState {
     var medias: CurrentValueSubject<[Media], Never> = CurrentValueSubject([])
     var text: CurrentValueSubject<String, Never> = CurrentValueSubject("")
     var didSendMessage: ((DraftMessage) -> Void)?

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MessageView: View {
     let message: Message
+    let onTapAttachment: (any Attachment) -> Void
 
     @Environment(\.messageUseMarkdown) var messageUseMarkdown
 
@@ -29,7 +30,7 @@ struct MessageView: View {
                 }
 
                 if !message.attachments.isEmpty {
-                    AttachmentsGrid(attachments: message.attachments)
+                    AttachmentsGrid(attachments: message.attachments, onTap: onTapAttachment)
                 }
             }
         }
@@ -43,14 +44,16 @@ struct MessageView_Previews: PreviewProvider {
                 id: 0,
                 user: .tim,
                 text: "Example text"
-            )
+            ),
+            onTapAttachment: { _ in }
         )
         MessageView(
             message: Message(
                 id: 0,
                 user: .steve,
                 text: "*Example* **markdown** _text_"
-            )
+            ),
+            onTapAttachment: { _ in }
         )
         .chatMessageUseMarkdown()
 
@@ -66,7 +69,8 @@ struct MessageView_Previews: PreviewProvider {
                         name: nil
                     )
                 ]
-            )
+            ),
+            onTapAttachment: { _ in }
         )
     }
 }

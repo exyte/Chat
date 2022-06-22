@@ -50,6 +50,8 @@ final class FullscreenCellViewModel: ObservableObject {
         guard let url = url else {
             return
         }
-        player = AVPlayer(url: url)
+        await MainActor.run { [weak self, url] in
+            self?.player = AVPlayer(url: url)
+        }
     }
 }
