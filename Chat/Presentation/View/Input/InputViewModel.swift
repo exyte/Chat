@@ -40,6 +40,7 @@ final class InputViewModel: ObservableObject {
 }
 
 private extension InputViewModel {
+    
     func mapAttachmentsForSend() -> AnyPublisher<[any Attachment], Never> {
         medias.publisher
             .receive(on: DispatchQueue.global())

@@ -6,12 +6,6 @@ import Foundation
 import Combine
 import AVKit
 
-extension AVPlayer {
-    var isPlaying: Bool {
-        return rate != 0 && error == nil
-    }
-}
-
 // TODO: Create option "download video before playing"
 final class VideoViewModel: ObservableObject {
     @Published var attachment: VideoAttachment
@@ -54,6 +48,7 @@ final class VideoViewModel: ObservableObject {
 }
 
 private extension VideoViewModel {
+
     func playVideo() {
         player?.play()
         hideActionsAfterDelay()

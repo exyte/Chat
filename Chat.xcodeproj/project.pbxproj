@@ -16,6 +16,7 @@
 		13905A212862DE0E0034043C /* AttachmentsPagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13905A202862DE0E0034043C /* AttachmentsPagesViewModel.swift */; };
 		13905A232862DE330034043C /* AttachmentsPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13905A222862DE330034043C /* AttachmentsPages.swift */; };
 		13905A262862E5590034043C /* AttachmentsEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13905A252862E5590034043C /* AttachmentsEditor.swift */; };
+		13905A2828632B830034043C /* AVPlayer+State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13905A2728632B830034043C /* AVPlayer+State.swift */; };
 		13AD59E12859C144009DE654 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E02859C144009DE654 /* Colors.swift */; };
 		13AD59E32859C7FF009DE654 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AD59E22859C7FF009DE654 /* Configuration.swift */; };
 		13AF033A285C488300EF4F1B /* TextInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13AF0339285C488300EF4F1B /* TextInputView.swift */; };
@@ -53,6 +54,7 @@
 		13905A202862DE0E0034043C /* AttachmentsPagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentsPagesViewModel.swift; sourceTree = "<group>"; };
 		13905A222862DE330034043C /* AttachmentsPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentsPages.swift; sourceTree = "<group>"; };
 		13905A252862E5590034043C /* AttachmentsEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentsEditor.swift; sourceTree = "<group>"; };
+		13905A2728632B830034043C /* AVPlayer+State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVPlayer+State.swift"; sourceTree = "<group>"; };
 		13AD59E02859C144009DE654 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		13AD59E22859C7FF009DE654 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		13AF0339285C488300EF4F1B /* TextInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputView.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				5B846A8128101CC1005835BB /* Color+Hex.swift */,
 				13C432EA28606E180094E66B /* SizeGetter.swift */,
+				13905A2728632B830034043C /* AVPlayer+State.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -414,6 +417,7 @@
 			files = (
 				13AF0352285C4BF000EF4F1B /* User.swift in Sources */,
 				13BC9A9B2860834800675DD9 /* AttachmentsPage.swift in Sources */,
+				13905A2828632B830034043C /* AVPlayer+State.swift in Sources */,
 				13C432EB28606E180094E66B /* SizeGetter.swift in Sources */,
 				13905A232862DE330034043C /* AttachmentsPages.swift in Sources */,
 				5B846A802810070C005835BB /* ChatView.swift in Sources */,
