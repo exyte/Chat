@@ -1,12 +1,8 @@
 //
-//  AttachmentsPage.swift
-//  Chat
-//
 //  Created by Alex.M on 20.06.2022.
 //
 
 import SwiftUI
-import AVKit
 
 struct AttachmentsPage: View {
     let attachment: any Attachment
@@ -23,10 +19,10 @@ struct AttachmentsPage: View {
                     .frame(minWidth: 100, minHeight: 100)
             }
             .frame(maxHeight: 200)
-        } else if attachment is VideoAttachment {
-            VideoPlayer(player: AVPlayer(url: attachment.full))
-                .padding()
-                .background(.red)
+        } else if let attachment = attachment as? VideoAttachment {
+            VideoView(
+                viewModel: VideoViewModel(attachment: attachment)
+            )
         } else {
             Rectangle()
                 .foregroundColor(Color.gray)
@@ -45,6 +41,10 @@ extension CGSize {
     }
 }
 
+final class AttachmentsPagesViewModel: ObservableObject {
+    @Published var showMinis = false
+}
+
 struct AttachmentsPages: View {
     var attachments: [any Attachment]
     @State var index: Int
@@ -52,6 +52,7 @@ struct AttachmentsPages: View {
     var onClose: () -> Void
 
     @State var offset: CGSize = .zero
+    @StateObject var viewModel = AttachmentsPagesViewModel()
 
     var body: some View {
         let closeGesture = DragGesture()
@@ -75,12 +76,23 @@ struct AttachmentsPages: View {
                         AttachmentsPage(attachment: attachment)
                             .tag(index)
                             .frame(maxHeight: .infinity)
-                            .padding()
+                            .onTapGesture {
+                                withAnimation {
+                                    viewModel.showMinis.toggle()
+                                }
+                            }
                     }
                 }
+                .environmentObject(viewModel)
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .overlay(alignment: .bottom) {
-                    ScrollViewReader { proxy in
+            }
+            .offset(offset)
+            .gesture(closeGesture)
+
+            VStack {
+                Spacer()
+                ScrollViewReader { proxy in
+                    if viewModel.showMinis {
                         ScrollView(.horizontal) {
                             HStack {
                                 ForEach(attachments.enumerated().map({ $0 }), id: \.offset) { (index, attachment) in
@@ -96,19 +108,18 @@ struct AttachmentsPages: View {
                                 }
                             }
                         }
+                        .onAppear {
+                            proxy.scrollTo(index)
+                        }
                         .onChange(of: index) { newValue in
                             withAnimation {
                                 proxy.scrollTo(newValue, anchor: .center)
                             }
                         }
-                        .onAppear {
-                            proxy.scrollTo(index, anchor: .center)
-                        }
                     }
                 }
             }
             .offset(offset)
-            .gesture(closeGesture)
         }
     }
 }

@@ -32,22 +32,37 @@ struct ExampleView: View {
                     id: 7,
                     user: .steve,
                     attachments: [
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!)
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/92c952")!,
+                            full: URL(string: "https://via.placeholder.com/600/92c952")!
+                        )
                     ]),
                 Message(
                     id: 8,
                     user: .steve,
                     text: "Hey",
                     attachments: [
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!)
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/771796")!,
+                            full: URL(string: "https://via.placeholder.com/600/771796")!
+                        )
                     ]),
                 Message(
                     id: 9,
                     user: .steve,
                     attachments: [
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/arch")!),
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/animal")!),
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/24f355")!,
+                            full: URL(string: "https://via.placeholder.com/600/24f355")!
+                        ),
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/d32776")!,
+                            full: URL(string: "https://via.placeholder.com/600/d32776")!
+                        ),
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/f66b97")!,
+                            full: URL(string: "https://via.placeholder.com/600/f66b97")!
+                        ),
                     ]),
                 Message(
                     id: 10,
@@ -62,17 +77,26 @@ struct ExampleView: View {
                     id: 11,
                     user: .tim,
                     attachments: [
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
-                        VideoAttachment(
-                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4")!,
-                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg")!
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/56a8c2")!,
+                            full: URL(string: "https://via.placeholder.com/600/56a8c2")!
                         ),
-                        VideoAttachment(
-                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")!,
-                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg")!
+//                        VideoAttachment(
+//                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4")!,
+//                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg")!
+//                        ),
+//                        VideoAttachment(
+//                            thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")!,
+//                            full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg")!
+//                        ),
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/54176f")!,
+                            full: URL(string: "https://via.placeholder.com/600/54176f")!
                         ),
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!),
-                        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/arch")!),
+                        ImageAttachment(
+                            thumbnail: URL(string: "https://via.placeholder.com/150/197d29")!,
+                            full: URL(string: "https://via.placeholder.com/600/197d29")!
+                        ),
                     ]),
             ]
         }
