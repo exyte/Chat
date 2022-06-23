@@ -7,11 +7,11 @@ import SwiftUI
 struct SelectIndicatorView: View {
     let index: Int?
     
-    @Environment(\.assetSelectionStyle) var assetSelectionStyle
+    @Environment(\.assetsSelectionStyle) var assetsSelectionStyle
     
     var body: some View {
         Group {
-            switch assetSelectionStyle {
+            switch assetsSelectionStyle {
             case .checkmark:
                 checkView
             case .count:
@@ -86,7 +86,7 @@ struct SelectIndicatorView_Preview: PreviewProvider {
                         .padding(4)
                         .background(Color.red)
                 }
-                .environment(\.assetSelectionStyle, .count)
+                .environment(\.assetsSelectionStyle, .count)
             }
         }
     }

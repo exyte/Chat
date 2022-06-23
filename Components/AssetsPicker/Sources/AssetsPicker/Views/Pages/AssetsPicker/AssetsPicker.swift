@@ -4,20 +4,25 @@
 
 import SwiftUI
 
+final class ConfigurationState: ObservableObject {
+    @Published var isStandalone: Bool = true
+}
+
 public struct AssetsPicker: View {
     @Binding public var openPicker: Bool
-    public let completion: AssetsPickerCompletionClosure
 
     @StateObject private var viewModel = AssetsPickerViewModel()
     @StateObject private var selectionService = SelectionService()
+    @StateObject private var configurationState = ConfigurationState()
     @StateObject private var permissionService = PermissionsService()
     
-    @Environment(\.assetSelectionLimit) private var assetSelectionLimit
+    @Environment(\.assetsSelectionLimit) private var assetsSelectionLimit
+    @Environment(\.assetsPickerCompletion) private var assetsPickerCompletion
+    @Environment(\.assetsPickerOnChange) private var assetsPickerOnChange
     
     // MARK: - Object life cycle
-    public init(openPicker: Binding<Bool>, completion: @escaping AssetsPickerCompletionClosure) {
+    public init(openPicker: Binding<Bool>) {
         self._openPicker = openPicker
-        self.completion = completion
     }
     
     // MARK: - SwiftUI View implementation
@@ -51,8 +56,12 @@ public struct AssetsPicker: View {
         .navigationViewStyle(.stack)
         .environmentObject(selectionService)
         .environmentObject(permissionService)
+        .environmentObject(configurationState)
         .onAppear {
-            selectionService.assetSelectionLimit = assetSelectionLimit
+            selectionService.assetSelectionLimit = assetsSelectionLimit
+            selectionService.onChangeClosure = assetsPickerOnChange
+
+            configurationState.isStandalone = assetsPickerCompletion != nil
         }
         .cameraSheet(isShow: $viewModel.showCamera, image: $viewModel.cameraImage)
         .onChange(of: viewModel.isSent) { flag in
@@ -60,10 +69,7 @@ public struct AssetsPicker: View {
                 return
             }
             openPicker = false
-            completion(selectionService.mapToMedia())
-        }
-        .onDisappear {
-            // TODO: Call ``completion`` here. Wait when allert will be close.
+            assetsPickerCompletion?(selectionService.mapToMedia())
         }
 #if os(iOS)
         .onChange(of: viewModel.cameraImage) { newValue in
@@ -72,7 +78,7 @@ public struct AssetsPicker: View {
                 return
             }
             openPicker = false
-            completion([Media(source: .url(url), type: .image)])
+            assetsPickerCompletion?([Media(source: .url(url), type: .image)])
         }
 #endif
     }

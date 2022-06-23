@@ -15,6 +15,8 @@ struct ChatView: View {
 
     @State private var scrollView: UIScrollView?
     @StateObject private var viewModel = ChatViewModel()
+    @StateObject private var inputViewModel = InputViewModel()
+    @StateObject private var globalFocusState = GlobalFocusState()
 
     var body: some View {
         ZStack {
@@ -22,7 +24,7 @@ struct ChatView: View {
                 ScrollView {
                     ForEach(messages, id: \.id) { message in
                         MessageView(message: message) { attachment in
-                            viewModel.attachmentsFullscreenState.showFullscreen.value = attachment
+                            viewModel.fullscreenAttachmentItem = attachment
                         }
                     }
                 }
@@ -31,48 +33,55 @@ struct ChatView: View {
                 }
 
                 InputView(
-                    viewModel: InputViewModel(
-                        draftMessageService: viewModel.draftMessageService
-                    )
+                    viewModel: inputViewModel,
+                    onTapAttach: {
+                        inputViewModel.showPicker = true
+                    }
                 )
+                .environmentObject(globalFocusState)
             }
             .onChange(of: messages) { _ in
                 scrollToBottom()
             }
-            if viewModel.showMedias {
-                Rectangle()
-                    .fill(Color.black)
-                    .opacity(0.3)
-                    .ignoresSafeArea()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .overlay {
-                        AttachmentsView(
-                            viewModel: AttachmentsViewModel(
-                                draftMessageService: viewModel.draftMessageService
-                            )
-                        )
-                        .cornerRadius(20)
-                        .padding(.horizontal, 20)
-                    }
-            }
-            if viewModel.showAttachmentsView {
+            if viewModel.fullscreenAttachmentItem != nil {
                 let attachments = messages.flatMap { $0.attachments }
-                let index = attachments.firstIndex { $0.id == viewModel.attachmentsFullscreenState.showFullscreen.value?.id }
+                let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
                 AttachmentsPages(
                     viewModel: AttachmentsPagesViewModel(
                         attachments: attachments,
                         index: index ?? 0
                     ),
                     onClose: {
-                        viewModel.attachmentsFullscreenState.showFullscreen.value = nil
+                        viewModel.fullscreenAttachmentItem = nil
                     }
                 )
             }
         }
         .onAppear {
-            viewModel.draftMessageService.didSendMessage = { [self] value in
+            inputViewModel.didSendMessage = { [self] value in
                 self.didSendMessage(value)
                 self.scrollToBottom() // TODO: Make sure have no retain cycle
+            }
+        }
+        .sheet(isPresented: $inputViewModel.showPicker) {
+            AttachmentsEditor(viewModel: inputViewModel)
+                .presentationDetents([.medium, .large])
+                .environmentObject(globalFocusState)
+        }
+        .onChange(of: inputViewModel.showPicker) {
+            if $0 {
+                globalFocusState.focus = nil
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .keyboard) {
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        globalFocusState.focus = nil
+                    }
+                    .tint(Color.blue)
+                }
             }
         }
     }

@@ -9,7 +9,7 @@ struct SelectableView<Content>: View where Content: View {
     let onSelect: () -> Void
     @ViewBuilder let content: () -> Content
     
-    @Environment(\.assetSelectionStyle) private var assetSelectionStyle
+    @Environment(\.assetsSelectionStyle) private var assetsSelectionStyle
     
     var body: some View {
         content()
@@ -28,7 +28,7 @@ struct SelectableView<Content>: View where Content: View {
 
 private extension SelectableView {
     var selectionAlignment: Alignment {
-        switch assetSelectionStyle {
+        switch assetsSelectionStyle {
         case .checkmark:
             return .bottomTrailing
         case .count:

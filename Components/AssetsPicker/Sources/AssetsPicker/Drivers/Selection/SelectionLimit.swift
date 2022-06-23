@@ -4,19 +4,19 @@
 
 import SwiftUI
 
-struct AssetSelectionLimitKey: EnvironmentKey {
+struct AssetsSelectionLimitKey: EnvironmentKey {
     static var defaultValue: Int = 10
 }
 
 extension EnvironmentValues {
-    var assetSelectionLimit: Int {
-        get { self[AssetSelectionLimitKey.self] }
-        set { self[AssetSelectionLimitKey.self] = newValue }
+    var assetsSelectionLimit: Int {
+        get { self[AssetsSelectionLimitKey.self] }
+        set { self[AssetsSelectionLimitKey.self] = newValue }
     }
 }
 
 public extension View {
-    func assetSelectionLimit(_ value: Int) -> some View {
-        self.environment(\.assetSelectionLimit, value)
+    func assetsSelectionLimit(_ value: Int) -> some View {
+        self.environment(\.assetsSelectionLimit, value)
     }
 }

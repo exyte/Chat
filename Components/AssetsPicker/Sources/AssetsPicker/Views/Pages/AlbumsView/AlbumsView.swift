@@ -12,6 +12,7 @@ struct AlbumsView: View {
 
     @EnvironmentObject private var selectionService: SelectionService
     @EnvironmentObject private var permissionsService: PermissionsService
+    @EnvironmentObject private var configurationState: ConfigurationState
 
     private var columns: [GridItem] {
         [GridItem(.adaptive(minimum: 100), spacing: 0, alignment: .top)]
@@ -58,17 +59,27 @@ struct AlbumsView: View {
                 Spacer()
             }
         }
-        .navigationBarItems(
-            trailing: Button("Send") {
-                isSent = true
-            }
-                .disabled(!selectionService.canSendSelected)
-        )
+        .navigationBarItems(trailing: rightNavigationItem)
         .onAppear {
             viewModel.onStart()
         }
         .onDisappear {
             viewModel.onStop()
+        }
+    }
+}
+
+private extension AlbumsView {
+    @ViewBuilder
+    var rightNavigationItem: some View {
+        if configurationState.isStandalone {
+            Button("Send") {
+                isSent = true
+            }
+            .disabled(!selectionService.canSendSelected)
+        } else {
+            Button("Send") { }
+                .hidden()
         }
     }
 }
