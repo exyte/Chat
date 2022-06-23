@@ -33,6 +33,7 @@
 		13C432EB28606E180094E66B /* SizeGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13C432EA28606E180094E66B /* SizeGetter.swift */; };
 		13DCB5C9286436190054E6F0 /* GlobalFocusState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DCB5C8286436190054E6F0 /* GlobalFocusState.swift */; };
 		13DCB5CB286436330054E6F0 /* Focusable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DCB5CA286436330054E6F0 /* Focusable.swift */; };
+		13DCB5CE28643ADC0054E6F0 /* CustomFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DCB5CD28643ADC0054E6F0 /* CustomFocus.swift */; };
 		5B41BFED28324C7100B181D8 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 5B41BFEC28324C7100B181D8 /* Introspect */; };
 		5B846A70281004E1005835BB /* ChatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B846A6F281004E1005835BB /* ChatApp.swift */; };
 		5B846A72281004E1005835BB /* ExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B846A71281004E1005835BB /* ExampleView.swift */; };
@@ -72,6 +73,7 @@
 		13C432EA28606E180094E66B /* SizeGetter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SizeGetter.swift; sourceTree = "<group>"; };
 		13DCB5C8286436190054E6F0 /* GlobalFocusState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalFocusState.swift; sourceTree = "<group>"; };
 		13DCB5CA286436330054E6F0 /* Focusable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Focusable.swift; sourceTree = "<group>"; };
+		13DCB5CD28643ADC0054E6F0 /* CustomFocus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFocus.swift; sourceTree = "<group>"; };
 		5B846A6C281004E1005835BB /* Chat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B846A6F281004E1005835BB /* ChatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatApp.swift; sourceTree = "<group>"; };
 		5B846A71281004E1005835BB /* ExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleView.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				5B846A8128101CC1005835BB /* Color+Hex.swift */,
 				13C432EA28606E180094E66B /* SizeGetter.swift */,
 				13905A2728632B830034043C /* AVPlayer+State.swift */,
+				13DCB5CD28643ADC0054E6F0 /* CustomFocus.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -452,6 +455,7 @@
 				1357C12B28617D3E00F0EA01 /* VideoViewModel.swift in Sources */,
 				5B846A8228101CC1005835BB /* Color+Hex.swift in Sources */,
 				13AD59E32859C7FF009DE654 /* Configuration.swift in Sources */,
+				13DCB5CE28643ADC0054E6F0 /* CustomFocus.swift in Sources */,
 				13905A262862E5590034043C /* AttachmentsEditor.swift in Sources */,
 				1302738F283E456F0044F5D9 /* InputView.swift in Sources */,
 				5B846A70281004E1005835BB /* ChatApp.swift in Sources */,

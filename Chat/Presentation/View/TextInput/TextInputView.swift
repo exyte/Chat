@@ -20,13 +20,11 @@ struct TextInputView: View {
                 .background(.white)
                 .cornerRadius(10)
                 .padding(3)
-                .focused($focus, equals: .uuid(uuid))
+                .customFocus($globalFocusState.focus, equals: .uuid(uuid))
                 .onTapGesture {
                     focus = .uuid(uuid)
                 }
         }
-        .onChange(of: focus) { globalFocusState.focus = $0 }
-        .onChange(of: globalFocusState.focus) { focus = $0 }
         .onAppear {
             print("UUID", uuid.uuidString)
         }
