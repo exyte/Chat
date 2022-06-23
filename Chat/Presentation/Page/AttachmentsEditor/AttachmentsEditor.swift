@@ -25,6 +25,7 @@ struct AttachmentsEditor: View {
                 onTapAttach: nil
             )
         }
+        .padding(.top)
     }
 }
 

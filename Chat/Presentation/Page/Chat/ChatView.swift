@@ -16,6 +16,7 @@ struct ChatView: View {
     @State private var scrollView: UIScrollView?
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
+    @StateObject private var globalFocusState = GlobalFocusState()
 
     var body: some View {
         ZStack {
@@ -37,6 +38,7 @@ struct ChatView: View {
                         inputViewModel.showPicker = true
                     }
                 )
+                .environmentObject(globalFocusState)
             }
             .onChange(of: messages) { _ in
                 scrollToBottom()
@@ -64,6 +66,23 @@ struct ChatView: View {
         .sheet(isPresented: $inputViewModel.showPicker) {
             AttachmentsEditor(viewModel: inputViewModel)
                 .presentationDetents([.medium, .large])
+                .environmentObject(globalFocusState)
+        }
+        .onChange(of: inputViewModel.showPicker) {
+            if $0 {
+                globalFocusState.focus = nil
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .keyboard) {
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        globalFocusState.focus = nil
+                    }
+                    .tint(Color.blue)
+                }
+            }
         }
     }
 }

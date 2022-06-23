@@ -20,9 +20,7 @@ struct InputView: View {
                 attachButton
                     .hidden()
             }
-//            if onTapAttach == nil {
-                TextInputView(text: $viewModel.text)
-//            }
+            TextInputView(text: $viewModel.text)
             sendButton
                 .disabled(!viewModel.canSend)
         }

@@ -8,7 +8,8 @@ struct TextInputView: View {
     @Binding var text: String
 
     @State private var uuid = UUID()
-    @FocusState var focus: Focusable?
+    @FocusState private var focus: Focusable?
+    @EnvironmentObject private var globalFocusState: GlobalFocusState
 
     var body: some View {
         VStack {
@@ -24,15 +25,10 @@ struct TextInputView: View {
                     focus = .uuid(uuid)
                 }
         }
-        .toolbar {
-            ToolbarItem(placement: .keyboard) {
-                HStack {
-                    Spacer()
-                    Button("Done") {
-                        focus = nil
-                    }
-                }
-            }
+        .onChange(of: focus) { globalFocusState.focus = $0 }
+        .onChange(of: globalFocusState.focus) { focus = $0 }
+        .onAppear {
+            print("UUID", uuid.uuidString)
         }
     }
 }

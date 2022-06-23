@@ -41,6 +41,21 @@ struct AttachmentsPages: View {
                 .environmentObject(viewModel)
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
+            .overlay(alignment: .top) {
+                if viewModel.showMinis {
+                    Text("\(viewModel.index + 1)/\(viewModel.attachments.count)")
+                        .foregroundColor(.white)
+                }
+            }
+            .overlay(alignment: .topLeading) {
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                }
+                .tint(.white)
+                .padding(.leading, 20)
+            }
             .offset(viewModel.offset)
             .gesture(closeGesture)
 
