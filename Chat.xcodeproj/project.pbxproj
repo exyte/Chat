@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1302738D283E44D00044F5D9 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1302738C283E44D00044F5D9 /* MessageView.swift */; };
 		1302738F283E456F0044F5D9 /* InputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1302738E283E456F0044F5D9 /* InputView.swift */; };
+		1306B50A286424950028C957 /* TextInputViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1306B509286424950028C957 /* TextInputViewModel.swift */; };
 		1337F6B1285C3412005FEE50 /* Draft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1337F6B0285C3412005FEE50 /* Draft.swift */; };
 		1357C12928617D3300F0EA01 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1357C12828617D3300F0EA01 /* VideoView.swift */; };
 		1357C12B28617D3E00F0EA01 /* VideoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1357C12A28617D3E00F0EA01 /* VideoViewModel.swift */; };
@@ -43,6 +44,7 @@
 /* Begin PBXFileReference section */
 		1302738C283E44D00044F5D9 /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		1302738E283E456F0044F5D9 /* InputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputView.swift; sourceTree = "<group>"; };
+		1306B509286424950028C957 /* TextInputViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputViewModel.swift; sourceTree = "<group>"; };
 		1337F6B0285C3412005FEE50 /* Draft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Draft.swift; sourceTree = "<group>"; };
 		1357C12828617D3300F0EA01 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		1357C12A28617D3E00F0EA01 /* VideoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoViewModel.swift; sourceTree = "<group>"; };
@@ -91,6 +93,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1306B508286424800028C957 /* TextInput */ = {
+			isa = PBXGroup;
+			children = (
+				13AF0339285C488300EF4F1B /* TextInputView.swift */,
+				1306B509286424950028C957 /* TextInputViewModel.swift */,
+			);
+			path = TextInput;
+			sourceTree = "<group>";
+		};
 		1357C12728617D1C00F0EA01 /* Video */ = {
 			isa = PBXGroup;
 			children = (
@@ -194,11 +205,11 @@
 		13AF033E285C49C800EF4F1B /* View */ = {
 			isa = PBXGroup;
 			children = (
+				1306B508286424800028C957 /* TextInput */,
 				1357C12728617D1C00F0EA01 /* Video */,
 				13C432E7286065750094E66B /* Input */,
 				13AF034E285C4B8500EF4F1B /* Message */,
 				13AF0341285C4A1700EF4F1B /* Attachments */,
-				13AF0339285C488300EF4F1B /* TextInputView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -417,6 +428,7 @@
 				13AF0346285C4A1700EF4F1B /* AttachmentCell.swift in Sources */,
 				13AF037F285C9C0B00EF4F1B /* MessageParser.swift in Sources */,
 				1302738D283E44D00044F5D9 /* MessageView.swift in Sources */,
+				1306B50A286424950028C957 /* TextInputViewModel.swift in Sources */,
 				1357C12B28617D3E00F0EA01 /* VideoViewModel.swift in Sources */,
 				5B846A8228101CC1005835BB /* Color+Hex.swift in Sources */,
 				13AD59E32859C7FF009DE654 /* Configuration.swift in Sources */,

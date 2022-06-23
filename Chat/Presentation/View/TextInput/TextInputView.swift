@@ -7,24 +7,29 @@ import SwiftUI
 struct TextInputView: View {
     @Binding var text: String
 
-    @FocusState private var focused: Bool
+    @State private var uuid = UUID()
+    @FocusState var focus: Focusable?
 
     var body: some View {
         VStack {
             TextField("Message", text: $text, axis: .vertical)
+                .border(.red)
                 .frame(minHeight: 35)
                 .padding(10)
                 .background(.white)
                 .cornerRadius(10)
                 .padding(3)
-                .focused($focused, equals: true)
+                .focused($focus, equals: .uuid(uuid))
+                .onTapGesture {
+                    focus = .uuid(uuid)
+                }
         }
         .toolbar {
             ToolbarItem(placement: .keyboard) {
                 HStack {
                     Spacer()
                     Button("Done") {
-                        focused = false
+                        focus = nil
                     }
                 }
             }
