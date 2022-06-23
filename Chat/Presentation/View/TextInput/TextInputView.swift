@@ -8,7 +8,6 @@ struct TextInputView: View {
     @Binding var text: String
 
     @State private var uuid = UUID()
-    @FocusState private var focus: Focusable?
     @EnvironmentObject private var globalFocusState: GlobalFocusState
 
     var body: some View {
@@ -22,11 +21,8 @@ struct TextInputView: View {
                 .padding(3)
                 .customFocus($globalFocusState.focus, equals: .uuid(uuid))
                 .onTapGesture {
-                    focus = .uuid(uuid)
+                    globalFocusState.focus = .uuid(uuid)
                 }
-        }
-        .onAppear {
-            print("UUID", uuid.uuidString)
         }
     }
 }
