@@ -28,8 +28,8 @@ public struct ChatView: View {
             VStack {
                 ScrollView {
                     ForEach(messages, id: \.id) { message in
-                        MessageView(message: message) { attachment in
-                            viewModel.fullscreenAttachmentItem = attachment
+                        MessageView(message: message) { [weak viewModel] attachment in
+                            viewModel?.fullscreenAttachmentItem = attachment
                         }
                     }
                 }
@@ -56,8 +56,8 @@ public struct ChatView: View {
                         attachments: attachments,
                         index: index ?? 0
                     ),
-                    onClose: {
-                        viewModel.fullscreenAttachmentItem = nil
+                    onClose: { [weak viewModel] in
+                        viewModel?.fullscreenAttachmentItem = nil
                     }
                 )
             }

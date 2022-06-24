@@ -11,31 +11,16 @@ final class LiveUpdateExampleViewModel: AbstractExampleViewModel {
     private lazy var endlessMessagesGenerator = EndlessMessagesGenerator()
 
     private var lastMessageId = 0
-
     private var subscriptions = Set<AnyCancellable>()
 
-    override init() {
-        super.init()
-
-        endlessMessagesGenerator.messages
-            .map(mapMyMessages)
-            .print("Messages")
-            .assign(to: &$messages)
-    }
-
-    override func send(draft: DraftMessage) {
-//        chatService.send(message: draft.text)
-    }
+    override func send(draft: DraftMessage) {}
     
     override func onStart() {
-//        chatService.loadMessages()
-//            .print("Load messages")
-//            .sink { completion in
-//                print(completion)
-//            } receiveValue: { _ in
-//                // Do nothing
-//            }
-//            .store(in: &subscriptions)
+        endlessMessagesGenerator.messages
+            .compactMap { [weak self] in
+                self?.mapMyMessages($0)
+            }
+            .assign(to: &$messages)
     }
 }
 

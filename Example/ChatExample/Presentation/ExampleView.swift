@@ -6,7 +6,7 @@ import SwiftUI
 import Chat
 
 struct ExampleView: View {
-    @ObservedObject var viewModel: AbstractExampleViewModel
+    @StateObject var viewModel: AbstractExampleViewModel
 
     var body: some View {
         ChatView(messages: viewModel.messages) { draft in

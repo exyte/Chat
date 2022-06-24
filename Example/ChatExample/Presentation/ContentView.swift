@@ -8,12 +8,27 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                NavigationLink("Simple example") {
-                    ExampleView(viewModel: SimpleExampleViewModel())
-                }
+                VStack(spacing: 10) {
+                    Group {
+                        Text("Examples will be removed")
+                            .font(.title)
+                        NavigationLink("Simple example") {
+                            ExampleView(viewModel: SimpleExampleViewModel())
+                        }
+                        NavigationLink("Live update example") {
+                            ExampleView(viewModel: LiveUpdateExampleViewModel())
+                        }
+                    }
+                    .tint(.red)
 
-                NavigationLink("Live update example") {
-                    ExampleView(viewModel: LiveUpdateExampleViewModel())
+                    Group {
+                        Text("Work examples")
+                            .font(.title)
+
+                        NavigationLink("Support chat example") {
+                            SupportChatView()
+                        }
+                    }
                 }
             }
             .padding()
