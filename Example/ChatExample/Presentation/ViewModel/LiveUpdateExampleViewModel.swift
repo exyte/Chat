@@ -7,49 +7,42 @@ import Combine
 import Chat
 
 final class LiveUpdateExampleViewModel: AbstractExampleViewModel {
-    private lazy var chatService = MockChatService()
-    private lazy var endlessMessagesGenerator = EndlessMessagesGenerator()
-
-    private var lastMessageId = 0
+    private let interactor: ChatInteractorProtocol
     private var subscriptions = Set<AnyCancellable>()
 
-    override func send(draft: DraftMessage) {}
+    init(interactor: ChatInteractorProtocol = MockChatInteractor()) {
+        self.interactor = interactor
+    }
+
+    override func send(draft: DraftMessage) {
+        interactor.send(message: draft.toMockCreateMessage())
+    }
     
     override func onStart() {
-        endlessMessagesGenerator.messages
-            .compactMap { [weak self] in
-                self?.mapMyMessages($0)
-            }
-            .assign(to: &$messages)
     }
 }
 
-private extension LiveUpdateExampleViewModel {
-    var nextMessageId: Int {
-        defer {
-            lastMessageId += 1
-        }
-        return lastMessageId + 1
-    }
+struct MockCreateMessage {
+    let text: String
+    let createdAt: Date
+}
 
-    func mapMyMessages(_ messages: [MyMessage]) -> [Message] {
-        messages.map {
-            Message(
-                id: nextMessageId,
-                user: getUser(from: $0.sender),
-                text: $0.text
-            )
-        }
+extension MockCreateMessage {
+    func toMockMessage(user: MockUser) throws -> MockMessage {
+        MockMessage(
+            uid: .random(),
+            sender: user,
+            createdAt: createdAt,
+            text: text
+        )
     }
+}
 
-    func getUser(from id: Int) -> User {
-        switch id {
-        case 11:
-            return .steve
-        case 42:
-            return .tim
-        default:
-            fatalError()
-        }
+extension DraftMessage {
+    func toMockCreateMessage() -> MockCreateMessage {
+        MockCreateMessage(
+            text: text,
+            createdAt: createdAt
+        )
     }
 }

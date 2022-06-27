@@ -6,10 +6,12 @@ import Foundation
 import Chat
 
 final class SimpleExampleViewModel: AbstractExampleViewModel {
+    private lazy var chatData = MockChatData()
+
     override func send(draft: DraftMessage) {
         let message = Message(
             id: messages.count + 1,
-            user: .tim,
+            user: chatData.tim.toChatUser(),
             text: draft.text,
             attachments: draft.attachments,
             createdAt: draft.createdAt
@@ -20,15 +22,15 @@ final class SimpleExampleViewModel: AbstractExampleViewModel {
     override func onStart() {
         messages =
         [
-            Message(id: 1, user: .tim, text: "**Hey**"),
-            Message(id: 2, user: .steve, text: "Yeah sure, gimme 5"),
-            Message(id: 3, user: .steve, text: "Okay ready when you are"),
-            Message(id: 4, user: .tim, text: "**Awesome** 😁"),
-            Message(id: 5, user: .tim, text: "Ugh, gotta sit through these two"),
-            Message(id: 6, user: .steve, text: "*Every. Single. Time.* Every. Single. Time. Every. Single. Time. Every. Single. Time."),
+            Message(id: 1, user: chatData.tim.toChatUser(), text: "**Hey**"),
+            Message(id: 2, user: chatData.steve.toChatUser(), text: "Yeah sure, gimme 5"),
+            Message(id: 3, user: chatData.steve.toChatUser(), text: "Okay ready when you are"),
+            Message(id: 4, user: chatData.tim.toChatUser(), text: "**Awesome** 😁"),
+            Message(id: 5, user: chatData.tim.toChatUser(), text: "Ugh, gotta sit through these two"),
+            Message(id: 6, user: chatData.steve.toChatUser(), text: "*Every. Single. Time.* Every. Single. Time. Every. Single. Time. Every. Single. Time."),
             Message(
                 id: 7,
-                user: .steve,
+                user: chatData.steve.toChatUser(),
                 attachments: [
                     ImageAttachment(
                         thumbnail: URL(string: "https://via.placeholder.com/150/92c952")!,
@@ -37,7 +39,7 @@ final class SimpleExampleViewModel: AbstractExampleViewModel {
                 ]),
             Message(
                 id: 8,
-                user: .steve,
+                user: chatData.steve.toChatUser(),
                 text: "Hey",
                 attachments: [
                     ImageAttachment(
@@ -47,7 +49,7 @@ final class SimpleExampleViewModel: AbstractExampleViewModel {
                 ]),
             Message(
                 id: 9,
-                user: .steve,
+                user: chatData.steve.toChatUser(),
                 attachments: [
                     ImageAttachment(
                         thumbnail: URL(string: "https://via.placeholder.com/150/24f355")!,
@@ -64,7 +66,7 @@ final class SimpleExampleViewModel: AbstractExampleViewModel {
                 ]),
             Message(
                 id: 10,
-                user: .tim,
+                user: chatData.tim.toChatUser(),
                 attachments: [
                     VideoAttachment(
                         thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg")!,
@@ -73,7 +75,7 @@ final class SimpleExampleViewModel: AbstractExampleViewModel {
                 ]),
             Message(
                 id: 11,
-                user: .tim,
+                user: chatData.tim.toChatUser(),
                 attachments: [
                     ImageAttachment(
                         thumbnail: URL(string: "https://via.placeholder.com/150/56a8c2")!,
