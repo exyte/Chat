@@ -33,6 +33,12 @@ final class SimpleExampleViewModel: ObservableObject {
     func onStop() {
         interactor.disconnect()
     }
+
+    func loadMoreMessage(before message: Message) {
+        interactor.loadNextPage()
+            .sink { _ in }
+            .store(in: &subscriptions)
+    }
 }
 
 struct MockCreateMessage {

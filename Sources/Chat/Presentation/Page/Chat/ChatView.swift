@@ -10,7 +10,7 @@ import Introspect
 import AssetsPicker
 
 public struct ChatView: View {
-    public var messages: [Message]
+    @Binding public var messages: [Message]
     public var didSendMessage: (DraftMessage) -> Void
 
     @State private var scrollView: UIScrollView?
@@ -18,24 +18,39 @@ public struct ChatView: View {
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
 
-    public init(messages: [Message], didSendMessage: @escaping (DraftMessage) -> Void) {
-        self.messages = messages
+    @Environment(\.chatPagination) private var paginationState
+
+    public init(messages: Binding<[Message]>,
+                didSendMessage: @escaping (DraftMessage) -> Void) {
+        self._messages = messages
         self.didSendMessage = didSendMessage
     }
 
     public var body: some View {
         ZStack {
             VStack {
-                ScrollView {
-                    ForEach(messages, id: \.id) { message in
-                        MessageView(message: message) { [weak viewModel] attachment in
-                            viewModel?.fullscreenAttachmentItem = attachment
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(messages.reversed(), id: \.id) { message in
+                                MessageView(message: message) { attachment in
+                                    viewModel.fullscreenAttachmentItem = attachment
+                                }
+                                .rotationEffect(Angle(degrees: 180))
+                                .id(message.id)
+                                .onAppear {
+                                    paginationState.handle(message, in: messages)
+                                }
+                            }
                         }
                     }
+                    .scrollIndicators(.hidden)
+                    .rotationEffect(Angle(degrees: 180))
+                    .introspectScrollView { scrollView in
+                        self.scrollView = scrollView
+                    }
                 }
-                .introspectScrollView { scrollView in
-                    self.scrollView = scrollView
-                }
+                .animation(.default, value: messages)
 
                 InputView(
                     viewModel: inputViewModel,
@@ -44,9 +59,6 @@ public struct ChatView: View {
                     }
                 )
                 .environmentObject(globalFocusState)
-            }
-            .onChange(of: messages) { _ in
-                scrollToBottom()
             }
             if viewModel.fullscreenAttachmentItem != nil {
                 let attachments = messages.flatMap { $0.attachments }
@@ -65,7 +77,7 @@ public struct ChatView: View {
         .onAppear {
             inputViewModel.didSendMessage = { [self] value in
                 self.didSendMessage(value)
-                self.scrollToBottom() // TODO: Make sure have no retain cycle
+                self.scrollToLastMessage() // TODO: Make sure have no retain cycle
             }
         }
         .sheet(isPresented: $inputViewModel.showPicker) {
@@ -93,9 +105,9 @@ public struct ChatView: View {
 }
 
 private extension ChatView {
-    func scrollToBottom() {
+    func scrollToLastMessage() {
         if let scrollView = scrollView {
-            scrollView.contentOffset = CGPoint(x: 0, y: scrollView.contentSize.height)
+            scrollView.setContentOffset(.zero, animated: true)
         }
     }
 }

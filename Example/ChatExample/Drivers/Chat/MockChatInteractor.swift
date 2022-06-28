@@ -11,6 +11,8 @@ final class MockChatInteractor: ChatInteractorProtocol {
     private lazy var chatState = CurrentValueSubject<[MockMessage], Never>(generateStartMessages())
     private lazy var sharedState = chatState.share()
 
+    private var isLoading = false
+
     private var subscriptions = Set<AnyCancellable>()
 
     var messages: AnyPublisher<[MockMessage], Never> {
@@ -35,6 +37,23 @@ final class MockChatInteractor: ChatInteractorProtocol {
 
     func disconnect() {
         subscriptions.removeAll()
+    }
+
+    func loadNextPage() -> Future<Bool, Never> {
+        Future<Bool, Never> { [weak self] promise in
+            guard let self = self, !self.isLoading else {
+                promise(.success(false))
+                return
+            }
+            self.isLoading = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                guard let self = self else { return }
+                let messages = self.generateStartMessages()
+                self.chatState.value = messages + self.chatState.value
+                self.isLoading = false
+                promise(.success(true))
+            }
+        }
     }
 }
 

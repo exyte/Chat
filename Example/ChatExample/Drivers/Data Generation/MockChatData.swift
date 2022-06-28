@@ -24,6 +24,8 @@ final class MockChatData {
         avatar: URL(string: "https://ui-avatars.com/api/?name=Emma")!
     )
 
+    private var lastMessageId = 0
+
     func randomMessage(senders: [MockUser] = [], date: Date? = nil) -> MockMessage {
         let senders = senders.isEmpty ? [tim, steve, emma] : senders
         let sender = senders.random()!
@@ -33,7 +35,7 @@ final class MockChatData {
         let shouldGenerateText = images.isEmpty ? true : .random()
 
         return MockMessage(
-            uid: Int.random(),
+            uid: messageId(),
             sender: sender,
             createdAt: date,
             text: shouldGenerateText ? Lorem.sentence(useMarkdown: true) : "",
@@ -71,5 +73,10 @@ private extension MockChatData {
     func randomHexChar() -> String {
         let letters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]
         return letters.random()!
+    }
+
+    func messageId() -> Int {
+        lastMessageId += 1
+        return lastMessageId
     }
 }
