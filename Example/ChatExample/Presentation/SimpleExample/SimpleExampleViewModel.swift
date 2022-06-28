@@ -1,0 +1,71 @@
+//
+//  Created by Alex.M on 23.06.2022.
+//
+
+import Foundation
+import Combine
+import Chat
+
+final class SimpleExampleViewModel: ObservableObject {
+    @Published var messages: [Message] = []
+
+    private let interactor: ChatInteractorProtocol
+    private var subscriptions = Set<AnyCancellable>()
+
+    init(interactor: ChatInteractorProtocol = MockChatInteractor()) {
+        self.interactor = interactor
+    }
+
+    func send(draft: DraftMessage) {
+        interactor.send(message: draft.toMockCreateMessage())
+    }
+    
+    func onStart() {
+        interactor.messages
+            .compactMap { messages in
+                messages.map { $0.toChatMessage() }
+            }
+            .assign(to: &$messages)
+
+        interactor.connect()
+    }
+
+    func onStop() {
+        interactor.disconnect()
+    }
+}
+
+struct MockCreateMessage {
+    let text: String
+    let createdAt: Date
+    let images: [MockImage]
+}
+
+extension MockCreateMessage {
+    func toMockMessage(user: MockUser) -> MockMessage {
+        MockMessage(
+            uid: .random(),
+            sender: user,
+            createdAt: createdAt,
+            text: text
+        )
+    }
+}
+
+extension DraftMessage {
+    func makeMockImages() -> [MockImage] {
+        attachments
+            .compactMap { $0 as? ImageAttachment }
+            .map {
+                MockImage(thumbnail: $0.thumbnail, full: $0.full)
+            }
+    }
+
+    func toMockCreateMessage() -> MockCreateMessage {
+        MockCreateMessage(
+            text: text,
+            createdAt: createdAt,
+            images: makeMockImages()
+        )
+    }
+}
