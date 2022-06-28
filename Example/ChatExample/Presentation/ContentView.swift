@@ -8,12 +8,17 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
-                NavigationLink("Simple example") {
-                    ExampleView(viewModel: SimpleExampleViewModel())
+                Section {
+                    NavigationLink("Simple example") {
+                        SimpleExampleView()
+                    }
+                } header: {
+                    Text("Basic examples")
                 }
             }
+            .navigationTitle("Chat examples")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .navigationViewStyle(.stack)
-        .navigationTitle("Chat examples")
     }
 }

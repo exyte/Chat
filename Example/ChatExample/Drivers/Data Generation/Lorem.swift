@@ -64,6 +64,8 @@ public class Lorem {
         "sapiente", "delectus", "ut", "aut", "reiciendis", "voluptatibus",
         "maiores", "doloribus", "asperiores", "repellat"
     ]
+
+    private static var markdownSymbols = ["*", "_", "**", "**"]
     
     /**
      Return a random word.
@@ -92,8 +94,16 @@ public class Lorem {
      
      - returns: Returns a string of `count` words.
      */
-    public class func words(nbWords: Int = 3) -> String {
-        return words(nbWords: nbWords).joined(separator: " ")
+    public class func words(nbWords: Int = 3, useMarkdown: Bool = false) -> String {
+        words(nbWords: nbWords)
+            .map {
+                guard useMarkdown, Int.random(min: 0, max: 10) == 0 else {
+                    return $0
+                }
+                let symbol = markdownSymbols.random()!
+                return symbol + $0 + symbol
+            }
+            .joined(separator: " ")
     }
     
     /**
@@ -103,12 +113,15 @@ public class Lorem {
      +/- 40% of `nbWords`.
      - returns:
      */
-    public class func sentence(nbWords: Int = 6, variable: Bool = true) -> String {
+    public class func sentence(nbWords: Int = 6, variable: Bool = true, useMarkdown: Bool = false) -> String {
         if nbWords <= 0 {
             return ""
         }
         
-        let result: String = words(nbWords: variable ? nbWords.randomize(variation: 40) : nbWords)
+        let result: String = words(
+            nbWords: variable ? nbWords.randomize(variation: 40) : nbWords,
+            useMarkdown: useMarkdown
+        )
         
         return result.firstCapitalized + "."
     }

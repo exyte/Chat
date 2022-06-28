@@ -10,6 +10,15 @@ struct MockMessage {
     let sender: MockUser
     let createdAt: Date
     let text: String
+    let images: [MockImage]
+
+    init(uid: Int, sender: MockUser, createdAt: Date, text: String, images: [MockImage] = []) {
+        self.uid = uid
+        self.sender = sender
+        self.createdAt = createdAt
+        self.text = text
+        self.images = images
+    }
 }
 
 extension MockMessage {
@@ -18,6 +27,7 @@ extension MockMessage {
             id: uid,
             user: sender.toChatUser(),
             text: text,
+            attachments: images.map { $0.toChatAttachment() },
             createdAt: createdAt
         )
     }

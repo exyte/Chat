@@ -6,7 +6,9 @@ import Foundation
 import Combine
 import Chat
 
-final class LiveUpdateExampleViewModel: AbstractExampleViewModel {
+final class SimpleExampleViewModel: ObservableObject {
+    @Published var messages: [Message] = []
+
     private let interactor: ChatInteractorProtocol
     private var subscriptions = Set<AnyCancellable>()
 
@@ -14,21 +16,33 @@ final class LiveUpdateExampleViewModel: AbstractExampleViewModel {
         self.interactor = interactor
     }
 
-    override func send(draft: DraftMessage) {
+    func send(draft: DraftMessage) {
         interactor.send(message: draft.toMockCreateMessage())
     }
     
-    override func onStart() {
+    func onStart() {
+        interactor.messages
+            .compactMap { messages in
+                messages.map { $0.toChatMessage() }
+            }
+            .assign(to: &$messages)
+
+        interactor.connect()
+    }
+
+    func onStop() {
+        interactor.disconnect()
     }
 }
 
 struct MockCreateMessage {
     let text: String
     let createdAt: Date
+    let images: [MockImage]
 }
 
 extension MockCreateMessage {
-    func toMockMessage(user: MockUser) throws -> MockMessage {
+    func toMockMessage(user: MockUser) -> MockMessage {
         MockMessage(
             uid: .random(),
             sender: user,
@@ -39,10 +53,19 @@ extension MockCreateMessage {
 }
 
 extension DraftMessage {
+    func makeMockImages() -> [MockImage] {
+        attachments
+            .compactMap { $0 as? ImageAttachment }
+            .map {
+                MockImage(thumbnail: $0.thumbnail, full: $0.full)
+            }
+    }
+
     func toMockCreateMessage() -> MockCreateMessage {
         MockCreateMessage(
             text: text,
-            createdAt: createdAt
+            createdAt: createdAt,
+            images: makeMockImages()
         )
     }
 }
