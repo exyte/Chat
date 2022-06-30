@@ -6,14 +6,12 @@
 //
 
 import SwiftUI
-import Introspect
 import AssetsPicker
 
 public struct ChatView: View {
     @Binding public var messages: [Message]
     public var didSendMessage: (DraftMessage) -> Void
 
-    @State private var scrollView: UIScrollView?
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
@@ -30,24 +28,28 @@ public struct ChatView: View {
         ZStack {
             VStack {
                 ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack {
-                            ForEach(messages.reversed(), id: \.id) { message in
-                                MessageView(message: message) { attachment in
-                                    viewModel.fullscreenAttachmentItem = attachment
-                                }
-                                .rotationEffect(Angle(degrees: 180))
-                                .id(message.id)
-                                .onAppear {
-                                    paginationState.handle(message, in: messages)
-                                }
-                            }
+                    List(messages.reversed(), id: \.id) { message in
+                        MessageView(message: message) { attachment in
+                            viewModel.fullscreenAttachmentItem = attachment
+                        }
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets())
+                        .rotationEffect(Angle(degrees: 180))
+                        .id(message.id)
+                        .onAppear {
+                            paginationState.handle(message, in: messages)
                         }
                     }
+                    .listStyle(.plain)
                     .scrollIndicators(.hidden)
                     .rotationEffect(Angle(degrees: 180))
-                    .introspectScrollView { scrollView in
-                        self.scrollView = scrollView
+                    .onAppear {
+                        inputViewModel.didSendMessage = { value in
+                            didSendMessage(value)
+                            if let id = messages.last?.id {
+                                proxy.scrollTo(id)
+                            }
+                        }
                     }
                 }
                 .animation(.default, value: messages)
@@ -74,12 +76,6 @@ public struct ChatView: View {
                 )
             }
         }
-        .onAppear {
-            inputViewModel.didSendMessage = { [self] value in
-                self.didSendMessage(value)
-                self.scrollToLastMessage() // TODO: Make sure have no retain cycle
-            }
-        }
         .sheet(isPresented: $inputViewModel.showPicker) {
             AttachmentsEditor(viewModel: inputViewModel)
                 .presentationDetents([.medium, .large])
@@ -100,14 +96,6 @@ public struct ChatView: View {
                     .tint(Color.blue)
                 }
             }
-        }
-    }
-}
-
-private extension ChatView {
-    func scrollToLastMessage() {
-        if let scrollView = scrollView {
-            scrollView.setContentOffset(.zero, animated: true)
         }
     }
 }
