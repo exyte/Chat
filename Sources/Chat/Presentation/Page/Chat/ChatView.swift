@@ -16,7 +16,7 @@ public struct ChatView: View {
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
 
-    @Environment(\.chatPagination) private var paginationState
+    @StateObject var paginationState = PaginationState()
 
     public init(messages: Binding<[Message]>,
                 didSendMessage: @escaping (DraftMessage) -> Void) {
@@ -97,5 +97,13 @@ public struct ChatView: View {
                 }
             }
         }
+    }
+}
+
+public extension ChatView {
+    func chatEnablePagination(offset: Int = 0, handler: @escaping ChatPaginationClosure) -> ChatView {
+        var view = self
+        view._paginationState = StateObject(wrappedValue: PaginationState(onEvent: handler, offset: offset))
+        return view
     }
 }
