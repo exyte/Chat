@@ -29,24 +29,50 @@ struct AttachmentsGrid: View {
         VStack {
             if let attachment = single {
                 AttachmentCell(attachment: attachment)
+                    .frame(height: 200)
+                    .clipped()
                     .onTapGesture {
                         onTap(attachment)
                     }
             }
             if !grid.isEmpty {
-                LazyVGrid(columns: columns) {
-                    ForEach(grid, id: \.id) { attachment in
-                        AttachmentCell(attachment: attachment)
+                ForEach(pair(), id: \.id) { pair in
+                    HStack {
+                        AttachmentCell(attachment: pair.left)
+                            .frame(height: 100)
+                            .clipped()
                             .onTapGesture {
-                                onTap(attachment)
+                                onTap(pair.left)
+                            }
+                        AttachmentCell(attachment: pair.right)
+                            .frame(height: 100)
+                            .clipped()
+                            .onTapGesture {
+                                onTap(pair.right)
                             }
                     }
                 }
-                .frame(maxWidth: .infinity)
             }
         }
     }
 }
+
+private extension AttachmentsGrid {
+    func pair() -> Array<AttachmentsPair> {
+        return stride(from: 0, to: grid.count - 1, by: 2)
+            .map { AttachmentsPair(left: grid[$0], right: grid[$0+1]) }
+    }
+}
+
+struct AttachmentsPair {
+    let left: any Attachment
+    let right: any Attachment
+
+    var id: String {
+        left.id + "+" + right.id
+    }
+}
+
 
 #if DEBUG
 struct AttachmentsGrid_Preview: PreviewProvider {

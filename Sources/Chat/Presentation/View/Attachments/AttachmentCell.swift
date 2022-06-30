@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct AttachmentCell: View {
     let attachment: any Attachment
@@ -34,17 +35,14 @@ struct AttachmentCell: View {
     }
 
     var content: some View {
-        AsyncImage(url: attachment.thumbnail) { imageView in
+        CachedAsyncImage(url: attachment.thumbnail, urlCache: .imageCache) { imageView in
             imageView
                 .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(maxHeight: 200)
-                .clipped()
+                .scaledToFill()
         } placeholder: {
             Rectangle()
                 .foregroundColor(Color.gray)
                 .frame(minWidth: 100, minHeight: 100)
-                .frame(maxHeight: 200)
         }
     }
 }

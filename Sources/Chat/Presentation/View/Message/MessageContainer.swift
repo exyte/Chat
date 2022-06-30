@@ -3,6 +3,7 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct MessageContainer<Content>: View where Content: View {
     let user: User
@@ -26,7 +27,7 @@ struct MessageContainer<Content>: View where Content: View {
     }
 
     var avatar: some View {
-        AsyncImage(url: user.avatarURL) { image in
+        CachedAsyncImage(url: user.avatarURL, urlCache: .imageCache) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: imageSize, height: imageSize)

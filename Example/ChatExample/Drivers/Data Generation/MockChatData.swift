@@ -16,7 +16,7 @@ final class MockChatData {
     let steve = MockUser(
         uid: "2",
         name: "Steve",
-        avatar: URL(string: "https://ui-avatars.com/api/?name=Steve")!
+        avatar: URL(string: "https://ui-avatars.com/api/?name=S+T")!
     )
     let emma = MockUser(
         uid: "3",
