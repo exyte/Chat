@@ -3,13 +3,14 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 struct AttachmentsPage: View {
     let attachment: any Attachment
 
     var body: some View {
         if attachment is ImageAttachment {
-            AsyncImage(url: attachment.full) { imageView in
+            CachedAsyncImage(url: attachment.full, urlCache: .imageCache) { imageView in
                 imageView
                     .resizable()
                     .aspectRatio(contentMode: .fill)
