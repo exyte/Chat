@@ -12,4 +12,6 @@ protocol ChatInteractorProtocol {
 
     func connect()
     func disconnect()
+
+    func loadNextPage() -> Future<Bool, Never>
 }

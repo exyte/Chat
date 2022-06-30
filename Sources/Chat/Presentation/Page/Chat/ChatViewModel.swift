@@ -5,10 +5,10 @@
 import Foundation
 import Combine
 
+public typealias ChatPaginationClosure = (Message) -> Void
+
 final class ChatViewModel: ObservableObject {
     @Published var fullscreenAttachmentItem: Optional<any Attachment> = nil
 
     private var subscriptions = Set<AnyCancellable>()
-
-    init() {}
 }
