@@ -27,9 +27,8 @@ struct MessageContainer<Content>: View where Content: View {
         .padding(.horizontal, 8)
     }
 
-    @ViewBuilder
     var avatar: some View {
-        let view = CachedAsyncImage(url: user.avatarURL, urlCache: .imageCache) { image in
+        CachedAsyncImage(url: user.avatarURL, urlCache: .imageCache) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: imageSize, height: imageSize)
@@ -40,11 +39,7 @@ struct MessageContainer<Content>: View where Content: View {
             Circle().foregroundColor(Color.gray)
                 .frame(width: imageSize, height: imageSize)
         }
-        if hideAvatar {
-            view.hidden()
-        } else {
-            view
-        }
+        .hidden(hideAvatar)
     }
 
     var contentView: some View {
