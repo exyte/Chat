@@ -38,6 +38,7 @@ final class MockChatData {
             uid: messageId(),
             sender: sender,
             createdAt: date,
+            status: sender.isCurrentUser ? .read : nil,
             text: shouldGenerateText ? Lorem.sentence(useMarkdown: true) : "",
             images: images
         )

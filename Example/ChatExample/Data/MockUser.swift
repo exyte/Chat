@@ -18,7 +18,13 @@ struct MockUser: Equatable {
 }
 
 extension MockUser {
+    var isCurrentUser: Bool {
+        uid == "1"
+    }
+}
+
+extension MockUser {
     func toChatUser() -> Chat.User {
-        Chat.User.init(avatarURL: avatar, isCurrentUser: uid == "1")
+        Chat.User.init(avatarURL: avatar, isCurrentUser: isCurrentUser)
     }
 }

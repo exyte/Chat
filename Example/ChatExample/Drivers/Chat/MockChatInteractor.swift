@@ -22,7 +22,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
     /// TODO: Generate error with random chance
     /// TODO: Save images from url to files. Imitate upload process
     func send(message: MockCreateMessage) {
-        let message = message.toMockMessage(user: chatData.tim)
+        let message = message.toMockMessage(user: chatData.tim, status: .sending)
         chatState.value.append(message)
     }
 
@@ -30,6 +30,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
         Timer.publish(every: 2, on: .main, in: .default)
             .autoconnect()
             .sink { [weak self] _ in
+                self?.updateSendingStatuses()
                 self?.generateNewMessage()
             }
             .store(in: &subscriptions)
@@ -67,5 +68,18 @@ private extension MockChatInteractor {
     func generateNewMessage() {
         let message = chatData.randomMessage(senders: [chatData.steve, chatData.emma])
         chatState.value.append(message)
+    }
+
+    func updateSendingStatuses() {
+        let updated = chatState.value.map {
+            var message = $0
+            if message.status == .sending {
+                message.status = .sent
+            } else if message.status == .sent {
+                message.status = .read
+            }
+            return message
+        }
+        chatState.value = updated
     }
 }

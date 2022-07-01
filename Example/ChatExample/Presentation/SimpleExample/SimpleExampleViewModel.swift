@@ -48,11 +48,12 @@ struct MockCreateMessage {
 }
 
 extension MockCreateMessage {
-    func toMockMessage(user: MockUser) -> MockMessage {
+    func toMockMessage(user: MockUser, status: Message.Status = .read) -> MockMessage {
         MockMessage(
             uid: .random(),
             sender: user,
             createdAt: createdAt,
+            status: user.isCurrentUser ? status : nil,
             text: text
         )
     }
