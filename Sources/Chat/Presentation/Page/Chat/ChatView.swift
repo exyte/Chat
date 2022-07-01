@@ -31,6 +31,8 @@ public struct ChatView: View {
                     List(messages.reversed(), id: \.id) { message in
                         MessageView(message: message) { attachment in
                             viewModel.fullscreenAttachmentItem = attachment
+                        } onRetry: {
+                            didSendMessage(message.toDraft())
                         }
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets())
