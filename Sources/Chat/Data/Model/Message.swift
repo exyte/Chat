@@ -8,14 +8,14 @@
 import SwiftUI
 
 public struct Message {
-    public var id: Int
+    public var id: String
     public var user: User
     public var status: Status?
     public var text: String
     public var attachments: [any Attachment]
     public var createdAt: Date
 
-    public init(id: Int,
+    public init(id: String,
                 user: User,
                 status: Status? = nil,
                 text: String = "",

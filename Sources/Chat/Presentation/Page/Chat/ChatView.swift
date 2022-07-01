@@ -8,8 +8,15 @@
 import SwiftUI
 import AssetsPicker
 
+struct WrappedMessage: Equatable {
+    let message: Message
+    let nextMessageIsSameUser: Bool
+    let isFirstMessage: Bool
+}
+
 public struct ChatView: View {
-    @Binding public var messages: [Message]
+    @Binding public var originalMessages: [Message]
+    @State private var messages: [WrappedMessage] = []
     public var didSendMessage: (DraftMessage) -> Void
 
     @StateObject private var viewModel = ChatViewModel()
@@ -20,7 +27,7 @@ public struct ChatView: View {
 
     public init(messages: Binding<[Message]>,
                 didSendMessage: @escaping (DraftMessage) -> Void) {
-        self._messages = messages
+        self._originalMessages = messages
         self.didSendMessage = didSendMessage
     }
 
@@ -28,18 +35,23 @@ public struct ChatView: View {
         ZStack {
             VStack {
                 ScrollViewReader { proxy in
-                    List(messages.reversed(), id: \.id) { message in
-                        MessageView(message: message) { attachment in
-                            viewModel.fullscreenAttachmentItem = attachment
-                        } onRetry: {
-                            didSendMessage(message.toDraft())
+                    List(messages, id: \.message.id) { box in
+                        Group {
+                            if box.isFirstMessage {
+                                EmptyView().id("FirstMessageAnchor")
+                            }
+                            MessageView(message: box.message, hideAvatar: box.nextMessageIsSameUser) { attachment in
+                                viewModel.fullscreenAttachmentItem = attachment
+                            } onRetry: {
+                                didSendMessage(box.message.toDraft())
+                            }
+                            .id(box.message.id)
+                            .rotationEffect(Angle(degrees: 180))
                         }
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets())
-                        .rotationEffect(Angle(degrees: 180))
-                        .id(message.id)
                         .onAppear {
-                            paginationState.handle(message, in: messages)
+                            paginationState.handle(box.message, in: originalMessages)
                         }
                     }
                     .listStyle(.plain)
@@ -48,8 +60,10 @@ public struct ChatView: View {
                     .onAppear {
                         inputViewModel.didSendMessage = { value in
                             didSendMessage(value)
-                            if let id = messages.last?.id {
-                                proxy.scrollTo(id)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation {
+                                    proxy.scrollTo("FirstMessageAnchor")
+                                }
                             }
                         }
                     }
@@ -65,7 +79,7 @@ public struct ChatView: View {
                 .environmentObject(globalFocusState)
             }
             if viewModel.fullscreenAttachmentItem != nil {
-                let attachments = messages.flatMap { $0.attachments }
+                let attachments = originalMessages.flatMap { $0.attachments }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
                 AttachmentsPages(
                     viewModel: AttachmentsPagesViewModel(
@@ -87,6 +101,18 @@ public struct ChatView: View {
             if $0 {
                 globalFocusState.focus = nil
             }
+        }
+        .onChange(of: originalMessages) { newValue in
+            self.messages = newValue.enumerated()
+                .map {
+                    let nextMessageIsSameUser = newValue[safe: $0.offset + 1]?.user.id == $0.element.user.id
+                    return WrappedMessage(
+                        message: $0.element,
+                        nextMessageIsSameUser: nextMessageIsSameUser,
+                        isFirstMessage: $0.offset == (newValue.count - 1)
+                    )
+                }
+                .reversed()
         }
         .toolbar {
             ToolbarItem(placement: .keyboard) {

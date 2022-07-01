@@ -25,6 +25,6 @@ extension MockUser {
 
 extension MockUser {
     func toChatUser() -> Chat.User {
-        Chat.User.init(avatarURL: avatar, isCurrentUser: isCurrentUser)
+        Chat.User(id: uid, avatarURL: avatar, isCurrentUser: isCurrentUser)
     }
 }

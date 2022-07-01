@@ -7,6 +7,7 @@ import CachedAsyncImage
 
 struct MessageContainer<Content>: View where Content: View {
     let user: User
+    let hideAvatar: Bool
     @ViewBuilder var content: () -> Content
 
     let imageSize = 30.0 // TODO: Create config for avatar size
@@ -26,8 +27,9 @@ struct MessageContainer<Content>: View where Content: View {
         .padding(.horizontal, 8)
     }
 
+    @ViewBuilder
     var avatar: some View {
-        CachedAsyncImage(url: user.avatarURL, urlCache: .imageCache) { image in
+        let view = CachedAsyncImage(url: user.avatarURL, urlCache: .imageCache) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: imageSize, height: imageSize)
@@ -37,6 +39,11 @@ struct MessageContainer<Content>: View where Content: View {
         } placeholder: {
             Circle().foregroundColor(Color.gray)
                 .frame(width: imageSize, height: imageSize)
+        }
+        if hideAvatar {
+            view.hidden()
+        } else {
+            view
         }
     }
 

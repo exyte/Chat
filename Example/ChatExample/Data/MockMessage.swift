@@ -6,7 +6,7 @@ import Foundation
 import Chat
 
 struct MockMessage {
-    let uid: Int
+    let uid: String
     let sender: MockUser
     let createdAt: Date
     var status: Message.Status?
@@ -14,7 +14,7 @@ struct MockMessage {
     let text: String
     let images: [MockImage]
 
-    init(uid: Int, sender: MockUser, createdAt: Date, status: Message.Status?, text: String, images: [MockImage] = []) {
+    init(uid: String, sender: MockUser, createdAt: Date, status: Message.Status?, text: String, images: [MockImage] = []) {
         self.uid = uid
         self.sender = sender
         self.createdAt = createdAt
