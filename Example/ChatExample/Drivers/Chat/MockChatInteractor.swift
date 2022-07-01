@@ -22,6 +22,13 @@ final class MockChatInteractor: ChatInteractorProtocol {
     /// TODO: Generate error with random chance
     /// TODO: Save images from url to files. Imitate upload process
     func send(message: MockCreateMessage) {
+        if message.uid != nil {
+            guard let index = chatState.value.firstIndex(where: { $0.uid == message.uid }) else {
+                // TODO: Create error
+                return
+            }
+            chatState.value.remove(at: index)
+        }
         let message = message.toMockMessage(user: chatData.tim, status: .sending)
         chatState.value.append(message)
     }
@@ -74,7 +81,11 @@ private extension MockChatInteractor {
         let updated = chatState.value.map {
             var message = $0
             if message.status == .sending {
-                message.status = .sent
+                if Int.random(min: 0, max: 2) == 0 {
+                    message.status = .error
+                } else {
+                    message.status = .sent
+                }
             } else if message.status == .sent {
                 message.status = .read
             }

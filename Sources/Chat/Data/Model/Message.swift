@@ -42,13 +42,6 @@ public extension Message {
         case sending
         case sent
         case read
-
-        func toString() -> String {
-            switch self {
-            case .sending: return "sending"
-            case .sent: return "sent"
-            case .read: return "read"
-            }
-        }
+        case error
     }
 }
