@@ -6,12 +6,12 @@ import Foundation
 import AssetsPicker
 
 public struct DraftMessage {
-    public let id: Int?
+    public let id: String?
     public let text: String
     public let attachments: [any Attachment]
     public let createdAt: Date
 
-    init(id: Int? = nil, text: String, attachments: [any Attachment], createdAt: Date) {
+    init(id: String? = nil, text: String, attachments: [any Attachment], createdAt: Date) {
         self.id = id
         self.text = text
         self.attachments = attachments

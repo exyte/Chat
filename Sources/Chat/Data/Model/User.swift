@@ -5,10 +5,12 @@
 import Foundation
 
 public struct User {
+    public let id: String
     public let avatarURL: URL?
     public let isCurrentUser: Bool
 
-    public init(avatarURL: URL?, isCurrentUser: Bool = false) {
+    public init(id: String, avatarURL: URL?, isCurrentUser: Bool) {
+        self.id = id
         self.avatarURL = avatarURL
         self.isCurrentUser = isCurrentUser
     }

@@ -14,12 +14,8 @@ struct InputView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            if onTapAttach != nil {
-                attachButton
-            } else {
-                attachButton
-                    .hidden()
-            }
+            attachButton
+                .hidden(onTapAttach == nil)
             TextInputView(text: $viewModel.text)
             sendButton
                 .disabled(!viewModel.canSend)

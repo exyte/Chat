@@ -42,7 +42,7 @@ final class SimpleExampleViewModel: ObservableObject {
 }
 
 struct MockCreateMessage {
-    let uid: Int?
+    let uid: String?
     let text: String
     let createdAt: Date
     let images: [MockImage]
@@ -51,7 +51,7 @@ struct MockCreateMessage {
 extension MockCreateMessage {
     func toMockMessage(user: MockUser, status: Message.Status = .read) -> MockMessage {
         MockMessage(
-            uid: .random(),
+            uid: UUID().uuidString,
             sender: user,
             createdAt: createdAt,
             status: user.isCurrentUser ? status : nil,

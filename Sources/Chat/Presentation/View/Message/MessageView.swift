@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MessageView: View {
     let message: Message
+    let hideAvatar: Bool
     let onTapAttachment: (any Attachment) -> Void
     let onRetry: () -> Void
 
@@ -16,7 +17,7 @@ struct MessageView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            MessageContainer(user: message.user) {
+            MessageContainer(user: message.user, hideAvatar: hideAvatar) {
                 HStack {
                     VStack(alignment: .leading) {
                         if !message.text.isEmpty {
@@ -84,8 +85,8 @@ private extension MessageView {
 
 struct MessageView_Preview: PreviewProvider {
     static private var message = Message(
-        id: 0,
-        user: User(avatarURL: nil, isCurrentUser: true),
+        id: UUID().uuidString,
+        user: User(id: UUID().uuidString, avatarURL: nil, isCurrentUser: true),
         status: .error,
         text: "Hello"
     )
@@ -93,6 +94,7 @@ struct MessageView_Preview: PreviewProvider {
     static var previews: some View {
         MessageView(
             message: message,
+            hideAvatar: false,
             onTapAttachment: { _ in },
             onRetry: { }
         )
