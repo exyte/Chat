@@ -14,6 +14,8 @@ struct WrappedMessage: Equatable {
     let isFirstMessage: Bool
 }
 
+private let lastMessageAnchorKey = "LastMessageAnchorKey"
+
 public struct ChatView: View {
     @Binding public var originalMessages: [Message]
     @State private var messages: [WrappedMessage] = []
@@ -35,23 +37,23 @@ public struct ChatView: View {
         ZStack {
             VStack {
                 ScrollViewReader { proxy in
-                    List(messages, id: \.message.id) { box in
+                    List(messages, id: \.message.id) { wrappedMessage in
                         Group {
-                            if box.isFirstMessage {
-                                EmptyView().id("FirstMessageAnchor")
+                            if wrappedMessage.isFirstMessage {
+                                EmptyView().id(lastMessageAnchorKey)
                             }
-                            MessageView(message: box.message, hideAvatar: box.nextMessageIsSameUser) { attachment in
+                            MessageView(message: wrappedMessage.message, hideAvatar: wrappedMessage.nextMessageIsSameUser) { attachment in
                                 viewModel.fullscreenAttachmentItem = attachment
                             } onRetry: {
-                                didSendMessage(box.message.toDraft())
+                                didSendMessage(wrappedMessage.message.toDraft())
                             }
-                            .id(box.message.id)
+                            .id(wrappedMessage.message.id)
                             .rotationEffect(Angle(degrees: 180))
                         }
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets())
                         .onAppear {
-                            paginationState.handle(box.message, in: originalMessages)
+                            paginationState.handle(wrappedMessage.message, in: originalMessages)
                         }
                     }
                     .listStyle(.plain)
@@ -62,7 +64,7 @@ public struct ChatView: View {
                             didSendMessage(value)
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 withAnimation {
-                                    proxy.scrollTo("FirstMessageAnchor")
+                                    proxy.scrollTo(lastMessageAnchorKey)
                                 }
                             }
                         }
