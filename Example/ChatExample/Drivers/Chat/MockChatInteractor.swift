@@ -12,6 +12,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
     private lazy var sharedState = chatState.share()
 
     private var isLoading = false
+    private var lastDate = Date()
 
     private var subscriptions = Set<AnyCancellable>()
 
@@ -67,8 +68,11 @@ final class MockChatInteractor: ChatInteractorProtocol {
 
 private extension MockChatInteractor {
     func generateStartMessages() -> [MockMessage] {
-        (0...10).map { index in
-            chatData.randomMessage()
+        defer {
+            lastDate = lastDate.addingTimeInterval(-(60*60*24))
+        }
+        return (0...10).map { index in
+            chatData.randomMessage(date: lastDate)
         }
     }
 
