@@ -11,6 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "Chat",
+            type: .dynamic,
             targets: ["Chat"]),
     ],
     dependencies: [

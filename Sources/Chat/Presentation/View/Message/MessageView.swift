@@ -13,82 +13,92 @@ struct MessageView: View {
     let onTapAttachment: (any Attachment) -> Void
     let onRetry: () -> Void
 
-    @Environment(\.messageUseMarkdown) var messageUseMarkdown
+    var messageWidth: CGFloat {
+        message.text.width(withConstrainedHeight: 1, font: .preferredFont(forTextStyle: .body))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            MessageContainer(user: message.user, hideAvatar: hideAvatar) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        if !message.text.isEmpty {
-                            Group {
-                                if messageUseMarkdown,
-                                   let attributed = try? AttributedString(markdown: message.text) {
-                                    Text(attributed)
-                                } else {
-                                    Text(message.text)
+            HStack(alignment: .bottom, spacing: 0) {
+                if !message.user.isCurrentUser {
+                    AvatarView(url: message.user.avatarURL, hideAvatar: hideAvatar)
+                        .padding(.horizontal, 8)
+                } else {
+                    Spacer()
+                }
+                VStack(alignment: .leading, spacing: 0) {
+                    if !message.attachments.isEmpty {
+                        AttachmentsGrid(attachments: message.attachments, onTap: onTapAttachment)
+                            .overlay(alignment: .bottomTrailing) {
+                                if message.text.isEmpty {
+                                    time
                                 }
                             }
-                            .padding(.horizontal, 15)
-                            .padding(.vertical, 8)
-                        }
-
-                        if !message.attachments.isEmpty {
-                            AttachmentsGrid(attachments: message.attachments, onTap: onTapAttachment)
-                        }
+                            .layoutPriority(2)
                     }
-                    if message.status == .error {
-                        retryButton
+                    if !message.text.isEmpty {
+                        if messageWidth >= UIScreen.main.bounds.width * 0.7 {
+                            VStack(alignment: .trailing, spacing: 0) {
+                                MessageTextView(text: message.text)
+                                time
+                            }
+                        } else {
+                            HStack(alignment: .bottom, spacing: 0) {
+                                MessageTextView(text: message.text)
+                                time
+                            }
+                        }
                     }
                 }
-            }
-            if let status = message.status, status != .error {
-                statusView(status: status)
+                .frame(width: message.attachments.isEmpty ? nil : 204)
+                .foregroundColor(message.user.isCurrentUser ? .white : .black)
+                .background {
+                    if !message.text.isEmpty {
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundColor(message.user.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
+                    }
+                }
+                .padding(message.user.isCurrentUser ? .leading : .trailing, 20)
+
+                if message.user.isCurrentUser, let status = message.status {
+                    MessageStatusView(status: status, onRetry: onRetry)
+                }
+                if !message.user.isCurrentUser {
+                    Spacer()
+                }
             }
         }
+        .padding(.top, hideAvatar ? 4 : 8)
     }
 }
 
 private extension MessageView {
-    func statusView(status: Message.Status) -> some View {
-        HStack {
-            Spacer()
-            Group {
-                switch status {
-                case .sending:
-                    Text("Sending")
-                case .sent:
-                    Text("Sent")
-                case .read:
-                    Text("Read")
-                case .error:
-                    EmptyView()
-                }
-            }
-            .font(.footnote)
-        }
-        .padding(.horizontal)
-    }
-
-    var retryButton: some View {
-        Button {
-            onRetry()
-        } label: {
-            Image(systemName: "exclamationmark.arrow.circlepath")
-                .resizable()
-                .frame(width: 24, height: 24)
-        }
-        .foregroundColor(.red)
-        .padding(.trailing)
+    var time: some View {
+        Text("00:00")
+            .font(.caption)
+            .foregroundColor(message.user.isCurrentUser ? .white : .black)
+            .opacity(0.4)
+            .padding(.trailing, 12)
+            .padding(.bottom, 8)
     }
 }
 
 struct MessageView_Preview: PreviewProvider {
+    static private var shortMessage = "Hi, buddy!"
+    static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
+
     static private var message = Message(
         id: UUID().uuidString,
-        user: User(id: UUID().uuidString, avatarURL: nil, isCurrentUser: true),
-        status: .error,
-        text: "Hello"
+        user: User(id: UUID().uuidString, avatarURL: nil, isCurrentUser: false),
+        status: .read,
+        text: longMessage,
+        attachments: [
+            ImageAttachment.random(),
+            ImageAttachment.random(),
+            ImageAttachment.random(),
+            ImageAttachment.random(),
+            ImageAttachment.random(),
+        ]
     )
 
     static var previews: some View {

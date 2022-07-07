@@ -10,21 +10,21 @@ struct MessageContainer<Content>: View where Content: View {
     let hideAvatar: Bool
     @ViewBuilder var content: () -> Content
 
-    let imageSize = 30.0 // TODO: Create config for avatar size
+    let imageSize = 32.0 // TODO: Create config for avatar size
 
     var body: some View {
-        HStack(alignment: .bottom) {
+        HStack(alignment: .bottom, spacing: 8) {
             if user.isCurrentUser {
-                Spacer(minLength: 40)
+                Spacer(minLength: 20)
                 contentView
-                avatar
+//                avatar
             } else {
                 avatar
                 contentView
-                Spacer(minLength: 40)
+                Spacer(minLength: 20)
             }
         }
-        .padding(.horizontal, 8)
+//        .padding(.horizontal, 8)
     }
 
     var avatar: some View {
@@ -47,8 +47,9 @@ struct MessageContainer<Content>: View where Content: View {
             .mask {
                 RoundedRectangle(cornerRadius: 15)
             }
+            .foregroundColor(user.isCurrentUser ? .white : .black)
             .background(
-                RoundedRectangle(cornerRadius: 15)
+                RoundedRectangle(cornerRadius: 20)
                     .foregroundColor(user.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
             )
     }
