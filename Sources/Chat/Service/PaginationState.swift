@@ -17,15 +17,11 @@ final class PaginationState: ObservableObject {
         self.offset = offset
     }
 
-    func handle(_ message: Message, in messages: [Message]) {
+    func handle(_ message: Message, ids: [String]) {
         guard shouldHandlePagination else {
             return
         }
-        let ids = messages
-            .prefix(upTo: offset + 1)
-            .map { $0.id }
-
-        if ids.contains(message.id) {
+        if ids.prefix(offset + 1).contains(message.id) {
             onEvent?(message)
         }
     }

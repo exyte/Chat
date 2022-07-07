@@ -10,7 +10,7 @@ struct SimpleExampleView: View {
     @StateObject var viewModel = SimpleExampleViewModel()
 
     var body: some View {
-        ChatView(messages: $viewModel.messages) { draft in
+        ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
         }
         .chatEnablePagination(offset: 3) { message in
