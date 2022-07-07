@@ -9,7 +9,7 @@ extension Date {
         Calendar.current.startOfDay(for: self)
     }
 
-    func isSame(_ date: Date) -> Bool {
+    func isSameDay(_ date: Date) -> Bool {
         Calendar.current.isDate(self, inSameDayAs: date)
     }
 }

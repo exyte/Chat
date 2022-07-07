@@ -155,8 +155,8 @@ public struct ChatView: View {
             }
         } footer: {
             Text(section.date)
-            .frame(maxWidth: .infinity)
-            .rotationEffect(Angle(degrees: 180))
+                .frame(maxWidth: .infinity)
+                .rotationEffect(Angle(degrees: 180))
         }
         .listSectionSeparator(.hidden)
     }
@@ -172,7 +172,7 @@ private extension ChatView {
         for date in dates {
             let section = MessagesSection(
                 date: date.formatted(date: .complete, time: .omitted),
-                messages: wrapMessages(messages.filter({ $0.createdAt.isSame(date) }))
+                messages: wrapMessages(messages.filter({ $0.createdAt.isSameDay(date) }))
             )
             result.append(section)
         }
