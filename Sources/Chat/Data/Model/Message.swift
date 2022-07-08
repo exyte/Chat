@@ -31,6 +31,12 @@ public struct Message {
     }
 }
 
+extension Message {
+    var time: String {
+        DateFormatter.timeFormatter.string(from: createdAt)
+    }
+}
+
 extension Message: Equatable {
     public static func == (lhs: Message, rhs: Message) -> Bool {
         lhs.id == rhs.id

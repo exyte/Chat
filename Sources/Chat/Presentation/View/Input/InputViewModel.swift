@@ -17,7 +17,18 @@ final class InputViewModel: ObservableObject {
 
     private var subscriptions = Set<AnyCancellable>()
 
-    init() {}
+    init() {
+
+    }
+
+    func onStart() {
+        subscribeValidation()
+        subscribePicker()
+    }
+
+    func onStop() {
+        subscriptions.removeAll()
+    }
 
     func reset() {
         DispatchQueue.main.async { [weak self] in
@@ -79,5 +90,27 @@ private extension InputViewModel {
                     self?.reset()
                 }
             }
+    }
+
+    func subscribeValidation() {
+        let textTrigger = $text.map { _ in }
+        let mediasTrigger = $medias.map { _ in }
+
+        textTrigger
+            .merge(with: mediasTrigger)
+            .sink { [weak self] in
+                self?.validateDraft()
+            }
+            .store(in: &subscriptions)
+    }
+
+    func subscribePicker() {
+        $showPicker
+            .sink { [weak self] value in
+                if !value {
+                    self?.medias = []
+                }
+            }
+            .store(in: &subscriptions)
     }
 }

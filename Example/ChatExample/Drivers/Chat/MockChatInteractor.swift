@@ -71,9 +71,13 @@ private extension MockChatInteractor {
         defer {
             lastDate = lastDate.addingTimeInterval(-(60*60*24))
         }
-        return (0...10).map { index in
-            chatData.randomMessage(date: lastDate)
-        }
+        return (0...10)
+            .map { index in
+                chatData.randomMessage(date: lastDate.randomTime())
+            }
+            .sorted { lhs, rhs in
+                lhs.createdAt < rhs.createdAt
+            }
     }
 
     func generateNewMessage() {
