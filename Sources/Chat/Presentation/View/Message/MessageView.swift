@@ -31,7 +31,12 @@ struct MessageView: View {
                         AttachmentsGrid(attachments: message.attachments, onTap: onTapAttachment)
                             .overlay(alignment: .bottomTrailing) {
                                 if message.text.isEmpty {
-                                    time
+                                    MessageTimeView(
+                                        text: message.time,
+                                        isCurrentUser: message.user.isCurrentUser,
+                                        isOverlay: true
+                                    )
+                                    .padding(4)
                                 }
                             }
                             .layoutPriority(2)
@@ -40,12 +45,22 @@ struct MessageView: View {
                         if messageWidth >= UIScreen.main.bounds.width * 0.7 {
                             VStack(alignment: .trailing, spacing: 0) {
                                 MessageTextView(text: message.text)
-                                time
+                                MessageTimeView(
+                                    text: message.time,
+                                    isCurrentUser: message.user.isCurrentUser,
+                                    isOverlay: false
+                                )
+                                .padding(4)
                             }
                         } else {
                             HStack(alignment: .bottom, spacing: 0) {
                                 MessageTextView(text: message.text)
-                                time
+                                MessageTimeView(
+                                    text: message.time,
+                                    isCurrentUser: message.user.isCurrentUser,
+                                    isOverlay: false
+                                )
+                                .padding(4)
                             }
                         }
                     }
@@ -69,17 +84,6 @@ struct MessageView: View {
             }
         }
         .padding(.top, hideAvatar ? 4 : 8)
-    }
-}
-
-private extension MessageView {
-    var time: some View {
-        Text("00:00")
-            .font(.caption)
-            .foregroundColor(message.user.isCurrentUser ? .white : .black)
-            .opacity(0.4)
-            .padding(.trailing, 12)
-            .padding(.bottom, 8)
     }
 }
 

@@ -11,4 +11,6 @@ extension Colors {
     static let myMessage = Color(hex: "4962FF")
     static let friendMessage = Color(hex: "EBEDF0")
     static let grayStatus = Color(hex: "AFB3B8")
+    static let inputBackground = Color(hex: "F2F3F5")
+    static let button = Color(hex: "989EAC")
 }

@@ -5,37 +5,23 @@
 import SwiftUI
 
 struct TextInputView: View {
+    let style: InputViewStyle
     @Binding var text: String
 
     @State private var uuid = UUID()
     @EnvironmentObject private var globalFocusState: GlobalFocusState
 
     var body: some View {
-        VStack {
-            TextField("Message", text: $text, axis: .vertical)
-                .frame(minHeight: 35)
-                .padding(10)
-                .background(.white)
-                .cornerRadius(10)
-                .padding(3)
-                .customFocus($globalFocusState.focus, equals: .uuid(uuid))
-                .onTapGesture {
-                    globalFocusState.focus = .uuid(uuid)
-                }
-        }
-    }
-}
-
-struct TextInputView_Previews: PreviewProvider {
-    @State private static var text: String = "Hello world"
-
-    static var previews: some View {
-        ZStack {
-            Rectangle()
-                .fill(Colors.background)
-                .ignoresSafeArea()
-
-            TextInputView(text: $text)
-        }
+        TextField("", text: $text, axis: .vertical)
+            .customFocus($globalFocusState.focus, equals: .uuid(uuid))
+            .placeholder(when: text.isEmpty) {
+                Text(style.placeholder)
+                    .foregroundColor(Colors.button)
+            }
+            .foregroundColor(style == .message ? .black : .white)
+            .padding(.vertical, 10)
+            .onTapGesture {
+                globalFocusState.focus = .uuid(uuid)
+            }
     }
 }

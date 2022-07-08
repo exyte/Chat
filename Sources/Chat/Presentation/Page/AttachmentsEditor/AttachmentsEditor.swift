@@ -21,8 +21,18 @@ struct AttachmentsEditor: View {
                 }
 
             InputView(
-                viewModel: viewModel,
-                onTapAttach: nil
+                style: .signature,
+                text: $viewModel.text,
+                canSend: viewModel.canSend,
+                onAction: {
+                    switch $0 {
+                    case .attach, .photo:
+                        // TODO: Open camera
+                        break
+                    case .send:
+                        viewModel.send()
+                    }
+                }
             )
         }
         .padding(.top)

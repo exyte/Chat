@@ -8,17 +8,6 @@
 import SwiftUI
 import AssetsPicker
 
-struct WrappedMessage: Equatable {
-    let message: Message
-    let nextMessageIsSameUser: Bool
-    let isFirstMessage: Bool
-}
-
-struct MessagesSection: Equatable {
-    let date: String
-    let messages: [WrappedMessage]
-}
-
 private let lastMessageAnchorKey = "LastMessageAnchorKey"
 
 public struct ChatView: View {
@@ -43,33 +32,28 @@ public struct ChatView: View {
     public var body: some View {
         ZStack {
             VStack {
-                ScrollViewReader { proxy in
-                    List(sections, id: \.date) { section in
-                        buildSection(section)
-                    }
-                    .listStyle(.plain)
-                    .scrollIndicators(.hidden)
-                    .rotationEffect(Angle(degrees: 180))
-                    .onAppear {
-                        inputViewModel.didSendMessage = { value in
-                            didSendMessage(value)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation {
-                                    proxy.scrollTo(lastMessageAnchorKey)
-                                }
-                            }
-                        }
-                    }
-                }
-                .animation(.default, value: sections)
+                list
 
                 InputView(
-                    viewModel: inputViewModel,
-                    onTapAttach: {
-                        inputViewModel.showPicker = true
+                    style: .message,
+                    text: $inputViewModel.text,
+                    canSend: inputViewModel.canSend,
+                    onAction: {
+                        switch $0 {
+                        case .attach, .photo:
+                            inputViewModel.showPicker = true
+                        case .send:
+                            inputViewModel.send()
+                        }
                     }
                 )
                 .environmentObject(globalFocusState)
+                .onAppear {
+                    inputViewModel.onStart()
+                }
+                .onDisappear {
+                    inputViewModel.onStop()
+                }
             }
             if viewModel.fullscreenAttachmentItem != nil {
                 // TODO: Remove double flatMap for attachments
@@ -88,6 +72,7 @@ public struct ChatView: View {
         }
         .sheet(isPresented: $inputViewModel.showPicker) {
             AttachmentsEditor(viewModel: inputViewModel)
+                .background(Color(hex: "1F1F1F"))
                 .presentationDetents([.medium, .large])
                 .environmentObject(globalFocusState)
                 .assetsPickerCompletion { _ in }
@@ -113,6 +98,9 @@ public struct ChatView: View {
     var list: some View {
         ScrollViewReader { proxy in
             List(sections, id: \.date) { section in
+                if sections.first?.date == section.date {
+                    EmptyView().id(lastMessageAnchorKey)
+                }
                 buildSection(section)
             }
             .listStyle(.plain)
@@ -123,7 +111,7 @@ public struct ChatView: View {
                     didSendMessage(value)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         withAnimation {
-                            proxy.scrollTo("FirstMessageAnchor")
+                            proxy.scrollTo(lastMessageAnchorKey)
                         }
                     }
                 }
@@ -134,23 +122,20 @@ public struct ChatView: View {
 
     func buildSection(_ section: MessagesSection) -> some View {
         Section {
-            ForEach(section.messages, id: \.message.id) { wrappedMessage in
+            ForEach(section.messages, id: \.message.id) { row in
                 Group {
-                    if wrappedMessage.isFirstMessage {
-                        EmptyView().id("FirstMessageAnchor")
-                    }
-                    MessageView(message: wrappedMessage.message, hideAvatar: wrappedMessage.nextMessageIsSameUser) { attachment in
+                    MessageView(message: row.message, hideAvatar: row.nextMessageIsSameUser) { attachment in
                         viewModel.fullscreenAttachmentItem = attachment
                     } onRetry: {
-                        didSendMessage(wrappedMessage.message.toDraft())
+                        didSendMessage(row.message.toDraft())
                     }
-                    .id(wrappedMessage.message.id)
+                    .id(row.message.id)
                     .rotationEffect(Angle(degrees: 180))
                 }
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
                 .onAppear {
-                    paginationState.handle(wrappedMessage.message, ids: ids)
+                    paginationState.handle(row.message, ids: ids)
                 }
             }
         } footer: {
@@ -180,15 +165,14 @@ private extension ChatView {
         return result
     }
 
-    static func wrapMessages(_ messages: [Message]) -> [WrappedMessage] {
+    static func wrapMessages(_ messages: [Message]) -> [MessageRow] {
         return messages
             .enumerated()
             .map {
                 let nextMessageIsSameUser = messages[safe: $0.offset + 1]?.user.id == $0.element.user.id
-                return WrappedMessage(
+                return MessageRow(
                     message: $0.element,
-                    nextMessageIsSameUser: nextMessageIsSameUser,
-                    isFirstMessage: $0.offset == (messages.count - 1)
+                    nextMessageIsSameUser: nextMessageIsSameUser
                 )
             }
             .reversed()

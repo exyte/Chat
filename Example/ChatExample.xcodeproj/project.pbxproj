@@ -14,6 +14,7 @@
 		135987BA2869F3AE006388CF /* MockMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987B92869F3AE006388CF /* MockMessage.swift */; };
 		135987BD2869F6F2006388CF /* ChatInteractorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987BC2869F6F2006388CF /* ChatInteractorProtocol.swift */; };
 		135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987BE2869F704006388CF /* MockChatInteractor.swift */; };
+		1376133E28782F8E00E7CF67 /* Date+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376133D28782F8E00E7CF67 /* Date+Random.swift */; };
 		1376F7AB286467700016CD1B /* Chat in Frameworks */ = {isa = PBXBuildFile; productRef = 1376F7AA286467700016CD1B /* Chat */; };
 		1376F7BB286472530016CD1B /* ChatError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376F7BA286472530016CD1B /* ChatError.swift */; };
 		13DF042D2864790B0043DBBC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DF042C2864790B0043DBBC /* ContentView.swift */; };
@@ -33,6 +34,7 @@
 		135987B92869F3AE006388CF /* MockMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMessage.swift; sourceTree = "<group>"; };
 		135987BC2869F6F2006388CF /* ChatInteractorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInteractorProtocol.swift; sourceTree = "<group>"; };
 		135987BE2869F704006388CF /* MockChatInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatInteractor.swift; sourceTree = "<group>"; };
+		1376133D28782F8E00E7CF67 /* Date+Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Random.swift"; sourceTree = "<group>"; };
 		1376F7A3286466460016CD1B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1376F7A6286466770016CD1B /* Chat */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Chat; path = ..; sourceTree = "<group>"; };
 		1376F7BA286472530016CD1B /* ChatError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatError.swift; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 				1376F7B2286471990016CD1B /* Application */,
 				1376F7B3286471A80016CD1B /* Data */,
 				1376F7B4286471B30016CD1B /* Drivers */,
+				1376133C28782F7C00E7CF67 /* Extension */,
 				1376F7B5286471BF0016CD1B /* Presentation */,
 				1376F7AE286470B70016CD1B /* Support Files */,
 			);
@@ -101,6 +104,14 @@
 				135987BE2869F704006388CF /* MockChatInteractor.swift */,
 			);
 			path = Chat;
+			sourceTree = "<group>";
+		};
+		1376133C28782F7C00E7CF67 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				1376133D28782F8E00E7CF67 /* Date+Random.swift */,
+			);
+			path = Extension;
 			sourceTree = "<group>";
 		};
 		1376F7A5286466770016CD1B /* Packages */ = {
@@ -261,6 +272,7 @@
 				1376F7BB286472530016CD1B /* ChatError.swift in Sources */,
 				135987B82869F369006388CF /* Lorem.swift in Sources */,
 				135987BA2869F3AE006388CF /* MockMessage.swift in Sources */,
+				1376133E28782F8E00E7CF67 /* Date+Random.swift in Sources */,
 				13F1C0EF286AC86200D25D8A /* SimpleExampleView.swift in Sources */,
 				135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */,
 				13F1C0F2286ADD8900D25D8A /* MockImage.swift in Sources */,
@@ -396,6 +408,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChatExample/Info.plist;
@@ -425,6 +438,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChatExample/Info.plist;

@@ -52,6 +52,7 @@ public struct AssetsPicker: View {
             .assetsPickerNavigationBar(mode: $viewModel.mode) {
                 openPicker = false
             }
+            .background(Color(hex: "1F1F1F"))
         }
         .navigationViewStyle(.stack)
         .environmentObject(selectionService)
