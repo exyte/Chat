@@ -6,5 +6,5 @@ import Foundation
 
 struct MessagesSection: Equatable {
     let date: String
-    let messages: [MessageRow]
+    let rows: [MessageRow]
 }

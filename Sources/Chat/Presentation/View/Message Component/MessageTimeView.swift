@@ -27,10 +27,6 @@ struct MessageTimeView: View {
     }
 
     var textColor: Color {
-        if isOverlay {
-            return .white
-        } else {
-            return isCurrentUser ? .white : .black
-        }
+        isOverlay || isCurrentUser ? .white : .black
     }
 }

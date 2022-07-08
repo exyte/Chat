@@ -76,9 +76,9 @@ struct InputView: View {
         } label: {
             Image(systemName: "paperclip")
                 .resizable()
-                .padding(4)
-                .frame(width: 24, height: 24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
+                .scaledToFit()
+                .frame(width: 16, height: 16)
+                .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 12))
         }
         .tint(Colors.button)
     }

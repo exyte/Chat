@@ -5,26 +5,31 @@
 import SwiftUI
 
 struct AttachmentsGrid: View {
+    let onTap: (any Attachment) -> Void
+    let maxImages: Int = 4 // TODO: Make injectable
+
     private let single: (any Attachment)?
     private let grid: [any Attachment]
     private let hidden: String?
-
-    let onTap: (any Attachment) -> Void
+    private let showMoreAttachmentId: String?
 
     init(attachments: [any Attachment], onTap: @escaping (any Attachment) -> Void) {
-        if attachments.count > 4 {
-            single = nil
-            grid = attachments.prefix(4).map({ $0 })
-            hidden = "+\(attachments.count - 3)"
+        var toShow = attachments
+
+        if toShow.count > maxImages {
+            toShow = attachments.prefix(maxImages).map({ $0 })
+            hidden = "+\(attachments.count - (maxImages - 1))"
+            showMoreAttachmentId = attachments[safe: (maxImages - 1)]?.id
         } else {
-            if attachments.count % 2 == 0 {
-                single = nil
-                grid = attachments
-            } else {
-                single = attachments.first
-                grid = attachments.dropFirst().map { $0 }
-            }
             hidden = nil
+            showMoreAttachmentId = nil
+        }
+        if toShow.count % 2 == 0 {
+            single = nil
+            grid = toShow
+        } else {
+            single = toShow.first
+            grid = toShow.dropFirst().map { $0 }
         }
         self.onTap = onTap
     }
@@ -58,7 +63,7 @@ struct AttachmentsGrid: View {
                             .frame(width: 100, height: 100)
                             .clipped()
                             .overlay {
-                                if let hidden = hidden, pair.right.id == grid[3].id {
+                                if pair.right.id == showMoreAttachmentId, let hidden = hidden {
                                     ZStack {
                                         RadialGradient(
                                             colors: [

@@ -57,7 +57,7 @@ public struct ChatView: View {
             }
             if viewModel.fullscreenAttachmentItem != nil {
                 // TODO: Remove double flatMap for attachments
-                let attachments = sections.flatMap { $0.messages.flatMap { $0.message.attachments } }
+                let attachments = sections.flatMap { $0.rows.flatMap { $0.message.attachments } }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
                 AttachmentsPages(
                     viewModel: AttachmentsPagesViewModel(
@@ -122,7 +122,7 @@ public struct ChatView: View {
 
     func buildSection(_ section: MessagesSection) -> some View {
         Section {
-            ForEach(section.messages, id: \.message.id) { row in
+            ForEach(section.rows, id: \.message.id) { row in
                 Group {
                     MessageView(message: row.message, hideAvatar: row.nextMessageIsSameUser) { attachment in
                         viewModel.fullscreenAttachmentItem = attachment
@@ -157,7 +157,7 @@ private extension ChatView {
         for date in dates {
             let section = MessagesSection(
                 date: date.formatted(date: .complete, time: .omitted),
-                messages: wrapMessages(messages.filter({ $0.createdAt.isSameDay(date) }))
+                rows: wrapMessages(messages.filter({ $0.createdAt.isSameDay(date) }))
             )
             result.append(section)
         }

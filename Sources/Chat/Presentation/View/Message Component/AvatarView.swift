@@ -9,19 +9,19 @@ struct AvatarView: View {
     let url: URL?
     let hideAvatar: Bool
 
-    let avatarSize = 32.0 // TODO: Create config for avatar size
+    @Environment(\.chatSizes) var chatSizes
 
     var body: some View {
         CachedAsyncImage(url: url, urlCache: .imageCache) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: avatarSize, height: avatarSize)
+                .frame(width: chatSizes.avatar, height: chatSizes.avatar)
                 .mask {
                     Circle()
                 }
         } placeholder: {
             Circle().foregroundColor(Color.gray)
-                .frame(width: avatarSize, height: avatarSize)
+                .frame(width: chatSizes.avatar, height: chatSizes.avatar)
         }
         .hidden(hideAvatar)
     }
