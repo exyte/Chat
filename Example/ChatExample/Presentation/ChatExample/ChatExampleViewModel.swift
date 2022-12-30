@@ -6,7 +6,7 @@ import Foundation
 import Combine
 import Chat
 
-final class SimpleExampleViewModel: ObservableObject {
+final class ChatExampleViewModel: ObservableObject {
     @Published var messages: [Message] = []
 
     private let interactor: ChatInteractorProtocol
