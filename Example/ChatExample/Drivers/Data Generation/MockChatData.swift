@@ -11,17 +11,17 @@ final class MockChatData {
     let tim = MockUser(
         uid: "1",
         name: "Tim",
-        avatar: URL(string: "https://ui-avatars.com/api/?name=Tim")!
+        avatar: URL(string: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Solid_green.svg/1200px-Solid_green.svg.png")!
     )
     let steve = MockUser(
         uid: "2",
         name: "Steve",
-        avatar: URL(string: "https://ui-avatars.com/api/?name=S+T")!
+        avatar: URL(string: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Oxford_blue.png")!
     )
     let emma = MockUser(
         uid: "3",
         name: "Emma",
-        avatar: URL(string: "https://ui-avatars.com/api/?name=Emma")!
+        avatar: URL(string: "https://upload.wikimedia.org/wikipedia/commons/4/40/Dark_orange.PNG")!
     )
 
     func randomMessage(senders: [MockUser] = [], date: Date? = nil) -> MockMessage {

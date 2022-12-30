@@ -13,16 +13,14 @@ struct AvatarView: View {
 
     var body: some View {
         CachedAsyncImage(url: url, urlCache: .imageCache) { image in
-            image.resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: chatSizes.avatar, height: chatSizes.avatar)
-                .mask {
-                    Circle()
-                }
+            image
+                .resizable()
+                .scaledToFill()
         } placeholder: {
-            Circle().foregroundColor(Color.gray)
-                .frame(width: chatSizes.avatar, height: chatSizes.avatar)
+            Rectangle().fill(Color.gray)
         }
+        .frame(width: chatSizes.avatar, height: chatSizes.avatar)
+        .clipShape(Circle())
         .hidden(hideAvatar)
     }
 }
