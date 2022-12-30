@@ -31,7 +31,7 @@ public struct ChatView: View {
 
     public var body: some View {
         ZStack {
-            VStack {
+            VStack(spacing: 0) {
                 list
 
                 InputView(
