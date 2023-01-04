@@ -11,6 +11,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
     private lazy var chatState = CurrentValueSubject<[MockMessage], Never>(generateStartMessages())
     private lazy var sharedState = chatState.share()
 
+    private let isActive: Bool
     private var isLoading = false
     private var lastDate = Date()
 
@@ -18,6 +19,10 @@ final class MockChatInteractor: ChatInteractorProtocol {
 
     var messages: AnyPublisher<[MockMessage], Never> {
         sharedState.eraseToAnyPublisher()
+    }
+    
+    init(isActive: Bool = false) {
+        self.isActive = isActive
     }
 
     /// TODO: Generate error with random chance
@@ -39,7 +44,9 @@ final class MockChatInteractor: ChatInteractorProtocol {
             .autoconnect()
             .sink { [weak self] _ in
                 self?.updateSendingStatuses()
-                self?.generateNewMessage()
+                if self?.isActive ?? false {
+                    self?.generateNewMessage()
+                }
             }
             .store(in: &subscriptions)
     }

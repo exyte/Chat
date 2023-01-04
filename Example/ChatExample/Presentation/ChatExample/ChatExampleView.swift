@@ -6,9 +6,16 @@ import Foundation
 import SwiftUI
 import Chat
 
-struct SimpleExampleView: View {
-    @StateObject var viewModel = SimpleExampleViewModel()
+struct ChatExampleView: View {
+    @StateObject private var viewModel: ChatExampleViewModel
+    
+    private let title: String
 
+    init(viewModel: ChatExampleViewModel = ChatExampleViewModel(), title: String) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.title = title
+    }
+    
     var body: some View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
@@ -23,7 +30,7 @@ struct SimpleExampleView: View {
         .onDisappear {
             viewModel.onStop()
         }
-        .navigationTitle("Simple example")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

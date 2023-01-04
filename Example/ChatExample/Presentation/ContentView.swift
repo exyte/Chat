@@ -9,8 +9,15 @@ struct ContentView: View {
         NavigationView {
             List {
                 Section {
+                    NavigationLink("Active chat example") {
+                        ChatExampleView(
+                            viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
+                            title: "Active chat example"
+                        )
+                    }
+                    
                     NavigationLink("Simple example") {
-                        SimpleExampleView()
+                        ChatExampleView(title: "Simple example")
                     }
                 } header: {
                     Text("Basic examples")

@@ -83,7 +83,7 @@ struct MessageView: View {
                 }
             }
         }
-        .padding(.top, hideAvatar ? 4 : 8)
+        .padding(.bottom, hideAvatar ? 4 : 8)
     }
 }
 
