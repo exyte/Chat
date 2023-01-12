@@ -49,6 +49,7 @@ struct InputView: View {
                 .fill(backgroundColor)
         }
         .padding(.horizontal, 12)
+        .padding(.vertical, 5)
     }
 
     @ViewBuilder

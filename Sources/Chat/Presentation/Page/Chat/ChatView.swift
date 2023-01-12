@@ -48,12 +48,8 @@ public struct ChatView: View {
                     }
                 )
                 .environmentObject(globalFocusState)
-                .onAppear {
-                    inputViewModel.onStart()
-                }
-                .onDisappear {
-                    inputViewModel.onStop()
-                }
+                .onAppear(perform: inputViewModel.onStart)
+                .onDisappear(perform: inputViewModel.onStop)
             }
             if viewModel.fullscreenAttachmentItem != nil {
                 // TODO: Remove double flatMap for attachments
@@ -82,17 +78,7 @@ public struct ChatView: View {
                 globalFocusState.focus = nil
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .keyboard) {
-                HStack {
-                    Spacer()
-                    Button("Done") {
-                        globalFocusState.focus = nil
-                    }
-                    .tint(Color.blue)
-                }
-            }
-        }
+        .scrollDismissesKeyboard(.immediately)
     }
 
     var list: some View {
