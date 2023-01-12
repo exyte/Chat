@@ -55,7 +55,8 @@ extension MockCreateMessage {
             sender: user,
             createdAt: createdAt,
             status: user.isCurrentUser ? status : nil,
-            text: text
+            text: text,
+            images: images
         )
     }
 }

@@ -69,7 +69,6 @@ public struct ChatView: View {
                 .background(Color(hex: "1F1F1F"))
                 .presentationDetents([.medium, .large])
                 .environmentObject(globalFocusState)
-                .assetsPickerCompletion { _ in }
         }
         .onChange(of: inputViewModel.showPicker) {
             if $0 {

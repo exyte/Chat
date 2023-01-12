@@ -69,8 +69,8 @@ public struct AssetsPicker: View {
             guard flag else {
                 return
             }
-            openPicker = false
             assetsPickerCompletion?(selectionService.mapToMedia())
+            openPicker = false
         }
 #if os(iOS)
         .onChange(of: viewModel.cameraImage) { newValue in

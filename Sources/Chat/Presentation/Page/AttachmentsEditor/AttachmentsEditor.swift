@@ -19,6 +19,9 @@ struct AttachmentsEditor: View {
                 .assetsPickerOnChange { medias in
                     viewModel.medias = medias
                 }
+                .assetsPickerCompletion { _ in
+                    viewModel.send()
+                }
 
             InputView(
                 style: .signature,
