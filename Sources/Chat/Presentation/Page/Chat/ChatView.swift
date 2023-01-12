@@ -30,41 +30,39 @@ public struct ChatView: View {
     }
 
     public var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                list
+        VStack(spacing: 0) {
+            list
 
-                InputView(
-                    style: .message,
-                    text: $inputViewModel.text,
-                    canSend: inputViewModel.canSend,
-                    onAction: {
-                        switch $0 {
-                        case .attach, .photo:
-                            inputViewModel.showPicker = true
-                        case .send:
-                            inputViewModel.send()
-                        }
+            InputView(
+                style: .message,
+                text: $inputViewModel.text,
+                canSend: inputViewModel.canSend,
+                onAction: {
+                    switch $0 {
+                    case .attach, .photo:
+                        inputViewModel.showPicker = true
+                    case .send:
+                        inputViewModel.send()
                     }
-                )
-                .environmentObject(globalFocusState)
-                .onAppear(perform: inputViewModel.onStart)
-                .onDisappear(perform: inputViewModel.onStop)
-            }
-            if viewModel.fullscreenAttachmentItem != nil {
-                // TODO: Remove double flatMap for attachments
-                let attachments = sections.flatMap { $0.rows.flatMap { $0.message.attachments } }
-                let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
-                AttachmentsPages(
-                    viewModel: AttachmentsPagesViewModel(
-                        attachments: attachments,
-                        index: index ?? 0
-                    ),
-                    onClose: { [weak viewModel] in
-                        viewModel?.fullscreenAttachmentItem = nil
-                    }
-                )
-            }
+                }
+            )
+            .environmentObject(globalFocusState)
+            .onAppear(perform: inputViewModel.onStart)
+            .onDisappear(perform: inputViewModel.onStop)
+        }
+        .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
+            let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
+            let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
+
+            AttachmentsPages(
+                viewModel: AttachmentsPagesViewModel(
+                    attachments: attachments,
+                    index: index ?? 0
+                ),
+                onClose: { [weak viewModel] in
+                    viewModel?.dismissAttachmentFullScreen()
+                }
+            )
         }
         .sheet(isPresented: $inputViewModel.showPicker) {
             AttachmentsEditor(viewModel: inputViewModel)
@@ -111,7 +109,7 @@ public struct ChatView: View {
             ForEach(section.rows, id: \.message.id) { row in
                 Group {
                     MessageView(message: row.message, hideAvatar: row.nextMessageIsSameUser) { attachment in
-                        viewModel.fullscreenAttachmentItem = attachment
+                        viewModel.presentAttachmentFullScreen(attachment)
                     } onRetry: {
                         didSendMessage(row.message.toDraft())
                     }
