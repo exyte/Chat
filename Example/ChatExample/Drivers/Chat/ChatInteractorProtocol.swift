@@ -7,6 +7,8 @@ import Combine
 
 protocol ChatInteractorProtocol {
     var messages: AnyPublisher<[MockMessage], Never> { get }
+    var senders: [MockUser] { get }
+    var otherSenders: [MockUser] { get }
 
     func send(message: MockCreateMessage)
 

@@ -24,13 +24,12 @@ struct ChatExampleView: View {
             viewModel.loadMoreMessage(before: message)
         }
         .chatMessageUseMarkdown()
-        .onAppear {
-            viewModel.onStart()
-        }
-        .onDisappear {
-            viewModel.onStop()
-        }
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
+        .chatNavigation(
+            title: viewModel.chatTitle,
+            status: viewModel.chatStatus,
+            cover: viewModel.chatCover
+        )
+        .onAppear(perform: viewModel.onStart)
+        .onDisappear(perform: viewModel.onStop)
     }
 }

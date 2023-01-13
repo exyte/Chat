@@ -21,6 +21,16 @@ final class MockChatInteractor: ChatInteractorProtocol {
         sharedState.eraseToAnyPublisher()
     }
     
+    var senders: [MockUser] {
+        var members = [chatData.steve, chatData.tim]
+        if isActive { members.append(chatData.emma) }
+        return members
+    }
+    
+    var otherSenders: [MockUser] {
+        senders.filter { !$0.isCurrentUser }
+    }
+    
     init(isActive: Bool = false) {
         self.isActive = isActive
     }
@@ -80,7 +90,7 @@ private extension MockChatInteractor {
         }
         return (0...10)
             .map { index in
-                chatData.randomMessage(date: lastDate.randomTime())
+                chatData.randomMessage(senders: senders, date: lastDate.randomTime())
             }
             .sorted { lhs, rhs in
                 lhs.createdAt < rhs.createdAt
@@ -88,7 +98,7 @@ private extension MockChatInteractor {
     }
 
     func generateNewMessage() {
-        let message = chatData.randomMessage(senders: [chatData.steve, chatData.emma])
+        let message = chatData.randomMessage(senders: otherSenders)
         chatState.value.append(message)
     }
 
