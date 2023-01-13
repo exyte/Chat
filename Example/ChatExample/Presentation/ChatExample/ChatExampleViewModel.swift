@@ -8,6 +8,16 @@ import Chat
 
 final class ChatExampleViewModel: ObservableObject {
     @Published var messages: [Message] = []
+    
+    var chatTitle: String {
+        interactor.otherSenders.count == 1 ? interactor.otherSenders.first!.name : "Group chat"
+    }
+    var chatStatus: String {
+        interactor.otherSenders.count == 1 ? "online" : "\(interactor.senders.count) members"
+    }
+    var chatCover: URL? {
+        interactor.otherSenders.count == 1 ? interactor.otherSenders.first!.avatar : nil
+    }
 
     private let interactor: ChatInteractorProtocol
     private var subscriptions = Set<AnyCancellable>()
