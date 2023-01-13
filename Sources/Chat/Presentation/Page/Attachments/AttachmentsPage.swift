@@ -10,7 +10,7 @@ struct AttachmentsPage: View {
 
     var body: some View {
         if attachment is ImageAttachment {
-            CachedAsyncImage(url: attachment.full, urlCache: .imageCache, content: { phase in
+            CachedAsyncImage(url: attachment.full, urlCache: .imageCache) { phase in
                 switch phase {
                 case let .success(image):
                     image
@@ -19,9 +19,8 @@ struct AttachmentsPage: View {
                 default:
                     Color.clear
                 }
-            })
+            }
             .frame(maxHeight: 200)
-            
         } else if let attachment = attachment as? VideoAttachment {
             VideoView(
                 viewModel: VideoViewModel(attachment: attachment)
