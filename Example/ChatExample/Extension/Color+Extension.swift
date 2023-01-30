@@ -1,8 +1,15 @@
 //
-//  Created by Alisa Mylnikova on 20.04.2022.
+//  Color+Extension.swift
+//  ChatExample
+//
+//  Created by Alisa Mylnikova on 30.01.2023.
 //
 
 import SwiftUI
+
+extension Color {
+    static var exampleGrey = Color(hex: "1F1F1F")
+}
 
 extension Color {
     init(hex: String) {

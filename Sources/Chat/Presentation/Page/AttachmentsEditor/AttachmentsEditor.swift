@@ -6,22 +6,36 @@
 //
 
 import SwiftUI
-import AssetsPicker
+import MediaPicker
 
 struct AttachmentsEditor: View {
     @ObservedObject var viewModel: InputViewModel
 
     var body: some View {
         VStack {
-            AssetsPicker(openPicker: $viewModel.showPicker)
-                .assetsPicker(selectionStyle: .count)
-                .assetsSelectionLimit(Configuration.assetsPickerLimit)
-                .assetsPickerOnChange { medias in
-                    viewModel.medias = medias
-                }
-                .assetsPickerCompletion { _ in
-                    viewModel.send()
-                }
+            MediaPicker(isPresented: $viewModel.showPicker, limit: Configuration.assetsPickerLimit) { medias in
+                viewModel.medias = medias
+            }
+            .selectionStyle(.count)
+            .mediaPickerTheme(
+                    main: .init(
+                        background: Color(hex: "1F1F1F")
+                    ),
+                    selection: .init(
+//                        emptyTint: .white,
+//                        emptyBackground: .black.opacity(0.25),
+//                        selectedTint: Color("CustomPurple")
+                    )
+                )
+//            AssetsPicker(openPicker: $viewModel.showPicker)
+//                .assetsPicker(selectionStyle: .count)
+//                .assetsSelectionLimit(Configuration.assetsPickerLimit)
+//                .assetsPickerOnChange { medias in
+//                    viewModel.medias = medias
+//                }
+//                .assetsPickerCompletion { _ in
+//                    viewModel.send()
+//                }
 
             InputView(
                 style: .signature,

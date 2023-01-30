@@ -4,9 +4,10 @@
 
 import Foundation
 import Combine
-import AssetsPicker
+import MediaPicker
 
 final class InputViewModel: ObservableObject {
+    
     @Published var text: String = ""
     @Published var medias: [Media] = []
     @Published var showPicker = false
@@ -54,10 +55,10 @@ private extension InputViewModel {
     
     func mapAttachmentsForSend() -> AnyPublisher<[any Attachment], Never> {
         medias.publisher
-            .receive(on: DispatchQueue.global())
-            .flatMap { media in
-                media.getUrl()
-                    .map { url in (media, url) }
+            //.receive(on: DispatchQueue.global())
+            .asyncMap { media in
+                await (media, media.getUrl())
+                    //.map { url in (media, url) }
             }
             .compactMap { (media, url) -> (Media, URL)? in
                 guard let url = url else { return nil }
@@ -76,7 +77,7 @@ private extension InputViewModel {
     }
 
     func sendMessage() -> AnyCancellable {
-        return mapAttachmentsForSend()
+        mapAttachmentsForSend()
             .compactMap { [text] in
                 DraftMessage(
                     text: text,
@@ -112,5 +113,20 @@ private extension InputViewModel {
                 }
             }
             .store(in: &subscriptions)
+    }
+}
+
+extension Publisher {
+    func asyncMap<T>(
+        _ transform: @escaping (Output) async -> T
+    ) -> Publishers.FlatMap<Future<T, Never>, Self> {
+        flatMap { value in
+            Future { promise in
+                Task {
+                    let output = await transform(value)
+                    promise(.success(output))
+                }
+            }
+        }
     }
 }

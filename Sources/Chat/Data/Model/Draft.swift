@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import AssetsPicker
 
 public struct DraftMessage {
     public let id: String?

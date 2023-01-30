@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "mediapicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/MediaPicker.git",
+      "state" : {
+        "revision" : "7d3949cf30378023a0dd9219c3a8ce988df14420",
+        "version" : "0.0.1"
+      }
+    },
+    {
       "identity" : "swiftui-cached-async-image",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/lorenzofiamingo/swiftui-cached-async-image.git",

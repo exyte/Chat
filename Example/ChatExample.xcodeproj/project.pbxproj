@@ -23,6 +23,7 @@
 		13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6E2869E983004DF140 /* MockChatData.swift */; };
 		13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */; };
 		13F1C0F2286ADD8900D25D8A /* MockImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockImage.swift */; };
+		5B6D3A732987D85A00765148 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		13E17B6E2869E983004DF140 /* MockChatData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatData.swift; sourceTree = "<group>"; };
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
 		13F1C0F1286ADD8900D25D8A /* MockImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImage.swift; sourceTree = "<group>"; };
+		5B6D3A722987D85A00765148 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,11 +81,13 @@
 		135549322864620900C9459A /* ChatExample */ = {
 			isa = PBXGroup;
 			children = (
-				1376F7B2286471990016CD1B /* Application */,
+				135549332864620900C9459A /* ChatExampleApp.swift */,
+				13DF043128647C070043DBBC /* ChatExampleViewModel.swift */,
+				13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */,
+				13DF042C2864790B0043DBBC /* ContentView.swift */,
 				1376F7B3286471A80016CD1B /* Data */,
 				1376F7B4286471B30016CD1B /* Drivers */,
 				1376133C28782F7C00E7CF67 /* Extension */,
-				1376F7B5286471BF0016CD1B /* Presentation */,
 				1376F7AE286470B70016CD1B /* Support Files */,
 			);
 			path = ChatExample;
@@ -110,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				1376133D28782F8E00E7CF67 /* Date+Random.swift */,
+				5B6D3A722987D85A00765148 /* Color+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -139,14 +144,6 @@
 			name = "Support Files";
 			sourceTree = "<group>";
 		};
-		1376F7B2286471990016CD1B /* Application */ = {
-			isa = PBXGroup;
-			children = (
-				135549332864620900C9459A /* ChatExampleApp.swift */,
-			);
-			path = Application;
-			sourceTree = "<group>";
-		};
 		1376F7B3286471A80016CD1B /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -165,24 +162,6 @@
 				135987BB2869F6C2006388CF /* Chat */,
 			);
 			path = Drivers;
-			sourceTree = "<group>";
-		};
-		1376F7B5286471BF0016CD1B /* Presentation */ = {
-			isa = PBXGroup;
-			children = (
-				13F1C0F0286ADD5F00D25D8A /* ChatExample */,
-				13DF042C2864790B0043DBBC /* ContentView.swift */,
-			);
-			path = Presentation;
-			sourceTree = "<group>";
-		};
-		13F1C0F0286ADD5F00D25D8A /* ChatExample */ = {
-			isa = PBXGroup;
-			children = (
-				13DF043128647C070043DBBC /* ChatExampleViewModel.swift */,
-				13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */,
-			);
-			path = ChatExample;
 			sourceTree = "<group>";
 		};
 		13F1C0F3286ADE5D00D25D8A /* Data Generation */ = {
@@ -241,6 +220,8 @@
 				Base,
 			);
 			mainGroup = 135549272864620900C9459A;
+			packageReferences = (
+			);
 			productRefGroup = 135549312864620900C9459A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -268,6 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13DF043228647C070043DBBC /* ChatExampleViewModel.swift in Sources */,
+				5B6D3A732987D85A00765148 /* Color+Extension.swift in Sources */,
 				13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */,
 				1376F7BB286472530016CD1B /* ChatError.swift in Sources */,
 				135987B82869F369006388CF /* Lorem.swift in Sources */,

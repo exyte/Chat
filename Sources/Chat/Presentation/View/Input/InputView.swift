@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import AssetsPicker
 
 enum InputViewStyle {
     case message

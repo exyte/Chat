@@ -24,9 +24,9 @@ let package = Package(
             from: "2.1.1"
         ),
         .package(
-            name: "AssetsPicker",
-            path: "Components/AssetsPicker"
-        )
+            url: "https://github.com/exyte/MediaPicker.git",
+            from: "0.0.1"
+        ),
     ],
     targets: [
         .target(
@@ -34,7 +34,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Introspect", package: "SwiftUI-Introspect"),
                 .product(name: "CachedAsyncImage", package: "swiftui-cached-async-image"),
-                "AssetsPicker",
+                .product(name: "MediaPicker", package: "MediaPicker")
             ]
         ),
         .testTarget(
