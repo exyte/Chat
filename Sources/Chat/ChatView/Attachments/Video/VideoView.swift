@@ -6,8 +6,11 @@ import SwiftUI
 import AVKit
 
 struct VideoView: View {
-    @StateObject var viewModel: VideoViewModel
+
     @EnvironmentObject var attachmentsPagesViewModel: AttachmentsPagesViewModel
+    @Environment(\.chatTheme) private var theme
+
+    @StateObject var viewModel: VideoViewModel
 
     var body: some View {
         Group {
@@ -45,13 +48,11 @@ struct VideoView: View {
                         Button {
                             viewModel.togglePlay()
                         } label: {
-                            Image(systemName: viewModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                            (viewModel.isPlaying ? theme.images.pauseCircleButton : theme.images.playCircleButton)
                                 .resizable()
                                 .frame(width: 64, height: 64)
                                 .foregroundColor(.white)
                         }
-                    } else {
-                        EmptyView()
                     }
                 }
         }

@@ -6,6 +6,9 @@ import Foundation
 import SwiftUI
 
 struct AttachmentsPages: View {
+
+    @Environment(\.chatTheme) private var theme
+
     @StateObject var viewModel: AttachmentsPagesViewModel
     var onClose: () -> Void
 
@@ -49,7 +52,7 @@ struct AttachmentsPages: View {
             }
             .overlay(alignment: .topLeading) {
                 Button(action: onClose) {
-                    Image(systemName: "xmark")
+                    theme.images.removeButton
                         .resizable()
                         .frame(width: 20, height: 20)
                 }

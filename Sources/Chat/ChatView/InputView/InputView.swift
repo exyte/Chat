@@ -30,16 +30,19 @@ extension InputView {
 }
 
 struct InputView: View {
-    let style: InputViewStyle
+
+    @Environment(\.chatTheme) private var theme
 
     @Binding var text: String
+
+    let style: InputViewStyle
     let canSend: Bool
-    var onAction: (Action) -> Void
+    let onAction: (Action) -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             leftButton
-            TextInputView(style: style, text: $text)
+            TextInputView(text: $text, style: style)
                 .frame(minHeight: 48)
             rigthButton
         }
@@ -74,20 +77,20 @@ struct InputView: View {
         Button {
             onAction(.attach)
         } label: {
-            Image(systemName: "paperclip")
+            theme.images.attachButton
                 .resizable()
                 .scaledToFit()
                 .frame(width: 16, height: 16)
                 .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 12))
         }
-        .tint(Colors.button)
+        .tint(theme.colors.buttonBackground)
     }
 
     var addButton: some View {
         Button {
             onAction(.photo)
         } label: {
-            Image(systemName: "plus.circle.fill")
+            theme.images.addButton
                 .resizable()
                 .frame(width: 24, height: 24)
                 .background {
@@ -95,27 +98,27 @@ struct InputView: View {
                 }
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
         }
-        .tint(Colors.button)
+        .tint(theme.colors.buttonBackground)
     }
 
     var cameraButton: some View {
         Button {
             onAction(.photo)
         } label: {
-            Image(systemName: "camera")
+            theme.images.cameraButton
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
                 .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 12))
         }
-        .tint(Colors.button)
+        .tint(theme.colors.buttonBackground)
     }
 
     var sendButton: some View {
         Button {
             onAction(.send)
         } label: {
-            Image(systemName: "arrow.up.circle.fill")
+            theme.images.sendButton
                 .resizable()
                 .scaledToFit()
                 .frame(width: 32, height: 32)
@@ -124,15 +127,15 @@ struct InputView: View {
                 }
                 .padding(8)
         }
-        .tint(Colors.myMessage)
+        .tint(theme.colors.myMessage)
     }
 
     var backgroundColor: Color {
         switch style {
         case .message:
-            return Colors.inputBackground
+            return theme.colors.inputLightContextBackground
         case .signature:
-            return Color(hex: "F2F3F5").opacity(0.12)
+            return theme.colors.inputDarkContextBackground
         }
     }
 }
@@ -147,15 +150,15 @@ struct InputView_Previews: PreviewProvider {
 
                 VStack {
                     InputView(
-                        style: .message,
                         text: .constant(text),
+                        style: .message,
                         canSend: true,
                         onAction: { _ in }
                     )
 
                     InputView(
-                        style: .message,
                         text: .constant(""),
+                        style: .message,
                         canSend: false,
                         onAction: { _ in }
                     )
@@ -167,15 +170,15 @@ struct InputView_Previews: PreviewProvider {
 
                 VStack {
                     InputView(
-                        style: .signature,
                         text: .constant(text),
+                        style: .signature,
                         canSend: true,
                         onAction: { _ in }
                     )
 
                     InputView(
-                        style: .signature,
                         text: .constant(""),
+                        style: .signature,
                         canSend: false,
                         onAction: { _ in }
                     )

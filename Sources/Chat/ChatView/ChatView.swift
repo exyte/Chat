@@ -10,6 +10,7 @@ import SwiftUI
 private let lastMessageAnchorKey = "LastMessageAnchorKey"
 
 public struct ChatView: View {
+
     let didSendMessage: (DraftMessage) -> Void
 
     private let sections: [MessagesSection]
@@ -33,8 +34,8 @@ public struct ChatView: View {
             list
 
             InputView(
-                style: .message,
                 text: $inputViewModel.text,
+                style: .message,
                 canSend: inputViewModel.canSend,
                 onAction: {
                     switch $0 {

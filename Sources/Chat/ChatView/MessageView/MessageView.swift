@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MessageView: View {
+
+    @Environment(\.chatTheme) private var theme
+
     let message: Message
     let hideAvatar: Bool
     let onTapAttachment: (any Attachment) -> Void
@@ -70,7 +73,7 @@ struct MessageView: View {
                 .background {
                     if !message.text.isEmpty {
                         RoundedRectangle(cornerRadius: 20)
-                            .foregroundColor(message.user.isCurrentUser ? Colors.myMessage : Colors.friendMessage)
+                            .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                     }
                 }
                 .padding(message.user.isCurrentUser ? .leading : .trailing, 20)

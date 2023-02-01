@@ -6,6 +6,9 @@ import SwiftUI
 import CachedAsyncImage
 
 struct AttachmentCell: View {
+
+    @Environment(\.chatTheme) private var theme
+
     let attachment: any Attachment
 
     var body: some View {
@@ -15,7 +18,7 @@ struct AttachmentCell: View {
             } else if attachment is VideoAttachment {
                 content
                     .overlay {
-                        Image(systemName: "play.fill")
+                        theme.images.playButton
                             .foregroundColor(.white)
                             .padding()
                             .background {

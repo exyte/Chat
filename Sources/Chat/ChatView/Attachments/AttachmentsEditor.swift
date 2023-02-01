@@ -9,6 +9,9 @@ import SwiftUI
 import MediaPicker
 
 struct AttachmentsEditor: View {
+
+    @Environment(\.chatTheme) private var theme
+
     @ObservedObject var viewModel: InputViewModel
 
     var body: some View {
@@ -19,7 +22,7 @@ struct AttachmentsEditor: View {
             .selectionStyle(.count)
             .mediaPickerTheme(
                     main: .init(
-                        background: Color(hex: "1F1F1F")
+                        background: theme.colors.mediaPickerBackground
                     ),
                     selection: .init(
 //                        emptyTint: .white,
@@ -38,8 +41,8 @@ struct AttachmentsEditor: View {
 //                }
 
             InputView(
-                style: .signature,
                 text: $viewModel.text,
+                style: .signature,
                 canSend: viewModel.canSend,
                 onAction: {
                     switch $0 {

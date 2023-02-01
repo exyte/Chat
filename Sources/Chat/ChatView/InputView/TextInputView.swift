@@ -5,8 +5,11 @@
 import SwiftUI
 
 struct TextInputView: View {
-    let style: InputViewStyle
+
+    @Environment(\.chatTheme) private var theme
+
     @Binding var text: String
+    let style: InputViewStyle
 
     @State private var uuid = UUID()
     @EnvironmentObject private var globalFocusState: GlobalFocusState
@@ -16,9 +19,9 @@ struct TextInputView: View {
             .customFocus($globalFocusState.focus, equals: .uuid(uuid))
             .placeholder(when: text.isEmpty) {
                 Text(style.placeholder)
-                    .foregroundColor(Colors.button)
+                    .foregroundColor(theme.colors.buttonBackground)
             }
-            .foregroundColor(style == .message ? .black : .white)
+            .foregroundColor(style == .message ? theme.colors.textLightContext : theme.colors.textDarkContext)
             .padding(.vertical, 10)
             .onTapGesture {
                 globalFocusState.focus = .uuid(uuid)

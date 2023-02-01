@@ -9,12 +9,13 @@ import SwiftUI
 import CachedAsyncImage
 
 struct ChatNavigationModifier: ViewModifier {
+
+    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.chatTheme) private var theme
     
     let title: String
     let status: String?
     let cover: URL?
-    
-    @Environment(\.presentationMode) var presentationMode
     
     func body(content: Content) -> some View {
         content
@@ -28,7 +29,7 @@ struct ChatNavigationModifier: ViewModifier {
     private var backButton: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
             Button { presentationMode.wrappedValue.dismiss() } label: {
-                Image("backArrow", bundle: .current)
+                theme.images.backButton
             }
         }
     }
@@ -44,7 +45,7 @@ struct ChatNavigationModifier: ViewModifier {
                                 .resizable()
                                 .scaledToFill()
                         default:
-                            Rectangle().fill(Colors.grayStatus)
+                            Rectangle().fill(theme.colors.grayStatus)
                         }
                     }
                     .frame(width: 35, height: 35)
@@ -58,7 +59,7 @@ struct ChatNavigationModifier: ViewModifier {
                     if let status = status {
                         Text(status)
                             .font(.footnote)
-                            .foregroundColor(Colors.grayStatus)
+                            .foregroundColor(theme.colors.grayStatus)
                     }
                 }
                 Spacer()

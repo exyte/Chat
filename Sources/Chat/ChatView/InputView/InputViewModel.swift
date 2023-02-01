@@ -55,10 +55,9 @@ private extension InputViewModel {
     
     func mapAttachmentsForSend() -> AnyPublisher<[any Attachment], Never> {
         medias.publisher
-            //.receive(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.global())
             .asyncMap { media in
                 await (media, media.getUrl())
-                    //.map { url in (media, url) }
             }
             .compactMap { (media, url) -> (Media, URL)? in
                 guard let url = url else { return nil }

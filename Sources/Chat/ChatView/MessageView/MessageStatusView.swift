@@ -5,6 +5,9 @@
 import SwiftUI
 
 struct MessageStatusView: View {
+
+    @Environment(\.chatTheme) private var theme
+
     let status: Message.Status
     let onRetry: () -> Void
 
@@ -12,30 +15,30 @@ struct MessageStatusView: View {
         Group {
             switch status {
             case .sending:
-                Image(systemName: "clock")
+                theme.images.sendingStatus
                     .resizable()
                     .frame(width: 14, height: 14)
                     .rotationEffect(.degrees(90))
-                    .foregroundColor(Colors.grayStatus)
+                    .foregroundColor(theme.colors.grayStatus)
             case .sent:
-                Image("checkmarks", bundle: .current)
+                theme.images.sentStatus
                     .resizable()
                     .frame(width: 14, height: 14)
-                    .foregroundColor(Colors.grayStatus)
+                    .foregroundColor(theme.colors.grayStatus)
             case .read:
-                Image("checkmarks", bundle: .current)
+                theme.images.sentStatus
                     .resizable()
                     .frame(width: 14, height: 14)
-                    .foregroundColor(Colors.myMessage)
+                    .foregroundColor(theme.colors.myMessage)
             case .error:
                 Button {
                     onRetry()
                 } label: {
-                    Image(systemName: "exclamationmark.octagon.fill")
+                    theme.images.errorStatus
                         .resizable()
                         .frame(width: 14, height: 14)
                 }
-                .foregroundColor(.red)
+                .foregroundColor(theme.colors.errorStatus)
             }
         }
         .padding(.trailing, 8)
