@@ -26,8 +26,14 @@ struct MessageView: View {
         VStack(spacing: 0) {
             HStack(alignment: .bottom, spacing: 0) {
                 if !message.user.isCurrentUser {
-                    AvatarView(url: message.user.avatarURL, showAvatar: showAvatar, avatarSize: avatarSize)
-                        .padding(.horizontal, 8)
+                    Group {
+                        if showAvatar {
+                            AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
+                        } else {
+                            Color.clear.frame(width: avatarSize)
+                        }
+                    }
+                    .padding(.horizontal, 8)
                 } else {
                     Spacer()
                 }

@@ -8,6 +8,7 @@ import Combine
 public typealias ChatPaginationClosure = (Message) -> Void
 
 final class ChatViewModel: ObservableObject {
+    
     @Published private(set) var fullscreenAttachmentItem: Optional<any Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 

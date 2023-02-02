@@ -9,9 +9,30 @@ import SwiftUI
 
 private let lastMessageAnchorKey = "LastMessageAnchorKey"
 
-public struct ChatView: View {
+public extension ChatView where MessageContent == EmptyView {
+
+    init(messages: [Message],
+         didSendMessage: @escaping (DraftMessage) -> Void) {
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages)
+        self.ids = messages.map { $0.id }
+    }
+}
+
+public struct ChatView<MessageContent: View>: View {
+
+    /// To build a custom message view use the following parameters:
+    /// - message containing all you need user, attachments, etc.
+    /// - position of message in its group
+    /// - pass attachment to this closure to use ChatView's fullscreen media viewer
+    public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (any Attachment) -> Void) -> MessageContent)
+
+    @Environment(\.chatTheme) private var theme
 
     let didSendMessage: (DraftMessage) -> Void
+
+    /// provide custom message view builder
+    var messageBuilder: MessageBuilderClosure? = nil
 
     var avatarSize: CGFloat = 32
     var assetsPickerLimit: Int = 10
@@ -27,10 +48,12 @@ public struct ChatView: View {
     @StateObject var paginationState = PaginationState()
 
     public init(messages: [Message],
-                didSendMessage: @escaping (DraftMessage) -> Void) {
+                didSendMessage: @escaping (DraftMessage) -> Void,
+                messageBuilder: @escaping MessageBuilderClosure) {
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages)
         self.ids = messages.map { $0.id }
+        self.messageBuilder = messageBuilder
     }
 
     public var body: some View {
@@ -70,7 +93,7 @@ public struct ChatView: View {
         }
         .sheet(isPresented: $inputViewModel.showPicker) {
             AttachmentsEditor(viewModel: inputViewModel, assetsPickerLimit: assetsPickerLimit)
-                .background(Color(hex: "1F1F1F"))
+                .background(theme.colors.mediaPickerBackground)
                 .presentationDetents([.medium, .large])
                 .environmentObject(globalFocusState)
         }
@@ -111,18 +134,24 @@ public struct ChatView: View {
         Section {
             ForEach(section.rows, id: \.message.id) { row in
                 Group {
-                    MessageView(
-                        message: row.message,
-                        showAvatar: !row.nextMessageIsSameUser,
-                        avatarSize: avatarSize,
-                        messageUseMarkdown: messageUseMarkdown) { attachment in
-                        viewModel.presentAttachmentFullScreen(attachment)
-                    } onRetry: {
-                        didSendMessage(row.message.toDraft())
+                    if let messageBuilder = messageBuilder {
+                        messageBuilder(row.message, row.positionInGroup) { attachment in
+                            viewModel.presentAttachmentFullScreen(attachment)
+                        }
+                    } else {
+                        MessageView(
+                            message: row.message,
+                            showAvatar: row.positionInGroup == .last,
+                            avatarSize: avatarSize,
+                            messageUseMarkdown: messageUseMarkdown) { attachment in
+                                viewModel.presentAttachmentFullScreen(attachment)
+                            } onRetry: {
+                                didSendMessage(row.message.toDraft())
+                            }
                     }
-                    .id(row.message.id)
-                    .rotationEffect(Angle(degrees: 180))
                 }
+                .id(row.message.id)
+                .rotationEffect(Angle(degrees: 180))
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
                 .onAppear {
@@ -161,10 +190,20 @@ private extension ChatView {
             .enumerated()
             .map {
                 let nextMessageIsSameUser = messages[safe: $0.offset + 1]?.user.id == $0.element.user.id
-                return MessageRow(
-                    message: $0.element,
-                    nextMessageIsSameUser: nextMessageIsSameUser
-                )
+                let prevMessageIsSameUser = messages[safe: $0.offset - 1]?.user.id == $0.element.user.id
+
+                let position: PositionInGroup
+                if nextMessageIsSameUser, prevMessageIsSameUser {
+                    position = .middle
+                } else if !nextMessageIsSameUser, !nextMessageIsSameUser {
+                    position = .single
+                } else if nextMessageIsSameUser {
+                    position = .first
+                } else {
+                    position = .last
+                }
+
+                return MessageRow(message: $0.element, positionInGroup: position)
             }
             .reversed()
     }

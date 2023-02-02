@@ -4,7 +4,14 @@
 
 import Foundation
 
+public enum PositionInGroup {
+    case first
+    case middle
+    case last
+    case single // the only message in its group
+}
+
 struct MessageRow: Equatable {
     let message: Message
-    let nextMessageIsSameUser: Bool
+    let positionInGroup: PositionInGroup
 }
