@@ -13,6 +13,10 @@ public struct ChatView: View {
 
     let didSendMessage: (DraftMessage) -> Void
 
+    var avatarSize: CGFloat = 32
+    var assetsPickerLimit: Int = 10
+    var messageUseMarkdown: Bool = false
+
     private let sections: [MessagesSection]
     private let ids: [String]
 
@@ -65,7 +69,7 @@ public struct ChatView: View {
             )
         }
         .sheet(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(viewModel: inputViewModel)
+            AttachmentsEditor(viewModel: inputViewModel, assetsPickerLimit: assetsPickerLimit)
                 .background(Color(hex: "1F1F1F"))
                 .presentationDetents([.medium, .large])
                 .environmentObject(globalFocusState)
@@ -107,7 +111,11 @@ public struct ChatView: View {
         Section {
             ForEach(section.rows, id: \.message.id) { row in
                 Group {
-                    MessageView(message: row.message, hideAvatar: row.nextMessageIsSameUser) { attachment in
+                    MessageView(
+                        message: row.message,
+                        showAvatar: !row.nextMessageIsSameUser,
+                        avatarSize: avatarSize,
+                        messageUseMarkdown: messageUseMarkdown) { attachment in
                         viewModel.presentAttachmentFullScreen(attachment)
                     } onRetry: {
                         didSendMessage(row.message.toDraft())
@@ -163,9 +171,33 @@ private extension ChatView {
 }
 
 public extension ChatView {
-    func chatEnablePagination(offset: Int = 0, handler: @escaping ChatPaginationClosure) -> ChatView {
+
+    func avatarSize(avatarSize: CGFloat) -> ChatView {
+        var view = self
+        view.avatarSize = avatarSize
+        return view
+    }
+
+    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
+        var view = self
+        view.assetsPickerLimit = assetsPickerLimit
+        return view
+    }
+
+    func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
+        var view = self
+        view.messageUseMarkdown = messageUseMarkdown
+        return view
+    }
+
+    /// when user scrolls to `offset`-th meassage from the end, call the handler function, so user can load more messages
+    func enableLoadMore(offset: Int = 0, handler: @escaping ChatPaginationClosure) -> ChatView {
         var view = self
         view._paginationState = StateObject(wrappedValue: PaginationState(onEvent: handler, offset: offset))
         return view
+    }
+
+    func chatNavigation(title: String, status: String? = nil, cover: URL? = nil) -> some View {
+        self.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
     }
 }

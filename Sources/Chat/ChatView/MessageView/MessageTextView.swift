@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct MessageTextView: View {
-    let text: String?
 
-    @Environment(\.messageUseMarkdown) var messageUseMarkdown
+    let text: String?
+    let messageUseMarkdown: Bool
 
     var body: some View {
         if let text = text, !text.isEmpty {
@@ -33,6 +33,6 @@ struct MessageTextView: View {
 
 struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageTextView(text: "Hello world!")
+        MessageTextView(text: "Hello world!", messageUseMarkdown: false)
     }
 }

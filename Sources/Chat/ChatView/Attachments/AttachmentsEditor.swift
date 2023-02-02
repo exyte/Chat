@@ -14,9 +14,11 @@ struct AttachmentsEditor: View {
 
     @ObservedObject var viewModel: InputViewModel
 
+    var assetsPickerLimit: Int
+
     var body: some View {
         VStack {
-            MediaPicker(isPresented: $viewModel.showPicker, limit: Configuration.assetsPickerLimit) { medias in
+            MediaPicker(isPresented: $viewModel.showPicker, limit: assetsPickerLimit) { medias in
                 viewModel.medias = medias
             }
             .selectionStyle(.count)
@@ -63,6 +65,6 @@ struct AttachmentsEditor_Previews: PreviewProvider {
     @StateObject private static var viewModel = InputViewModel()
 
     static var previews: some View {
-        AttachmentsEditor(viewModel: viewModel)
+        AttachmentsEditor(viewModel: viewModel, assetsPickerLimit: 10)
     }
 }

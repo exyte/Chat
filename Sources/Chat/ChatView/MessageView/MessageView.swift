@@ -12,7 +12,9 @@ struct MessageView: View {
     @Environment(\.chatTheme) private var theme
 
     let message: Message
-    let hideAvatar: Bool
+    let showAvatar: Bool
+    let avatarSize: CGFloat
+    let messageUseMarkdown: Bool
     let onTapAttachment: (any Attachment) -> Void
     let onRetry: () -> Void
 
@@ -24,7 +26,7 @@ struct MessageView: View {
         VStack(spacing: 0) {
             HStack(alignment: .bottom, spacing: 0) {
                 if !message.user.isCurrentUser {
-                    AvatarView(url: message.user.avatarURL, hideAvatar: hideAvatar)
+                    AvatarView(url: message.user.avatarURL, showAvatar: showAvatar, avatarSize: avatarSize)
                         .padding(.horizontal, 8)
                 } else {
                     Spacer()
@@ -47,7 +49,7 @@ struct MessageView: View {
                     if !message.text.isEmpty {
                         if messageWidth >= UIScreen.main.bounds.width * 0.7 {
                             VStack(alignment: .trailing, spacing: 0) {
-                                MessageTextView(text: message.text)
+                                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
                                 MessageTimeView(
                                     text: message.time,
                                     isCurrentUser: message.user.isCurrentUser,
@@ -57,7 +59,7 @@ struct MessageView: View {
                             }
                         } else {
                             HStack(alignment: .bottom, spacing: 0) {
-                                MessageTextView(text: message.text)
+                                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
                                 MessageTimeView(
                                     text: message.time,
                                     isCurrentUser: message.user.isCurrentUser,
@@ -86,7 +88,7 @@ struct MessageView: View {
                 }
             }
         }
-        .padding(.bottom, hideAvatar ? 4 : 8)
+        .padding(.bottom, showAvatar ? 8 : 4)
     }
 }
 
@@ -111,7 +113,9 @@ struct MessageView_Preview: PreviewProvider {
     static var previews: some View {
         MessageView(
             message: message,
-            hideAvatar: false,
+            showAvatar: true,
+            avatarSize: 32,
+            messageUseMarkdown: false,
             onTapAttachment: { _ in },
             onRetry: { }
         )

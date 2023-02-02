@@ -7,6 +7,7 @@ import SwiftUI
 import Chat
 
 struct ChatExampleView: View {
+
     @StateObject private var viewModel: ChatExampleViewModel
     
     private let title: String
@@ -20,10 +21,10 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
         }
-        .chatEnablePagination(offset: 3) { message in
+        .enableLoadMore(offset: 3) { message in
             viewModel.loadMoreMessage(before: message)
         }
-        .chatMessageUseMarkdown()
+        .messageUseMarkdown(messageUseMarkdown: true)
         .chatNavigation(
             title: viewModel.chatTitle,
             status: viewModel.chatStatus,

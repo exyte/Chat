@@ -6,22 +6,23 @@ import SwiftUI
 import CachedAsyncImage
 
 struct AvatarView: View {
-    let url: URL?
-    let hideAvatar: Bool
 
-    @Environment(\.chatSizes) var chatSizes
+    let url: URL?
+    let showAvatar: Bool
+    let avatarSize: CGFloat
 
     var body: some View {
-        CachedAsyncImage(url: url, urlCache: .imageCache) { image in
-            image
-                .resizable()
-                .scaledToFill()
-        } placeholder: {
-            Rectangle().fill(Color.gray)
+        if showAvatar {
+            CachedAsyncImage(url: url, urlCache: .imageCache) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Rectangle().fill(Color.gray)
+            }
+            .frame(width: avatarSize, height: avatarSize)
+            .clipShape(Circle())
         }
-        .frame(width: chatSizes.avatar, height: chatSizes.avatar)
-        .clipShape(Circle())
-        .hidden(hideAvatar)
     }
 }
 
@@ -29,7 +30,8 @@ struct AvatarView_Previews: PreviewProvider {
     static var previews: some View {
         AvatarView(
             url: URL(string: "https://placeimg.com/640/480/sepia"),
-            hideAvatar: false
+            showAvatar: true,
+            avatarSize: 32
         )
     }
 }
