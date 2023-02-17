@@ -30,7 +30,25 @@ struct ChatExampleView: View {
             status: viewModel.chatStatus,
             cover: viewModel.chatCover
         )
+        .mediaPickerTheme(
+            main: .init(
+                text: .white,
+                albumSelectionBackground: .examplePickerBg,
+                fullscreenPhotoBackground: .examplePickerBg
+            ),
+            selection: .init(
+                emptyTint: .white,
+                emptyBackground: .black.opacity(0.25),
+                selectedTint: .exampleBlue,
+                fullscreenTint: .white
+            )
+        )
         .onAppear(perform: viewModel.onStart)
         .onDisappear(perform: viewModel.onStop)
     }
+}
+
+extension Color {
+    static var exampleBlue = Color(hex: "#4962FF")
+    static var examplePickerBg = Color(hex: "1F1F1F")
 }

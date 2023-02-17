@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MediaPicker
 
 private let lastMessageAnchorKey = "LastMessageAnchorKey"
 
@@ -21,13 +22,14 @@ public extension ChatView where MessageContent == EmptyView {
 
 public struct ChatView<MessageContent: View>: View {
 
-    /// To build a custom message view use the following parameters:
-    /// - message containing all you need user, attachments, etc.
-    /// - position of message in its group
+    /// To build a custom message view use the following parameters passed by this closure:
+    /// - message containing user, attachments, etc.
+    /// - position of message in its countinuous group of messages from the same user
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
     public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (any Attachment) -> Void) -> MessageContent)
 
     @Environment(\.chatTheme) private var theme
+    @Environment(\.mediaPickerTheme) private var pickerTheme
 
     let didSendMessage: (DraftMessage) -> Void
 
@@ -37,6 +39,7 @@ public struct ChatView<MessageContent: View>: View {
     var avatarSize: CGFloat = 32
     var assetsPickerLimit: Int = 10
     var messageUseMarkdown: Bool = false
+    var chatTitle: String?
 
     private let sections: [MessagesSection]
     private let ids: [String]
@@ -44,8 +47,9 @@ public struct ChatView<MessageContent: View>: View {
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
+    @StateObject private var paginationState = PaginationState()
 
-    @StateObject var paginationState = PaginationState()
+    @State private var mediaPickerMode = MediaPickerMode.photos
 
     public init(messages: [Message],
                 didSendMessage: @escaping (DraftMessage) -> Void,
@@ -66,7 +70,13 @@ public struct ChatView<MessageContent: View>: View {
                 canSend: inputViewModel.canSend,
                 onAction: {
                     switch $0 {
-                    case .attach, .photo:
+                    case .attach:
+                        mediaPickerMode = .photos
+                        inputViewModel.showPicker = true
+                    case .add:
+                        break
+                    case .camera:
+                        mediaPickerMode = .camera
                         inputViewModel.showPicker = true
                     case .send:
                         inputViewModel.send()
@@ -91,10 +101,8 @@ public struct ChatView<MessageContent: View>: View {
                 }
             )
         }
-        .sheet(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(viewModel: inputViewModel, assetsPickerLimit: assetsPickerLimit)
-                .background(theme.colors.mediaPickerBackground)
-                .presentationDetents([.medium, .large])
+        .fullScreenCover(isPresented: $inputViewModel.showPicker) {
+            AttachmentsEditor(viewModel: inputViewModel, mediaPickerMode: $mediaPickerMode, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {
@@ -141,7 +149,7 @@ public struct ChatView<MessageContent: View>: View {
                     } else {
                         MessageView(
                             message: row.message,
-                            showAvatar: row.positionInGroup == .last,
+                            showAvatar: row.showAvatar,
                             avatarSize: avatarSize,
                             messageUseMarkdown: messageUseMarkdown) { attachment in
                                 viewModel.presentAttachmentFullScreen(attachment)
@@ -186,7 +194,7 @@ private extension ChatView {
     }
 
     static func wrapMessages(_ messages: [Message]) -> [MessageRow] {
-        return messages
+        messages
             .enumerated()
             .map {
                 let nextMessageIsSameUser = messages[safe: $0.offset + 1]?.user.id == $0.element.user.id
@@ -237,6 +245,8 @@ public extension ChatView {
     }
 
     func chatNavigation(title: String, status: String? = nil, cover: URL? = nil) -> some View {
-        self.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
+        var view = self
+        view.chatTitle = title
+        return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
     }
 }

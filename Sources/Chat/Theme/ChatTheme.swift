@@ -43,39 +43,46 @@ public struct ChatTheme {
         public var grayStatus: Color
         public var errorStatus: Color
 
-        public var mediaPickerBackground: Color
-        public var buttonBackground: Color
         public var inputLightContextBackground: Color
         public var inputDarkContextBackground: Color
+
+        public var buttonBackground: Color
+        public var addButtonBackground: Color
+        public var sendButtonBackground: Color
 
         public var myMessage: Color
         public var friendMessage: Color
 
         public var textLightContext: Color
         public var textDarkContext: Color
+        public var textMediaPicker: Color
 
         public init(
             grayStatus: Color = Color(hex: "AFB3B8"),
             errorStatus: Color = Color.red,
-            mediaPickerBackground: Color = Color(hex: "1F1F1F"),
-            buttonBackground: Color = Color(hex: "989EAC"),
             inputLightContextBackground: Color = Color(hex: "F2F3F5"),
             inputDarkContextBackground: Color = Color(hex: "F2F3F5").opacity(0.12),
+            buttonBackground: Color = Color(hex: "989EAC"),
+            addButtonBackground: Color = Color(hex: "#4F5055"),
+            sendButtonBackground: Color = Color(hex: "#4962FF"),
             myMessage: Color = Color(hex: "4962FF"),
             friendMessage: Color = Color(hex: "EBEDF0"),
             textLightContext: Color = Color.black,
-            textDarkContext: Color = Color.white
+            textDarkContext: Color = Color.white,
+            textMediaPicker: Color = Color(hex: "818C99")
         ) {
             self.grayStatus = grayStatus
             self.errorStatus = errorStatus
-            self.mediaPickerBackground = mediaPickerBackground
-            self.buttonBackground = buttonBackground
             self.inputLightContextBackground = inputLightContextBackground
             self.inputDarkContextBackground = inputDarkContextBackground
+            self.buttonBackground = buttonBackground
+            self.addButtonBackground = addButtonBackground
+            self.sendButtonBackground = sendButtonBackground
             self.myMessage = myMessage
             self.friendMessage = friendMessage
             self.textLightContext = textLightContext
             self.textDarkContext = textDarkContext
+            self.textMediaPicker = textMediaPicker
         }
     }
 
@@ -92,33 +99,39 @@ public struct ChatTheme {
         public var playCircleButton: Image
         public var pauseCircleButton: Image
         public var playButton: Image
+        public var closeButton: Image
+        public var chevronRight: Image
 
         public init(
             sendingStatus: Image = Image(systemName: "clock"),
             sentStatus: Image? = nil,
             errorStatus: Image = Image(systemName: "exclamationmark.octagon.fill"),
-            attachButton: Image = Image(systemName: "paperclip"),
-            addButton: Image = Image(systemName: "plus.circle.fill"),
-            cameraButton: Image = Image(systemName: "camera"),
-            sendButton: Image = Image(systemName: "arrow.up.circle.fill"),
+            attachButton: Image? = nil,
+            addButton: Image? = nil,
+            cameraButton: Image? = nil,
+            sendButton: Image? = nil,
             backButton: Image? = nil,
             removeButton: Image = Image(systemName: "xmark"),
             playCircleButton: Image = Image(systemName: "play.circle.fill"),
             pauseCircleButton: Image = Image(systemName: "pause.circle.fill"),
-            playButton: Image = Image(systemName: "play.fill")
+            playButton: Image = Image(systemName: "play.fill"),
+            closeButton: Image? = nil,
+            chevronRight: Image? = nil
         ) {
             self.sendingStatus = sendingStatus
             self.sentStatus = sentStatus ?? Image("checkmarks", bundle: .current)
             self.errorStatus = errorStatus
-            self.attachButton = attachButton
-            self.addButton = addButton
-            self.cameraButton = cameraButton
-            self.sendButton = sendButton
+            self.attachButton = attachButton ?? Image("attach", bundle: .current)
+            self.addButton = addButton ?? Image("add", bundle: .current)
+            self.cameraButton = cameraButton ?? Image("camera", bundle: .current)
+            self.sendButton = sendButton ?? Image("arrowUp", bundle: .current)
             self.backButton = backButton ?? Image("backArrow", bundle: .current)
             self.removeButton = removeButton
             self.playCircleButton = playCircleButton
             self.pauseCircleButton = pauseCircleButton
             self.playButton = playButton
+            self.closeButton = closeButton ?? Image("cross", bundle: .current)
+            self.chevronRight = closeButton ?? Image("chevronRight", bundle: .current)
         }
     }
 }

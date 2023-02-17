@@ -23,8 +23,24 @@
 		13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6E2869E983004DF140 /* MockChatData.swift */; };
 		13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */; };
 		13F1C0F2286ADD8900D25D8A /* MockImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockImage.swift */; };
+		5B06E7922991116F002C7061 /* Chat in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 1376F7AA286467700016CD1B /* Chat */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5B6D3A732987D85A00765148 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+Extension.swift */; };
+		5BAF32AE299CBCC1006FE98A /* MediaPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BAF32AD299CBCC1006FE98A /* MediaPicker */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5B06E7932991116F002C7061 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5B06E7922991116F002C7061 /* Chat in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		135549302864620900C9459A /* ChatExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,6 +62,7 @@
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
 		13F1C0F1286ADD8900D25D8A /* MockImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImage.swift; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		5BAF32AC299CBCA5006FE98A /* MediaPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MediaPicker; path = ../../MediaPicker; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +71,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1376F7AB286467700016CD1B /* Chat in Frameworks */,
+				5BAF32AE299CBCC1006FE98A /* MediaPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,6 +140,7 @@
 		1376F7A5286466770016CD1B /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				5BAF32AC299CBCA5006FE98A /* MediaPicker */,
 				1376F7A6286466770016CD1B /* Chat */,
 			);
 			name = Packages;
@@ -183,6 +202,7 @@
 				1355492C2864620900C9459A /* Sources */,
 				1355492D2864620900C9459A /* Frameworks */,
 				1355492E2864620900C9459A /* Resources */,
+				5B06E7932991116F002C7061 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -191,6 +211,7 @@
 			name = ChatExample;
 			packageProductDependencies = (
 				1376F7AA286467700016CD1B /* Chat */,
+				5BAF32AD299CBCC1006FE98A /* MediaPicker */,
 			);
 			productName = ChatExample;
 			productReference = 135549302864620900C9459A /* ChatExample.app */;
@@ -390,7 +411,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FZXCM5CJ7P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChatExample/Info.plist;
@@ -420,7 +441,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FZXCM5CJ7P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChatExample/Info.plist;
@@ -469,6 +490,10 @@
 		1376F7AA286467700016CD1B /* Chat */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Chat;
+		};
+		5BAF32AD299CBCC1006FE98A /* MediaPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MediaPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

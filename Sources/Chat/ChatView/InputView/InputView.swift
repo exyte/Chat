@@ -24,7 +24,8 @@ enum InputViewStyle {
 extension InputView {
     enum Action {
         case attach
-        case photo
+        case add
+        case camera
         case send
     }
 }
@@ -83,27 +84,26 @@ struct InputView: View {
                 .frame(width: 16, height: 16)
                 .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 12))
         }
-        .tint(theme.colors.buttonBackground)
     }
 
     var addButton: some View {
         Button {
-            onAction(.photo)
+            onAction(.add)
         } label: {
             theme.images.addButton
                 .resizable()
-                .frame(width: 24, height: 24)
+                .frame(width: 12, height: 12)
+                .padding(8)
                 .background {
-                    Circle().fill(Color.white)
+                    Circle().fill(theme.colors.addButtonBackground)
                 }
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
         }
-        .tint(theme.colors.buttonBackground)
     }
 
     var cameraButton: some View {
         Button {
-            onAction(.photo)
+            onAction(.camera)
         } label: {
             theme.images.cameraButton
                 .resizable()
@@ -111,7 +111,6 @@ struct InputView: View {
                 .frame(width: 24, height: 24)
                 .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 12))
         }
-        .tint(theme.colors.buttonBackground)
     }
 
     var sendButton: some View {
@@ -121,13 +120,13 @@ struct InputView: View {
             theme.images.sendButton
                 .resizable()
                 .scaledToFit()
-                .frame(width: 32, height: 32)
+                .frame(width: 14, height: 14)
+                .padding(10)
                 .background {
-                    Circle().fill(Color.white)
+                    Circle().fill(theme.colors.sendButtonBackground)
                 }
                 .padding(8)
         }
-        .tint(theme.colors.myMessage)
     }
 
     var backgroundColor: Color {
