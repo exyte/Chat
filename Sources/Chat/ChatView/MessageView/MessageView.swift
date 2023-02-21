@@ -11,12 +11,12 @@ struct MessageView: View {
 
     @Environment(\.chatTheme) private var theme
 
+    @ObservedObject var viewModel: ChatViewModel
+
     let message: Message
     let showAvatar: Bool
     let avatarSize: CGFloat
     let messageUseMarkdown: Bool
-    let onTapAttachment: (any Attachment) -> Void
-    let onRetry: () -> Void
 
     var messageWidth: CGFloat {
         message.text.width(withConstrainedHeight: 1, font: .preferredFont(forTextStyle: .body))
@@ -39,18 +39,21 @@ struct MessageView: View {
                 }
                 VStack(alignment: .leading, spacing: 0) {
                     if !message.attachments.isEmpty {
-                        AttachmentsGrid(attachments: message.attachments, onTap: onTapAttachment)
-                            .overlay(alignment: .bottomTrailing) {
-                                if message.text.isEmpty {
-                                    MessageTimeView(
-                                        text: message.time,
-                                        isCurrentUser: message.user.isCurrentUser,
-                                        isOverlay: true
-                                    )
-                                    .padding(4)
-                                }
+                        AttachmentsGrid(attachments: message.attachments) {
+                            viewModel.presentAttachmentFullScreen($0)
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            if message.text.isEmpty {
+                                MessageTimeView(
+                                    text: message.time,
+                                    isCurrentUser: message.user.isCurrentUser,
+                                    isOverlay: true
+                                )
+                                .padding(4)
                             }
-                            .layoutPriority(2)
+                        }
+                        .contentShape(Rectangle())
+                        .layoutPriority(2)
                     }
                     if !message.text.isEmpty {
                         if messageWidth >= UIScreen.main.bounds.width * 0.7 {
@@ -87,7 +90,9 @@ struct MessageView: View {
                 .padding(message.user.isCurrentUser ? .leading : .trailing, 20)
 
                 if message.user.isCurrentUser, let status = message.status {
-                    MessageStatusView(status: status, onRetry: onRetry)
+                    MessageStatusView(status: status) {
+                        viewModel.sendMessage(message.toDraft())
+                    }
                 }
                 if !message.user.isCurrentUser {
                     Spacer()
@@ -118,12 +123,11 @@ struct MessageView_Preview: PreviewProvider {
 
     static var previews: some View {
         MessageView(
+            viewModel: ChatViewModel(),
             message: message,
             showAvatar: true,
             avatarSize: 32,
-            messageUseMarkdown: false,
-            onTapAttachment: { _ in },
-            onRetry: { }
+            messageUseMarkdown: false
         )
     }
 }

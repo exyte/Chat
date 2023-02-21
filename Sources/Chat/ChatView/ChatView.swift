@@ -125,6 +125,7 @@ public struct ChatView<MessageContent: View>: View {
             .scrollIndicators(.hidden)
             .rotationEffect(Angle(degrees: 180))
             .onAppear {
+                viewModel.didSendMessage = didSendMessage
                 inputViewModel.didSendMessage = { value in
                     didSendMessage(value)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -148,14 +149,11 @@ public struct ChatView<MessageContent: View>: View {
                         }
                     } else {
                         MessageView(
+                            viewModel: viewModel,
                             message: row.message,
                             showAvatar: row.showAvatar,
                             avatarSize: avatarSize,
-                            messageUseMarkdown: messageUseMarkdown) { attachment in
-                                viewModel.presentAttachmentFullScreen(attachment)
-                            } onRetry: {
-                                didSendMessage(row.message.toDraft())
-                            }
+                            messageUseMarkdown: messageUseMarkdown)
                     }
                 }
                 .id(row.message.id)
@@ -167,7 +165,7 @@ public struct ChatView<MessageContent: View>: View {
                 }
             }
         } footer: {
-            Text(section.date)
+            Text(section.formattedDate)
                 .frame(maxWidth: .infinity)
                 .rotationEffect(Angle(degrees: 180))
         }
@@ -184,7 +182,7 @@ private extension ChatView {
 
         for date in dates {
             let section = MessagesSection(
-                date: date.formatted(date: .complete, time: .omitted),
+                date: date,
                 rows: wrapMessages(messages.filter({ $0.createdAt.isSameDay(date) }))
             )
             result.append(section)

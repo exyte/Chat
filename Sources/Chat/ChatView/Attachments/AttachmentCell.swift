@@ -10,6 +10,7 @@ struct AttachmentCell: View {
     @Environment(\.chatTheme) private var theme
 
     let attachment: any Attachment
+    let onTap: (any Attachment) -> Void
 
     var body: some View {
         Group {
@@ -35,6 +36,9 @@ struct AttachmentCell: View {
             }
         }
         .contentShape(Rectangle())
+        .onTapGesture {
+            onTap(attachment)
+        }
     }
 
     var content: some View {

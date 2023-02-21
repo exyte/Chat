@@ -41,25 +41,19 @@ struct AttachmentsGrid: View {
     var body: some View {
         VStack(spacing: 4) {
             if let attachment = single {
-                AttachmentCell(attachment: attachment)
+                AttachmentCell(attachment: attachment, onTap: onTap)
                     .frame(width: 204, height: grid.isEmpty ? 200 : 100)
                     .clipped()
                     .cornerRadius(12)
-                    .onTapGesture {
-                        onTap(attachment)
-                    }
             }
             if !grid.isEmpty {
                 ForEach(pair(), id: \.id) { pair in
                     HStack(spacing: 4) {
-                        AttachmentCell(attachment: pair.left)
+                        AttachmentCell(attachment: pair.left, onTap: onTap)
                             .frame(width: 100, height: 100)
                             .clipped()
                             .cornerRadius(12)
-                            .onTapGesture {
-                                onTap(pair.left)
-                            }
-                        AttachmentCell(attachment: pair.right)
+                        AttachmentCell(attachment: pair.right, onTap: onTap)
                             .frame(width: 100, height: 100)
                             .clipped()
                             .overlay {
@@ -82,9 +76,6 @@ struct AttachmentsGrid: View {
                                 }
                             }
                             .cornerRadius(12)
-                            .onTapGesture {
-                                onTap(pair.right)
-                            }
                     }
                 }
             }

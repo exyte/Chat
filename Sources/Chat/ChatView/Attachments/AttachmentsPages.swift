@@ -69,15 +69,14 @@ struct AttachmentsPages: View {
                         ScrollView(.horizontal) {
                             HStack {
                                 ForEach(viewModel.attachments.enumerated().map({ $0 }), id: \.offset) { (index, attachment) in
-                                    AttachmentCell(attachment: attachment)
-                                        .frame(width: 100, height: 100)
-                                        .clipped()
-                                        .id(index)
-                                        .onTapGesture {
-                                            withAnimation {
-                                                viewModel.index = index
-                                            }
+                                    AttachmentCell(attachment: attachment) { _ in
+                                        withAnimation {
+                                            viewModel.index = index
                                         }
+                                    }
+                                    .frame(width: 100, height: 100)
+                                    .clipped()
+                                    .id(index)
                                 }
                             }
                         }

@@ -12,7 +12,7 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var fullscreenAttachmentItem: Optional<any Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
-    private var subscriptions = Set<AnyCancellable>()
+    public var didSendMessage: (DraftMessage) -> Void = {_ in}
     
     func presentAttachmentFullScreen(_ attachment: any Attachment) {
         fullscreenAttachmentItem = attachment
@@ -22,5 +22,9 @@ final class ChatViewModel: ObservableObject {
     func dismissAttachmentFullScreen() {
         fullscreenAttachmentPresented = false
         fullscreenAttachmentItem = nil
+    }
+
+    func sendMessage(_ message: DraftMessage) {
+        didSendMessage(message)
     }
 }

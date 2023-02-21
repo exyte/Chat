@@ -5,6 +5,10 @@
 import Foundation
 
 struct MessagesSection: Equatable {
-    let date: String
-    let rows: [MessageRow]
+    let date: Date
+    var rows: [MessageRow]
+
+    var formattedDate: String {
+        date.formatted(date: .complete, time: .omitted)
+    }
 }

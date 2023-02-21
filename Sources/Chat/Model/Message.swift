@@ -39,7 +39,7 @@ extension Message {
 
 extension Message: Equatable {
     public static func == (lhs: Message, rhs: Message) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.status == rhs.status
     }
 }
 
