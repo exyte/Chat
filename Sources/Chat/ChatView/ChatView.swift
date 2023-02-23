@@ -24,7 +24,7 @@ public struct ChatView<MessageContent: View>: View {
 
     /// To build a custom message view use the following parameters passed by this closure:
     /// - message containing user, attachments, etc.
-    /// - position of message in its countinuous group of messages from the same user
+    /// - position of message in its continuous group of messages from the same user
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
     public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (any Attachment) -> Void) -> MessageContent)
 
@@ -223,15 +223,15 @@ public extension ChatView {
         return view
     }
 
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
-        var view = self
-        view.assetsPickerLimit = assetsPickerLimit
-        return view
-    }
-
     func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
+        return view
+    }
+
+    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
+        var view = self
+        view.assetsPickerLimit = assetsPickerLimit
         return view
     }
 

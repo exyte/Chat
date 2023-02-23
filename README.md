@@ -1,19 +1,9 @@
-<img src="https://github.com/exyte/Macaw/blob/master/header.png">
-<img align="right" src="https://raw.githubusercontent.com/exyte/Macaw/master/demo.gif" width="480" />
+<img src="https://raw.githubusercontent.com/exyte/media/master/common/header.png">
+<img align="right" src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic1.png" width="300">
 
+<p><h1 align="left">Chat</h1></p>
 
-# Chat
-## Description for component
-
---- 
-
-### TODO
-- [ ] Create images/video picker for attaching to message
-    - [ ] Multiple choice
-    - [ ] First cell is "camera". Just image
-        - [ ] \* Live preview for camera
-    - [ ] Mix photo and video to single grid
-    - [ ] Switch between photos/albums (on top of view)
+<p><h4>Chat with fully customizable message cells and built-in media picker written with SwiftUI</h4></p>
 
 ___
 
@@ -25,109 +15,107 @@ ___
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
 </br></br>
-
-[![CI Status](https://travis-ci.org/exyte/Macaw.svg?style=flat)](https://travis-ci.org/exyte/Macaw)
-[![Version](https://img.shields.io/cocoapods/v/Macaw.svg?style=flat)](http://cocoapods.org/pods/Macaw)
+[![Travis CI](https://travis-ci.org/exyte/Chat.svg?branch=master)](https://travis-ci.org/exyte/Chat)
+[![Version](https://img.shields.io/cocoapods/v/Chat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-0473B3.svg?style=flat)](https://github.com/Carthage/Carthage)
-[![License](https://img.shields.io/cocoapods/l/Macaw.svg?style=flat)](http://cocoapods.org/pods/Macaw)
-[![Platform](https://img.shields.io/cocoapods/p/Macaw.svg?style=flat)](http://cocoapods.org/pods/Macaw)
+[![License](https://img.shields.io/cocoapods/l/ExyteChat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
+[![Platform](https://img.shields.io/cocoapods/p/ExyteChat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
+[![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 
+# Usage
 
-## What is Macaw?
-
-<img src="https://raw.githubusercontent.com/exyte/Macaw/master/logo.png" width="300">
-
-Macaw is a powerful and easy-to-use vector graphics library written in Swift.
-
-#### It's simple
-
-Get started with Macaw in several lines of code:
-
+Create an indicator like this:
 ```swift
-class MyView: MacawView {
+@State var messages: [Message] = []
 
-	required init?(coder aDecoder: NSCoder) {
-		let text = Text(text: "Hello, World!", place: .move(dx: 145, dy: 100))
-		super.init(node: text, coder: aDecoder)
-	}
-
+var body: some View {
+    ChatView(messages: viewModel.messages) { draft in
+        viewModel.send(draft: draft)
+    }
 }
 ```
+where  
+   `messages` - list of messages to display  
+   `didSendMessage` - a closure which gets called when the user presses send button  
 
-<img src="http://i.imgur.com/ffPc4mr.png" width="475">
+`Message` is a type `Chat` is using on the inside, here it expects the user to provide a list of `Message` structs, and it also returns a `Message` in `didSendMessage` closure. You can map it both ways on your own Message model your API expects.
 
-#### It has SVG support
+You may customize message cells like this: 
+```swift
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+} messageBuilder: { message, positionInGroup, showAttachmentClosure in
+    VStack {
+        Text(message.text)
+        if !message.attachments.isEmpty {
+            ForEach(message.attachments, id: \.id) { at in
+                AsyncImage(url: at.thumbnail)
+            }
+        }
+    }
+}
+```
+`messageBuilder`'s parameters:     
+- message containing user, attachments, etc.   
+- position of message in its continuous group of messages from the same user     
+- pass attachment to this closure to use ChatView's fullscreen media viewer     
 
-Include Scalable Vector Graphics right into your iOS application:
+### Modifiers
+if you are not using your own `messageBuilder`:   
+`avatarSize` - default avatar is a circle, you can specify its diameter here   
+`messageUseMarkdown` - whether default message cell uses markdown     
 
-<img src="http://i.imgur.com/NWkEzcu.png" width="300">
+`assetsPickerLimit` - max media count user can select in the media picker      
+`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th meassage from the end, call the handler function, so user can load more messages       
+`chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass info for Chat's navigation bar  
 
-#### It's powerful
+<img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 
-Affine transformations, user events, animation and various effects to build beautiful apps with Macaw:
+## Example
 
-<img src="http://i.imgur.com/pjmxrDI.gif" width="600">
-
-## Motivation
-
-Modern designs contain tons of illustrations and complex animations. Mobile developers have to spend a lot of time on converting designs into native views that will be resizable for different screens. With Macaw you can reduce development time to a minimum and describe all graphics in high level [scene](https://en.wikipedia.org/wiki/Scene_graph) elements. Or even render SVG graphics right from your design tool with Macaw events and animation support.
-
-## Resources
-
-### Docs
-We're working hard to provide full documentation. Currently you can take a look at the following docs:
-* [Getting started guide](https://github.com/exyte/Macaw/wiki/Getting-started)
-* [Render SVG file](https://github.com/exyte/Macaw/wiki/Render-SVG-file)
-* [Content animation](https://github.com/exyte/Macaw/wiki/Content-animation)
-* [Morphing animation](https://github.com/exyte/Macaw/wiki/Morphing-animation)
-
-### Posts
-* [Replicating Apple Design Awarded Applications](https://medium.com/exyte/replicating-apple-design-awarded-applications-70e5df4c4b94#.ckt1hfnei)
-* [How friendly can drawing API be on iOS?](https://medium.com/exyte/how-friendly-can-drawing-api-be-on-ios-b3a818bf8105#.o9i35zcai)
-* [Macaw iOS Library: Morphing Animations](https://medium.com/exyte/macaw-ios-library-morphing-animations-and-touch-events-a4cb1c0be97f)
-
-## Examples
-
-[Macaw-Examples](https://github.com/exyte/macaw-examples) is a repository where you can find various usages of the `Macaw` library from simple charts to the complex periodic table.
-
-<img src="http://i.imgur.com/rQIh3qD.gif" height="280"> <img src="http://i.imgur.com/bIgHtzt.gif" height="280"> <img src="http://i.imgur.com/NiBT2rv.gif" height="280"> <img src="http://i.imgur.com/Un8TJKc.gif" height="280">
-
-<img src="http://i.imgur.com/o6tBKW6.gif" height="280"><img src="http://i.imgur.com/1JXF60f.gif" height="280">
-
-
-## Requirements
-
-* iOS 9.0+
-* Mac OS X 10.11+
-* Xcode 7.3+
+To try out the Chat examples:
+- Clone the repo `git clone git@github.com:exyte/Chat.git`
+- Open terminal and run `cd <ChatRepo>/Example`
+- Wait for SPM to finish downloading packages
+- Try it!
 
 ## Installation
 
-## [CocoaPods](http://cocoapods.org)
+### Swift Package Manager
 
-To install it, simply add the following line to your Podfile:
-```ruby
-pod "Macaw", "0.9.7"
+```swift
+dependencies: [
+    .package(url: "https://github.com/exyte/Chat.git")
+]
 ```
 
-## [Carthage](http://github.com/Carthage/Carthage)
+### CocoaPods
+
+```ruby
+pod 'ExyteChat'
+```
+
+### Carthage
 
 ```ogdl
-github "Exyte/Macaw" ~> 0.9.7
+github "Exyte/Chat"
 ```
 
-## Building from sources
+## Requirements
 
-To build Macaw from sources:
-* clone the repo `git@github.com:exyte/Macaw.git`
-* open terminal and run `cd <MacawRepo>/Example/`
-* run `pod install` to install all dependencies
-* run `open Example.xcworkspace/` to open project in the Xcode
+* iOS 16+
+* Xcode 14+
 
-## Change Log
+## Our other open source SwiftUI libraries
+[PopupView](https://github.com/exyte/PopupView) - Toasts and popups library    
+[Grid](https://github.com/exyte/Grid) - The most powerful Grid container    
+[ScalingHeaderScrollView](https://github.com/exyte/ScalingHeaderScrollView) - A scroll view with a sticky header which shrinks as you scroll  
+[AnimatedTabBar](https://github.com/exyte/AnimatedTabBar) - A tabbar with number of preset animations         
+[MediaPicker](https://github.com/exyte/mediapicker) - Customizable media picker     
+[ConcentricOnboarding](https://github.com/exyte/ConcentricOnboarding) - Animated onboarding flow    
+[FloatingButton](https://github.com/exyte/FloatingButton) - Floating button menu    
+[ActivityIndicatorView](https://github.com/exyte/ActivityIndicatorView) - A number of animated loading indicators     
+[ProgressIndicatorView](https://github.com/exyte/ProgressIndicatorView) - A number of animated progress indicators    
+[SVGView](https://github.com/exyte/SVGView) - SVG parser    
+[LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation    
 
-You can find list of all changes by version in the [Change Log](https://github.com/exyte/Macaw/wiki/Change-Log)
-
-## License
-
-Macaw is available under the MIT license. See the LICENSE file for more info.
