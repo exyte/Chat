@@ -40,6 +40,7 @@ where
 
 `Message` is a type `Chat` is using on the inside, here it expects the user to provide a list of `Message` structs, and it also returns a `Message` in `didSendMessage` closure. You can map it both ways on your own Message model your API expects.
 
+## Customization
 You may customize message cells like this: 
 ```swift
 ChatView(messages: viewModel.messages) { draft in
