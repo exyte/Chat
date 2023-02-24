@@ -22,6 +22,11 @@ ___
 [![Platform](https://img.shields.io/cocoapods/p/ExyteChat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
 [![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 
+# Features
+- Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure)
+- Allows you to pass custom view builder for message view
+- Has a built-in photo/video library/camera picker fro multiple media selection
+
 # Usage
 
 Create an indicator like this:
@@ -34,7 +39,7 @@ var body: some View {
     }
 }
 ```
-where  
+where:  
    `messages` - list of messages to display  
    `didSendMessage` - a closure which gets called when the user presses send button  
 
@@ -56,10 +61,18 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
-`messageBuilder`'s parameters:     
+`messageBuilder`'s parameters:  
 - message containing user, attachments, etc.   
 - position of message in its continuous group of messages from the same user     
 - pass attachment to this closure to use ChatView's fullscreen media viewer     
+
+## Supported content types
+Library allows to send following content in messages in any combination:
+- Text with/without markdown
+- Photo single/multiple
+Coming soon:
+- Audio message
+- Use's location
 
 ### Modifiers
 if you are not using your own `messageBuilder`:   
@@ -67,7 +80,7 @@ if you are not using your own `messageBuilder`:
 `messageUseMarkdown` - whether default message cell uses markdown     
 
 `assetsPickerLimit` - max media count user can select in the media picker      
-`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th meassage from the end, call the handler function, so user can load more messages       
+`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so user can load more messages       
 `chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass info for Chat's navigation bar  
 
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
