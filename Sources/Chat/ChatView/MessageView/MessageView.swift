@@ -14,12 +14,16 @@ struct MessageView: View {
     @ObservedObject var viewModel: ChatViewModel
 
     let message: Message
-    let showAvatar: Bool
+    let positionInGroup: PositionInGroup
     let avatarSize: CGFloat
     let messageUseMarkdown: Bool
 
     var messageWidth: CGFloat {
         message.text.width(withConstrainedHeight: 1, font: .preferredFont(forTextStyle: .body))
+    }
+
+    var showAvatar: Bool {
+        positionInGroup == .single || positionInGroup == .last
     }
 
     var body: some View {
@@ -37,6 +41,7 @@ struct MessageView: View {
                 } else {
                     Spacer()
                 }
+
                 VStack(alignment: .leading, spacing: 0) {
                     if !message.attachments.isEmpty {
                         AttachmentsGrid(attachments: message.attachments) {
@@ -94,12 +99,13 @@ struct MessageView: View {
                         viewModel.sendMessage(message.toDraft())
                     }
                 }
+
                 if !message.user.isCurrentUser {
                     Spacer()
                 }
             }
         }
-        .padding(.bottom, showAvatar ? 8 : 4)
+        .padding(.bottom, showAvatar ? 4 : 4)
     }
 }
 
@@ -125,7 +131,7 @@ struct MessageView_Preview: PreviewProvider {
         MessageView(
             viewModel: ChatViewModel(),
             message: message,
-            showAvatar: true,
+            positionInGroup: .single,
             avatarSize: 32,
             messageUseMarkdown: false
         )

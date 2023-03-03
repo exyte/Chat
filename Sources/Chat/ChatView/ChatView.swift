@@ -114,62 +114,20 @@ public struct ChatView<MessageContent: View>: View {
     }
 
     var list: some View {
-        ScrollViewReader { proxy in
-            List(sections, id: \.date) { section in
-                if sections.first?.date == section.date {
-                    EmptyView().id(lastMessageAnchorKey)
-                }
-                buildSection(section)
-            }
-            .listStyle(.plain)
-            .scrollIndicators(.hidden)
-            .rotationEffect(Angle(degrees: 180))
-            .onAppear {
-                viewModel.didSendMessage = didSendMessage
-                inputViewModel.didSendMessage = { value in
-                    didSendMessage(value)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation {
-                            proxy.scrollTo(lastMessageAnchorKey)
-                        }
-                    }
+        UIList(viewModel: viewModel,
+               avatarSize: avatarSize,
+               messageUseMarkdown: messageUseMarkdown,
+               sections: sections
+        )
+        .onAppear {
+            viewModel.didSendMessage = didSendMessage
+            inputViewModel.didSendMessage = { value in
+                didSendMessage(value)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                 }
             }
         }
-        .animation(.default, value: sections)
-    }
-
-    func buildSection(_ section: MessagesSection) -> some View {
-        Section {
-            ForEach(section.rows, id: \.message.id) { row in
-                Group {
-                    if let messageBuilder = messageBuilder {
-                        messageBuilder(row.message, row.positionInGroup) { attachment in
-                            viewModel.presentAttachmentFullScreen(attachment)
-                        }
-                    } else {
-                        MessageView(
-                            viewModel: viewModel,
-                            message: row.message,
-                            showAvatar: row.showAvatar,
-                            avatarSize: avatarSize,
-                            messageUseMarkdown: messageUseMarkdown)
-                    }
-                }
-                .id(row.message.id)
-                .rotationEffect(Angle(degrees: 180))
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets())
-                .onAppear {
-                    paginationState.handle(row.message, ids: ids)
-                }
-            }
-        } footer: {
-            Text(section.formattedDate)
-                .frame(maxWidth: .infinity)
-                .rotationEffect(Angle(degrees: 180))
-        }
-        .listSectionSeparator(.hidden)
     }
 }
 
@@ -195,15 +153,16 @@ private extension ChatView {
         messages
             .enumerated()
             .map {
+                let nextMessageExists = messages[safe: $0.offset + 1] != nil
                 let nextMessageIsSameUser = messages[safe: $0.offset + 1]?.user.id == $0.element.user.id
                 let prevMessageIsSameUser = messages[safe: $0.offset - 1]?.user.id == $0.element.user.id
 
                 let position: PositionInGroup
-                if nextMessageIsSameUser, prevMessageIsSameUser {
+                if nextMessageExists, nextMessageIsSameUser, prevMessageIsSameUser {
                     position = .middle
-                } else if !nextMessageIsSameUser, !nextMessageIsSameUser {
+                } else if !nextMessageExists || !nextMessageIsSameUser, !prevMessageIsSameUser {
                     position = .single
-                } else if nextMessageIsSameUser {
+                } else if nextMessageExists, nextMessageIsSameUser {
                     position = .first
                 } else {
                     position = .last

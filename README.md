@@ -25,11 +25,11 @@ ___
 # Features
 - Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure)
 - Allows you to pass custom view builder for message view
-- Has a built-in photo/video library/camera picker fro multiple media selection
+- Has a built-in photo/video library/camera picker for multiple media selection
 
 # Usage
 
-Create an indicator like this:
+Create a chat view like this:
 ```swift
 @State var messages: [Message] = []
 
@@ -72,7 +72,7 @@ Library allows to send following content in messages in any combination:
 - Photo single/multiple
 Coming soon:
 - Audio message
-- Use's location
+- User's location
 
 ### Modifiers
 if you are not using your own `messageBuilder`:   

@@ -14,8 +14,4 @@ public enum PositionInGroup {
 struct MessageRow: Equatable {
     let message: Message
     let positionInGroup: PositionInGroup
-
-    var showAvatar: Bool {
-        return positionInGroup == .single || positionInGroup == .last
-    }
 }
