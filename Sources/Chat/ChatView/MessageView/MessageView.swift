@@ -26,86 +26,88 @@ struct MessageView: View {
         positionInGroup == .single || positionInGroup == .last
     }
 
+    var topPadding: CGFloat {
+        positionInGroup == .first || positionInGroup == .single ? 8 : 4
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .bottom, spacing: 0) {
-                if !message.user.isCurrentUser {
-                    Group {
-                        if showAvatar {
-                            AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
-                        } else {
-                            Color.clear.frame(width: avatarSize)
-                        }
+        HStack(alignment: .bottom, spacing: 0) {
+            if !message.user.isCurrentUser {
+                Group {
+                    if showAvatar {
+                        AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
+                    } else {
+                        Color.clear.frame(width: avatarSize)
                     }
-                    .padding(.horizontal, 8)
-                } else {
-                    Spacer()
                 }
+                .padding(.horizontal, 8)
+            } else {
+                Spacer()
+            }
 
-                VStack(alignment: .leading, spacing: 0) {
-                    if !message.attachments.isEmpty {
-                        AttachmentsGrid(attachments: message.attachments) {
-                            viewModel.presentAttachmentFullScreen($0)
-                        }
-                        .overlay(alignment: .bottomTrailing) {
-                            if message.text.isEmpty {
-                                MessageTimeView(
-                                    text: message.time,
-                                    isCurrentUser: message.user.isCurrentUser,
-                                    isOverlay: true
-                                )
-                                .padding(4)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                        .layoutPriority(2)
+            VStack(alignment: .leading, spacing: 0) {
+                if !message.attachments.isEmpty {
+                    AttachmentsGrid(attachments: message.attachments) {
+                        viewModel.presentAttachmentFullScreen($0)
                     }
-                    if !message.text.isEmpty {
-                        if messageWidth >= UIScreen.main.bounds.width * 0.7 {
-                            VStack(alignment: .trailing, spacing: 0) {
-                                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                                MessageTimeView(
-                                    text: message.time,
-                                    isCurrentUser: message.user.isCurrentUser,
-                                    isOverlay: false
-                                )
-                                .padding(4)
-                            }
-                        } else {
-                            HStack(alignment: .bottom, spacing: 0) {
-                                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                                MessageTimeView(
-                                    text: message.time,
-                                    isCurrentUser: message.user.isCurrentUser,
-                                    isOverlay: false
-                                )
-                                .padding(4)
-                            }
+                    .overlay(alignment: .bottomTrailing) {
+                        if message.text.isEmpty {
+                            MessageTimeView(
+                                text: message.time,
+                                isCurrentUser: message.user.isCurrentUser,
+                                isOverlay: true
+                            )
+                            .padding(4)
                         }
                     }
+                    .contentShape(Rectangle())
+                    .layoutPriority(2)
                 }
-                .frame(width: message.attachments.isEmpty ? nil : 204)
-                .foregroundColor(message.user.isCurrentUser ? .white : .black)
-                .background {
-                    if !message.text.isEmpty {
-                        RoundedRectangle(cornerRadius: 20)
-                            .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
+                if !message.text.isEmpty {
+                    if messageWidth >= UIScreen.main.bounds.width * 0.7 {
+                        VStack(alignment: .trailing, spacing: 0) {
+                            MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                            MessageTimeView(
+                                text: message.time,
+                                isCurrentUser: message.user.isCurrentUser,
+                                isOverlay: false
+                            )
+                            .padding(4)
+                        }
+                    } else {
+                        HStack(alignment: .bottom, spacing: 0) {
+                            MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                            MessageTimeView(
+                                text: message.time,
+                                isCurrentUser: message.user.isCurrentUser,
+                                isOverlay: false
+                            )
+                            .padding(4)
+                        }
                     }
-                }
-                .padding(message.user.isCurrentUser ? .leading : .trailing, 20)
-
-                if message.user.isCurrentUser, let status = message.status {
-                    MessageStatusView(status: status) {
-                        viewModel.sendMessage(message.toDraft())
-                    }
-                }
-
-                if !message.user.isCurrentUser {
-                    Spacer()
                 }
             }
+            .frame(width: message.attachments.isEmpty ? nil : 204)
+            .foregroundColor(message.user.isCurrentUser ? .white : .black)
+            .background {
+                if !message.text.isEmpty {
+                    RoundedRectangle(cornerRadius: 20)
+                        .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
+                }
+            }
+            .padding(message.user.isCurrentUser ? .leading : .trailing, 20)
+
+            if message.user.isCurrentUser, let status = message.status {
+                MessageStatusView(status: status) {
+                    viewModel.sendMessage(message.toDraft())
+                }
+            }
+
+            if !message.user.isCurrentUser {
+                Spacer()
+            }
         }
-        .padding(.bottom, showAvatar ? 4 : 4)
+        .padding(.top, topPadding)
     }
 }
 

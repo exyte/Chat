@@ -128,7 +128,6 @@ struct UIList: UIViewRepresentable {
                     tableView.insertRows(at: [IndexPath(row: offset, section: index)], with: .top)
                 }
             }
-            print()
         }
     }
 
@@ -186,6 +185,7 @@ struct UIList: UIViewRepresentable {
                     messageUseMarkdown: messageUseMarkdown)
                 .rotationEffect(Angle(degrees: 180))
             }
+            .minSize(width: 0, height: 0)
             .margins(.all, 0)
 
             return tableViewCell
