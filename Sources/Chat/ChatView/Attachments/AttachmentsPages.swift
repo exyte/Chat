@@ -52,7 +52,7 @@ struct AttachmentsPages: View {
             }
             .overlay(alignment: .topLeading) {
                 Button(action: onClose) {
-                    theme.images.removeButton
+                    theme.images.mediaPicker.cross
                         .resizable()
                         .frame(width: 20, height: 20)
                 }

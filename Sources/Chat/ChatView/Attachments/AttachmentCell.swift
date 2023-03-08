@@ -19,7 +19,7 @@ struct AttachmentCell: View {
             } else if attachment is VideoAttachment {
                 content
                     .overlay {
-                        theme.images.playButton
+                        theme.images.message.playVideo
                             .foregroundColor(.white)
                             .padding()
                             .background {

@@ -15,18 +15,18 @@ struct MessageStatusView: View {
         Group {
             switch status {
             case .sending:
-                theme.images.sendingStatus
+                theme.images.message.sending
                     .resizable()
                     .frame(width: 14, height: 14)
                     .rotationEffect(.degrees(90))
                     .foregroundColor(theme.colors.grayStatus)
             case .sent:
-                theme.images.sentStatus
+                theme.images.message.checkmarks
                     .resizable()
                     .frame(width: 14, height: 14)
                     .foregroundColor(theme.colors.grayStatus)
             case .read:
-                theme.images.sentStatus
+                theme.images.message.checkmarks
                     .resizable()
                     .frame(width: 14, height: 14)
                     .foregroundColor(theme.colors.myMessage)
@@ -34,7 +34,7 @@ struct MessageStatusView: View {
                 Button {
                     onRetry()
                 } label: {
-                    theme.images.errorStatus
+                    theme.images.message.error
                         .resizable()
                         .frame(width: 14, height: 14)
                 }

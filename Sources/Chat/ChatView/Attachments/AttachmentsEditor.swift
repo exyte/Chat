@@ -56,7 +56,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var inputView: some View {
         let actionClosure: (InputViewAction) -> Void = {
             switch $0 {
-            case .attach, .camera:
+            case .photo, .camera:
                 break
             case .add:
                 mediaPickerMode = .camera
@@ -114,12 +114,12 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             Button {
                 cancelClosure()
             } label: {
-                theme.images.closeButton
+                theme.images.mediaPicker.cross
             }
             .padding(.trailing, 30)
 
             if let chatTitle = chatTitle {
-                theme.images.chevronRight
+                theme.images.mediaPicker.chevronRight
                 Text(chatTitle)
                     .font(.title3)
                     .foregroundColor(theme.colors.textMediaPicker)

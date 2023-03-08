@@ -22,7 +22,7 @@ public enum InputViewStyle {
 }
 
 public enum InputViewAction {
-    case attach
+    case photo
     case add
     case camera
     case send
@@ -74,9 +74,9 @@ struct InputView: View {
 
     var attachButton: some View {
         Button {
-            onAction(.attach)
+            onAction(.photo)
         } label: {
-            theme.images.attachButton
+            theme.images.inputView.attach
                 .resizable()
                 .scaledToFit()
                 .frame(width: 16, height: 16)
@@ -88,7 +88,7 @@ struct InputView: View {
         Button {
             onAction(.add)
         } label: {
-            theme.images.addButton
+            theme.images.inputView.add
                 .resizable()
                 .frame(width: 12, height: 12)
                 .padding(8)
@@ -103,7 +103,7 @@ struct InputView: View {
         Button {
             onAction(.camera)
         } label: {
-            theme.images.cameraButton
+            theme.images.inputView.attachCamera
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
@@ -115,7 +115,7 @@ struct InputView: View {
         Button {
             onAction(.send)
         } label: {
-            theme.images.sendButton
+            theme.images.inputView.arrowSend
                 .resizable()
                 .scaledToFit()
                 .frame(width: 14, height: 14)
@@ -123,7 +123,7 @@ struct InputView: View {
                 .background {
                     Circle().fill(theme.colors.sendButtonBackground)
                 }
-                .padding(8)
+                .padding([.horizontal, .bottom], 8)
         }
     }
 

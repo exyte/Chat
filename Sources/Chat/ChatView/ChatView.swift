@@ -59,7 +59,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     public var body: some View {
         let actionClosure: (InputViewAction) -> Void = {
             switch $0 {
-            case .attach:
+            case .photo:
                 mediaPickerMode = .photos
                 inputViewModel.showPicker = true
             case .add:
@@ -126,6 +126,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                sections: sections,
                ids: ids
         )
+        .onTapGesture {
+            globalFocusState.focus = nil
+        }
         .onAppear {
             viewModel.didSendMessage = didSendMessage
             inputViewModel.didSendMessage = { value in

@@ -48,7 +48,7 @@ struct VideoView: View {
                         Button {
                             viewModel.togglePlay()
                         } label: {
-                            (viewModel.isPlaying ? theme.images.pauseCircleButton : theme.images.playCircleButton)
+                            (viewModel.isPlaying ? theme.images.message.pauseVideo : theme.images.message.playVideo)
                                 .resizable()
                                 .frame(width: 64, height: 64)
                                 .foregroundColor(.white)
