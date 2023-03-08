@@ -11,20 +11,26 @@ public extension Notification.Name {
     static let onScrollToBottom = Notification.Name("onScrollToBottom")
 }
 
-struct UIList: UIViewRepresentable {
+struct UIList<MessageContent: View>: UIViewRepresentable {
+
+    typealias MessageBuilderClosure = ChatView<MessageContent, EmptyView>.MessageBuilderClosure
 
     @ObservedObject var viewModel: ChatViewModel
+    @ObservedObject var paginationState: PaginationState
+
+    var messageBuilder: MessageBuilderClosure?
+
     let avatarSize: CGFloat
     let messageUseMarkdown: Bool
-
     let sections: [MessagesSection]
+    let ids: [String]
 
-    let updatesQueue = DispatchQueue(label: "updatesQueue")
-    @State var updateSemaphore = DispatchSemaphore(value: 1)
-    @State var tableSemaphore = DispatchSemaphore(value: 0)
+    private let updatesQueue = DispatchQueue(label: "updatesQueue")
+    @State private var updateSemaphore = DispatchSemaphore(value: 1)
+    @State private var tableSemaphore = DispatchSemaphore(value: 0)
 
     func makeUIView(context: Context) -> UITableView {
-        let tableView = UITableView(frame: .zero, style: .plain)
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
         tableView.dataSource = context.coordinator
@@ -32,11 +38,9 @@ struct UIList: UIViewRepresentable {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.transform = CGAffineTransform(rotationAngle: .pi)
 
-        // these lines fix jumping of footer
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 0
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
-        tableView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom:  0, right: 0)
         tableView.backgroundColor = .white
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
@@ -68,6 +72,7 @@ struct UIList: UIViewRepresentable {
                 // step 2
                 // apply the rest of the changes to table's dataSource
                 context.coordinator.sections = sections
+                context.coordinator.ids = ids
                 // insert new rows/sections and remove old ones with animation
                 tableView.beginUpdates()
                 applyInserts(tableView: tableView, prevSections: prevSections)
@@ -131,22 +136,30 @@ struct UIList: UIViewRepresentable {
         }
     }
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown)
+    func makeCoordinator() -> Coordinator<MessageContent> {
+        Coordinator(viewModel: viewModel, paginationState: paginationState, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids)
     }
 
-    class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
+    class Coordinator<MessageContent: View>: NSObject, UITableViewDataSource, UITableViewDelegate {
 
         @ObservedObject var viewModel: ChatViewModel
+        @ObservedObject var paginationState: PaginationState
+
+        var messageBuilder: MessageBuilderClosure?
+
         let avatarSize: CGFloat
         let messageUseMarkdown: Bool
+        var sections: [MessagesSection]
+        var ids: [String]
 
-        var sections: [MessagesSection] = []
-
-        init(viewModel: ChatViewModel, avatarSize: CGFloat, messageUseMarkdown: Bool) {
+        init(viewModel: ChatViewModel, paginationState: PaginationState, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String]) {
             self.viewModel = viewModel
+            self.paginationState = paginationState
+            self.messageBuilder = messageBuilder
             self.avatarSize = avatarSize
             self.messageUseMarkdown = messageUseMarkdown
+            self.sections = sections
+            self.ids = ids
         }
 
         func numberOfSections(in tableView: UITableView) -> Int {
@@ -177,18 +190,32 @@ struct UIList: UIViewRepresentable {
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
-                MessageView(
-                    viewModel: viewModel,
-                    message: row.message,
-                    positionInGroup: row.positionInGroup,
-                    avatarSize: avatarSize,
-                    messageUseMarkdown: messageUseMarkdown)
+                Group {
+                    if let messageBuilder = messageBuilder {
+                        messageBuilder(row.message, row.positionInGroup) { attachment in
+                            self.viewModel.presentAttachmentFullScreen(attachment)
+                        }
+                    } else {
+                        MessageView(
+                            viewModel: viewModel,
+                            message: row.message,
+                            positionInGroup: row.positionInGroup,
+                            avatarSize: avatarSize,
+                            messageUseMarkdown: messageUseMarkdown)
+                    }
+                }
+                .id(row.message.id)
                 .rotationEffect(Angle(degrees: 180))
             }
             .minSize(width: 0, height: 0)
             .margins(.all, 0)
 
             return tableViewCell
+        }
+
+        func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+            let row = sections[indexPath.section].rows[indexPath.row]
+            paginationState.handle(row.message, ids: ids)
         }
     }
 }

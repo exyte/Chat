@@ -8,25 +8,16 @@
 import SwiftUI
 import MediaPicker
 
-private let lastMessageAnchorKey = "LastMessageAnchorKey"
-
-public extension ChatView where MessageContent == EmptyView {
-
-    init(messages: [Message],
-         didSendMessage: @escaping (DraftMessage) -> Void) {
-        self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages)
-        self.ids = messages.map { $0.id }
-    }
-}
-
-public struct ChatView<MessageContent: View>: View {
+public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     /// To build a custom message view use the following parameters passed by this closure:
     /// - message containing user, attachments, etc.
     /// - position of message in its continuous group of messages from the same user
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
     public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (any Attachment) -> Void) -> MessageContent)
+
+    public typealias InputViewBuilderClosure = ((
+        Binding<String>, InputViewStyle, @escaping (InputViewAction) -> Void) -> InputViewContent)
 
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
@@ -35,6 +26,9 @@ public struct ChatView<MessageContent: View>: View {
 
     /// provide custom message view builder
     var messageBuilder: MessageBuilderClosure? = nil
+
+    /// provide custom input view builder
+    var inputViewBuilder: InputViewBuilderClosure? = nil
 
     var avatarSize: CGFloat = 32
     var assetsPickerLimit: Int = 10
@@ -53,36 +47,46 @@ public struct ChatView<MessageContent: View>: View {
 
     public init(messages: [Message],
                 didSendMessage: @escaping (DraftMessage) -> Void,
-                messageBuilder: @escaping MessageBuilderClosure) {
+                messageBuilder: @escaping MessageBuilderClosure,
+                inputViewBuilder: @escaping InputViewBuilderClosure) {
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
+        self.inputViewBuilder = inputViewBuilder
     }
 
     public var body: some View {
+        let actionClosure: (InputViewAction) -> Void = {
+            switch $0 {
+            case .attach:
+                mediaPickerMode = .photos
+                inputViewModel.showPicker = true
+            case .add:
+                break
+            case .camera:
+                mediaPickerMode = .camera
+                inputViewModel.showPicker = true
+            case .send:
+                inputViewModel.send()
+            }
+        }
+
         VStack(spacing: 0) {
             list
 
-            InputView(
-                text: $inputViewModel.text,
-                style: .message,
-                canSend: inputViewModel.canSend,
-                onAction: {
-                    switch $0 {
-                    case .attach:
-                        mediaPickerMode = .photos
-                        inputViewModel.showPicker = true
-                    case .add:
-                        break
-                    case .camera:
-                        mediaPickerMode = .camera
-                        inputViewModel.showPicker = true
-                    case .send:
-                        inputViewModel.send()
-                    }
+            Group {
+                if let inputViewBuilder = inputViewBuilder {
+                    inputViewBuilder($inputViewModel.text, .message, actionClosure)
+                } else {
+                    InputView(
+                        text: $inputViewModel.text,
+                        style: .message,
+                        canSend: inputViewModel.canSend,
+                        onAction: actionClosure
+                    )
                 }
-            )
+            }
             .environmentObject(globalFocusState)
             .onAppear(perform: inputViewModel.onStart)
             .onDisappear(perform: inputViewModel.onStop)
@@ -102,7 +106,7 @@ public struct ChatView<MessageContent: View>: View {
             )
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(viewModel: inputViewModel, mediaPickerMode: $mediaPickerMode, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle)
+            AttachmentsEditor(viewModel: inputViewModel, mediaPickerMode: $mediaPickerMode, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {
@@ -115,9 +119,12 @@ public struct ChatView<MessageContent: View>: View {
 
     var list: some View {
         UIList(viewModel: viewModel,
+               paginationState: paginationState,
+               messageBuilder: messageBuilder,
                avatarSize: avatarSize,
                messageUseMarkdown: messageUseMarkdown,
-               sections: sections
+               sections: sections,
+               ids: ids
         )
         .onAppear {
             viewModel.didSendMessage = didSendMessage
@@ -207,3 +214,38 @@ public extension ChatView {
         return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
     }
 }
+
+public extension ChatView where MessageContent == EmptyView {
+
+    init(messages: [Message],
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         inputViewBuilder: @escaping InputViewBuilderClosure) {
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages)
+        self.ids = messages.map { $0.id }
+        self.inputViewBuilder = inputViewBuilder
+    }
+}
+
+public extension ChatView where InputViewContent == EmptyView {
+
+    init(messages: [Message],
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         messageBuilder: @escaping MessageBuilderClosure) {
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages)
+        self.ids = messages.map { $0.id }
+        self.messageBuilder = messageBuilder
+    }
+}
+
+public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView {
+
+    init(messages: [Message],
+         didSendMessage: @escaping (DraftMessage) -> Void) {
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages)
+        self.ids = messages.map { $0.id }
+    }
+}
+

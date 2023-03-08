@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum InputViewStyle {
+public enum InputViewStyle {
     case message
     case signature
 
@@ -21,13 +21,11 @@ enum InputViewStyle {
     }
 }
 
-extension InputView {
-    enum Action {
-        case attach
-        case add
-        case camera
-        case send
-    }
+public enum InputViewAction {
+    case attach
+    case add
+    case camera
+    case send
 }
 
 struct InputView: View {
@@ -38,7 +36,7 @@ struct InputView: View {
 
     let style: InputViewStyle
     let canSend: Bool
-    let onAction: (Action) -> Void
+    let onAction: (InputViewAction) -> Void
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {

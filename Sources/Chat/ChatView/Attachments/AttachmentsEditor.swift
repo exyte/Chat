@@ -8,13 +8,16 @@
 import SwiftUI
 import MediaPicker
 
-struct AttachmentsEditor: View {
+struct AttachmentsEditor<InputViewContent: View>: View {
+
+    typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent>.InputViewBuilderClosure
 
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var pickerTheme
 
     @ObservedObject var viewModel: InputViewModel
     @Binding var mediaPickerMode: MediaPickerMode
+    var inputViewBuilder: InputViewBuilderClosure?
     var assetsPickerLimit: Int
     var chatTitle: String?
 
@@ -49,22 +52,31 @@ struct AttachmentsEditor: View {
         .ignoresSafeArea(.all)
     }
 
+    @ViewBuilder
     var inputView: some View {
-        InputView(
-            text: $viewModel.text,
-            style: .signature,
-            canSend: viewModel.canSend,
-            onAction: {
-                switch $0 {
-                case .attach, .camera:
-                    break
-                case .add:
-                    mediaPickerMode = .camera
-                case .send:
-                    viewModel.send()
-                }
+        let actionClosure: (InputViewAction) -> Void = {
+            switch $0 {
+            case .attach, .camera:
+                break
+            case .add:
+                mediaPickerMode = .camera
+            case .send:
+                viewModel.send()
             }
-        )
+        }
+
+        Group {
+            if let inputViewBuilder = inputViewBuilder {
+                inputViewBuilder($viewModel.text, .signature, actionClosure)
+            } else {
+                InputView(
+                    text: $viewModel.text,
+                    style: .signature,
+                    canSend: viewModel.canSend,
+                    onAction: actionClosure
+                )
+            }
+        }
     }
 
     var albumSelectionHeaderView: some View {
