@@ -151,6 +151,7 @@ public struct ChatTheme {
         }
 
         public var backButton: Image
+        public var scrollToBottom: Image
 
         public var attachMenu: AttachMenu
         public var inputView: InputView
@@ -202,9 +203,11 @@ public struct ChatTheme {
             stopRecord: Image? = nil,
             cancelReply: Image? = nil,
             replyToMessage: Image? = nil,
-            backButton: Image? = nil
+            backButton: Image? = nil,
+            scrollToBottom: Image? = nil
         ) {
-            self.backButton = backButton ?? Image("backButton", bundle: .current)
+            self.backButton = backButton ?? Image("backArrow", bundle: .current)
+            self.scrollToBottom = scrollToBottom ?? Image("scrollToBottom", bundle: .current)
 
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),

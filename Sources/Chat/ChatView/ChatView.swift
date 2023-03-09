@@ -44,6 +44,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var paginationState = PaginationState()
 
     @State private var mediaPickerMode = MediaPickerMode.photos
+    @State private var showScrollToBottom: Bool = false
 
     public init(messages: [Message],
                 didSendMessage: @escaping (DraftMessage) -> Void,
@@ -73,7 +74,21 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         }
 
         VStack(spacing: 0) {
-            list
+            ZStack(alignment: .bottomTrailing) {
+                list
+
+                if showScrollToBottom {
+                    Button {
+                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                    } label: {
+                        theme.images.scrollToBottom
+                            .frame(width: 40, height: 40)
+                            .background(theme.colors.friendMessage)
+                            .cornerRadius(.infinity)
+                    }
+                    .padding(8)
+                }
+            }
 
             Group {
                 if let inputViewBuilder = inputViewBuilder {
@@ -120,6 +135,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var list: some View {
         UIList(viewModel: viewModel,
                paginationState: paginationState,
+               showScrollToBottom: $showScrollToBottom,
                messageBuilder: messageBuilder,
                avatarSize: avatarSize,
                messageUseMarkdown: messageUseMarkdown,

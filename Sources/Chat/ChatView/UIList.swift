@@ -18,6 +18,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     @ObservedObject var viewModel: ChatViewModel
     @ObservedObject var paginationState: PaginationState
 
+    @Binding var showScrollToBottom: Bool
+
     var messageBuilder: MessageBuilderClosure?
 
     let avatarSize: CGFloat
@@ -137,13 +139,15 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator<MessageContent> {
-        Coordinator(viewModel: viewModel, paginationState: paginationState, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids)
+        Coordinator(viewModel: viewModel, paginationState: paginationState, showScrollToBottom: $showScrollToBottom, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids)
     }
 
     class Coordinator<MessageContent: View>: NSObject, UITableViewDataSource, UITableViewDelegate {
 
         @ObservedObject var viewModel: ChatViewModel
         @ObservedObject var paginationState: PaginationState
+
+        @Binding var showScrollToBottom: Bool
 
         var messageBuilder: MessageBuilderClosure?
 
@@ -152,9 +156,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         var sections: [MessagesSection]
         var ids: [String]
 
-        init(viewModel: ChatViewModel, paginationState: PaginationState, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String]) {
+        init(viewModel: ChatViewModel, paginationState: PaginationState, showScrollToBottom: Binding<Bool>, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String]) {
             self.viewModel = viewModel
             self.paginationState = paginationState
+            self._showScrollToBottom = showScrollToBottom
             self.messageBuilder = messageBuilder
             self.avatarSize = avatarSize
             self.messageUseMarkdown = messageUseMarkdown
@@ -216,6 +221,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
             let row = sections[indexPath.section].rows[indexPath.row]
             paginationState.handle(row.message, ids: ids)
+        }
+
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            showScrollToBottom = scrollView.contentOffset.y > 0
         }
     }
 }
