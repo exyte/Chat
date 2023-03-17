@@ -8,19 +8,18 @@ import MediaPicker
 
 final class InputViewModel: ObservableObject {
     
-    @Published var text: String = ""
-    @Published var medias: [Media] = []
-    @Published var showPicker = false
+    @Published var attachments = InputViewAttachments()
+    @Published var state: InputViewState = .empty
 
-    @Published var canSend = false
+    @Published var showPicker = false
+    @Published var mediaPickerMode = MediaPickerMode.photos
 
     var didSendMessage: ((DraftMessage) -> Void)?
 
+    private var recorder = Recorder()
+
+    private var recordPlayerSubscription: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
-
-    init() {
-
-    }
 
     func onStart() {
         subscribeValidation()
@@ -33,9 +32,10 @@ final class InputViewModel: ObservableObject {
 
     func reset() {
         DispatchQueue.main.async { [weak self] in
-            self?.text = ""
-            self?.medias = []
+            self?.recorder.stopRecording()
+            self?.attachments = InputViewAttachments()
             self?.showPicker = false
+            self?.state = .empty
         }
     }
 
@@ -44,17 +44,114 @@ final class InputViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
+    func inputViewAction() -> (InputViewAction) -> Void {
+        { [weak self] in
+            self?.inputViewActionInternal($0)
+        }
+    }
+
+    func inputViewActionInternal(_ action: InputViewAction) {
+        print(action)
+        switch action {
+        case .photo:
+            mediaPickerMode = .photos
+            showPicker = true
+        case .add:
+            mediaPickerMode = .camera
+        case .camera:
+            mediaPickerMode = .camera
+            showPicker = true
+        case .send:
+            send()
+        case .recordAudioTap:
+            state = .isRecordingTap
+            recordAudio()
+        case .recordAudioHold:
+            state = .isRecordingHold
+            recordAudio()
+        case .recordAudioLock:
+            state = .isRecordingTap
+        case .stopRecordAudio:
+            recorder.stopRecording()
+            if let _ = attachments.recording {
+                state = .hasRecording
+            }
+        case .deleteRecord:
+            unsubscribeRecordPlayer()
+            recorder.stopRecording()
+            attachments.recording = nil
+        case .playRecord:
+            state = .playingRecording
+            if let recording = attachments.recording {
+                subscribeRecordPlayer()
+                RecordingPlayer.shared.play(recording)
+            }
+        case .pauseRecord:
+            state = .pausedRecording
+            RecordingPlayer.shared.pause()
+        }
+    }
+
+    func recordAudio() {
+        if recorder.isRecording {
+            return
+        }
+        attachments.recording = Recording()
+        attachments.recording?.url = recorder.startRecording { [weak self] duration, samples in
+            self?.attachments.recording?.duration = duration
+            self?.attachments.recording?.waveformSamples = samples
+        }
+    }
+}
+
+private extension InputViewModel {
+
     func validateDraft() {
-        let notEmptyTextInChatWindow = !text.isEmpty && !showPicker
-        let notEmptyMediasInPickerWindow = !medias.isEmpty && showPicker
-        canSend = notEmptyTextInChatWindow || notEmptyMediasInPickerWindow
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if !self.attachments.text.isEmpty || !self.attachments.medias.isEmpty {
+                self.state = .hasTextOrMedia
+            } else if self.attachments.text.isEmpty,
+                      self.attachments.medias.isEmpty,
+                      self.attachments.recording == nil {
+                self.state = .empty
+            }
+        }
+    }
+
+    func subscribeValidation() {
+        $attachments.sink { [weak self] _ in
+            self?.validateDraft()
+        }
+        .store(in: &subscriptions)
+    }
+
+    func subscribePicker() {
+        $showPicker
+            .sink { [weak self] value in
+                if !value {
+                    self?.attachments.medias = []
+                }
+            }
+            .store(in: &subscriptions)
+    }
+
+    func subscribeRecordPlayer() {
+        recordPlayerSubscription = RecordingPlayer.shared.didPlayTillEnd
+            .sink { [weak self] in
+                self?.state = .hasRecording
+            }
+    }
+
+    func unsubscribeRecordPlayer() {
+        recordPlayerSubscription = nil
     }
 }
 
 private extension InputViewModel {
     
     func mapAttachmentsForSend() -> AnyPublisher<[any Attachment], Never> {
-        medias.publisher
+        attachments.medias.publisher
             .receive(on: DispatchQueue.global())
             .asyncMap { media in
                 await (media, media.getUrl())
@@ -77,10 +174,11 @@ private extension InputViewModel {
 
     func sendMessage() -> AnyCancellable {
         mapAttachmentsForSend()
-            .compactMap { [text] in
+            .compactMap { [attachments] in
                 DraftMessage(
-                    text: text,
+                    text: attachments.text,
                     attachments: $0,
+                    recording: attachments.recording,
                     createdAt: Date()
                 )
             }
@@ -90,28 +188,6 @@ private extension InputViewModel {
                     self?.reset()
                 }
             }
-    }
-
-    func subscribeValidation() {
-        let textTrigger = $text.map { _ in }
-        let mediasTrigger = $medias.map { _ in }
-
-        textTrigger
-            .merge(with: mediasTrigger)
-            .sink { [weak self] in
-                self?.validateDraft()
-            }
-            .store(in: &subscriptions)
-    }
-
-    func subscribePicker() {
-        $showPicker
-            .sink { [weak self] value in
-                if !value {
-                    self?.medias = []
-                }
-            }
-            .store(in: &subscriptions)
     }
 }
 

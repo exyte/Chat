@@ -15,19 +15,19 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var pickerTheme
 
-    @ObservedObject var viewModel: InputViewModel
-    @Binding var mediaPickerMode: MediaPickerMode
+    @ObservedObject var inputViewModel: InputViewModel
+
     var inputViewBuilder: InputViewBuilderClosure?
     var assetsPickerLimit: Int
     var chatTitle: String?
 
     var showingAlbums: Bool {
-        mediaPickerMode == .albums
+        inputViewModel.mediaPickerMode == .albums
     }
 
     var body: some View {
-        MediaPicker(isPresented: $viewModel.showPicker, limit: assetsPickerLimit) {
-            viewModel.medias = $0
+        MediaPicker(isPresented: $inputViewModel.showPicker, limit: assetsPickerLimit) {
+            inputViewModel.attachments.medias = $0
         } albumSelectionBuilder: { _, albumSelectionView in
             VStack {
                 albumSelectionHeaderView
@@ -46,7 +46,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .background(pickerTheme.main.albumSelectionBackground)
         }
         .showLiveCameraCell()
-        .pickerMode($mediaPickerMode)
+        .pickerMode($inputViewModel.mediaPickerMode)
         .padding(.top)
         .background(pickerTheme.main.albumSelectionBackground)
         .ignoresSafeArea(.all)
@@ -54,26 +54,13 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     @ViewBuilder
     var inputView: some View {
-        let actionClosure: (InputViewAction) -> Void = {
-            switch $0 {
-            case .photo, .camera:
-                break
-            case .add:
-                mediaPickerMode = .camera
-            case .send:
-                viewModel.send()
-            }
-        }
-
         Group {
             if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($viewModel.text, .signature, actionClosure)
+                inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction())
             } else {
                 InputView(
-                    text: $viewModel.text,
-                    style: .signature,
-                    canSend: viewModel.canSend,
-                    onAction: actionClosure
+                    viewModel: inputViewModel,
+                    style: .signature
                 )
             }
         }
@@ -83,7 +70,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         ZStack {
             HStack {
                 Button {
-                    viewModel.showPicker = false
+                    inputViewModel.showPicker = false
                 } label: {
                     Text("Cancel")
                         .foregroundColor(.white.opacity(0.7))
@@ -100,7 +87,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .foregroundColor(.white)
             .onTapGesture {
                 withAnimation {
-                    mediaPickerMode = showingAlbums ? .photos : .albums
+                    inputViewModel.mediaPickerMode = showingAlbums ? .photos : .albums
                 }
             }
             .frame(maxWidth: .infinity)

@@ -13,15 +13,7 @@ struct MockMessage {
 
     let text: String
     let images: [MockImage]
-
-    init(uid: String, sender: MockUser, createdAt: Date, status: Message.Status?, text: String, images: [MockImage] = []) {
-        self.uid = uid
-        self.sender = sender
-        self.createdAt = createdAt
-        self.status = status
-        self.text = text
-        self.images = images
-    }
+    let recording: Recording?
 }
 
 extension MockMessage {
@@ -30,9 +22,10 @@ extension MockMessage {
             id: uid,
             user: sender.toChatUser(),
             status: status,
+            createdAt: createdAt,
             text: text,
             attachments: images.map { $0.toChatAttachment() },
-            createdAt: createdAt
+            recording: recording
         )
     }
 }

@@ -5,17 +5,11 @@
 import Foundation
 
 public struct DraftMessage {
-    public let id: String?
+    public var id: String?
     public let text: String
     public let attachments: [any Attachment]
+    public let recording: Recording?
     public let createdAt: Date
-
-    init(id: String? = nil, text: String, attachments: [any Attachment], createdAt: Date) {
-        self.id = id
-        self.text = text
-        self.attachments = attachments
-        self.createdAt = createdAt
-    }
 }
 
 extension Message {
@@ -24,6 +18,7 @@ extension Message {
             id: id,
             text: text,
             attachments: attachments,
+            recording: recording,
             createdAt: Date()
         )
     }

@@ -11,22 +11,25 @@ public struct Message {
     public var id: String
     public var user: User
     public var status: Status?
+    public var createdAt: Date
     public var text: String
     public var attachments: [any Attachment]
-    public var createdAt: Date
+    public var recording: Recording?
 
     public init(id: String,
                 user: User,
                 status: Status? = nil,
+                createdAt: Date = Date(),
                 text: String = "",
                 attachments: [any Attachment] = [],
-                createdAt: Date = Date()) {
+                recording: Recording? = nil) {
 
         self.id = id
         self.user = user
         self.status = status
         self.text = text
         self.attachments = attachments
+        self.recording = recording
         self.createdAt = createdAt
     }
 }

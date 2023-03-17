@@ -52,45 +52,47 @@ struct MessageView: View {
                     }
                     .overlay(alignment: .bottomTrailing) {
                         if message.text.isEmpty {
-                            MessageTimeView(
-                                text: message.time,
-                                isCurrentUser: message.user.isCurrentUser,
-                                isOverlay: true
-                            )
-                            .padding(4)
+                            messageTimeView(isOverlay: true)
                         }
                     }
                     .contentShape(Rectangle())
                     .layoutPriority(2)
                 }
+
                 if !message.text.isEmpty {
                     if messageWidth >= UIScreen.main.bounds.width * 0.7 {
                         VStack(alignment: .trailing, spacing: 0) {
                             MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                            MessageTimeView(
-                                text: message.time,
-                                isCurrentUser: message.user.isCurrentUser,
-                                isOverlay: false
-                            )
-                            .padding(4)
+                            messageTimeView()
                         }
+                        .border(Color.red, width: 2)
                     } else {
                         HStack(alignment: .bottom, spacing: 0) {
                             MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                            MessageTimeView(
-                                text: message.time,
-                                isCurrentUser: message.user.isCurrentUser,
-                                isOverlay: false
-                            )
-                            .padding(4)
+                            messageTimeView()
                         }
+                    }
+                }
+
+                if let recording = message.recording {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        RecordWaveformWithButtons(
+                            recording: recording,
+                            colorButton: message.user.isCurrentUser ? theme.colors.myMessage : .white,
+                            colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
+                            colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
+                        )
+                        .padding(.horizontal, 12)
+                        .padding(.top, 8)
+
+                        messageTimeView()
                     }
                 }
             }
             .frame(width: message.attachments.isEmpty ? nil : 204)
-            .foregroundColor(message.user.isCurrentUser ? .white : .black)
+            .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
-                if !message.text.isEmpty {
+                if !message.text.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: 20)
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                 }
@@ -108,6 +110,15 @@ struct MessageView: View {
             }
         }
         .padding(.top, topPadding)
+    }
+
+    func messageTimeView(isOverlay: Bool = false) -> some View {
+        MessageTimeView(
+            text: message.time,
+            isCurrentUser: message.user.isCurrentUser,
+            isOverlay: isOverlay
+        )
+        .padding(4)
     }
 }
 

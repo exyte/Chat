@@ -53,9 +53,11 @@ final class ChatExampleViewModel: ObservableObject {
 
 struct MockCreateMessage {
     let uid: String?
-    let text: String
     let createdAt: Date
+
+    let text: String
     let images: [MockImage]
+    let recording: Recording?
 }
 
 extension MockCreateMessage {
@@ -66,7 +68,8 @@ extension MockCreateMessage {
             createdAt: createdAt,
             status: user.isCurrentUser ? status : nil,
             text: text,
-            images: images
+            images: images,
+            recording: recording
         )
     }
 }
@@ -83,9 +86,10 @@ extension DraftMessage {
     func toMockCreateMessage() -> MockCreateMessage {
         MockCreateMessage(
             uid: id,
-            text: text,
             createdAt: createdAt,
-            images: makeMockImages()
+            text: text,
+            images: makeMockImages(),
+            recording: recording
         )
     }
 }

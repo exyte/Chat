@@ -13,4 +13,15 @@ extension DateFormatter {
 
         return formatter
     }()
+
+    static func timeString(_ seconds: Int) -> String {
+        let hour = Int(seconds) / 3600
+        let minute = Int(seconds) / 60 % 60
+        let second = Int(seconds) % 60
+
+        if hour > 0 {
+            return String(format: "%02i:%02i:%02i", hour, minute, second)
+        }
+        return String(format: "%02i:%02i", minute, second)
+    }
 }

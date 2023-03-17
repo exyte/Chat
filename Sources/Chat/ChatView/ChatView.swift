@@ -17,7 +17,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (any Attachment) -> Void) -> MessageContent)
 
     public typealias InputViewBuilderClosure = ((
-        Binding<String>, InputViewStyle, @escaping (InputViewAction) -> Void) -> InputViewContent)
+        Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void) -> InputViewContent)
 
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
@@ -43,7 +43,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var paginationState = PaginationState()
 
-    @State private var mediaPickerMode = MediaPickerMode.photos
     @State private var showScrollToBottom: Bool = false
 
     public init(messages: [Message],
@@ -58,22 +57,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     }
 
     public var body: some View {
-        let actionClosure: (InputViewAction) -> Void = {
-            switch $0 {
-            case .photo:
-                mediaPickerMode = .photos
-                inputViewModel.showPicker = true
-            case .add:
-                break
-            case .camera:
-                mediaPickerMode = .camera
-                inputViewModel.showPicker = true
-            case .send:
-                inputViewModel.send()
-            }
-        }
-
-        VStack(spacing: 0) {
+        VStack {
             ZStack(alignment: .bottomTrailing) {
                 list
 
@@ -83,8 +67,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                     } label: {
                         theme.images.scrollToBottom
                             .frame(width: 40, height: 40)
-                            .background(theme.colors.friendMessage)
-                            .cornerRadius(.infinity)
+                            .circleBackground(theme.colors.friendMessage)
                     }
                     .padding(8)
                 }
@@ -92,13 +75,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
             Group {
                 if let inputViewBuilder = inputViewBuilder {
-                    inputViewBuilder($inputViewModel.text, .message, actionClosure)
+                    inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction())
                 } else {
                     InputView(
-                        text: $inputViewModel.text,
-                        style: .message,
-                        canSend: inputViewModel.canSend,
-                        onAction: actionClosure
+                        viewModel: inputViewModel,
+                        style: .message
                     )
                 }
             }
@@ -121,7 +102,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             )
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(viewModel: inputViewModel, mediaPickerMode: $mediaPickerMode, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle)
+            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {

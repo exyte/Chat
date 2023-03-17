@@ -57,6 +57,8 @@ public struct ChatTheme {
         public var textDarkContext: Color
         public var textMediaPicker: Color
 
+        public var recordDot: Color
+
         public init(
             grayStatus: Color = Color(hex: "AFB3B8"),
             errorStatus: Color = Color.red,
@@ -69,7 +71,8 @@ public struct ChatTheme {
             friendMessage: Color = Color(hex: "EBEDF0"),
             textLightContext: Color = Color.black,
             textDarkContext: Color = Color.white,
-            textMediaPicker: Color = Color(hex: "818C99")
+            textMediaPicker: Color = Color(hex: "818C99"),
+            recordDot: Color = Color(hex: "F62121")
         ) {
             self.grayStatus = grayStatus
             self.errorStatus = errorStatus
@@ -83,6 +86,7 @@ public struct ChatTheme {
             self.textLightContext = textLightContext
             self.textDarkContext = textDarkContext
             self.textMediaPicker = textMediaPicker
+            self.recordDot = recordDot
         }
     }
 
