@@ -18,8 +18,31 @@ struct MessageView: View {
     let avatarSize: CGFloat
     let messageUseMarkdown: Bool
 
-    var messageWidth: CGFloat {
-        message.text.width(withConstrainedHeight: 1, font: .preferredFont(forTextStyle: .body))
+    @State var avatarViewSize: CGSize = .zero
+    @State var statusSize: CGSize = .zero
+    @State var timeSize: CGSize = .zero
+
+    static let widthWithMedia: CGFloat = 204
+    static let horizontalAvatarPadding: CGFloat = 8
+    static let horizontalTextPadding: CGFloat = 12
+    static let statusViewSize: CGFloat = 14
+    static let horizontalStatusPadding: CGFloat = 8
+    static let horizontalBubblePadding: CGFloat = 8
+
+    var dateFits: Bool {
+        let timeWidth = timeSize.width + 10
+        let textPaddings = MessageView.horizontalTextPadding * 2
+        let widthWithoutMedia = UIScreen.main.bounds.width
+            - avatarViewSize.width
+            - statusSize.width
+            - MessageView.horizontalBubblePadding
+            - textPaddings
+        let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
+        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: .preferredFont(forTextStyle: .body))
+        let lastLineWidth = message.text.lastLineMaxX(labelWidth: maxWidth, font: .preferredFont(forTextStyle: .body))
+
+        print(message.text.prefix(6), timeWidth, statusSize.width, avatarViewSize.width, maxWidth, finalWidth, lastLineWidth)
+        return lastLineWidth + CGFloat(timeWidth) < finalWidth
     }
 
     var showAvatar: Bool {
@@ -37,10 +60,11 @@ struct MessageView: View {
                     if showAvatar {
                         AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
                     } else {
-                        Color.clear.frame(width: avatarSize)
+                        Color.clear.viewSize(avatarSize)
                     }
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, MessageView.horizontalAvatarPadding)
+                .sizeGetter($avatarViewSize)
             } else {
                 Spacer()
             }
@@ -53,6 +77,7 @@ struct MessageView: View {
                     .overlay(alignment: .bottomTrailing) {
                         if message.text.isEmpty {
                             messageTimeView(isOverlay: true)
+                                .padding(4)
                         }
                     }
                     .contentShape(Rectangle())
@@ -60,16 +85,38 @@ struct MessageView: View {
                 }
 
                 if !message.text.isEmpty {
-                    if messageWidth >= UIScreen.main.bounds.width * 0.7 {
-                        VStack(alignment: .trailing, spacing: 0) {
-                            MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                            messageTimeView()
-                        }
-                        .border(Color.red, width: 2)
-                    } else {
-                        HStack(alignment: .bottom, spacing: 0) {
-                            MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                            messageTimeView()
+                    Group {
+                        if !dateFits {
+                            VStack(alignment: .trailing, spacing: 4) {
+                                HStack {
+                                    MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                                        .padding(.horizontal, MessageView.horizontalTextPadding)
+                                    if !message.attachments.isEmpty {
+                                        Spacer()
+                                    }
+                                }
+                                HStack {
+                                    if !message.attachments.isEmpty {
+                                        Spacer()
+                                    }
+                                    messageTimeView()
+                                }
+                            }
+                            .padding(.vertical, 8)
+                        } else {
+                            HStack {
+                                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                                    .padding(.horizontal, MessageView.horizontalTextPadding)
+                                if !message.attachments.isEmpty {
+                                    Spacer()
+                                }
+                            }
+                            .padding(.vertical, 8)
+                            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
+                            .overlay(alignment: .bottomTrailing) {
+                                messageTimeView()
+                                    .padding(4)
+                            }
                         }
                     }
                 }
@@ -89,7 +136,7 @@ struct MessageView: View {
                     }
                 }
             }
-            .frame(width: message.attachments.isEmpty ? nil : 204)
+            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
                 if !message.text.isEmpty || message.recording != nil {
@@ -97,12 +144,13 @@ struct MessageView: View {
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                 }
             }
-            .padding(message.user.isCurrentUser ? .leading : .trailing, 20)
+            .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
 
             if message.user.isCurrentUser, let status = message.status {
                 MessageStatusView(status: status) {
                     viewModel.sendMessage(message.toDraft())
                 }
+                .sizeGetter($statusSize)
             }
 
             if !message.user.isCurrentUser {
@@ -118,7 +166,7 @@ struct MessageView: View {
             isCurrentUser: message.user.isCurrentUser,
             isOverlay: isOverlay
         )
-        .padding(4)
+        .sizeGetter($timeSize)
     }
 }
 
@@ -128,7 +176,7 @@ struct MessageView_Preview: PreviewProvider {
 
     static private var message = Message(
         id: UUID().uuidString,
-        user: User(id: UUID().uuidString, avatarURL: nil, isCurrentUser: false),
+        user: User(id: UUID().uuidString, name: "Stan", avatarURL: nil, isCurrentUser: false),
         status: .read,
         text: longMessage,
         attachments: [

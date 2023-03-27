@@ -20,6 +20,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var inputViewBuilder: InputViewBuilderClosure?
     var assetsPickerLimit: Int
     var chatTitle: String?
+    var messageUseMarkdown: Bool
 
     var showingAlbums: Bool {
         inputViewModel.mediaPickerMode == .albums
@@ -60,7 +61,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             } else {
                 InputView(
                     viewModel: inputViewModel,
-                    style: .signature
+                    style: .signature,
+                    messageUseMarkdown: messageUseMarkdown
                 )
             }
         }

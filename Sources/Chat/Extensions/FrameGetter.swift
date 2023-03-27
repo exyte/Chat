@@ -54,3 +54,26 @@ extension View {
         modifier(SizeGetter(size: size))
     }
 }
+
+struct MessageMenuPreferenceKey: PreferenceKey {
+    typealias Value = [String: CGRect]
+
+    static var defaultValue: Value = [:]
+
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value.merge(nextValue()) { (_, new) in new }
+    }
+}
+
+struct MessageMenuPreferenceViewSetter: View {
+    let id: String
+
+    var body: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(Color.clear)
+                .preference(key: MessageMenuPreferenceKey.self,
+                            value: [id: geometry.frame(in: .global)])
+        }
+    }
+}

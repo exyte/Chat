@@ -18,7 +18,7 @@ struct AvatarView: View {
         } placeholder: {
             Rectangle().fill(Color.gray)
         }
-        .frame(width: avatarSize, height: avatarSize)
+        .viewSize(avatarSize)
         .clipShape(Circle())
     }
 }

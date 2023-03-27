@@ -195,22 +195,13 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
-                Group {
-                    if let messageBuilder = messageBuilder {
-                        messageBuilder(row.message, row.positionInGroup) { attachment in
-                            self.viewModel.presentAttachmentFullScreen(attachment)
-                        }
-                    } else {
-                        MessageView(
-                            viewModel: viewModel,
-                            message: row.message,
-                            positionInGroup: row.positionInGroup,
-                            avatarSize: avatarSize,
-                            messageUseMarkdown: messageUseMarkdown)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown)
+                    .background(MessageMenuPreferenceViewSetter(id: row.id))
+                    .rotationEffect(Angle(degrees: 180))
+                    .onTapGesture { }
+                    .onLongPressGesture {
+                        self.viewModel.messageMenuRow = row
                     }
-                }
-                .id(row.message.id)
-                .rotationEffect(Angle(degrees: 180))
             }
             .minSize(width: 0, height: 0)
             .margins(.all, 0)

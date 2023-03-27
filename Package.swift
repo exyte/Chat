@@ -27,6 +27,10 @@ let package = Package(
             url: "https://github.com/exyte/MediaPicker.git",
             from: "0.0.1"
         ),
+        .package(
+            url: "https://github.com/exyte/FloatingButton",
+            from: "1.0.1"
+        ),
     ],
     targets: [
         .target(
@@ -34,7 +38,8 @@ let package = Package(
             dependencies: [
                 .product(name: "Introspect", package: "SwiftUI-Introspect"),
                 .product(name: "CachedAsyncImage", package: "swiftui-cached-async-image"),
-                .product(name: "MediaPicker", package: "MediaPicker")
+                .product(name: "MediaPicker", package: "MediaPicker"),
+                .product(name: "FloatingButton", package: "FloatingButton")
             ]
         ),
         .testTarget(

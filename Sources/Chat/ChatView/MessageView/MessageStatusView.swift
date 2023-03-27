@@ -17,18 +17,15 @@ struct MessageStatusView: View {
             case .sending:
                 theme.images.message.sending
                     .resizable()
-                    .frame(width: 14, height: 14)
                     .rotationEffect(.degrees(90))
                     .foregroundColor(theme.colors.grayStatus)
             case .sent:
                 theme.images.message.checkmarks
                     .resizable()
-                    .frame(width: 14, height: 14)
                     .foregroundColor(theme.colors.grayStatus)
             case .read:
                 theme.images.message.checkmarks
                     .resizable()
-                    .frame(width: 14, height: 14)
                     .foregroundColor(theme.colors.myMessage)
             case .error:
                 Button {
@@ -36,12 +33,12 @@ struct MessageStatusView: View {
                 } label: {
                     theme.images.message.error
                         .resizable()
-                        .frame(width: 14, height: 14)
                 }
                 .foregroundColor(theme.colors.errorStatus)
             }
         }
-        .padding(.trailing, 8)
+        .viewSize(MessageView.statusViewSize)
+        .padding(.trailing, MessageView.horizontalStatusPadding)
     }
 }
 

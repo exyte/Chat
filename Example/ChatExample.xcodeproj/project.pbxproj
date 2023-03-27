@@ -62,6 +62,7 @@
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
 		13F1C0F1286ADD8900D25D8A /* MockImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImage.swift; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		5B8A67B529CD7CB30079E0BE /* FloatingButton */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FloatingButton; path = ../../FloatingButton; sourceTree = "<group>"; };
 		5BAF32AC299CBCA5006FE98A /* MediaPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MediaPicker; path = ../../MediaPicker; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -140,6 +141,7 @@
 		1376F7A5286466770016CD1B /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				5B8A67B529CD7CB30079E0BE /* FloatingButton */,
 				5BAF32AC299CBCA5006FE98A /* MediaPicker */,
 				1376F7A6286466770016CD1B /* Chat */,
 			);

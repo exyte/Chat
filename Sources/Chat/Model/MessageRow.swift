@@ -15,3 +15,10 @@ struct MessageRow: Equatable {
     let message: Message
     let positionInGroup: PositionInGroup
 }
+
+extension MessageRow: Identifiable {
+    public typealias ID = String
+    public var id: String {
+        return message.id
+    }
+}

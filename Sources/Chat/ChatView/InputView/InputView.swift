@@ -60,6 +60,7 @@ public struct InputViewAttachments {
     public var text: String = ""
     public var medias: [Media] = []
     public var recording: Recording?
+    public var replyMessage: Message?
 }
 
 public struct Recording {
@@ -74,6 +75,7 @@ struct InputView: View {
 
     @ObservedObject var viewModel: InputViewModel
     let style: InputViewStyle
+    let messageUseMarkdown: Bool
 
     private var onAction: (InputViewAction) -> Void {
         viewModel.inputViewAction()
@@ -94,21 +96,24 @@ struct InputView: View {
     @State private var dragStart: Date?
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 10) {
-            HStack(alignment: .bottom, spacing: 0) {
-                leftView
-                middleView
-                rigthView
-            }
-            .background {
-                RoundedRectangle(cornerRadius: 18)
-                    .fill(backgroundColor)
-            }
+        VStack {
+            viewOnTop
+            HStack(alignment: .bottom, spacing: 10) {
+                HStack(alignment: .bottom, spacing: 0) {
+                    leftView
+                    middleView
+                    rightView
+                }
+                .background {
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(backgroundColor)
+                }
 
-            rigthOutsideButton
+                rigthOutsideButton
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 5)
     }
 
     @ViewBuilder
@@ -143,7 +148,7 @@ struct InputView: View {
     }
 
     @ViewBuilder
-    var rigthView: some View {
+    var rightView: some View {
         Group {
             switch state {
             case .empty:
@@ -192,6 +197,50 @@ struct InputView: View {
             }
         }
         .viewSize(48)
+    }
+
+    @ViewBuilder
+    var viewOnTop: some View {
+        if let message = viewModel.attachments.replyMessage {
+            VStack(spacing: 8) {
+                Rectangle()
+                    .foregroundColor(theme.colors.friendMessage)
+                    .frame(height: 2)
+
+                HStack {
+                    theme.images.reply.replyToMessage
+                    Capsule()
+                        .foregroundColor(theme.colors.myMessage)
+                        .frame(width: 2)
+                    VStack(alignment: .leading) {
+                        Text("Reply to \(message.user.name)")
+                            .font(.caption2)
+                            .foregroundColor(theme.colors.buttonBackground)
+                        textView(message.text)
+                            .font(.caption2)
+                            .lineLimit(1)
+                    }
+                    .padding(.vertical, 2)
+                    Spacer()
+                    theme.images.reply.cancelReply
+                        .onTapGesture {
+                            viewModel.attachments.replyMessage = nil
+                        }
+                }
+                .padding(.horizontal, 26)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    @ViewBuilder
+    func textView(_ text: String) -> some View {
+        if messageUseMarkdown,
+           let attributed = try? AttributedString(markdown: text) {
+            Text(attributed)
+        } else {
+            Text(text)
+        }
     }
 
     var attachButton: some View {

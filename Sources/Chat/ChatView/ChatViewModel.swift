@@ -12,6 +12,8 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var fullscreenAttachmentItem: Optional<any Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
+    @Published var messageMenuRow: MessageRow?
+
     public var didSendMessage: (DraftMessage) -> Void = {_ in}
     
     func presentAttachmentFullScreen(_ attachment: any Attachment) {

@@ -21,6 +21,34 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
         }
+//        messageBuilder: { message, _, _ in
+//            Text(message.text)
+//                .background(Color.green)
+//                .cornerRadius(10)
+//                .padding(10)
+//        }
+//        inputViewBuilder: { textBinding, attachments, state, style, actionClosure in
+//            Group {
+//                switch style {
+//                case .message:
+//                    VStack {
+//                        HStack {
+//                            Button("Send") { actionClosure(.send) }
+//                            Button("Attach") { actionClosure(.photo) }
+//                        }
+//                        TextField("aa", text: textBinding)
+//                    }
+//                case .signature:
+//                    VStack {
+//                        HStack {
+//                            Button("Send") { actionClosure(.send) }
+//                        }
+//                        TextField("bb", text: textBinding)
+//                            .background(Color.green)
+//                    }
+//                }
+//            }
+//        }
         .enableLoadMore(offset: 3) { message in
             viewModel.loadMoreMessage(before: message)
         }

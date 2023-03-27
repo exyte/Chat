@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MediaPicker
+import FloatingButton
 
 public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
@@ -21,6 +22,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
+
+    @Namespace private var messageAnimation
 
     let didSendMessage: (DraftMessage) -> Void
 
@@ -44,6 +47,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var paginationState = PaginationState()
 
     @State private var showScrollToBottom: Bool = false
+
+    @State private var isShowingMenu = false
+    @State private var wholeMenuSize: CGSize = .zero
+    @State private var cellFrames = [String: CGRect]()
+    @State private var menuCellPosition: CGPoint = .zero
+    @State private var menuBgOpacity: CGFloat = 0
+    @State private var menuCellOpacity: CGFloat = 0
 
     public init(messages: [Message],
                 didSendMessage: @escaping (DraftMessage) -> Void,
@@ -79,7 +89,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 } else {
                     InputView(
                         viewModel: inputViewModel,
-                        style: .message
+                        style: .message,
+                        messageUseMarkdown: messageUseMarkdown
                     )
                 }
             }
@@ -102,7 +113,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             )
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle)
+            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {
@@ -110,7 +121,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 globalFocusState.focus = nil
             }
         }
-        .scrollDismissesKeyboard(.immediately)
     }
 
     var list: some View {
@@ -123,6 +133,43 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                sections: sections,
                ids: ids
         )
+        .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
+            if let row = viewModel.messageMenuRow {
+                ZStack(alignment: .topLeading) {
+                    Color.white
+                        .opacity(menuBgOpacity)
+                    MessageMenu(
+                        isShowingMenu: $isShowingMenu,
+                        wholeMenuSize: $wholeMenuSize,
+                        alignment: row.message.user.isCurrentUser ? .right : .left,
+                        leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
+                        trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
+                            ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown)
+                                .onTapGesture {
+                                    hideMessageMenu()
+                                }
+                        } onAction: { action in
+                            onMessageMenuAction(row: row, action: action)
+                        }
+                        .position(menuCellPosition)
+                        .opacity(menuCellOpacity)
+                        .onAppear {
+                            DispatchQueue.main.async {
+                                if let frame = cellFrames[row.id] {
+                                    showMessageMenu(frame)
+                                }
+                            }
+                        }
+                }
+                .ignoresSafeArea(.all)
+                .onTapGesture {
+                    hideMessageMenu()
+                }
+            }
+        }
+        .onPreferenceChange(MessageMenuPreferenceKey.self) {
+            self.cellFrames = $0
+        }
         .onTapGesture {
             globalFocusState.focus = nil
         }
@@ -134,6 +181,44 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                     NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                 }
             }
+        }
+    }
+
+    func showMessageMenu(_ cellFrame: CGRect) {
+        menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.midY)
+        menuCellOpacity = 1
+
+        var finalCellPosition = menuCellPosition
+        if cellFrame.minY + wholeMenuSize.height > UIScreen.main.bounds.height {
+            finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuSize.height)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            withAnimation(.linear(duration: 0.1)) {
+                menuBgOpacity = 0.9
+                menuCellPosition = finalCellPosition
+                isShowingMenu = true
+            }
+        }
+    }
+
+    func hideMessageMenu() {
+        withAnimation(.linear(duration: 0.1)) {
+            menuCellOpacity = 0
+            menuBgOpacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            viewModel.messageMenuRow = nil
+            isShowingMenu = false
+        }
+    }
+
+    func onMessageMenuAction(row: MessageRow, action: MessageMenuAction) {
+        hideMessageMenu()
+
+        switch action {
+        case .reply:
+            inputViewModel.attachments.replyMessage = row.message
         }
     }
 }
