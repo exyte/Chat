@@ -15,7 +15,6 @@ struct MessageTextView: View {
     var body: some View {
         if let text = text, !text.isEmpty {
             textView(text)
-                .font(.body)
         }
     }
 

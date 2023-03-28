@@ -60,7 +60,7 @@ public struct InputViewAttachments {
     public var text: String = ""
     public var medias: [Media] = []
     public var recording: Recording?
-    public var replyMessage: Message?
+    public var replyMessage: ReplyMessage?
 }
 
 public struct Recording {

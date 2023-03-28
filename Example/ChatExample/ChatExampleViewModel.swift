@@ -58,6 +58,7 @@ struct MockCreateMessage {
     let text: String
     let images: [MockImage]
     let recording: Recording?
+    let replyMessage: ReplyMessage?
 }
 
 extension MockCreateMessage {
@@ -69,7 +70,8 @@ extension MockCreateMessage {
             status: user.isCurrentUser ? status : nil,
             text: text,
             images: images,
-            recording: recording
+            recording: recording,
+            replyMessage: replyMessage
         )
     }
 }
@@ -89,7 +91,8 @@ extension DraftMessage {
             createdAt: createdAt,
             text: text,
             images: makeMockImages(),
-            recording: recording
+            recording: recording,
+            replyMessage: replyMessage
         )
     }
 }

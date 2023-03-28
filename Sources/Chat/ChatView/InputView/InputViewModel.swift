@@ -179,6 +179,7 @@ private extension InputViewModel {
                     text: attachments.text,
                     attachments: $0,
                     recording: attachments.recording,
+                    replyMessage: attachments.replyMessage,
                     createdAt: Date()
                 )
             }

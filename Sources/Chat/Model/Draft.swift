@@ -9,6 +9,7 @@ public struct DraftMessage {
     public let text: String
     public let attachments: [any Attachment]
     public let recording: Recording?
+    public let replyMessage: ReplyMessage?
     public let createdAt: Date
 }
 
@@ -19,6 +20,7 @@ extension Message {
             text: text,
             attachments: attachments,
             recording: recording,
+            replyMessage: replyMessage,
             createdAt: Date()
         )
     }

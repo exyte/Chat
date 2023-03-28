@@ -39,7 +39,8 @@ final class MockChatData {
             status: sender.isCurrentUser ? .read : nil,
             text: shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : "",
             images: images,
-            recording: nil
+            recording: nil,
+            replyMessage: nil
         )
     }
 

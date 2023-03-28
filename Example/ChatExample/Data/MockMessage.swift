@@ -14,6 +14,7 @@ struct MockMessage {
     let text: String
     let images: [MockImage]
     let recording: Recording?
+    let replyMessage: ReplyMessage?
 }
 
 extension MockMessage {
@@ -25,7 +26,8 @@ extension MockMessage {
             createdAt: createdAt,
             text: text,
             attachments: images.map { $0.toChatAttachment() },
-            recording: recording
+            recording: recording,
+            replyMessage: replyMessage
         )
     }
 }

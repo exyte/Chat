@@ -218,7 +218,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
         switch action {
         case .reply:
-            inputViewModel.attachments.replyMessage = row.message
+            inputViewModel.attachments.replyMessage = row.message.toReplyMessage()
         }
     }
 }

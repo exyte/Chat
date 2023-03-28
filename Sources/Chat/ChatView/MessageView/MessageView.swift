@@ -33,10 +33,10 @@ struct MessageView: View {
         let timeWidth = timeSize.width + 10
         let textPaddings = MessageView.horizontalTextPadding * 2
         let widthWithoutMedia = UIScreen.main.bounds.width
-            - avatarViewSize.width
-            - statusSize.width
-            - MessageView.horizontalBubblePadding
-            - textPaddings
+        - avatarViewSize.width
+        - statusSize.width
+        - MessageView.horizontalBubblePadding
+        - textPaddings
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
         let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: .preferredFont(forTextStyle: .body))
         let lastLineWidth = message.text.lastLineMaxX(labelWidth: maxWidth, font: .preferredFont(forTextStyle: .body))
@@ -56,95 +56,23 @@ struct MessageView: View {
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             if !message.user.isCurrentUser {
-                Group {
-                    if showAvatar {
-                        AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
-                    } else {
-                        Color.clear.viewSize(avatarSize)
-                    }
-                }
-                .padding(.horizontal, MessageView.horizontalAvatarPadding)
-                .sizeGetter($avatarViewSize)
+                avatarView
             } else {
                 Spacer()
             }
 
-            VStack(alignment: .leading, spacing: 0) {
-                if !message.attachments.isEmpty {
-                    AttachmentsGrid(attachments: message.attachments) {
-                        viewModel.presentAttachmentFullScreen($0)
-                    }
-                    .overlay(alignment: .bottomTrailing) {
-                        if message.text.isEmpty {
-                            messageTimeView(isOverlay: true)
-                                .padding(4)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .layoutPriority(2)
-                }
-
-                if !message.text.isEmpty {
-                    Group {
-                        if !dateFits {
-                            VStack(alignment: .trailing, spacing: 4) {
-                                HStack {
-                                    MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                                        .padding(.horizontal, MessageView.horizontalTextPadding)
-                                    if !message.attachments.isEmpty {
-                                        Spacer()
-                                    }
-                                }
-                                HStack {
-                                    if !message.attachments.isEmpty {
-                                        Spacer()
-                                    }
-                                    messageTimeView()
-                                }
-                            }
-                            .padding(.vertical, 8)
-                        } else {
-                            HStack {
-                                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                                    .padding(.horizontal, MessageView.horizontalTextPadding)
-                                if !message.attachments.isEmpty {
-                                    Spacer()
-                                }
-                            }
-                            .padding(.vertical, 8)
-                            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
-                            .overlay(alignment: .bottomTrailing) {
-                                messageTimeView()
-                                    .padding(4)
-                            }
-                        }
+            VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 2) {
+                if let reply = message.replyMessage?.toMessage() {
+                    HStack {
+                        Capsule()
+                            .foregroundColor(theme.colors.buttonBackground)
+                            .frame(width: 2)
+                        replyBubbleView(reply)
+                            .opacity(0.5)
                     }
                 }
-
-                if let recording = message.recording {
-                    VStack(alignment: .trailing, spacing: 0) {
-                        RecordWaveformWithButtons(
-                            recording: recording,
-                            colorButton: message.user.isCurrentUser ? theme.colors.myMessage : .white,
-                            colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
-                            colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
-                        )
-                        .padding(.horizontal, 12)
-                        .padding(.top, 8)
-
-                        messageTimeView()
-                    }
-                }
+                bubbleView(message)
             }
-            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
-            .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
-            .background {
-                if !message.text.isEmpty || message.recording != nil {
-                    RoundedRectangle(cornerRadius: 20)
-                        .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
-                }
-            }
-            .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
 
             if message.user.isCurrentUser, let status = message.status {
                 MessageStatusView(status: status) {
@@ -160,6 +88,131 @@ struct MessageView: View {
         .padding(.top, topPadding)
     }
 
+    @ViewBuilder
+    func bubbleView(_ message: Message) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if !message.attachments.isEmpty {
+                attachmentsView(message)
+            }
+
+            if !message.text.isEmpty {
+                textWithDateView(message)
+                    .font(.body)
+            }
+
+            if let recording = message.recording {
+                recordingView(recording)
+            }
+        }
+        .bubbleBackground(message, theme: theme)
+    }
+
+    @ViewBuilder
+    func replyBubbleView(_ message: Message) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(message.user.name)
+                .fontWeight(.semibold)
+
+            if !message.attachments.isEmpty {
+                attachmentsView(message)
+            }
+
+            if !message.text.isEmpty {
+                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+            }
+
+            if let recording = message.recording {
+                recordingView(recording)
+            }
+        }
+        .font(.caption2)
+        .padding(.horizontal, MessageView.horizontalTextPadding)
+        .padding(.vertical, 8)
+        .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
+        .bubbleBackground(message, theme: theme)
+    }
+
+    @ViewBuilder
+    var avatarView: some View {
+        Group {
+            if showAvatar {
+                AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
+            } else {
+                Color.clear.viewSize(avatarSize)
+            }
+        }
+        .padding(.horizontal, MessageView.horizontalAvatarPadding)
+        .sizeGetter($avatarViewSize)
+    }
+
+    @ViewBuilder
+    func attachmentsView(_ message: Message) -> some View {
+        AttachmentsGrid(attachments: message.attachments) {
+            viewModel.presentAttachmentFullScreen($0)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if message.text.isEmpty {
+                messageTimeView(isOverlay: true)
+                    .padding(4)
+            }
+        }
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    func textWithDateView(_ message: Message) -> some View {
+        Group {
+            if !dateFits {
+                VStack(alignment: .trailing, spacing: 4) {
+                    HStack {
+                        MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                            .padding(.horizontal, MessageView.horizontalTextPadding)
+                        if !message.attachments.isEmpty {
+                            Spacer()
+                        }
+                    }
+                    HStack {
+                        if !message.attachments.isEmpty {
+                            Spacer()
+                        }
+                        messageTimeView()
+                    }
+                }
+                .padding(.vertical, 8)
+            } else {
+                HStack {
+                    MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                        .padding(.horizontal, MessageView.horizontalTextPadding)
+                    if !message.attachments.isEmpty {
+                        Spacer()
+                    }
+                }
+                .padding(.vertical, 8)
+                .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
+                .overlay(alignment: .bottomTrailing) {
+                    messageTimeView()
+                        .padding(4)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    func recordingView(_ recording: Recording) -> some View {
+        VStack(alignment: .trailing, spacing: 0) {
+            RecordWaveformWithButtons(
+                recording: recording,
+                colorButton: message.user.isCurrentUser ? theme.colors.myMessage : .white,
+                colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
+                colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
+            )
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+
+            messageTimeView()
+        }
+    }
+
     func messageTimeView(isOverlay: Bool = false) -> some View {
         MessageTimeView(
             text: message.time,
@@ -167,6 +220,21 @@ struct MessageView: View {
             isOverlay: isOverlay
         )
         .sizeGetter($timeSize)
+    }
+}
+
+extension View {
+    func bubbleBackground(_ message: Message, theme: ChatTheme) -> some View {
+        self
+            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
+            .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
+            .background {
+                if !message.text.isEmpty || message.recording != nil {
+                    RoundedRectangle(cornerRadius: 20)
+                        .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
+                }
+            }
+            .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
     }
 }
 
