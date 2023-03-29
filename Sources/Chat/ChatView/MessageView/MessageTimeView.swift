@@ -14,8 +14,8 @@ struct MessageTimeView: View {
             .font(.caption)
             .foregroundColor(textColor)
             .opacity(isOverlay ? 0.8 : 0.4)
-            .padding(.vertical, 4)
-            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
+            .padding(.horizontal, 12)
             .background {
                 if isOverlay {
                     RoundedRectangle(cornerRadius: 2)

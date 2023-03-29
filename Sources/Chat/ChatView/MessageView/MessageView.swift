@@ -27,9 +27,15 @@ struct MessageView: View {
     static let horizontalTextPadding: CGFloat = 12
     static let statusViewSize: CGFloat = 14
     static let horizontalStatusPadding: CGFloat = 8
-    static let horizontalBubblePadding: CGFloat = 8
+    static let horizontalBubblePadding: CGFloat = 20
 
-    var dateFits: Bool {
+    let fontSize: CGFloat = 15
+
+    enum DateArrangment {
+        case hstack, vstack, overlay
+    }
+
+    var dateArrangment: DateArrangment {
         let timeWidth = timeSize.width + 10
         let textPaddings = MessageView.horizontalTextPadding * 2
         let widthWithoutMedia = UIScreen.main.bounds.width
@@ -38,11 +44,18 @@ struct MessageView: View {
         - MessageView.horizontalBubblePadding
         - textPaddings
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
-        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: .preferredFont(forTextStyle: .body))
-        let lastLineWidth = message.text.lastLineMaxX(labelWidth: maxWidth, font: .preferredFont(forTextStyle: .body))
+        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize))
+        let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize))
 
         print(message.text.prefix(6), timeWidth, statusSize.width, avatarViewSize.width, maxWidth, finalWidth, lastLineWidth)
-        return lastLineWidth + CGFloat(timeWidth) < finalWidth
+
+        if lastLineWidth + CGFloat(timeWidth) < finalWidth {
+            return .overlay
+        }
+        if finalWidth + CGFloat(timeWidth) < maxWidth {
+            return .hstack
+        }
+        return .vstack
     }
 
     var showAvatar: Bool {
@@ -96,8 +109,8 @@ struct MessageView: View {
             }
 
             if !message.text.isEmpty {
-                textWithDateView(message)
-                    .font(.body)
+                textWithTimeView(message)
+                    .font(.system(size: fontSize))
             }
 
             if let recording = message.recording {
@@ -160,39 +173,36 @@ struct MessageView: View {
     }
 
     @ViewBuilder
-    func textWithDateView(_ message: Message) -> some View {
+    func textWithTimeView(_ message: Message) -> some View {
+        let messageView = MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+            .padding(.horizontal, MessageView.horizontalTextPadding)
+            .padding(.vertical, 8)
+
         Group {
-            if !dateFits {
+            switch dateArrangment {
+            case .vstack:
                 VStack(alignment: .trailing, spacing: 4) {
-                    HStack {
-                        MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                            .padding(.horizontal, MessageView.horizontalTextPadding)
-                        if !message.attachments.isEmpty {
-                            Spacer()
-                        }
-                    }
-                    HStack {
-                        if !message.attachments.isEmpty {
-                            Spacer()
-                        }
-                        messageTimeView()
-                    }
+                    messageView
+                        .alignLeft(message)
+                    messageTimeView()
+                        .alignRight(message)
                 }
-                .padding(.vertical, 8)
-            } else {
-                HStack {
-                    MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                        .padding(.horizontal, MessageView.horizontalTextPadding)
+            case .hstack:
+                HStack(alignment: .bottom, spacing: 8) {
+                    messageView
                     if !message.attachments.isEmpty {
                         Spacer()
                     }
-                }
-                .padding(.vertical, 8)
-                .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
-                .overlay(alignment: .bottomTrailing) {
                     messageTimeView()
-                        .padding(4)
                 }
+            case .overlay:
+                messageView
+                    .alignLeft(message)
+                    .padding(.bottom, 8)
+                    .overlay(alignment: .bottomTrailing) {
+                        messageTimeView()
+                            .alignRight(message)
+                    }
             }
         }
     }
@@ -206,7 +216,7 @@ struct MessageView: View {
                 colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
                 colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
             )
-            .padding(.horizontal, 12)
+            .padding(.horizontal, MessageView.horizontalTextPadding)
             .padding(.top, 8)
 
             messageTimeView()
@@ -235,6 +245,24 @@ extension View {
                 }
             }
             .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
+    }
+
+    func alignLeft(_ message: Message) -> some View {
+        HStack {
+            self
+            if !message.attachments.isEmpty {
+                Spacer()
+            }
+        }
+    }
+
+    func alignRight(_ message: Message) -> some View {
+        HStack {
+            if !message.attachments.isEmpty {
+                Spacer()
+            }
+            self
+        }
     }
 }
 

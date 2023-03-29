@@ -22,7 +22,7 @@ extension String {
         return NSAttributedString(str)
     }
 
-    public func lastLineMaxX(labelWidth: CGFloat, font: UIFont) -> CGFloat {
+    public func lastLineWidth(labelWidth: CGFloat, font: UIFont) -> CGFloat {
         // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
         let attrString = toAttrString(font: font)
         let labelSize = CGSize(width: labelWidth, height: .infinity)
