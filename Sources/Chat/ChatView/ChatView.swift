@@ -187,13 +187,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     func showMessageMenu(_ cellFrame: CGRect) {
         menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.midY)
         menuCellOpacity = 1
-
-        var finalCellPosition = menuCellPosition
-        if cellFrame.minY + wholeMenuSize.height > UIScreen.main.bounds.height {
-            finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuSize.height)
-        }
-
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            var finalCellPosition = menuCellPosition
+            if cellFrame.minY + wholeMenuSize.height > UIScreen.main.bounds.height {
+                finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuSize.height + cellFrame.height/2 - 20
+                )
+            }
+
             withAnimation(.linear(duration: 0.1)) {
                 menuBgOpacity = 0.9
                 menuCellPosition = finalCellPosition
