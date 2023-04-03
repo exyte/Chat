@@ -1,25 +1,41 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "swiftui-cached-async-image",
-        "repositoryURL": "https://github.com/lorenzofiamingo/swiftui-cached-async-image.git",
-        "state": {
-          "branch": null,
-          "revision": "467a3d17479887943ab917a379e62bbaff60ac8a",
-          "version": "2.1.1"
-        }
-      },
-      {
-        "package": "Introspect",
-        "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect.git",
-        "state": {
-          "branch": null,
-          "revision": "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
-          "version": "0.2.3"
-        }
+  "pins" : [
+    {
+      "identity" : "floatingbutton",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/FloatingButton",
+      "state" : {
+        "revision" : "742705af8a33956406e10a2a033ef295d23e58f2",
+        "version" : "1.1.4"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "mediapicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/MediaPicker.git",
+      "state" : {
+        "revision" : "10f4996131764cab509d1ceb67bc77750ad32433",
+        "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "swiftui-cached-async-image",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lorenzofiamingo/swiftui-cached-async-image.git",
+      "state" : {
+        "revision" : "467a3d17479887943ab917a379e62bbaff60ac8a",
+        "version" : "2.1.1"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
+      "state" : {
+        "revision" : "c18951c747ab62af7c15e17a81bd37d4fd5a9979",
+        "version" : "0.2.3"
+      }
+    }
+  ],
+  "version" : 2
 }

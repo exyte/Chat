@@ -25,7 +25,6 @@
 		13F1C0F2286ADD8900D25D8A /* MockImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockImage.swift */; };
 		5B06E7922991116F002C7061 /* Chat in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 1376F7AA286467700016CD1B /* Chat */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5B6D3A732987D85A00765148 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+Extension.swift */; };
-		5BAF32AE299CBCC1006FE98A /* MediaPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BAF32AD299CBCC1006FE98A /* MediaPicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,8 +61,6 @@
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
 		13F1C0F1286ADD8900D25D8A /* MockImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImage.swift; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
-		5B8A67B529CD7CB30079E0BE /* FloatingButton */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FloatingButton; path = ../../FloatingButton; sourceTree = "<group>"; };
-		5BAF32AC299CBCA5006FE98A /* MediaPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MediaPicker; path = ../../MediaPicker; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,7 +69,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1376F7AB286467700016CD1B /* Chat in Frameworks */,
-				5BAF32AE299CBCC1006FE98A /* MediaPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,8 +137,6 @@
 		1376F7A5286466770016CD1B /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				5B8A67B529CD7CB30079E0BE /* FloatingButton */,
-				5BAF32AC299CBCA5006FE98A /* MediaPicker */,
 				1376F7A6286466770016CD1B /* Chat */,
 			);
 			name = Packages;
@@ -213,7 +207,6 @@
 			name = ChatExample;
 			packageProductDependencies = (
 				1376F7AA286467700016CD1B /* Chat */,
-				5BAF32AD299CBCC1006FE98A /* MediaPicker */,
 			);
 			productName = ChatExample;
 			productReference = 135549302864620900C9459A /* ChatExample.app */;
@@ -494,10 +487,6 @@
 		1376F7AA286467700016CD1B /* Chat */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Chat;
-		};
-		5BAF32AD299CBCC1006FE98A /* MediaPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = MediaPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
