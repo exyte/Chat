@@ -14,16 +14,15 @@ struct MessageTimeView: View {
             .font(.caption)
             .foregroundColor(textColor)
             .opacity(isOverlay ? 0.8 : 0.4)
-            .padding(.bottom, 8)
-            .padding(.horizontal, 12)
+            .padding(.top, isOverlay ? 4 : 0)
+            .padding(.bottom, isOverlay ? 4 : 8)
+            .padding(.horizontal, isOverlay ? 8 : 12)
             .background {
                 if isOverlay {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(.black)
-                        .opacity(0.4)
+                    Capsule()
+                        .fill(.black.opacity(0.4))
                 }
             }
-            .clipShape(Capsule())
     }
 
     var textColor: Color {

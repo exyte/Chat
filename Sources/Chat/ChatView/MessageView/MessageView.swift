@@ -47,8 +47,6 @@ struct MessageView: View {
         let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize))
         let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize))
 
-        print(message.text.prefix(6), timeWidth, statusSize.width, avatarViewSize.width, maxWidth, finalWidth, lastLineWidth)
-
         if lastLineWidth + CGFloat(timeWidth) < finalWidth {
             return .overlay
         }

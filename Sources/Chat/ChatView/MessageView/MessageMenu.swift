@@ -18,7 +18,7 @@ struct MessageMenu<MainButton: View>: View {
     @Environment(\.chatTheme) private var theme
 
     @Binding var isShowingMenu: Bool
-    @Binding var wholeMenuSize: CGSize
+    @Binding var menuButtonsSize: CGSize
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
@@ -37,7 +37,7 @@ struct MessageMenu<MainButton: View>: View {
         .alignment(alignment)
         .spacing(2)
         .animation(.linear(duration: 0.2))
-        .wholeMenuSize($wholeMenuSize)
+        .menuButtonsSize($menuButtonsSize)
     }
 
     func menuButton(title: String, icon: Image, action: MessageMenuAction) -> some View {

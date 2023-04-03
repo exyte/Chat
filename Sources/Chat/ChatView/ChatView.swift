@@ -8,6 +8,7 @@
 import SwiftUI
 import MediaPicker
 import FloatingButton
+import Introspect
 
 public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
@@ -20,6 +21,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     public typealias InputViewBuilderClosure = ((
         Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void) -> InputViewContent)
 
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
 
@@ -49,11 +51,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @State private var showScrollToBottom: Bool = false
 
     @State private var isShowingMenu = false
-    @State private var wholeMenuSize: CGSize = .zero
+    @State private var needsScrollView = false
+    @State private var readyToShowScrollView = false
+    @State private var menuButtonsSize: CGSize = .zero
     @State private var cellFrames = [String: CGRect]()
     @State private var menuCellPosition: CGPoint = .zero
     @State private var menuBgOpacity: CGFloat = 0
     @State private var menuCellOpacity: CGFloat = 0
+    @State private var menuScrollView: UIScrollView?
 
     public init(messages: [Message],
                 didSendMessage: @escaping (DraftMessage) -> Void,
@@ -123,6 +128,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         }
     }
 
+    @ViewBuilder
     var list: some View {
         UIList(viewModel: viewModel,
                paginationState: paginationState,
@@ -138,30 +144,31 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 ZStack(alignment: .topLeading) {
                     Color.white
                         .opacity(menuBgOpacity)
-                    MessageMenu(
-                        isShowingMenu: $isShowingMenu,
-                        wholeMenuSize: $wholeMenuSize,
-                        alignment: row.message.user.isCurrentUser ? .right : .left,
-                        leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
-                        trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
-                            ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown)
-                                .onTapGesture {
-                                    hideMessageMenu()
-                                }
-                        } onAction: { action in
-                            onMessageMenuAction(row: row, action: action)
+                        .ignoresSafeArea(.all)
+
+                    if needsScrollView {
+                        ScrollView {
+                            messageMenu(row)
                         }
-                        .position(menuCellPosition)
-                        .opacity(menuCellOpacity)
-                        .onAppear {
+                        .introspectScrollView { scrollView in
                             DispatchQueue.main.async {
-                                if let frame = cellFrames[row.id] {
-                                    showMessageMenu(frame)
-                                }
+                                self.menuScrollView = scrollView
                             }
                         }
+                        .opacity(readyToShowScrollView ? 1 : 0)
+                    }
+                    if !needsScrollView || !readyToShowScrollView {
+                        messageMenu(row)
+                            .position(menuCellPosition)
+                    }
                 }
-                .ignoresSafeArea(.all)
+                .onAppear {
+                    DispatchQueue.main.async {
+                        if let frame = cellFrames[row.id] {
+                            showMessageMenu(frame)
+                        }
+                    }
+                }
                 .onTapGesture {
                     hideMessageMenu()
                 }
@@ -184,26 +191,62 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         }
     }
 
-    func showMessageMenu(_ cellFrame: CGRect) {
-        menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.midY)
-        menuCellOpacity = 1
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            var finalCellPosition = menuCellPosition
-            if cellFrame.minY + wholeMenuSize.height > UIScreen.main.bounds.height {
-                finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuSize.height + cellFrame.height/2 - 20
-                )
+    func messageMenu(_ row: MessageRow) -> some View {
+        MessageMenu(
+            isShowingMenu: $isShowingMenu,
+            menuButtonsSize: $menuButtonsSize,
+            alignment: row.message.user.isCurrentUser ? .right : .left,
+            leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
+            trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown)
+                    .onTapGesture {
+                        hideMessageMenu()
+                    }
+            } onAction: { action in
+                onMessageMenuAction(row: row, action: action)
             }
+            .frame(height: menuButtonsSize.height + (cellFrames[row.id]?.height ?? 0), alignment: .top)
+            .opacity(menuCellOpacity)
+    }
 
-            withAnimation(.linear(duration: 0.1)) {
-                menuBgOpacity = 0.9
-                menuCellPosition = finalCellPosition
-                isShowingMenu = true
+    func showMessageMenu(_ cellFrame: CGRect) {
+        DispatchQueue.main.async {
+            menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.midY)
+            menuCellOpacity = 1
+            let wholeMenuHeight = menuButtonsSize.height + cellFrame.height
+            let needsScrollTemp = wholeMenuHeight > UIScreen.main.bounds.height - safeAreaInsets.top - safeAreaInsets.bottom
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                var finalCellPosition = menuCellPosition
+                if cellFrame.minY + wholeMenuHeight > UIScreen.main.bounds.height {
+                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight + cellFrame.height/2 - safeAreaInsets.bottom
+                    )
+                }
+                if needsScrollTemp {
+                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight + cellFrame.height/2 - safeAreaInsets.bottom + 13
+                    )
+                }
+
+                withAnimation(.linear(duration: 0.1)) {
+                    menuBgOpacity = 0.9
+                    menuCellPosition = finalCellPosition
+                    isShowingMenu = true
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                needsScrollView = needsScrollTemp
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                readyToShowScrollView = true
+                if let menuScrollView = menuScrollView {
+                    menuScrollView.contentOffset = CGPoint(x: 0, y: menuScrollView.contentSize.height - menuScrollView.frame.height + safeAreaInsets.bottom)
+                }
             }
         }
     }
 
     func hideMessageMenu() {
+        menuScrollView = nil
         withAnimation(.linear(duration: 0.1)) {
             menuCellOpacity = 0
             menuBgOpacity = 0
@@ -211,6 +254,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             viewModel.messageMenuRow = nil
             isShowingMenu = false
+            needsScrollView = false
+            readyToShowScrollView = false
         }
     }
 
