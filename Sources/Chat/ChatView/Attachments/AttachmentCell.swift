@@ -42,7 +42,16 @@ struct AttachmentCell: View {
     }
 
     var content: some View {
-        CachedAsyncImage(url: attachment.thumbnail, urlCache: .imageCache) { imageView in
+        AsyncImageView(url: attachment.thumbnail)
+    }
+}
+
+struct AsyncImageView: View {
+
+    let url: URL
+
+    var body: some View {
+        CachedAsyncImage(url: url, urlCache: .imageCache) { imageView in
             imageView
                 .resizable()
                 .scaledToFill()

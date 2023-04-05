@@ -25,8 +25,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
 
-    @Namespace private var messageAnimation
-
     let didSendMessage: (DraftMessage) -> Void
 
     /// provide custom message view builder
@@ -47,6 +45,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var paginationState = PaginationState()
+
+    @State private var inputFieldId = UUID()
 
     @State private var showScrollToBottom: Bool = false
 
@@ -94,6 +94,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 } else {
                     InputView(
                         viewModel: inputViewModel,
+                        inputFieldId: inputFieldId,
                         style: .message,
                         messageUseMarkdown: messageUseMarkdown
                     )
@@ -211,19 +212,18 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     func showMessageMenu(_ cellFrame: CGRect) {
         DispatchQueue.main.async {
-            menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.midY)
-            menuCellOpacity = 1
             let wholeMenuHeight = menuButtonsSize.height + cellFrame.height
             let needsScrollTemp = wholeMenuHeight > UIScreen.main.bounds.height - safeAreaInsets.top - safeAreaInsets.bottom
 
+            menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.minY + wholeMenuHeight/2 - safeAreaInsets.top)
+            menuCellOpacity = 1
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                 var finalCellPosition = menuCellPosition
-                if cellFrame.minY + wholeMenuHeight > UIScreen.main.bounds.height {
-                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight + cellFrame.height/2 - safeAreaInsets.bottom
-                    )
-                }
-                if needsScrollTemp {
-                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight + cellFrame.height/2 - safeAreaInsets.bottom + 13
+                if needsScrollTemp ||
+                    cellFrame.minY + wholeMenuHeight + safeAreaInsets.bottom > UIScreen.main.bounds.height {
+                    
+                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight/2 - safeAreaInsets.top - safeAreaInsets.bottom
                     )
                 }
 
@@ -265,6 +265,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         switch action {
         case .reply:
             inputViewModel.attachments.replyMessage = row.message.toReplyMessage()
+            globalFocusState.focus = .uuid(inputFieldId)
         }
     }
 }

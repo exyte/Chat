@@ -44,8 +44,8 @@ struct MessageView: View {
         - MessageView.horizontalBubblePadding
         - textPaddings
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
-        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize))
-        let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize))
+        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize), messageUseMarkdown: messageUseMarkdown)
+        let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize), messageUseMarkdown: messageUseMarkdown)
 
         if lastLineWidth + CGFloat(timeWidth) < finalWidth {
             return .overlay
@@ -74,16 +74,16 @@ struct MessageView: View {
 
             VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 2) {
                 if let reply = message.replyMessage?.toMessage() {
-                    HStack {
+                    HStack(spacing: 8) {
                         Capsule()
                             .foregroundColor(theme.colors.buttonBackground)
                             .frame(width: 2)
                         replyBubbleView(reply)
-                            .opacity(0.5)
                     }
                 }
                 bubbleView(message)
             }
+            .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
 
             if message.user.isCurrentUser, let status = message.status {
                 MessageStatusView(status: status) {
@@ -123,13 +123,17 @@ struct MessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(message.user.name)
                 .fontWeight(.semibold)
+                .padding(.horizontal, MessageView.horizontalTextPadding)
 
             if !message.attachments.isEmpty {
                 attachmentsView(message)
+                    .padding(.top, 4)
+                    .padding(.bottom, message.text.isEmpty ? 0 : 4)
             }
 
             if !message.text.isEmpty {
                 MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+                    .padding(.horizontal, MessageView.horizontalTextPadding)
             }
 
             if let recording = message.recording {
@@ -137,10 +141,9 @@ struct MessageView: View {
             }
         }
         .font(.caption2)
-        .padding(.horizontal, MessageView.horizontalTextPadding)
         .padding(.vertical, 8)
         .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
-        .bubbleBackground(message, theme: theme)
+        .bubbleBackground(message, theme: theme, isReply: true)
     }
 
     @ViewBuilder
@@ -232,17 +235,17 @@ struct MessageView: View {
 }
 
 extension View {
-    func bubbleBackground(_ message: Message, theme: ChatTheme) -> some View {
+    func bubbleBackground(_ message: Message, theme: ChatTheme, isReply: Bool = false) -> some View {
         self
             .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
-                if !message.text.isEmpty || message.recording != nil {
+                if isReply || !message.text.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: 20)
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
+                        .opacity(isReply ? 0.5 : 1)
                 }
             }
-            .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
     }
 
     func alignLeft(_ message: Message) -> some View {

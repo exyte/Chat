@@ -7,24 +7,24 @@ import UIKit
 
 extension String {
 
-    func width(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
+    func width(withConstrainedWidth width: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = toAttrString(font: font).boundingRect(with: constraintRect,
+        let boundingBox = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown).boundingRect(with: constraintRect,
                                                       options: .usesLineFragmentOrigin,
                                                       context: nil)
 
         return ceil(boundingBox.width)
     }
 
-    func toAttrString(font: UIFont) -> NSAttributedString {
-        var str = (try? AttributedString(markdown: self)) ?? AttributedString(self)
+    func toAttrString(font: UIFont, messageUseMarkdown: Bool) -> NSAttributedString {
+        var str = messageUseMarkdown ? (try? AttributedString(markdown: self)) ?? AttributedString(self) : AttributedString(self)
         str.setAttributes(AttributeContainer([.font: font]))
         return NSAttributedString(str)
     }
 
-    public func lastLineWidth(labelWidth: CGFloat, font: UIFont) -> CGFloat {
+    public func lastLineWidth(labelWidth: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
         // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
-        let attrString = toAttrString(font: font)
+        let attrString = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown)
         let labelSize = CGSize(width: labelWidth, height: .infinity)
         let layoutManager = NSLayoutManager()
         let textContainer = NSTextContainer(size: labelSize)

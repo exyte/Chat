@@ -61,6 +61,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             } else {
                 InputView(
                     viewModel: inputViewModel,
+                    inputFieldId: UUID(),
                     style: .signature,
                     messageUseMarkdown: messageUseMarkdown
                 )

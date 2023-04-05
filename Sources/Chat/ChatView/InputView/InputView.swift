@@ -74,8 +74,9 @@ struct InputView: View {
     @Environment(\.chatTheme) private var theme
 
     @ObservedObject var viewModel: InputViewModel
-    let style: InputViewStyle
-    let messageUseMarkdown: Bool
+    var inputFieldId: UUID
+    var style: InputViewStyle
+    var messageUseMarkdown: Bool
 
     private var onAction: (InputViewAction) -> Void {
         viewModel.inputViewAction()
@@ -94,6 +95,8 @@ struct InputView: View {
     @State private var deleteRecordFrame: CGRect = .zero
 
     @State private var dragStart: Date?
+    @State private var tapDelayTimer: Timer?
+    let tapDelay = 0.2
 
     var body: some View {
         VStack {
@@ -141,7 +144,7 @@ struct InputView: View {
             case .isRecordingTap:
                 Spacer()
             default:
-                TextInputView(text: $viewModel.attachments.text, style: style)
+                TextInputView(text: $viewModel.attachments.text, inputFieldId: inputFieldId, style: style)
             }
         }
         .frame(minHeight: 48)
@@ -216,12 +219,20 @@ struct InputView: View {
                         Text("Reply to \(message.user.name)")
                             .font(.caption2)
                             .foregroundColor(theme.colors.buttonBackground)
-                        textView(message.text)
-                            .font(.caption2)
-                            .lineLimit(1)
+                        if !message.text.isEmpty {
+                            textView(message.text)
+                                .font(.caption2)
+                                .lineLimit(1)
+                        }
                     }
                     .padding(.vertical, 2)
                     Spacer()
+                    if let first = message.attachments.first {
+                        AsyncImageView(url: first.thumbnail)
+                            .viewSize(30)
+                            .cornerRadius(4)
+                            .padding(.trailing, 16)
+                    }
                     theme.images.reply.cancelReply
                         .onTapGesture {
                             viewModel.attachments.replyMessage = nil
@@ -423,8 +434,6 @@ struct InputView: View {
         }
     }
 
-    @State private var tapDelayTimer: Timer?
-    let tapDelay = 0.2
     func dragGesture() -> some Gesture {
         DragGesture(minimumDistance: 0.0, coordinateSpace: .global)
             .onChanged { _ in
