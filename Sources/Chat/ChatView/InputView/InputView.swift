@@ -226,13 +226,22 @@ struct InputView: View {
                         }
                     }
                     .padding(.vertical, 2)
+
                     Spacer()
+
                     if let first = message.attachments.first {
                         AsyncImageView(url: first.thumbnail)
                             .viewSize(30)
                             .cornerRadius(4)
                             .padding(.trailing, 16)
                     }
+
+                    if let _ = message.recording {
+                        theme.images.inputView.microphone
+                            .renderingMode(.template)
+                            .foregroundColor(theme.colors.buttonBackground)
+                    }
+
                     theme.images.reply.cancelReply
                         .onTapGesture {
                             viewModel.attachments.replyMessage = nil

@@ -199,7 +199,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true)
                     .onTapGesture {
                         hideMessageMenu()
                     }
@@ -222,7 +222,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 var finalCellPosition = menuCellPosition
                 if needsScrollTemp ||
                     cellFrame.minY + wholeMenuHeight + safeAreaInsets.bottom > UIScreen.main.bounds.height {
-                    
+
                     finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight/2 - safeAreaInsets.top - safeAreaInsets.bottom
                     )
                 }

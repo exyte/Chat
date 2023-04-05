@@ -18,6 +18,7 @@ struct ChatMessageView<MessageContent: View>: View {
     let row: MessageRow
     let avatarSize: CGFloat
     let messageUseMarkdown: Bool
+    let isDisplayingMessageMenu: Bool
 
     var body: some View {
         Group {
@@ -31,7 +32,8 @@ struct ChatMessageView<MessageContent: View>: View {
                     message: row.message,
                     positionInGroup: row.positionInGroup,
                     avatarSize: avatarSize,
-                    messageUseMarkdown: messageUseMarkdown)
+                    messageUseMarkdown: messageUseMarkdown,
+                    isDisplayingMessageMenu: isDisplayingMessageMenu)
             }
         }
         .id(row.message.id)

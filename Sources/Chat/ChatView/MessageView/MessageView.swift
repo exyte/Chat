@@ -17,6 +17,7 @@ struct MessageView: View {
     let positionInGroup: PositionInGroup
     let avatarSize: CGFloat
     let messageUseMarkdown: Bool
+    let isDisplayingMessageMenu: Bool
 
     @State var avatarViewSize: CGSize = .zero
     @State var statusSize: CGSize = .zero
@@ -69,11 +70,11 @@ struct MessageView: View {
             if !message.user.isCurrentUser {
                 avatarView
             } else {
-                Spacer()
+                Spacer(minLength: 0)
             }
 
             VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 2) {
-                if let reply = message.replyMessage?.toMessage() {
+                if !isDisplayingMessageMenu, let reply = message.replyMessage?.toMessage() {
                     HStack(spacing: 8) {
                         Capsule()
                             .foregroundColor(theme.colors.buttonBackground)
@@ -93,7 +94,7 @@ struct MessageView: View {
             }
 
             if !message.user.isCurrentUser {
-                Spacer()
+                Spacer(minLength: 0)
             }
         }
         .padding(.top, topPadding)
@@ -112,7 +113,10 @@ struct MessageView: View {
             }
 
             if let recording = message.recording {
-                recordingView(recording)
+                VStack(alignment: .trailing, spacing: 0) {
+                    recordingView(recording)
+                    messageTimeView()
+                }
             }
         }
         .bubbleBackground(message, theme: theme)
@@ -219,8 +223,6 @@ struct MessageView: View {
             )
             .padding(.horizontal, MessageView.horizontalTextPadding)
             .padding(.top, 8)
-
-            messageTimeView()
         }
     }
 
@@ -291,7 +293,8 @@ struct MessageView_Preview: PreviewProvider {
             message: message,
             positionInGroup: .single,
             avatarSize: 32,
-            messageUseMarkdown: false
+            messageUseMarkdown: false,
+            isDisplayingMessageMenu: false
         )
     }
 }
