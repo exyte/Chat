@@ -113,7 +113,7 @@ struct MessageView: View {
             }
 
             if let recording = message.recording {
-                VStack(alignment: .trailing, spacing: 0) {
+                VStack(alignment: .trailing, spacing: 8) {
                     recordingView(recording)
                     messageTimeView()
                 }
@@ -214,16 +214,14 @@ struct MessageView: View {
 
     @ViewBuilder
     func recordingView(_ recording: Recording) -> some View {
-        VStack(alignment: .trailing, spacing: 0) {
-            RecordWaveformWithButtons(
-                recording: recording,
-                colorButton: message.user.isCurrentUser ? theme.colors.myMessage : .white,
-                colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
-                colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
-            )
-            .padding(.horizontal, MessageView.horizontalTextPadding)
-            .padding(.top, 8)
-        }
+        RecordWaveformWithButtons(
+            recording: recording,
+            colorButton: message.user.isCurrentUser ? theme.colors.myMessage : .white,
+            colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
+            colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
+        )
+        .padding(.horizontal, MessageView.horizontalTextPadding)
+        .padding(.top, 8)
     }
 
     func messageTimeView(isOverlay: Bool = false) -> some View {

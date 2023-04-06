@@ -78,6 +78,8 @@ struct InputView: View {
     var style: InputViewStyle
     var messageUseMarkdown: Bool
 
+    @StateObject var recordingPlayer = RecordingPlayer()
+
     private var onAction: (InputViewAction) -> Void {
         viewModel.inputViewAction()
     }
@@ -85,8 +87,6 @@ struct InputView: View {
     private var state: InputViewState {
         viewModel.state
     }
-
-    @ObservedObject var recordPlayer = RecordingPlayer.shared
 
     @State private var overlaySize: CGSize = .zero
 
@@ -116,6 +116,9 @@ struct InputView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
+        }
+        .onAppear {
+            viewModel.recordingPlayer = recordingPlayer
         }
     }
 
@@ -190,13 +193,13 @@ struct InputView: View {
                 Group {
                     if state == .isRecordingTap {
                         stopRecordButton
-                            .sizeGetter($overlaySize)
                     } else if state == .isRecordingHold {
                         lockRecordButton
-                            .sizeGetter($overlaySize)
                     }
                 }
-                .offset(y: -overlaySize.height - 24)
+                .sizeGetter($overlaySize)
+                // hardcode 28 for now because sizeGetter returns 0 somehow
+                .offset(y: (state == .isRecordingTap ? -28 : -overlaySize.height) - 24)
             }
         }
         .viewSize(48)
@@ -391,7 +394,7 @@ struct InputView: View {
     }
 
     var recordDurationLeft: some View {
-        Text(DateFormatter.timeString(Int(RecordingPlayer.shared.secondsLeft)))
+        Text(DateFormatter.timeString(Int(recordingPlayer.secondsLeft)))
             .foregroundColor(theme.colors.textLightContext)
             .opacity(0.6)
             .font(.caption2)
@@ -428,7 +431,7 @@ struct InputView: View {
                 }
                 .frame(width: 20)
 
-                RecordWaveformPlaying(samples: samples, progress: recordPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true)
+                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true)
             }
             .padding(.horizontal, 8)
         }

@@ -14,6 +14,7 @@ final class InputViewModel: ObservableObject {
     @Published var showPicker = false
     @Published var mediaPickerMode = MediaPickerMode.photos
 
+    var recordingPlayer: RecordingPlayer?
     var didSendMessage: ((DraftMessage) -> Void)?
 
     private var recorder = Recorder()
@@ -51,7 +52,6 @@ final class InputViewModel: ObservableObject {
     }
 
     func inputViewActionInternal(_ action: InputViewAction) {
-        print(action)
         switch action {
         case .photo:
             mediaPickerMode = .photos
@@ -84,11 +84,11 @@ final class InputViewModel: ObservableObject {
             state = .playingRecording
             if let recording = attachments.recording {
                 subscribeRecordPlayer()
-                RecordingPlayer.shared.play(recording)
+                recordingPlayer?.play(recording)
             }
         case .pauseRecord:
             state = .pausedRecording
-            RecordingPlayer.shared.pause()
+            recordingPlayer?.pause()
         }
     }
 
@@ -137,7 +137,7 @@ private extension InputViewModel {
     }
 
     func subscribeRecordPlayer() {
-        recordPlayerSubscription = RecordingPlayer.shared.didPlayTillEnd
+        recordPlayerSubscription = recordingPlayer?.didPlayTillEnd
             .sink { [weak self] in
                 self?.state = .hasRecording
             }

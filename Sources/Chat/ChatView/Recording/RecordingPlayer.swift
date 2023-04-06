@@ -10,8 +10,6 @@ import AVFoundation
 
 final class RecordingPlayer: ObservableObject {
 
-    static let shared = RecordingPlayer()
-
     @Published var playing = false
     @Published var duration: Double = 0.0
     @Published var secondsLeft: Double = 0.0

@@ -11,7 +11,7 @@ struct RecordWaveformWithButtons: View {
 
     @Environment(\.chatTheme) private var theme
 
-    @ObservedObject var recordPlayer = RecordingPlayer.shared
+    @StateObject var recordPlayer = RecordingPlayer()
 
     var recording: Recording
 
@@ -41,7 +41,7 @@ struct RecordWaveformWithButtons: View {
                 recordPlayer.togglePlay(recording)
             }
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 5) {
                 RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false)
                 Text(DateFormatter.timeString(time))
                     .font(.caption2)
@@ -64,24 +64,29 @@ struct RecordWaveformPlaying: View {
     }
 
     var body: some View {
-        ZStack {
+        VStack {
+            Spacer()
             GeometryReader { g in
-                let adjusted = adjustedSamples(g.size)
-                RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
-                    .foregroundColor(color.opacity(0.4))
-                RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
-                    .foregroundColor(color)
-                    .mask(alignment: .leading) {
-                        Rectangle()
-                            .frame(width: maxLength * progress, height: g.size.height)
-                    }
+                ZStack(alignment: .bottomLeading) {
+                    let adjusted = adjustedSamples(g.size)
+                    RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
+                        .foregroundColor(color.opacity(0.4))
+                    RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
+                        .foregroundColor(color)
+                        .mask(alignment: .topLeading) {
+                            Rectangle()
+                                .frame(width: maxLength * progress, height: 2*RecordWaveform.maxSampleHeight)
+                        }
+                }
             }
-            .fixedSize(horizontal: !addExtraDots, vertical: true)
         }
+        .frame(width: maxLength, height: RecordWaveform.maxSampleHeight)
+        .fixedSize(horizontal: !addExtraDots, vertical: true)
     }
 
     func adjustedSamples(_ size: CGSize) -> [CGFloat] {
-        let maxSamples = Int(size.width / (RecordWaveform.width + RecordWaveform.spacing))
+        let maxWidth = addExtraDots ? size.width : UIScreen.main.bounds.width
+        let maxSamples = Int(maxWidth / (RecordWaveform.width + RecordWaveform.spacing))
 
         var adjusted = samples
         var temp = [CGFloat]()
@@ -110,13 +115,14 @@ struct RecordWaveform: View {
 
     static let spacing: CGFloat = 2
     static let width: CGFloat = 2
+    static let maxSampleHeight: CGFloat = 20
 
     var body: some View {
         GeometryReader { g in
             HStack(alignment: .bottom, spacing: RecordWaveform.spacing) {
                 ForEach(Array(samples.enumerated()), id: \.offset) { _, s in
                     Capsule()
-                        .frame(width: RecordWaveform.width, height: 20 * CGFloat(s))
+                        .frame(width: RecordWaveform.width, height: RecordWaveform.maxSampleHeight * CGFloat(s))
                 }
 
                 if addExtraDots {
