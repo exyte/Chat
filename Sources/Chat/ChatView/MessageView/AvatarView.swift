@@ -3,7 +3,6 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
 
 struct AvatarView: View {
 

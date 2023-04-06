@@ -3,7 +3,6 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
 
 struct AttachmentsPage: View {
     let attachment: any Attachment
