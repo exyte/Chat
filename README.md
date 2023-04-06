@@ -1,7 +1,7 @@
 <img src="https://raw.githubusercontent.com/exyte/media/master/common/header.png">
-<img align="right" src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic1.png" width="300">
+<img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic1.png">
 
-<p><h1 align="left">Chat</h1></p>
+<p><h1>Chat</h1></p>
 
 <p><h4>Chat with fully customizable message cells and built-in media picker written with SwiftUI</h4></p>
 
@@ -15,10 +15,9 @@ ___
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
 </br></br>
-[![Travis CI](https://travis-ci.org/exyte/Chat.svg?branch=master)](https://travis-ci.org/exyte/Chat)
 [![Version](https://img.shields.io/cocoapods/v/Chat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-0473B3.svg?style=flat)](https://github.com/Carthage/Carthage)
-[![License](https://img.shields.io/cocoapods/l/ExyteChat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
+[![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/cocoapods/p/ExyteChat.svg?style=flat)](http://cocoapods.org/pods/ExyteChat)
 [![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 

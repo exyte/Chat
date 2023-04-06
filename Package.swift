@@ -20,10 +20,6 @@ let package = Package(
             from: "0.1.4"
         ),
         .package(
-            url: "https://github.com/lorenzofiamingo/swiftui-cached-async-image.git",
-            from: "2.1.1"
-        ),
-        .package(
             url: "https://github.com/exyte/MediaPicker.git",
             from: "0.0.1"
         ),
@@ -37,7 +33,6 @@ let package = Package(
             name: "Chat",
             dependencies: [
                 .product(name: "Introspect", package: "SwiftUI-Introspect"),
-                .product(name: "CachedAsyncImage", package: "swiftui-cached-async-image"),
                 .product(name: "MediaPicker", package: "MediaPicker"),
                 .product(name: "FloatingButton", package: "FloatingButton")
             ]
