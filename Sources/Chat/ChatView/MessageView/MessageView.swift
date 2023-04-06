@@ -69,8 +69,6 @@ struct MessageView: View {
         HStack(alignment: .bottom, spacing: 0) {
             if !message.user.isCurrentUser {
                 avatarView
-            } else {
-                Spacer(minLength: 0)
             }
 
             VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 2) {
@@ -92,12 +90,9 @@ struct MessageView: View {
                 }
                 .sizeGetter($statusSize)
             }
-
-            if !message.user.isCurrentUser {
-                Spacer(minLength: 0)
-            }
         }
         .padding(.top, topPadding)
+        .frame(width: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
     }
 
     @ViewBuilder
