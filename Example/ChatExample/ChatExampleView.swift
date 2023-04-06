@@ -36,14 +36,14 @@ struct ChatExampleView: View {
 //                            Button("Send") { actionClosure(.send) }
 //                            Button("Attach") { actionClosure(.photo) }
 //                        }
-//                        TextField("aa", text: textBinding)
+//                        TextField("Write your message", text: textBinding)
 //                    }
 //                case .signature:
 //                    VStack {
 //                        HStack {
 //                            Button("Send") { actionClosure(.send) }
 //                        }
-//                        TextField("bb", text: textBinding)
+//                        TextField("Compose a signature for photo", text: textBinding)
 //                            .background(Color.green)
 //                    }
 //                }

@@ -23,9 +23,12 @@ ___
 [![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 
 # Features
-- Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure)
-- Allows you to pass custom view builder for message view
-- Has a built-in photo/video library/camera picker for multiple media selection
+- Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure since user will be the one providing actual API calls)    
+- Allows you to pass custom view builder for message and input view    
+- Has a built-in photo/video library/camera picker for multiple media selection   
+- Can display fullscreen menu on message long press (automatically shows scroll for big messages)
+- Supports "reply to message" via message menu, remove and edit are coming soon
+- Supports voice recording, video/photo and text, more content types are coming soon
 
 # Usage
 
@@ -64,15 +67,50 @@ ChatView(messages: viewModel.messages) { draft in
 `messageBuilder`'s parameters:  
 - message containing user, attachments, etc.   
 - position of message in its continuous group of messages from the same user     
-- pass attachment to this closure to use ChatView's fullscreen media viewer     
+- pass attachment to this closure to use ChatView's fullscreen media viewer    
+
+You may customize input view (text field with buttons at the bottom) like this: 
+```swift
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+} inputViewBuilder: { textBinding, attachments, state, style, actionClosure in
+    Group {
+        switch style {
+        case .message: // input view on chat screen
+            VStack {
+                HStack {
+                    Button("Send") { actionClosure(.send) }
+                    Button("Attach") { actionClosure(.photo) }
+                }
+                TextField("Write your message", text: textBinding)
+            }
+        case .signature: // input view on photo selection screen
+            VStack {
+                HStack {
+                    Button("Send") { actionClosure(.send) }
+                }
+                TextField("Compose a signature for photo", text: textBinding)
+                    .background(Color.green)
+            }
+        }
+    }
+}
+```
+`inputViewBuilder`'s parameters:  
+- textBinding for your own TextField   
+- attachments struct containing photos, videos, recording and a message you are replying to     
+- state of input view - is controled by the library automatically if possible or through your calls of actionClosure
+- style - .message or .signature (chat screen or photo selection screen)   
+- actionClosure to call on taps of your custom buttons. For example, call actionClosure(.send) if you'd like to send your message, then the library will reset text and attachments and call sending closure `didSendMessage`
 
 ## Supported content types
 Library allows to send following content in messages in any combination:
 - Text with/without markdown
-- Photo single/multiple
+- Photo/video
+- Audio recording
 Coming soon:
-- Audio message
 - User's location
+- Document
 
 ### Modifiers
 if you are not using your own `messageBuilder`:   
