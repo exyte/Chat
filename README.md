@@ -5,16 +5,6 @@
 
 <p><h4>Chat with fully customizable message cells and built-in media picker written with SwiftUI</h4></p>
 
-___
-
-<p> We are a development agency building
-  <a href="https://clutch.co/profile/exyte#review-731233">phenomenal</a> apps.</p>
-
-</br>
-
-<a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
-
-</br></br>
 [![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 ![Platform](https://img.shields.io/badge/Platform-iOS-blue.svg)
 [![SPM Compatible](https://img.shields.io/badge/SwiftPM-Compatible-brightgreen.svg)](https://www.swift.org/package-manager/)
@@ -22,13 +12,21 @@ ___
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-brightgreen.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](https://opensource.org/licenses/MIT)
 
+
+___
+
+<p> We are a development agency building
+<a href="https://clutch.co/profile/exyte#review-731233">phenomenal</a> apps.</p>
+
+<a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
+
 # Features
 - Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure since user will be the one providing actual API calls)    
 - Allows you to pass custom view builder for message and input view    
 - Has a built-in photo/video library/camera picker for multiple media selection   
 - Can display fullscreen menu on message long press (automatically shows scroll for big messages)
-- Supports "reply to message" via message menu, remove and edit are coming soon
-- Supports voice recording, video/photo and text, more content types are coming soon
+- Supports "reply to message" via message menu, remove and edit are **coming soon**
+- Supports voice recording, video/photo and text, more content types are **coming soon**
 
 # Usage
 
@@ -108,7 +106,8 @@ Library allows to send following content in messages in any combination:
 - Text with/without markdown
 - Photo/video
 - Audio recording
-Coming soon:
+
+**Coming soon:**
 - User's location
 - Document
 
