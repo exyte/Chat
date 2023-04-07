@@ -3,7 +3,7 @@
 
 <p><h1>Chat</h1></p>
 
-<p><h4>Chat with fully customizable message cells and built-in media picker written with SwiftUI</h4></p>
+<p><h4>A SwiftUI Chat UI framework with fully customizable message cells and a built-in media picker</h4></p>
 
 [![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 ![Platform](https://img.shields.io/badge/Platform-iOS-blue.svg)
@@ -20,12 +20,12 @@ ___
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
 # Features
-- Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure since user will be the one providing actual API calls)    
-- Allows you to pass custom view builder for message and input view    
-- Has a built-in photo/video library/camera picker for multiple media selection   
-- Can display fullscreen menu on message long press (automatically shows scroll for big messages)
-- Supports "reply to message" via message menu, remove and edit are **coming soon**
-- Supports voice recording, video/photo and text, more content types are **coming soon**
+- Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure since user will be the one providing actual API calls)
+- Allows you to pass a custom view builder for messages and input views
+- Has a built-in photo and video library/camera picker for multiple media asset selection
+- Can display a fullscreen menu on long press a message cell (automatically shows scroll for big messages)
+- Supports "reply to message" via message menu. Remove and edit are **coming soon**
+- Supports voice recording, video/photo and text. More content types are **coming soon**
 
 # Usage
 
@@ -41,9 +41,9 @@ var body: some View {
 ```
 where:  
    `messages` - list of messages to display  
-   `didSendMessage` - a closure which gets called when the user presses send button  
+   `didSendMessage` - a closure which is called when the user presses the send button  
 
-`Message` is a type `Chat` is using on the inside, here it expects the user to provide a list of `Message` structs, and it also returns a `Message` in `didSendMessage` closure. You can map it both ways on your own Message model your API expects.
+`Message` is a type that `Chat` uses for the internal implementation. In the code above it expects the user to provide a list of `Message` structs, and it also returns a `Message` in the `didSendMessage` closure. You can map it both ways to your own Message model that your API expects.
 
 ## Customization
 You may customize message cells like this: 
@@ -62,11 +62,11 @@ ChatView(messages: viewModel.messages) { draft in
 }
 ```
 `messageBuilder`'s parameters:  
-- message containing user, attachments, etc.   
-- position of message in its continuous group of messages from the same user     
-- pass attachment to this closure to use ChatView's fullscreen media viewer    
+- `message` - the message containing user info, attachments, etc.   
+- `positionInGroup` - the position of the message in its continuous collection of messages from the same user     
+- `showAttachmentClosure` - you can pass an attachment to this closure to use ChatView's fullscreen media viewer    
 
-You may customize input view (text field with buttons at the bottom) like this: 
+You may customize the input view (a text field with buttons at the bottom) like this: 
 ```swift
 ChatView(messages: viewModel.messages) { draft in
     viewModel.send(draft: draft)
@@ -94,30 +94,29 @@ ChatView(messages: viewModel.messages) { draft in
 }
 ```
 `inputViewBuilder`'s parameters:  
-- textBinding for your own TextField   
-- attachments struct containing photos, videos, recording and a message you are replying to     
-- state of input view - is controled by the library automatically if possible or through your calls of actionClosure
-- style - .message or .signature (chat screen or photo selection screen)   
-- actionClosure to call on taps of your custom buttons. For example, call actionClosure(.send) if you'd like to send your message, then the library will reset text and attachments and call sending closure `didSendMessage`
+- `textBinding` to bind your own TextField   
+- `attachments` is a struct containing photos, videos, recordings and a message you are replying to     
+- `state` - the state of the input view that is controled by the library automatically if possible or through your calls of `actionClosure`
+- `style` - `.message` or `.signature` (the chat screen or the photo selection screen)   
+- `actionClosure` is called on taps on your custom buttons. For example, call `actionClosure(.send)` if you want to send your message, then the library will reset the text and attachments and call the `didSendMessage` sending closure
 
 ## Supported content types
-Library allows to send following content in messages in any combination:
+This library allows to send the following content in messages in any combination:
 - Text with/without markdown
 - Photo/video
 - Audio recording
 
 **Coming soon:**
 - User's location
-- Document
+- Documents
 
 ### Modifiers
-if you are not using your own `messageBuilder`:   
-`avatarSize` - default avatar is a circle, you can specify its diameter here   
-`messageUseMarkdown` - whether default message cell uses markdown     
-
-`assetsPickerLimit` - max media count user can select in the media picker      
-`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so user can load more messages       
-`chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass info for Chat's navigation bar  
+If you are not using your own `messageBuilder`:   
+`avatarSize` - the default avatar is a circle, you can specify its diameter here   
+`messageUseMarkdown` - whether the default message cell uses markdown     
+`assetsPickerLimit` - the maximum media count that the user can select in the media picker      
+`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages       
+`chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass the info for the Chat's navigation bar  
 
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 
@@ -127,7 +126,7 @@ To try out the Chat examples:
 - Clone the repo `git clone git@github.com:exyte/Chat.git`
 - Open terminal and run `cd <ChatRepo>/Example`
 - Wait for SPM to finish downloading packages
-- Try it!
+- Run it!
 
 ## Installation
 
