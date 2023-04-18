@@ -59,51 +59,62 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             updateSemaphore.wait()
 
             let prevSections = context.coordinator.sections
+            var editedSections = [MessagesSection]()
+
             DispatchQueue.main.async {
                 tableView.performBatchUpdates {
                     // step 1
                     // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
-                    applyEdits(tableView: tableView, prevSections: prevSections)
+                    editedSections = applyEdits(tableView: tableView, prevSections: prevSections)
+                    context.coordinator.sections = editedSections
                 } completion: { _ in
                     tableSemaphore.signal()
                 }
             }
             tableSemaphore.wait()
 
-            DispatchQueue.main.sync {
-                // step 2
-                // apply the rest of the changes to table's dataSource
-                context.coordinator.sections = sections
-                context.coordinator.ids = ids
-                // insert new rows/sections and remove old ones with animation
-                tableView.beginUpdates()
-                applyInserts(tableView: tableView, prevSections: prevSections)
-                tableView.endUpdates()
+            if !showScrollToBottom {
+                DispatchQueue.main.sync {
+                    // step 2
+                    // apply the rest of the changes to table's dataSource
+                    context.coordinator.sections = sections
+                    context.coordinator.ids = ids
+                    // insert new rows/sections and remove old ones with animation
+                    tableView.beginUpdates()
+                    applyInserts(tableView: tableView, prevSections: editedSections)
+                    tableView.endUpdates()
 
+                    updateSemaphore.signal()
+                }
+            } else {
                 updateSemaphore.signal()
             }
         }
     }
 
-    func applyEdits(tableView: UITableView, prevSections: [MessagesSection]) {
+    func applyEdits(tableView: UITableView, prevSections: [MessagesSection]) -> [MessagesSection] {
+        var result = [MessagesSection]()
         let prevDates = prevSections.map { $0.date }
         for iPrevDate in 0..<prevDates.count {
             let prevDate = prevDates[iPrevDate]
             guard let section = sections.first(where: { $0.date == prevDate } ),
                   let prevSection = prevSections.first(where: { $0.date == prevDate } ) else { continue }
 
+            var resultRows = [MessageRow]()
             for iPrevRow in 0..<prevSection.rows.count {
                 let prevRow = prevSection.rows[iPrevRow]
                 guard let row = section.rows.first(where: { $0.message.id == prevRow.message.id } ) else { continue }
-                if row != prevRow {
-                    prevSection.rows[iPrevRow] = row
+                resultRows.append(row)
 
+                if row != prevRow {
                     DispatchQueue.main.async {
                         tableView.reloadRows(at: [IndexPath(row: iPrevRow, section: iPrevDate)], with: .none)
                     }
                 }
             }
+            result.append(MessagesSection(date: prevDate, rows: resultRows))
         }
+        return result
     }
 
     func applyInserts(tableView: UITableView, prevSections: [MessagesSection]) {
