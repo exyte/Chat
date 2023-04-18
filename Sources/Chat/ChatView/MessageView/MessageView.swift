@@ -165,7 +165,7 @@ struct MessageView: View {
         }
         .overlay(alignment: .bottomTrailing) {
             if message.text.isEmpty {
-                messageTimeView(isOverlay: true)
+                messageTimeView(needsCapsule: true)
                     .padding(4)
             }
         }
@@ -175,33 +175,27 @@ struct MessageView: View {
     @ViewBuilder
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
+            .alignLeft(message)
             .padding(.horizontal, MessageView.horizontalTextPadding)
-            .padding(.vertical, 8)
+
+        let timeView = messageTimeView()
+            .alignRight(message)
+            .padding(.trailing, 12)
 
         Group {
             switch dateArrangment {
-            case .vstack:
+            case .vstack, .hstack: // TODO: fix new cell insertion animation glith when using hstack and restore hstack case
                 VStack(alignment: .trailing, spacing: 4) {
                     messageView
-                        .alignLeft(message)
-                    messageTimeView()
-                        .alignRight(message)
+                    timeView
                 }
-            case .hstack:
-                HStack(alignment: .bottom, spacing: 8) {
-                    messageView
-                    if !message.attachments.isEmpty {
-                        Spacer()
-                    }
-                    messageTimeView()
-                }
+                .padding(.vertical, 8)
             case .overlay:
                 messageView
-                    .alignLeft(message)
-                    .padding(.bottom, 8)
+                    .padding(.vertical, 8)
                     .overlay(alignment: .bottomTrailing) {
-                        messageTimeView()
-                            .alignRight(message)
+                        timeView
+                            .padding(.vertical, 8)
                     }
             }
         }
@@ -219,12 +213,14 @@ struct MessageView: View {
         .padding(.top, 8)
     }
 
-    func messageTimeView(isOverlay: Bool = false) -> some View {
-        MessageTimeView(
-            text: message.time,
-            isCurrentUser: message.user.isCurrentUser,
-            isOverlay: isOverlay
-        )
+    func messageTimeView(needsCapsule: Bool = false) -> some View {
+        Group {
+            if needsCapsule {
+                MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser)
+            } else {
+                MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser)
+            }
+        }
         .sizeGetter($timeSize)
     }
 }

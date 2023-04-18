@@ -5,27 +5,34 @@
 import SwiftUI
 
 struct MessageTimeView: View {
+
     let text: String
     let isCurrentUser: Bool
-    let isOverlay: Bool
 
     var body: some View {
         Text(text)
             .font(.caption)
-            .foregroundColor(textColor)
-            .opacity(isOverlay ? 0.8 : 0.4)
-            .padding(.top, isOverlay ? 4 : 0)
-            .padding(.bottom, isOverlay ? 4 : 8)
-            .padding(.horizontal, isOverlay ? 8 : 12)
-            .background {
-                if isOverlay {
-                    Capsule()
-                        .fill(.black.opacity(0.4))
-                }
-            }
+            .foregroundColor(isCurrentUser ? .white : .black)
+            .opacity(0.4)
     }
+}
 
-    var textColor: Color {
-        isOverlay || isCurrentUser ? .white : .black
+struct MessageTimeWithCapsuleView: View {
+
+    let text: String
+    let isCurrentUser: Bool
+
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .foregroundColor(.white)
+            .opacity(0.8)
+            .padding(.top, 4)
+            .padding(.bottom, 4)
+            .padding(.horizontal, 8)
+            .background {
+                Capsule()
+                    .fill(.black.opacity(0.4))
+            }
     }
 }

@@ -53,8 +53,6 @@ struct AttachmentsPages: View {
             .overlay(alignment: .topLeading) {
                 Button(action: onClose) {
                     theme.images.mediaPicker.cross
-                        .resizable()
-                        .frame(width: 20, height: 20)
                 }
                 .tint(.white)
                 .padding(.leading, 20)
