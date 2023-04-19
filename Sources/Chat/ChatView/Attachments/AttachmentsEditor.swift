@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import MediaPicker
+import ExyteMediaPicker
 
 struct AttachmentsEditor<InputViewContent: View>: View {
 

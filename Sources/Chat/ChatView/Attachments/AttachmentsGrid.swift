@@ -99,7 +99,6 @@ struct AttachmentsPair {
     }
 }
 
-
 #if DEBUG
 struct AttachmentsGrid_Preview: PreviewProvider {
     private static let examples = [1, 2, 3, 4, 5, 10]

@@ -21,7 +21,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
-            from: "0.0.1"
+            from: "0.2.5"
         ),
         .package(
             url: "https://github.com/exyte/FloatingButton",
@@ -33,7 +33,7 @@ let package = Package(
             name: "Chat",
             dependencies: [
                 .product(name: "Introspect", package: "SwiftUI-Introspect"),
-                .product(name: "MediaPicker", package: "MediaPicker"),
+                .product(name: "ExyteMediaPicker", package: "MediaPicker"),
                 .product(name: "FloatingButton", package: "FloatingButton")
             ]
         ),

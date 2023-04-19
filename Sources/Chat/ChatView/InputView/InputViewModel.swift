@@ -4,7 +4,7 @@
 
 import Foundation
 import Combine
-import MediaPicker
+import ExyteMediaPicker
 
 final class InputViewModel: ObservableObject {
     

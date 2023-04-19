@@ -258,6 +258,7 @@ extension View {
     }
 }
 
+#if DEBUG
 struct MessageView_Preview: PreviewProvider {
     static private var shortMessage = "Hi, buddy!"
     static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
@@ -287,3 +288,4 @@ struct MessageView_Preview: PreviewProvider {
         )
     }
 }
+#endif
