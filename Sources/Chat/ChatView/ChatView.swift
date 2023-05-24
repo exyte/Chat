@@ -103,6 +103,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             .onAppear(perform: inputViewModel.onStart)
             .onDisappear(perform: inputViewModel.onStop)
         }
+        .background(theme.colors.mainBackground)
         .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
             let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
             let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }

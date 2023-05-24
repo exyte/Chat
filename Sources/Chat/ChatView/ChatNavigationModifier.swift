@@ -55,6 +55,7 @@ struct ChatNavigationModifier: ViewModifier {
                     Text(title)
                         .fontWeight(.semibold)
                         .font(.headline)
+                        .foregroundColor(theme.colors.textLightContext)
                     if let status = status {
                         Text(status)
                             .font(.footnote)

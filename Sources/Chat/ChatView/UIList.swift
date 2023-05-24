@@ -15,6 +15,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     typealias MessageBuilderClosure = ChatView<MessageContent, EmptyView>.MessageBuilderClosure
 
+    @Environment(\.chatTheme) private var theme
+
     @ObservedObject var viewModel: ChatViewModel
     @ObservedObject var paginationState: PaginationState
 
@@ -43,7 +45,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 0
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
-        tableView.backgroundColor = .white
+        tableView.backgroundColor = UIColor(theme.colors.mainBackground)
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
@@ -150,7 +152,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator<MessageContent> {
-        Coordinator(viewModel: viewModel, paginationState: paginationState, showScrollToBottom: $showScrollToBottom, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids)
+        Coordinator(viewModel: viewModel, paginationState: paginationState, showScrollToBottom: $showScrollToBottom, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
     }
 
     class Coordinator<MessageContent: View>: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -167,7 +169,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         var sections: [MessagesSection]
         var ids: [String]
 
-        init(viewModel: ChatViewModel, paginationState: PaginationState, showScrollToBottom: Binding<Bool>, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String]) {
+        let mainBackgroundColor: Color
+
+        init(viewModel: ChatViewModel, paginationState: PaginationState, showScrollToBottom: Binding<Bool>, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
             self.viewModel = viewModel
             self.paginationState = paginationState
             self._showScrollToBottom = showScrollToBottom
@@ -176,6 +180,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             self.messageUseMarkdown = messageUseMarkdown
             self.sections = sections
             self.ids = ids
+            self.mainBackgroundColor = mainBackgroundColor
         }
 
         func numberOfSections(in tableView: UITableView) -> Int {
@@ -187,12 +192,14 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-            UIHostingController(rootView:
-                                    Text(sections[section].formattedDate)
-                .rotationEffect(Angle(degrees: 180))
-                .padding(10)
-                .foregroundColor(.gray)
+            let header = UIHostingController(rootView:
+                Text(sections[section].formattedDate)
+                    .rotationEffect(Angle(degrees: 180))
+                    .padding(10)
+                    .foregroundColor(.gray)
             ).view
+            header?.backgroundColor = UIColor(mainBackgroundColor)
+            return header
         }
 
         func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -203,6 +210,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             let tableViewCell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             tableViewCell.selectionStyle = .none
+            tableViewCell.backgroundColor = UIColor(mainBackgroundColor)
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {

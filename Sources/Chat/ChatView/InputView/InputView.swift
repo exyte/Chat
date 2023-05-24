@@ -72,6 +72,7 @@ public struct Recording {
 struct InputView: View {
 
     @Environment(\.chatTheme) private var theme
+    @Environment(\.mediaPickerTheme) private var pickerTheme
 
     @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
@@ -109,7 +110,7 @@ struct InputView: View {
                 }
                 .background {
                     RoundedRectangle(cornerRadius: 18)
-                        .fill(backgroundColor)
+                        .fill(fieldBackgroundColor)
                 }
 
                 rigthOutsideButton
@@ -117,6 +118,7 @@ struct InputView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
+        .background(backgroundColor)
         .onAppear {
             viewModel.recordingPlayer = recordingPlayer
         }
@@ -437,12 +439,21 @@ struct InputView: View {
         }
     }
 
-    var backgroundColor: Color {
+    var fieldBackgroundColor: Color {
         switch style {
         case .message:
             return theme.colors.inputLightContextBackground
         case .signature:
             return theme.colors.inputDarkContextBackground
+        }
+    }
+
+    var backgroundColor: Color {
+        switch style {
+        case .message:
+            return theme.colors.mainBackground
+        case .signature:
+            return pickerTheme.main.albumSelectionBackground
         }
     }
 

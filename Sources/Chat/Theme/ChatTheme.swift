@@ -46,6 +46,7 @@ public struct ChatTheme {
         public var inputLightContextBackground: Color
         public var inputDarkContextBackground: Color
 
+        public var mainBackground: Color
         public var buttonBackground: Color
         public var addButtonBackground: Color
         public var sendButtonBackground: Color
@@ -64,6 +65,7 @@ public struct ChatTheme {
             errorStatus: Color = Color.red,
             inputLightContextBackground: Color = Color(hex: "F2F3F5"),
             inputDarkContextBackground: Color = Color(hex: "F2F3F5").opacity(0.12),
+            mainBackground: Color = .white,
             buttonBackground: Color = Color(hex: "989EAC"),
             addButtonBackground: Color = Color(hex: "#4F5055"),
             sendButtonBackground: Color = Color(hex: "#4962FF"),
@@ -78,6 +80,7 @@ public struct ChatTheme {
             self.errorStatus = errorStatus
             self.inputLightContextBackground = inputLightContextBackground
             self.inputDarkContextBackground = inputDarkContextBackground
+            self.mainBackground = mainBackground
             self.buttonBackground = buttonBackground
             self.addButtonBackground = addButtonBackground
             self.sendButtonBackground = sendButtonBackground
