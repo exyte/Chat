@@ -162,7 +162,7 @@ private extension InputViewModel {
         attachments.medias.publisher
             .receive(on: DispatchQueue.global())
             .asyncMap { media in
-                await (media, media.getUrl())
+                await (media, media.getURL())
             }
             .compactMap { (media, url) -> (Media, URL)? in
                 guard let url = url else { return nil }

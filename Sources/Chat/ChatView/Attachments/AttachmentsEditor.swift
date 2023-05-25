@@ -27,7 +27,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     }
 
     var body: some View {
-        MediaPicker(isPresented: $inputViewModel.showPicker, limit: assetsPickerLimit) {
+        MediaPicker(isPresented: $inputViewModel.showPicker) {
             inputViewModel.attachments.medias = $0
         } albumSelectionBuilder: { _, albumSelectionView in
             VStack {
@@ -47,6 +47,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .background(pickerTheme.main.albumSelectionBackground)
         }
         .showLiveCameraCell()
+        .mediaSelectionLimit(assetsPickerLimit)
         .pickerMode($inputViewModel.mediaPickerMode)
         .padding(.top)
         .background(pickerTheme.main.albumSelectionBackground)
