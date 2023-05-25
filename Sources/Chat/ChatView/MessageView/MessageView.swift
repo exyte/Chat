@@ -111,6 +111,8 @@ struct MessageView: View {
                 VStack(alignment: .trailing, spacing: 8) {
                     recordingView(recording)
                     messageTimeView()
+                        .padding(.bottom, 8)
+                        .padding(.trailing, 12)
                 }
             }
         }

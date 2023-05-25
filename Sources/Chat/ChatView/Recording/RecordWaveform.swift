@@ -19,7 +19,7 @@ struct RecordWaveformWithButtons: View {
     var colorButtonBg: Color
     var colorWaveform: Color
 
-    var time: Int {
+    var duration: Int {
         Int(recordPlayer.secondsLeft != 0 ? recordPlayer.secondsLeft : recording.duration)
     }
 
@@ -43,7 +43,7 @@ struct RecordWaveformWithButtons: View {
             
             VStack(alignment: .leading, spacing: 5) {
                 RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false)
-                Text(DateFormatter.timeString(time))
+                Text(DateFormatter.timeString(duration))
                     .font(.caption2)
                     .monospacedDigit()
                     .foregroundColor(colorWaveform)
@@ -80,7 +80,8 @@ struct RecordWaveformPlaying: View {
                 }
             }
         }
-        .frame(width: maxLength, height: RecordWaveform.maxSampleHeight)
+        .frame(height: RecordWaveform.maxSampleHeight)
+        .frame(maxWidth: addExtraDots ? .infinity : maxLength)
         .fixedSize(horizontal: !addExtraDots, vertical: true)
     }
 

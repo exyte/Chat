@@ -42,6 +42,8 @@ public enum InputViewAction {
 public enum InputViewState {
     case empty
     case hasTextOrMedia
+
+    case waitingForRecordingPermission
     case isRecordingHold
     case isRecordingTap
     case hasRecording
@@ -159,7 +161,7 @@ struct InputView: View {
     var rightView: some View {
         Group {
             switch state {
-            case .empty:
+            case .empty, .waitingForRecordingPermission:
                 cameraButton
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
@@ -474,7 +476,7 @@ struct InputView: View {
                 if recordButtonFrame.contains(value.location) {
                     if let dragStart = dragStart, Date().timeIntervalSince(dragStart) < tapDelay {
                         onAction(.recordAudioTap)
-                    } else {
+                    } else if state != .waitingForRecordingPermission {
                         onAction(.send)
                     }
                 }

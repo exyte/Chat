@@ -64,10 +64,10 @@ final class InputViewModel: ObservableObject {
         case .send:
             send()
         case .recordAudioTap:
-            state = .isRecordingTap
+            state = recorder.isAllowedToRecordAudio ? .isRecordingTap : .waitingForRecordingPermission
             recordAudio()
         case .recordAudioHold:
-            state = .isRecordingHold
+            state = recorder.isAllowedToRecordAudio ? .isRecordingHold : .waitingForRecordingPermission
             recordAudio()
         case .recordAudioLock:
             state = .isRecordingTap
@@ -96,10 +96,18 @@ final class InputViewModel: ObservableObject {
         if recorder.isRecording {
             return
         }
-        attachments.recording = Recording()
-        attachments.recording?.url = recorder.startRecording { [weak self] duration, samples in
-            self?.attachments.recording?.duration = duration
-            self?.attachments.recording?.waveformSamples = samples
+        Task { @MainActor in
+            attachments.recording = Recording()
+            let url = await recorder.startRecording { duration, samples in
+                DispatchQueue.main.async { [weak self] in
+                    self?.attachments.recording?.duration = duration
+                    self?.attachments.recording?.waveformSamples = samples
+                }
+            }
+            if state == .waitingForRecordingPermission {
+                state = .isRecordingTap
+            }
+            attachments.recording?.url = url
         }
     }
 }

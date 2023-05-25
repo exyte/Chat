@@ -27,19 +27,16 @@ final class Recorder {
         audioRecorder?.isRecording ?? false
     }
 
-    func startRecording(durationProgressHandler: @escaping ProgressHandler) -> URL? {
+    func startRecording(durationProgressHandler: @escaping ProgressHandler) async -> URL? {
         if !isAllowedToRecordAudio {
-            Task {
-                let granted = await audioSession.requestRecordPermission()
-                if granted {
-                    return startRecordingInternal(durationProgressHandler)
-                }
-                return nil
+            let granted = await audioSession.requestRecordPermission()
+            if granted {
+                return startRecordingInternal(durationProgressHandler)
             }
+            return nil
         } else {
             return startRecordingInternal(durationProgressHandler)
         }
-        return nil
     }
 
     private func startRecordingInternal(_ durationProgressHandler: @escaping ProgressHandler) -> URL? {
@@ -60,8 +57,11 @@ final class Recorder {
             audioRecorder?.isMeteringEnabled = true
             audioRecorder?.record()
             durationProgressHandler(0.0, [])
-            audioTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-                self?.onTimer(durationProgressHandler)
+
+            DispatchQueue.main.async { [weak self] in
+                self?.audioTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                    self?.onTimer(durationProgressHandler)
+                }
             }
 
             return recordingUrl
