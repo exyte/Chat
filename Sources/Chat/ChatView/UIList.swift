@@ -49,7 +49,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
-                tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
+                if !sections.isEmpty {
+                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
+                }
             }
         }
 
