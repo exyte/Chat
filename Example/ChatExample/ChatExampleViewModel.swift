@@ -62,9 +62,9 @@ struct MockCreateMessage {
 }
 
 extension MockCreateMessage {
-    func toMockMessage(user: MockUser, status: Message.Status = .read) -> MockMessage {
+    func toMockMessage(id: String, user: MockUser, status: Message.Status = .read) -> MockMessage {
         MockMessage(
-            uid: UUID().uuidString,
+            uid: id,
             sender: user,
             createdAt: createdAt,
             status: user.isCurrentUser ? status : nil,

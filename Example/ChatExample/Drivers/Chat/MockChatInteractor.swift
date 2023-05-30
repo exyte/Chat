@@ -45,7 +45,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
             }
             chatState.value.remove(at: index)
         }
-        let message = message.toMockMessage(user: chatData.tim, status: .sending)
+        let message = message.toMockMessage(id: message.uid ?? UUID().uuidString, user: chatData.tim, status: .sending)
         chatState.value.append(message)
     }
 
