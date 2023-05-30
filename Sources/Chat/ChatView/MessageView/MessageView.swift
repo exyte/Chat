@@ -190,6 +190,7 @@ struct MessageView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     messageView
                     timeView
+                        .padding(.leading, 12)
                 }
                 .padding(.vertical, 8)
             case .overlay:
@@ -228,17 +229,21 @@ struct MessageView: View {
 }
 
 extension View {
+
+    @ViewBuilder
     func bubbleBackground(_ message: Message, theme: ChatTheme, isReply: Bool = false) -> some View {
+        let radius: CGFloat = !message.attachments.isEmpty ? 12 : 20
         self
             .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
                 if isReply || !message.text.isEmpty || message.recording != nil {
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: radius)
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                         .opacity(isReply ? 0.5 : 1)
                 }
             }
+            .cornerRadius(radius)
     }
 
     func alignLeft(_ message: Message) -> some View {

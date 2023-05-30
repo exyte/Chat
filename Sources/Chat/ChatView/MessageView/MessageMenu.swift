@@ -26,10 +26,8 @@ struct MessageMenu<MainButton: View>: View {
     var onAction: (MessageMenuAction) -> ()
 
     var body: some View {
-        FloatingButton(mainButtonView: mainButton(), buttons: [
-            menuButton(title: "Reply", icon: theme.images.messageMenu.reply, action: .reply),
-            menuButton(title: "Edit", icon: theme.images.messageMenu.edit, action: .reply),
-            menuButton(title: "Select", icon: theme.images.messageMenu.select, action: .reply)
+        FloatingButton(mainButtonView: mainButton().allowsHitTesting(false), buttons: [
+            menuButton(title: "Reply", icon: theme.images.messageMenu.reply, action: .reply)
         ], isOpen: $isShowingMenu)
         .straight()
         .initialOpacity(0)
@@ -49,10 +47,12 @@ struct MessageMenu<MainButton: View>: View {
             ZStack {
                 theme.colors.friendMessage
                     .background(.ultraThinMaterial)
+                    .environment(\.colorScheme, .light)
                     .opacity(0.5)
                     .cornerRadius(12)
                 HStack {
                     Text(title)
+                        .foregroundColor(theme.colors.textLightContext)
                     Spacer()
                     icon
                 }
