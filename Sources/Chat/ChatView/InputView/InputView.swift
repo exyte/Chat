@@ -149,7 +149,7 @@ struct InputView: View {
             case .isRecordingHold:
                 swipeToCancel
             case .isRecordingTap:
-                Spacer()
+                recordingInProgress
             default:
                 TextInputView(text: $viewModel.attachments.text, inputFieldId: inputFieldId, style: style)
             }
@@ -375,6 +375,16 @@ struct InputView: View {
                         .foregroundColor(theme.colors.textLightContext)
                 }
             }
+            Spacer()
+        }
+    }
+
+    var recordingInProgress: some View {
+        HStack {
+            Spacer()
+            Text("Recording...")
+                .font(.footnote)
+                .foregroundColor(theme.colors.textLightContext)
             Spacer()
         }
     }

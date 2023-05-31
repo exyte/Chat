@@ -13,6 +13,7 @@ struct MockMessage {
 
     let text: String
     let images: [MockImage]
+    let videos: [MockVideo]
     let recording: Recording?
     let replyMessage: ReplyMessage?
 }
@@ -25,7 +26,7 @@ extension MockMessage {
             status: status,
             createdAt: createdAt,
             text: text,
-            attachments: images.map { $0.toChatAttachment() },
+            attachments: images.map { $0.toChatAttachment() } + videos.map { $0.toChatAttachment() },
             recording: recording,
             replyMessage: replyMessage
         )

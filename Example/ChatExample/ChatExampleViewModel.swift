@@ -57,6 +57,7 @@ struct MockCreateMessage {
 
     let text: String
     let images: [MockImage]
+    let videos: [MockVideo]
     let recording: Recording?
     let replyMessage: ReplyMessage?
 }
@@ -70,6 +71,7 @@ extension MockCreateMessage {
             status: user.isCurrentUser ? status : nil,
             text: text,
             images: images,
+            videos: videos,
             recording: recording,
             replyMessage: replyMessage
         )
@@ -85,12 +87,21 @@ extension DraftMessage {
             }
     }
 
+    func makeMockVideos() -> [MockVideo] {
+        attachments
+            .compactMap { $0 as? VideoAttachment }
+            .map {
+                MockVideo(thumbnail: $0.thumbnail, full: $0.full)
+            }
+    }
+
     func toMockCreateMessage() -> MockCreateMessage {
         MockCreateMessage(
             uid: id,
             createdAt: createdAt,
             text: text,
             images: makeMockImages(),
+            videos: makeMockVideos(),
             recording: recording,
             replyMessage: replyMessage
         )

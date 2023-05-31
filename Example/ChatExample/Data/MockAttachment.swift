@@ -8,11 +8,21 @@ import Chat
 struct MockImage {
     let thumbnail: URL
     let full: URL
-}
 
-extension MockImage {
     func toChatAttachment() -> any Attachment {
         ImageAttachment(
+            thumbnail: thumbnail,
+            full: full
+        )
+    }
+}
+
+struct MockVideo {
+    let thumbnail: URL
+    let full: URL
+
+    func toChatAttachment() -> any Attachment {
+        VideoAttachment(
             thumbnail: thumbnail,
             full: full
         )

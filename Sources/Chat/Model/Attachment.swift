@@ -41,8 +41,4 @@ public struct VideoAttachment: Attachment {
         self.full = full
         self.name = name
     }
-
-    public init(url: URL) {
-        self.init(thumbnail: url, full: url)
-    }
 }

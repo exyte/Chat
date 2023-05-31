@@ -162,19 +162,22 @@ private extension InputViewModel {
         attachments.medias.publisher
             .receive(on: DispatchQueue.global())
             .asyncMap { media in
-                await (media, media.getURL())
-            }
-            .compactMap { (media, url) -> (Media, URL)? in
-                guard let url = url else { return nil }
-                return (media, url)
-            }
-            .map { (media, url) -> any Attachment in
+                guard let thumbnailURL = await media.getThumbnailURL() else {
+                    return nil
+                }
+
                 switch media.type {
                 case .image:
-                    return ImageAttachment(url: url)
+                    return ImageAttachment(url: thumbnailURL)
                 case .video:
-                    return VideoAttachment(url: url)
+                    guard let fullURL = await media.getURL() else {
+                        return nil
+                    }
+                    return VideoAttachment(thumbnail: thumbnailURL, full: fullURL)
                 }
+            }
+            .compactMap {
+                $0
             }
             .collect()
             .eraseToAnyPublisher()

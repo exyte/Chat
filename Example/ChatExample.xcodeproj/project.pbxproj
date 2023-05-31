@@ -22,7 +22,7 @@
 		13E17B6D2869E940004DF140 /* MockUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6C2869E940004DF140 /* MockUser.swift */; };
 		13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6E2869E983004DF140 /* MockChatData.swift */; };
 		13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */; };
-		13F1C0F2286ADD8900D25D8A /* MockImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockImage.swift */; };
+		13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */; };
 		5B06E7922991116F002C7061 /* Chat in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 1376F7AA286467700016CD1B /* Chat */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5B6D3A732987D85A00765148 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+Extension.swift */; };
 /* End PBXBuildFile section */
@@ -59,7 +59,7 @@
 		13E17B6C2869E940004DF140 /* MockUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUser.swift; sourceTree = "<group>"; };
 		13E17B6E2869E983004DF140 /* MockChatData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatData.swift; sourceTree = "<group>"; };
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
-		13F1C0F1286ADD8900D25D8A /* MockImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockImage.swift; sourceTree = "<group>"; };
+		13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAttachment.swift; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -165,7 +165,7 @@
 				1376F7BA286472530016CD1B /* ChatError.swift */,
 				13E17B6C2869E940004DF140 /* MockUser.swift */,
 				135987B92869F3AE006388CF /* MockMessage.swift */,
-				13F1C0F1286ADD8900D25D8A /* MockImage.swift */,
+				13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -273,7 +273,7 @@
 				1376133E28782F8E00E7CF67 /* Date+Random.swift in Sources */,
 				13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */,
 				135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */,
-				13F1C0F2286ADD8900D25D8A /* MockImage.swift in Sources */,
+				13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */,
 				135549342864620900C9459A /* ChatExampleApp.swift in Sources */,
 				13E17B6D2869E940004DF140 /* MockUser.swift in Sources */,
 				13DF042D2864790B0043DBBC /* ContentView.swift in Sources */,
@@ -406,7 +406,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
 				DEVELOPMENT_TEAM = FZXCM5CJ7P;
 				ENABLE_PREVIEWS = YES;
@@ -444,7 +444,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FZXCM5CJ7P;
