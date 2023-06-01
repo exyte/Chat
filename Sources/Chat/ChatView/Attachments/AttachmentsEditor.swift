@@ -22,13 +22,17 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var chatTitle: String?
     var messageUseMarkdown: Bool
 
+    @State private var seletedMedias: [Media] = []
+    @State private var currentFullscreenMedia: Media?
+
     var showingAlbums: Bool {
         inputViewModel.mediaPickerMode == .albums
     }
 
     var body: some View {
         MediaPicker(isPresented: $inputViewModel.showPicker) {
-            inputViewModel.attachments.medias = $0
+            seletedMedias = $0
+            assembleSelectedMedia()
         } albumSelectionBuilder: { _, albumSelectionView in
             VStack {
                 albumSelectionHeaderView
@@ -46,12 +50,29 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
             .background(pickerTheme.main.albumSelectionBackground)
         }
+        .didPressCancelCamera {
+            inputViewModel.showPicker = false
+        }
+        .currentFullscreenMedia($currentFullscreenMedia)
         .showLiveCameraCell()
         .mediaSelectionLimit(assetsPickerLimit)
         .pickerMode($inputViewModel.mediaPickerMode)
         .padding(.top)
         .background(pickerTheme.main.albumSelectionBackground)
         .ignoresSafeArea(.all)
+        .onChange(of: currentFullscreenMedia) { newValue in
+            assembleSelectedMedia()
+        }
+    }
+
+    func assembleSelectedMedia() {
+        if !seletedMedias.isEmpty {
+            inputViewModel.attachments.medias = seletedMedias
+        } else if let media = currentFullscreenMedia {
+            inputViewModel.attachments.medias = [media]
+        } else {
+            inputViewModel.attachments.medias = []
+        }
     }
 
     @ViewBuilder
