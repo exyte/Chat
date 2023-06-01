@@ -23,7 +23,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
     
     var senders: [MockUser] {
         var members = [chatData.steve, chatData.tim]
-        if isActive { members.append(chatData.emma) }
+        if isActive { members.append(chatData.bob) }
         return members
     }
     

@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import UIKit
 
 final class MockChatData {
 
@@ -11,21 +12,21 @@ final class MockChatData {
     let tim = MockUser(
         uid: "1",
         name: "Tim",
-        avatar: URL(string: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Solid_green.svg/1200px-Solid_green.svg.png")!
+        avatar: AssetExtractor.createLocalUrl(forImageNamed: "tim")!
     )
     let steve = MockUser(
         uid: "2",
         name: "Steve",
-        avatar: URL(string: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Oxford_blue.png")!
+        avatar: AssetExtractor.createLocalUrl(forImageNamed: "steve")!
     )
-    let emma = MockUser(
+    let bob = MockUser(
         uid: "3",
-        name: "Emma",
-        avatar: URL(string: "https://upload.wikimedia.org/wikipedia/commons/4/40/Dark_orange.PNG")!
+        name: "Bob",
+        avatar: AssetExtractor.createLocalUrl(forImageNamed: "bob")!
     )
 
     func randomMessage(senders: [MockUser] = [], date: Date? = nil) -> MockMessage {
-        let senders = senders.isEmpty ? [tim, steve, emma] : senders
+        let senders = senders.isEmpty ? [tim, steve, bob] : senders
         let sender = senders.random()!
         let date = date ?? Date()
         let images = randomImages()
@@ -76,4 +77,27 @@ private extension MockChatData {
         let letters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]
         return letters.random()!
     }
+}
+
+class AssetExtractor {
+
+    static func createLocalUrl(forImageNamed name: String) -> URL? {
+
+        let fileManager = FileManager.default
+        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        let url = cacheDirectory.appendingPathComponent("\(name).pdf")
+
+        guard fileManager.fileExists(atPath: url.path) else {
+            guard
+                let image = UIImage(named: name),
+                let data = image.pngData()
+            else { return nil }
+
+            fileManager.createFile(atPath: url.path, contents: data, attributes: nil)
+            return url
+        }
+
+        return url
+    }
+
 }

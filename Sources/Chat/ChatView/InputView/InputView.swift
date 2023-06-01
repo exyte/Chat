@@ -230,6 +230,7 @@ struct InputView: View {
                             textView(message.text)
                                 .font(.caption2)
                                 .lineLimit(1)
+                                .foregroundColor(theme.colors.textLightContext)
                         }
                     }
                     .padding(.vertical, 2)
