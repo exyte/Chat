@@ -106,7 +106,7 @@ private extension MockChatInteractor {
         let updated = chatState.value.map {
             var message = $0
             if message.status == .sending {
-                if Int.random(min: 0, max: 2) == 0 {
+                if Int.random(min: 0, max: 20) == 0 {
                     message.status = .error
                 } else {
                     message.status = .sent
