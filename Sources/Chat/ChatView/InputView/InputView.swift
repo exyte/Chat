@@ -99,6 +99,7 @@ struct InputView: View {
 
     @State private var dragStart: Date?
     @State private var tapDelayTimer: Timer?
+    @State private var cancelGesture = false
     let tapDelay = 0.2
 
     var body: some View {
@@ -472,32 +473,47 @@ struct InputView: View {
 
     func dragGesture() -> some Gesture {
         DragGesture(minimumDistance: 0.0, coordinateSpace: .global)
-            .onChanged { _ in
+            .onChanged { value in
                 if dragStart == nil {
                     dragStart = Date()
+                    cancelGesture = false
                     tapDelayTimer = Timer.scheduledTimer(withTimeInterval: tapDelay, repeats: false) { _ in
                         if state != .isRecordingTap {
                             self.onAction(.recordAudioHold)
                         }
                     }
                 }
-            }
-            .onEnded() { value in
-                tapDelayTimer = nil
-                if recordButtonFrame.contains(value.location) {
-                    if let dragStart = dragStart, Date().timeIntervalSince(dragStart) < tapDelay {
-                        onAction(.recordAudioTap)
-                    } else if state != .waitingForRecordingPermission {
-                        onAction(.send)
-                    }
-                }
-                else if lockRecordFrame.contains(value.location) {
+
+                if value.location.y < lockRecordFrame.minY,
+                   value.location.x > recordButtonFrame.minX {
+                    cancelGesture = true
                     onAction(.recordAudioLock)
                 }
-                else if deleteRecordFrame.contains(value.location) {
+
+                if value.location.x < UIScreen.main.bounds.width/2,
+                   value.location.y > recordButtonFrame.minY {
+                    cancelGesture = true
                     onAction(.deleteRecord)
-                } else {
-                    onAction(.send)
+                }
+            }
+            .onEnded() { value in
+                if !cancelGesture {
+                    tapDelayTimer = nil
+                    if recordButtonFrame.contains(value.location) {
+                        if let dragStart = dragStart, Date().timeIntervalSince(dragStart) < tapDelay {
+                            onAction(.recordAudioTap)
+                        } else if state != .waitingForRecordingPermission {
+                            onAction(.send)
+                        }
+                    }
+                    else if lockRecordFrame.contains(value.location) {
+                        onAction(.recordAudioLock)
+                    }
+                    else if deleteRecordFrame.contains(value.location) {
+                        onAction(.deleteRecord)
+                    } else {
+                        onAction(.send)
+                    }
                 }
                 dragStart = nil
             }
