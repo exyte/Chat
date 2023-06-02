@@ -92,7 +92,7 @@ struct MessageView: View {
             }
         }
         .padding(.top, topPadding)
-        .frame(width: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
+        .frame(maxWidth: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
     }
 
     @ViewBuilder
