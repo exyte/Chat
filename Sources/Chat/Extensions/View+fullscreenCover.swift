@@ -47,13 +47,10 @@ private struct TransparentNonAnimatableFullScreenModifier<Item, FullScreenConten
 private struct FullScreenCoverBackgroundRemovalView: UIViewRepresentable {
 
     private class BackgroundRemovalView: UIView {
-
         override func didMoveToWindow() {
             super.didMoveToWindow()
-
             superview?.superview?.backgroundColor = .clear
         }
-
     }
 
     func makeUIView(context: Context) -> UIView {

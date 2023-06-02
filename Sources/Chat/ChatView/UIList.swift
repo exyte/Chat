@@ -20,7 +20,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     @ObservedObject var viewModel: ChatViewModel
     @ObservedObject var paginationState: PaginationState
 
-    @Binding var showScrollToBottom: Bool
+    @Binding var isScrolledToBottom: Bool
+    @Binding var shouldScrollToTop: () -> ()
 
     var messageBuilder: MessageBuilderClosure?
 
@@ -28,6 +29,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     let messageUseMarkdown: Bool
     let sections: [MessagesSection]
     let ids: [String]
+
+    @State private var isScrolledToTop = false
 
     private let updatesQueue = DispatchQueue(label: "updatesQueue")
     @State private var updateSemaphore = DispatchSemaphore(value: 1)
@@ -46,12 +49,19 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.estimatedSectionHeaderHeight = 0
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
         tableView.backgroundColor = UIColor(theme.colors.mainBackground)
+        tableView.scrollsToTop = false
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
                 if !context.coordinator.sections.isEmpty {
                     tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
                 }
+            }
+        }
+
+        DispatchQueue.main.async {
+            shouldScrollToTop = {
+                tableView.contentOffset = CGPoint(x: 0, y: tableView.contentSize.height - tableView.frame.height)
             }
         }
 
@@ -77,7 +87,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             }
             tableSemaphore.wait()
 
-            if !showScrollToBottom {
+            if isScrolledToBottom || isScrolledToTop {
                 DispatchQueue.main.sync {
                     // step 2
                     // apply the rest of the changes to table's dataSource
@@ -91,6 +101,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     updateSemaphore.signal()
                 }
             } else {
+                context.coordinator.ids = ids
                 updateSemaphore.signal()
             }
         }
@@ -154,7 +165,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator<MessageContent> {
-        Coordinator(viewModel: viewModel, paginationState: paginationState, showScrollToBottom: $showScrollToBottom, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
+        Coordinator(viewModel: viewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
     }
 
     class Coordinator<MessageContent: View>: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -162,7 +173,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         @ObservedObject var viewModel: ChatViewModel
         @ObservedObject var paginationState: PaginationState
 
-        @Binding var showScrollToBottom: Bool
+        @Binding var isScrolledToBottom: Bool
+        @Binding var isScrolledToTop: Bool
 
         var messageBuilder: MessageBuilderClosure?
 
@@ -173,10 +185,11 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         let mainBackgroundColor: Color
 
-        init(viewModel: ChatViewModel, paginationState: PaginationState, showScrollToBottom: Binding<Bool>, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
+        init(viewModel: ChatViewModel, paginationState: PaginationState, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
             self.viewModel = viewModel
             self.paginationState = paginationState
-            self._showScrollToBottom = showScrollToBottom
+            self._isScrolledToBottom = isScrolledToBottom
+            self._isScrolledToTop = isScrolledToTop
             self.messageBuilder = messageBuilder
             self.avatarSize = avatarSize
             self.messageUseMarkdown = messageUseMarkdown
@@ -236,7 +249,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            showScrollToBottom = scrollView.contentOffset.y > 0
+            isScrolledToBottom = scrollView.contentOffset.y <= 0
+            isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
         }
     }
 }

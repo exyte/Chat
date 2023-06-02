@@ -47,7 +47,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     @State private var inputFieldId = UUID()
 
-    @State private var showScrollToBottom: Bool = false
+    @State private var isScrolledToBottom: Bool = true
+    @State private var shouldScrollToTop: () -> () = {}
 
     @State private var isShowingMenu = false
     @State private var needsScrollView = false
@@ -75,7 +76,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             ZStack(alignment: .bottomTrailing) {
                 list
 
-                if showScrollToBottom {
+                if !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                     } label: {
@@ -133,13 +134,17 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var list: some View {
         UIList(viewModel: viewModel,
                paginationState: paginationState,
-               showScrollToBottom: $showScrollToBottom,
+               isScrolledToBottom: $isScrolledToBottom,
+               shouldScrollToTop: $shouldScrollToTop,
                messageBuilder: messageBuilder,
                avatarSize: avatarSize,
                messageUseMarkdown: messageUseMarkdown,
                sections: sections,
                ids: ids
         )
+        .onStatusBarTap {
+            shouldScrollToTop()
+        }
         .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
             if let row = viewModel.messageMenuRow {
                 ZStack(alignment: .topLeading) {

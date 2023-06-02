@@ -87,7 +87,6 @@ final class RecordingPlayer: ObservableObject {
             guard let item = self?.player?.currentItem, !item.duration.seconds.isNaN else { return }
             self?.duration = item.duration.seconds
             self?.progress = time.seconds / item.duration.seconds
-            //print(self?.progress)
             self?.secondsLeft = (item.duration - time).seconds.rounded()
         }
     }
