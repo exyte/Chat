@@ -136,7 +136,11 @@ struct InputView: View {
             case .message:
                 attachButton
             case .signature:
-                addButton
+                if viewModel.mediaPickerMode == .cameraSelection {
+                    addButton
+                } else {
+                    Color.clear.frame(width: 12, height: 1)
+                }
             }
         }
     }
@@ -163,7 +167,9 @@ struct InputView: View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                cameraButton
+                if case .message = style {
+                    cameraButton
+                }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
             case .hasRecording:
