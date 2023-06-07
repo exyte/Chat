@@ -5,6 +5,10 @@
 import SwiftUI
 
 struct AttachmentsPage: View {
+
+    @EnvironmentObject var mediaPagesViewModel: FullscreenMediaPagesViewModel
+    @Environment(\.chatTheme) private var theme
+
     let attachment: any Attachment
 
     var body: some View {
@@ -14,16 +18,13 @@ struct AttachmentsPage: View {
                 case let .success(image):
                     image
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
+                        .aspectRatio(contentMode: .fit)
                 default:
                     Color.clear
                 }
             }
-            .frame(maxHeight: 200)
         } else if let attachment = attachment as? VideoAttachment {
-            VideoView(
-                viewModel: VideoViewModel(attachment: attachment)
-            )
+            VideoView(viewModel: VideoViewModel(attachment: attachment))
         } else {
             Rectangle()
                 .foregroundColor(Color.gray)

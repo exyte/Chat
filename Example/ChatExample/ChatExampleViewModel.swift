@@ -83,7 +83,7 @@ extension DraftMessage {
         attachments
             .compactMap { $0 as? ImageAttachment }
             .map {
-                MockImage(thumbnail: $0.thumbnail, full: $0.full)
+                MockImage(id: $0.id, thumbnail: $0.thumbnail, full: $0.full)
             }
     }
 
@@ -91,7 +91,7 @@ extension DraftMessage {
         attachments
             .compactMap { $0 as? VideoAttachment }
             .map {
-                MockVideo(thumbnail: $0.thumbnail, full: $0.full)
+                MockVideo(id: $0.id, thumbnail: $0.thumbnail, full: $0.full)
             }
     }
 

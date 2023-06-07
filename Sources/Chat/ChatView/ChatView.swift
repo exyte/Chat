@@ -109,15 +109,19 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
             let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
 
-            AttachmentsPages(
-                viewModel: AttachmentsPagesViewModel(
-                    attachments: attachments,
-                    index: index ?? 0
-                ),
-                onClose: { [weak viewModel] in
-                    viewModel?.dismissAttachmentFullScreen()
-                }
-            )
+            GeometryReader { g in
+                FullscreenMediaPages(
+                    viewModel: FullscreenMediaPagesViewModel(
+                        attachments: attachments,
+                        index: index ?? 0
+                    ),
+                    safeAreaInsets: g.safeAreaInsets,
+                    onClose: { [weak viewModel] in
+                        viewModel?.dismissAttachmentFullScreen()
+                    }
+                )
+                .ignoresSafeArea()
+            }
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
             AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown)

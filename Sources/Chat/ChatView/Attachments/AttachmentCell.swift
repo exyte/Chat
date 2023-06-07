@@ -19,13 +19,9 @@ struct AttachmentCell: View {
                 content
                     .overlay {
                         theme.images.message.playVideo
+                            .resizable()
                             .foregroundColor(.white)
-                            .padding()
-                            .background {
-                                Circle()
-                                    .fill(.black)
-                                    .opacity(0.72)
-                            }
+                            .frame(width: 36, height: 36)
                     }
             } else {
                 content

@@ -7,7 +7,7 @@ import AVKit
 
 struct VideoView: View {
 
-    @EnvironmentObject var attachmentsPagesViewModel: AttachmentsPagesViewModel
+    @EnvironmentObject var mediaPagesViewModel: FullscreenMediaPagesViewModel
     @Environment(\.chatTheme) private var theme
 
     @StateObject var viewModel: VideoViewModel
@@ -21,53 +21,28 @@ struct VideoView: View {
             }
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            viewModel.showActions()
-        }
         .onAppear {
             viewModel.onStart()
+
+            mediaPagesViewModel.toggleVideoPlaying = {
+                viewModel.togglePlay()
+            }
+            mediaPagesViewModel.toggleVideoMuted = {
+                viewModel.toggleMute()
+            }
         }
         .onDisappear {
             viewModel.onStop()
         }
-        .onChange(of: viewModel.hideAction) { hideActions in
-            attachmentsPagesViewModel.showMinis = !hideActions
+        .onChange(of: viewModel.isPlaying) { newValue in
+            mediaPagesViewModel.videoPlaying = newValue
+        }
+        .onChange(of: viewModel.isMuted) { newValue in
+            mediaPagesViewModel.videoMuted = newValue
         }
     }
 
     func content(for player: AVPlayer) -> some View {
-        Group {
-            Color.clear
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background {
-                    VideoPlayer(player: player)
-                        .allowsHitTesting(false)
-                }
-                .overlay {
-                    if !viewModel.hideAction {
-                        Button {
-                            viewModel.togglePlay()
-                        } label: {
-                            (viewModel.isPlaying ? theme.images.message.pauseVideo : theme.images.message.playVideo)
-                                .resizable()
-                                .frame(width: 64, height: 64)
-                                .foregroundColor(.white)
-                        }
-                    }
-                }
-        }
-    }
-}
-
-struct VideoView_Previews: PreviewProvider {
-    private static var attachment = VideoAttachment(
-        thumbnail: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg")!,
-        full: URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")!
-    )
-
-    static var previews: some View {
-        VideoView(
-            viewModel: VideoViewModel(attachment: attachment)
-        )
+        VideoPlayer(player: player)
     }
 }

@@ -8,14 +8,12 @@ import AVKit
 
 // TODO: Create option "download video before playing"
 final class VideoViewModel: ObservableObject {
+
     @Published var attachment: VideoAttachment
     @Published var player: AVPlayer?
 
     @Published var isPlaying = false
-    @Published var hideAction = false
-
-    var subscriptions = Set<AnyCancellable>()
-    var timersSubscriptions = Set<AnyCancellable>()
+    @Published var isMuted = false
 
     init(attachment: VideoAttachment) {
         self.attachment = attachment
@@ -24,6 +22,8 @@ final class VideoViewModel: ObservableObject {
     func onStart() {
         if player == nil {
             self.player = AVPlayer(url: attachment.full)
+
+            NotificationCenter.default.addObserver(self, selector: #selector(finishVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }
     }
 
@@ -39,11 +39,9 @@ final class VideoViewModel: ObservableObject {
         }
     }
 
-    func showActions() {
-        hideAction = false
-        if player?.isPlaying == true {
-            hideActionsAfterDelay()
-        }
+    func toggleMute() {
+        player?.isMuted.toggle()
+        isMuted = player?.isMuted ?? false
     }
 }
 
@@ -51,25 +49,16 @@ private extension VideoViewModel {
 
     func playVideo() {
         player?.play()
-        hideActionsAfterDelay()
         isPlaying = player?.isPlaying ?? false
+    }
+
+    @objc func finishVideo() {
+        player?.seek(to: CMTime(seconds: 0, preferredTimescale: 10))
+        isPlaying = false
     }
 
     func pauseVideo() {
         player?.pause()
-        timersSubscriptions.removeAll()
-        hideAction = false
         isPlaying = player?.isPlaying ?? false
-    }
-
-    func hideActionsAfterDelay() {
-        timersSubscriptions.removeAll()
-        Timer.publish(every: 3.0, on: .main, in: .common)
-            .autoconnect()
-            .first()
-            .sink { [weak self] _ in
-                self?.hideAction = true
-            }
-            .store(in: &timersSubscriptions)
     }
 }

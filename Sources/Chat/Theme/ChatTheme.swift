@@ -114,6 +114,13 @@ public struct ChatTheme {
             public var microphone: Image
         }
 
+        public struct FullscreenMedia {
+            public var play: Image
+            public var pause: Image
+            public var mute: Image
+            public var unmute: Image
+        }
+
         public struct MediaPicker {
             public var chevronDown: Image
             public var chevronRight: Image
@@ -162,6 +169,7 @@ public struct ChatTheme {
 
         public var attachMenu: AttachMenu
         public var inputView: InputView
+        public var fullscreenMedia: FullscreenMedia
         public var mediaPicker: MediaPicker
         public var message: Message
         public var messageMenu: MessageMenu
@@ -182,6 +190,10 @@ public struct ChatTheme {
             attach: Image? = nil,
             attachCamera: Image? = nil,
             microphone: Image? = nil,
+            fullscreenPlay: Image? = nil,
+            fullscreenPause: Image? = nil,
+            fullscreenMute: Image? = nil,
+            fullscreenUnmute: Image? = nil,
             chevronDown: Image? = nil,
             chevronRight: Image? = nil,
             cross: Image? = nil,
@@ -233,6 +245,13 @@ public struct ChatTheme {
                 attach: attach ?? Image("attach", bundle: .current),
                 attachCamera: attachCamera ?? Image("attachCamera", bundle: .current),
                 microphone: microphone ?? Image("microphone", bundle: .current)
+            )
+
+            self.fullscreenMedia = FullscreenMedia(
+                play: fullscreenPlay ?? Image(systemName: "play.fill"),
+                pause: fullscreenPause ?? Image(systemName: "pause.fill"),
+                mute: fullscreenMute ?? Image(systemName: "speaker.slash.fill"),
+                unmute: fullscreenUnmute ?? Image(systemName: "speaker.fill")
             )
 
             self.mediaPicker = MediaPicker(

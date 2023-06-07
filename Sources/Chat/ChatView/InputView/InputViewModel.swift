@@ -168,12 +168,12 @@ private extension InputViewModel {
 
                 switch media.type {
                 case .image:
-                    return ImageAttachment(url: thumbnailURL)
+                    return ImageAttachment(id: UUID().uuidString, url: thumbnailURL)
                 case .video:
                     guard let fullURL = await media.getURL() else {
                         return nil
                     }
-                    return VideoAttachment(thumbnail: thumbnailURL, full: fullURL)
+                    return VideoAttachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL)
                 }
             }
             .compactMap {

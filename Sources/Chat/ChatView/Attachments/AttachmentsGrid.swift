@@ -10,6 +10,8 @@ struct AttachmentsGrid: View {
 
     private let single: (any Attachment)?
     private let grid: [any Attachment]
+    private let onlyOne: Bool
+
     private let hidden: String?
     private let showMoreAttachmentId: String?
 
@@ -31,6 +33,7 @@ struct AttachmentsGrid: View {
             single = toShow.first
             grid = toShow.dropFirst().map { $0 }
         }
+        self.onlyOne = attachments.count == 1
         self.onTap = onTap
     }
 
@@ -44,6 +47,7 @@ struct AttachmentsGrid: View {
                 AttachmentCell(attachment: attachment, onTap: onTap)
                     .frame(width: 204, height: grid.isEmpty ? 200 : 100)
                     .clipped()
+                    .cornerRadius(onlyOne ? 0 : 12)
             }
             if !grid.isEmpty {
                 ForEach(pair(), id: \.id) { pair in
@@ -135,13 +139,13 @@ extension Array where Element == any Attachment {
 
 extension ImageAttachment {
     static func random() -> ImageAttachment {
-        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!)
+        ImageAttachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!)
     }
 }
 
 extension VideoAttachment {
     static func random() -> ImageAttachment {
-        ImageAttachment(url: URL(string: "https://placeimg.com/640/480/sepia")!)
+        ImageAttachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!)
     }
 }
 #endif

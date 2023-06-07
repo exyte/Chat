@@ -60,6 +60,7 @@ final class MockChatData {
     func randomMockImage() -> MockImage {
         let color = randomColorHex()
         return MockImage(
+            id: UUID().uuidString,
             thumbnail: URL(string: "https://via.placeholder.com/150/\(color)")!,
             full: URL(string: "https://via.placeholder.com/600/\(color)")!
         )

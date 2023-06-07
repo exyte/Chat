@@ -17,15 +17,15 @@ public struct ImageAttachment: Attachment {
     public let full: URL
     public let name: String?
 
-    public init(id: String = UUID().uuidString, thumbnail: URL, full: URL, name: String? = nil) {
+    public init(id: String, thumbnail: URL, full: URL, name: String? = nil) {
         self.id = id
         self.thumbnail = thumbnail
         self.full = full
         self.name = name
     }
 
-    public init(url: URL) {
-        self.init(thumbnail: url, full: url)
+    public init(id: String, url: URL) {
+        self.init(id: id, thumbnail: url, full: url)
     }
 }
 
@@ -35,7 +35,7 @@ public struct VideoAttachment: Attachment {
     public let full: URL
     public let name: String?
 
-    public init(id: String = UUID().uuidString, thumbnail: URL, full: URL, name: String? = nil) {
+    public init(id: String, thumbnail: URL, full: URL, name: String? = nil) {
         self.id = id
         self.thumbnail = thumbnail
         self.full = full
