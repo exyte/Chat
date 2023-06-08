@@ -14,6 +14,8 @@ final class InputViewModel: ObservableObject {
     @Published var showPicker = false
     @Published var mediaPickerMode = MediaPickerMode.photos
 
+    @Published var showActivityIndicator = false
+
     var recordingPlayer: RecordingPlayer?
     var didSendMessage: ((DraftMessage) -> Void)?
 
@@ -184,7 +186,8 @@ private extension InputViewModel {
     }
 
     func sendMessage() -> AnyCancellable {
-        mapAttachmentsForSend()
+        showActivityIndicator = true
+        return mapAttachmentsForSend()
             .compactMap { [attachments] in
                 DraftMessage(
                     text: attachments.text,
@@ -194,8 +197,9 @@ private extension InputViewModel {
                     createdAt: Date()
                 )
             }
-            .sink { draft in
-                DispatchQueue.main.async { [weak self, draft] in
+            .sink { [weak self] draft in
+                DispatchQueue.main.async { [self, draft] in
+                    self?.showActivityIndicator = false
                     self?.didSendMessage?(draft)
                     self?.reset()
                 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ExyteMediaPicker
+import ActivityIndicatorView
 
 struct AttachmentsEditor<InputViewContent: View>: View {
 
@@ -30,40 +31,55 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     }
 
     var body: some View {
-        MediaPicker(isPresented: $inputViewModel.showPicker) {
-            seletedMedias = $0
-            assembleSelectedMedia()
-        } albumSelectionBuilder: { _, albumSelectionView in
-            VStack {
-                albumSelectionHeaderView
-                albumSelectionView
-                Spacer()
-                inputView
+        ZStack {
+            mediaPicker
+
+            if inputViewModel.showActivityIndicator {
+                Color.black.opacity(0.8)
+                    .frame(width: 100, height: 100)
+                    .cornerRadius(8)
+                ActivityIndicatorView(isVisible: .constant(true), type: .flickeringDots())
+                    .foregroundColor(theme.colors.sendButtonBackground)
+                    .frame(width: 50, height: 50)
             }
-            .background(pickerTheme.main.albumSelectionBackground)
-        } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
-            VStack {
-                cameraSelectionHeaderView(cancelClosure: cancelClosure)
-                cameraSelectionView
-                Spacer()
-                inputView
-            }
-            .background(pickerTheme.main.albumSelectionBackground)
-        }
-        .didPressCancelCamera {
-            inputViewModel.showPicker = false
-        }
-        .currentFullscreenMedia($currentFullscreenMedia)
-        .showLiveCameraCell()
-        .mediaSelectionLimit(assetsPickerLimit)
-        .pickerMode($inputViewModel.mediaPickerMode)
-        .padding(.top)
-        .background(pickerTheme.main.albumSelectionBackground)
-        .ignoresSafeArea(.all)
-        .onChange(of: currentFullscreenMedia) { newValue in
-            assembleSelectedMedia()
         }
     }
+
+        var mediaPicker: some View {
+            MediaPicker(isPresented: $inputViewModel.showPicker) {
+                seletedMedias = $0
+                assembleSelectedMedia()
+            } albumSelectionBuilder: { _, albumSelectionView in
+                VStack {
+                    albumSelectionHeaderView
+                    albumSelectionView
+                    Spacer()
+                    inputView
+                }
+                .background(pickerTheme.main.albumSelectionBackground)
+            } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
+                VStack {
+                    cameraSelectionHeaderView(cancelClosure: cancelClosure)
+                    cameraSelectionView
+                    Spacer()
+                    inputView
+                }
+                .background(pickerTheme.main.albumSelectionBackground)
+            }
+            .didPressCancelCamera {
+                inputViewModel.showPicker = false
+            }
+            .currentFullscreenMedia($currentFullscreenMedia)
+            .showLiveCameraCell()
+            .mediaSelectionLimit(assetsPickerLimit)
+            .pickerMode($inputViewModel.mediaPickerMode)
+            .padding(.top)
+            .background(pickerTheme.main.albumSelectionBackground)
+            .ignoresSafeArea(.all)
+            .onChange(of: currentFullscreenMedia) { newValue in
+                assembleSelectedMedia()
+            }
+        }
 
     func assembleSelectedMedia() {
         if !seletedMedias.isEmpty {
