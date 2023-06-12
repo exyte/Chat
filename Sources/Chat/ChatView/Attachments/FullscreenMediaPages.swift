@@ -105,10 +105,11 @@ struct FullscreenMediaPages: View {
             if viewModel.showMinis {
                 Button(action: onClose) {
                     theme.images.mediaPicker.cross
+                        .padding(5)
                 }
                 .tint(.white)
-                .padding(.leading, 20)
-                .offset(y: safeAreaInsets.top)
+                .padding(.leading, 15)
+                .offset(y: safeAreaInsets.top - 5)
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -118,6 +119,8 @@ struct FullscreenMediaPages: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 24, height: 24)
+                        .padding(5)
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             viewModel.toggleVideoPlaying()
                         }
@@ -126,13 +129,15 @@ struct FullscreenMediaPages: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 24, height: 24)
+                        .padding(5)
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             viewModel.toggleVideoMuted()
                         }
                 }
                 .foregroundColor(.white)
                 .padding(.trailing, 10)
-                .offset(y: safeAreaInsets.top)
+                .offset(y: safeAreaInsets.top - 5)
             }
         }
     }
