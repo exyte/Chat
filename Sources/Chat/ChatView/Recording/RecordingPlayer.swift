@@ -52,6 +52,14 @@ final class RecordingPlayer: ObservableObject {
         if !playing { play() }
     }
 
+    func reset() {
+        if playing {
+            pause()
+        }
+        recording = nil
+        progress = 0
+    }
+
     private func play() {
         try? AVAudioSession.sharedInstance().setCategory(.playback)
         try? AVAudioSession.sharedInstance().setActive(true)

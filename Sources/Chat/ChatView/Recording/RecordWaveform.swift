@@ -64,29 +64,27 @@ struct RecordWaveformPlaying: View {
     }
 
     var body: some View {
-        VStack {
-            Spacer()
-            GeometryReader { g in
-                ZStack(alignment: .bottomLeading) {
-                    let adjusted = adjustedSamples(g.size)
-                    RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
-                        .foregroundColor(color.opacity(0.4))
-                    RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
-                        .foregroundColor(color)
-                        .mask(alignment: .topLeading) {
-                            Rectangle()
-                                .frame(width: maxLength * progress, height: 2*RecordWaveform.maxSampleHeight)
-                        }
-                }
+        GeometryReader { g in
+            ZStack {
+                let adjusted = adjustedSamples(g.size.width)
+                RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
+                    .foregroundColor(color.opacity(0.4))
+                RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
+                    .foregroundColor(color)
+                    .mask(alignment: .leading) {
+                        Rectangle()
+                            .frame(width: maxLength * progress, height: 2*RecordWaveform.maxSampleHeight)
+                    }
             }
+            .frame(height: RecordWaveform.maxSampleHeight)
         }
         .frame(height: RecordWaveform.maxSampleHeight)
         .frame(maxWidth: addExtraDots ? .infinity : maxLength)
         .fixedSize(horizontal: !addExtraDots, vertical: true)
     }
 
-    func adjustedSamples(_ size: CGSize) -> [CGFloat] {
-        let maxWidth = addExtraDots ? size.width : UIScreen.main.bounds.width
+    func adjustedSamples(_ width: CGFloat) -> [CGFloat] {
+        let maxWidth = addExtraDots ? width : UIScreen.main.bounds.width
         let maxSamples = Int(maxWidth / (RecordWaveform.width + RecordWaveform.spacing))
 
         var adjusted = samples
@@ -133,7 +131,9 @@ struct RecordWaveform: View {
                     }
                 }
             }
+            .frame(height: RecordWaveform.maxSampleHeight)
         }
+        .frame(height: RecordWaveform.maxSampleHeight)
         .fixedSize(horizontal: !addExtraDots, vertical: true)
     }
 }

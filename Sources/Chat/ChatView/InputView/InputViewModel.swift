@@ -35,7 +35,6 @@ final class InputViewModel: ObservableObject {
 
     func reset() {
         DispatchQueue.main.async { [weak self] in
-            self?.recorder.stopRecording()
             self?.attachments = InputViewAttachments()
             self?.showPicker = false
             self?.state = .empty
@@ -43,6 +42,8 @@ final class InputViewModel: ObservableObject {
     }
 
     func send() {
+        recorder.stopRecording()
+        recordingPlayer?.reset()
         sendMessage()
             .store(in: &subscriptions)
     }
