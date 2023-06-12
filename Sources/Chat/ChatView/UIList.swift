@@ -209,8 +209,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
             let header = UIHostingController(rootView:
                 Text(sections[section].formattedDate)
+                    .font(.system(size: 11))
                     .rotationEffect(Angle(degrees: 180))
                     .padding(10)
+                    .padding(.bottom, 8)
                     .foregroundColor(.gray)
             ).view
             header?.backgroundColor = UIColor(mainBackgroundColor)

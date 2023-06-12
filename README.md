@@ -12,6 +12,7 @@ ___
 
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
+![](https://img.shields.io/github/v/tag/exyte/Chat?label=Version)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fexyte%2FChat%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/exyte/Chat)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fexyte%2FChat%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/exyte/Chat)
 [![SPM Compatible](https://img.shields.io/badge/SwiftPM-Compatible-brightgreen.svg)](https://swiftpackageindex.com/exyte/Chat)
@@ -34,8 +35,8 @@ Create a chat view like this:
 @State var messages: [Message] = []
 
 var body: some View {
-    ChatView(messages: viewModel.messages) { draft in
-        viewModel.send(draft: draft)
+    ChatView(messages: messages) { draft in
+        yourViewModel.send(draft: draft)
     }
 }
 ```
@@ -43,7 +44,7 @@ where:
    `messages` - list of messages to display  
    `didSendMessage` - a closure which is called when the user presses the send button  
 
-`Message` is a type that `Chat` uses for the internal implementation. In the code above it expects the user to provide a list of `Message` structs, and it also returns a `Message` in the `didSendMessage` closure. You can map it both ways to your own Message model that your API expects.
+`Message` is a type that `Chat` uses for the internal implementation. In the code above it expects the user to provide a list of `Message` structs, and it returns a `DraftMessage` in the `didSendMessage` closure. You can map it both ways to your own `Message` model that your API expects.
 
 ## Customization
 You may customize message cells like this: 

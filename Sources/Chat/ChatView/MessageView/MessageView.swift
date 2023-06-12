@@ -28,7 +28,7 @@ struct MessageView: View {
     static let horizontalTextPadding: CGFloat = 12
     static let statusViewSize: CGFloat = 14
     static let horizontalStatusPadding: CGFloat = 8
-    static let horizontalBubblePadding: CGFloat = 20
+    static let horizontalBubblePadding: CGFloat = 70
 
     let fontSize: CGFloat = 15
 
@@ -82,7 +82,6 @@ struct MessageView: View {
                 }
                 bubbleView(message)
             }
-            .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
 
             if message.user.isCurrentUser, let status = message.status {
                 MessageStatusView(status: status) {
@@ -92,6 +91,7 @@ struct MessageView: View {
             }
         }
         .padding(.top, topPadding)
+        .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
         .frame(maxWidth: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
     }
 
