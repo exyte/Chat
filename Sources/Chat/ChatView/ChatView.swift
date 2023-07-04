@@ -15,7 +15,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     /// - message containing user, attachments, etc.
     /// - position of message in its continuous group of messages from the same user
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
-    public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (any Attachment) -> Void) -> MessageContent)
+    public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (Attachment) -> Void) -> MessageContent)
 
     public typealias InputViewBuilderClosure = ((
         Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void) -> InputViewContent)

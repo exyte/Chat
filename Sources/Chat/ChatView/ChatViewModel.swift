@@ -9,14 +9,14 @@ public typealias ChatPaginationClosure = (Message) -> Void
 
 final class ChatViewModel: ObservableObject {
     
-    @Published private(set) var fullscreenAttachmentItem: Optional<any Attachment> = nil
+    @Published private(set) var fullscreenAttachmentItem: Optional<Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
     @Published var messageMenuRow: MessageRow?
 
     public var didSendMessage: (DraftMessage) -> Void = {_ in}
     
-    func presentAttachmentFullScreen(_ attachment: any Attachment) {
+    func presentAttachmentFullScreen(_ attachment: Attachment) {
         fullscreenAttachmentItem = attachment
         fullscreenAttachmentPresented = true
     }

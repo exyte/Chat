@@ -113,7 +113,7 @@ struct FullscreenMediaPages: View {
             }
         }
         .overlay(alignment: .topTrailing) {
-            if viewModel.showMinis, viewModel.attachments[viewModel.index] is VideoAttachment {
+            if viewModel.showMinis, viewModel.attachments[viewModel.index].type == .video {
                 HStack(spacing: 20) {
                     (viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play)
                         .resizable()

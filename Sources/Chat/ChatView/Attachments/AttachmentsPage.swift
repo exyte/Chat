@@ -9,10 +9,10 @@ struct AttachmentsPage: View {
     @EnvironmentObject var mediaPagesViewModel: FullscreenMediaPagesViewModel
     @Environment(\.chatTheme) private var theme
 
-    let attachment: any Attachment
+    let attachment: Attachment
 
     var body: some View {
-        if attachment is ImageAttachment {
+        if attachment.type == .image {
             CachedAsyncImage(url: attachment.full, urlCache: .imageCache) { phase in
                 switch phase {
                 case let .success(image):
@@ -23,7 +23,7 @@ struct AttachmentsPage: View {
                     Color.clear
                 }
             }
-        } else if let attachment = attachment as? VideoAttachment {
+        } else if attachment.type == .video {
             VideoView(viewModel: VideoViewModel(attachment: attachment))
         } else {
             Rectangle()

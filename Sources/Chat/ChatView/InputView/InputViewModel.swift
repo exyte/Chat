@@ -161,7 +161,7 @@ private extension InputViewModel {
 
 private extension InputViewModel {
     
-    func mapAttachmentsForSend() -> AnyPublisher<[any Attachment], Never> {
+    func mapAttachmentsForSend() -> AnyPublisher<[Attachment], Never> {
         attachments.medias.publisher
             .receive(on: DispatchQueue.global())
             .asyncMap { media in
@@ -171,12 +171,12 @@ private extension InputViewModel {
 
                 switch media.type {
                 case .image:
-                    return ImageAttachment(id: UUID().uuidString, url: thumbnailURL)
+                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
                 case .video:
                     guard let fullURL = await media.getURL() else {
                         return nil
                     }
-                    return VideoAttachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL)
+                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
                 }
             }
             .compactMap {

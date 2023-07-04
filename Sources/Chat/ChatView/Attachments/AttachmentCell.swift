@@ -8,14 +8,14 @@ struct AttachmentCell: View {
 
     @Environment(\.chatTheme) private var theme
 
-    let attachment: any Attachment
-    let onTap: (any Attachment) -> Void
+    let attachment: Attachment
+    let onTap: (Attachment) -> Void
 
     var body: some View {
         Group {
-            if attachment is ImageAttachment {
+            if attachment.type == .image {
                 content
-            } else if attachment is VideoAttachment {
+            } else if attachment.type == .video {
                 content
                     .overlay {
                         theme.images.message.playVideo

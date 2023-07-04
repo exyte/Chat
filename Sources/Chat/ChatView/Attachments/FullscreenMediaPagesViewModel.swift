@@ -6,7 +6,7 @@ import Foundation
 import Combine
 
 final class FullscreenMediaPagesViewModel: ObservableObject {
-    var attachments: [any Attachment]
+    var attachments: [Attachment]
     @Published var index: Int
 
     @Published var showMinis = true
@@ -18,7 +18,7 @@ final class FullscreenMediaPagesViewModel: ObservableObject {
     @Published var toggleVideoPlaying = {}
     @Published var toggleVideoMuted = {}
 
-    init(attachments: [any Attachment], index: Int) {
+    init(attachments: [Attachment], index: Int) {
         self.attachments = attachments
         self.index = index
     }

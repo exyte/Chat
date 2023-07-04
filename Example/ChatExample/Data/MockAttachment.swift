@@ -10,7 +10,7 @@ struct MockImage {
     let thumbnail: URL
     let full: URL
 
-    func toChatAttachment() -> any Attachment {
+    func toChatAttachment() -> Attachment {
         ImageAttachment(
             id: id,
             thumbnail: thumbnail,
@@ -24,7 +24,7 @@ struct MockVideo {
     let thumbnail: URL
     let full: URL
 
-    func toChatAttachment() -> any Attachment {
+    func toChatAttachment() -> Attachment {
         VideoAttachment(
             id: id,
             thumbnail: thumbnail,

@@ -4,10 +4,10 @@
 
 import Foundation
 
-public struct DraftMessage {
+public struct DraftMessage: Codable {
     public var id: String?
     public let text: String
-    public let attachments: [any Attachment]
+    public let attachments: [Attachment]
     public let recording: Recording?
     public let replyMessage: ReplyMessage?
     public let createdAt: Date

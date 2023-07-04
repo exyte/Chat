@@ -276,11 +276,11 @@ struct MessageView_Preview: PreviewProvider {
         status: .read,
         text: longMessage,
         attachments: [
-            ImageAttachment.random(),
-            ImageAttachment.random(),
-            ImageAttachment.random(),
-            ImageAttachment.random(),
-            ImageAttachment.random(),
+            Attachment.randomImage(),
+            Attachment.randomImage(),
+            Attachment.randomImage(),
+            Attachment.randomImage(),
+            Attachment.randomImage(),
         ]
     )
 

@@ -7,14 +7,22 @@
 
 import SwiftUI
 
-public struct Message {
+public struct Message: Codable, Identifiable, Hashable {
+
+    public enum Status: Int, Codable {
+        case sending
+        case sent
+        case read
+        case error
+    }
+
     public var id: String
     public var user: User
     public var status: Status?
     public var createdAt: Date
 
     public var text: String
-    public var attachments: [any Attachment]
+    public var attachments: [Attachment]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
 
@@ -23,7 +31,7 @@ public struct Message {
                 status: Status? = nil,
                 createdAt: Date = Date(),
                 text: String = "",
-                attachments: [any Attachment] = [],
+                attachments: [Attachment] = [],
                 recording: Recording? = nil,
                 replyMessage: ReplyMessage? = nil) {
 
@@ -35,6 +43,21 @@ public struct Message {
         self.attachments = attachments
         self.recording = recording
         self.replyMessage = replyMessage
+    }
+
+    public init(id: String,
+                user: User,
+                status: Status? = nil,
+                draft: DraftMessage) {
+
+        self.id = id
+        self.user = user
+        self.status = status
+        self.createdAt = draft.createdAt
+        self.text = draft.text
+        self.attachments = draft.attachments
+        self.recording = draft.recording
+        self.replyMessage = draft.replyMessage
     }
 }
 
@@ -50,27 +73,22 @@ extension Message: Equatable {
     }
 }
 
-public extension Message {
-    enum Status: Int {
-        case sending
-        case sent
-        case read
-        case error
+public struct ReplyMessage: Codable, Identifiable, Hashable {
+    public static func == (lhs: ReplyMessage, rhs: ReplyMessage) -> Bool {
+        lhs.id == rhs.id
     }
-}
-
-public struct ReplyMessage {
+    
     public var id: String
     public var user: User
 
     public var text: String
-    public var attachments: [any Attachment]
+    public var attachments: [Attachment]
     public var recording: Recording?
 
     public init(id: String,
                 user: User,
                 text: String = "",
-                attachments: [any Attachment] = [],
+                attachments: [Attachment] = [],
                 recording: Recording? = nil) {
 
         self.id = id

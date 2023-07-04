@@ -9,13 +9,13 @@ import AVKit
 // TODO: Create option "download video before playing"
 final class VideoViewModel: ObservableObject {
 
-    @Published var attachment: VideoAttachment
+    @Published var attachment: Attachment
     @Published var player: AVPlayer?
 
     @Published var isPlaying = false
     @Published var isMuted = false
 
-    init(attachment: VideoAttachment) {
+    init(attachment: Attachment) {
         self.attachment = attachment
     }
 

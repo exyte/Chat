@@ -5,17 +5,17 @@
 import SwiftUI
 
 struct AttachmentsGrid: View {
-    let onTap: (any Attachment) -> Void
+    let onTap: (Attachment) -> Void
     let maxImages: Int = 4 // TODO: Make injectable
 
-    private let single: (any Attachment)?
-    private let grid: [any Attachment]
+    private let single: (Attachment)?
+    private let grid: [Attachment]
     private let onlyOne: Bool
 
     private let hidden: String?
     private let showMoreAttachmentId: String?
 
-    init(attachments: [any Attachment], onTap: @escaping (any Attachment) -> Void) {
+    init(attachments: [Attachment], onTap: @escaping (Attachment) -> Void) {
         var toShow = attachments
 
         if toShow.count > maxImages {
@@ -95,8 +95,8 @@ private extension AttachmentsGrid {
 }
 
 struct AttachmentsPair {
-    let left: any Attachment
-    let right: any Attachment
+    let left: Attachment
+    let right: Attachment
 
     var id: String {
         left.id + "+" + right.id
@@ -122,30 +122,28 @@ struct AttachmentsGrid_Preview: PreviewProvider {
     }
 }
 
-extension Array where Element == any Attachment {
-    static func random(count: Int) -> [any Attachment] {
+extension Array where Element == Attachment {
+    static func random(count: Int) -> [Attachment] {
         return Swift.Array(repeating: 0, count: count)
             .map { _ in randomAttachment() }
     }
 
-    private static func randomAttachment() -> any Attachment {
+    private static func randomAttachment() -> Attachment {
         if Int.random(in: 0...3) == 0 {
-            return VideoAttachment.random()
+            return Attachment.randomVideo()
         } else {
-            return ImageAttachment.random()
+            return Attachment.randomImage()
         }
     }
 }
 
-extension ImageAttachment {
-    static func random() -> ImageAttachment {
-        ImageAttachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!)
+extension Attachment {
+    static func randomImage() -> Attachment {
+        Attachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!, type: .image)
     }
-}
-
-extension VideoAttachment {
-    static func random() -> ImageAttachment {
-        ImageAttachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!)
+    // TODO get video, not image
+    static func randomVideo() -> Attachment {
+        Attachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!, type: .video)
     }
 }
 #endif
