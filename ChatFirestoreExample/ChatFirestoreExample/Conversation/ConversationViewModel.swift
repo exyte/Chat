@@ -17,43 +17,45 @@ public struct FirestoreMessage: Codable {
     @ServerTimestamp public var createdAt: Date?
 
     public var text: String
-    public var attachments: [Attachment]
+    public var mediaURLs: [String]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
 }
 
+@MainActor
 class ConversationViewModel: ObservableObject {
 
     var users: [User] // not including current user
+    var allUsers: [User]
+    var collection: CollectionReference
 
     @Published var messages: [Message] = []
 
-    private var allUsers: [User] {
-        var all = users
+    init(user: User) {
+        self.users = [user]
+        self.allUsers = [user]
         if let currentUser = SessionManager.shared.currentUser {
-            all.append(currentUser)
+            self.allUsers.append(currentUser)
         }
-        return all
-    }
-
-    private var collection: CollectionReference {
-        Firestore.firestore()
+        self.collection = Firestore.firestore()
             .collection(Collection.conversations)
-            .document("\(allUsers.sorted(by: { $0.id < $1.id }).reduce("") { $0 + $1.id })")
+            .document(user.id)
             .collection(Collection.messages)
     }
 
-    init(users: [User]) {
-        self.users = users
+    init(conversation: Conversation) {
+        self.users = conversation.users.filter { $0.id != SessionManager.shared.currentUserId }
+        self.allUsers = conversation.users
+        self.collection = Firestore.firestore()
+            .collection(Collection.conversations)
+            .document(conversation.id)
+            .collection(Collection.messages)
     }
 
     func getConversation() {
         collection
             .order(by: "createdAt", descending: false)
             .addSnapshotListener() { [weak self] (snapshot, _) in
-                print(snapshot?.documents.map{$0.data()})
-                // print("alisa", snapshot?.documents.map{try? $0.data(as: Message.self) })
-                print("alisa", try? snapshot?.documents.first?.data(as: FirestoreMessage.self))
                 let messages = snapshot?.documents
                     .compactMap { try? $0.data(as: FirestoreMessage.self) }
                     .compactMap { firestoreMessage -> Message? in
@@ -62,12 +64,16 @@ class ConversationViewModel: ObservableObject {
                             let user = self?.allUsers.first(where: { $0.id == firestoreMessage.userId }),
                             let date = firestoreMessage.createdAt
                         else { return nil }
+
+                        let attachments = firestoreMessage.mediaURLs.map {
+                            Attachment(id: UUID().uuidString, url: URL(string: $0)!, type: .image)
+                        }
                         return Message(id: id,
                                        user: user,
                                        status: .sent,
                                        createdAt: date,
                                        text: firestoreMessage.text,
-                                       attachments: firestoreMessage.attachments,
+                                       attachments: attachments,
                                        recording: firestoreMessage.recording,
                                        replyMessage: firestoreMessage.replyMessage)
                     }
@@ -76,27 +82,33 @@ class ConversationViewModel: ObservableObject {
     }
 
     func sendMessage(_ draft: DraftMessage) {
-        guard let user = SessionManager.shared.currentUser else { return }
-        let id = UUID().uuidString
-        let message = Message(id: id, user: user, status: .sending, draft: draft)
-        messages.append(message)
+        Task {
+            guard let user = SessionManager.shared.currentUser else { return }
+            let id = UUID().uuidString
+            let message = await Message.makeMessage(id: id, user: user, status: .sending, draft: draft)
+            messages.append(message)
 
-        let encoder = JSONEncoder()
-        guard let data = try? encoder.encode(draft) else { return }
-        guard var dict = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] else { return }
-        dict["userId"] = user.id
-        dict["createdAt"] = Timestamp(date: message.createdAt)
-        print(dict)
+            let mediaURLs = await draft.medias.asyncMap {
+                await UploadingManager.uploadMedia($0)?.absoluteString
+            }
 
-        collection.document(id).setData(dict) { [weak self] err in
-            if let err = err {
-                print("Error adding document: \(err)")
-                if let index = self?.messages.lastIndex(where: { $0.id == id }) {
-                    self?.messages[index].status = .error
-                }
-            } else {
-                if let index = self?.messages.lastIndex(where: { $0.id == id }) {
-                    self?.messages[index].status = .sent
+            let dict = [
+                "userId": user.id,
+                "createdAt": Timestamp(date: message.createdAt),
+                "text": draft.text,
+                "mediaURLs": mediaURLs
+            ]
+
+            collection.document(id).setData(dict) { [weak self] err in
+                if let err = err {
+                    print("Error adding document: \(err)")
+                    if let index = self?.messages.lastIndex(where: { $0.id == id }) {
+                        self?.messages[index].status = .error(draft)
+                    }
+                } else {
+                    if let index = self?.messages.lastIndex(where: { $0.id == id }) {
+                        self?.messages[index].status = .sent
+                    }
                 }
             }
         }

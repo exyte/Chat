@@ -85,7 +85,9 @@ struct MessageView: View {
 
             if message.user.isCurrentUser, let status = message.status {
                 MessageStatusView(status: status) {
-                    viewModel.sendMessage(message.toDraft())
+                    if case let .error(draft) = status {
+                        viewModel.sendMessage(draft)
+                    }
                 }
                 .sizeGetter($statusSize)
             }

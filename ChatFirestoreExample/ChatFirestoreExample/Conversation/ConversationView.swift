@@ -21,7 +21,14 @@ struct ConversationView: View {
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(viewModel.users.reduce("") { $0 + $1.name + " " }.dropLast())
+                if viewModel.users.count == 1, let user = viewModel.users.first {
+                    HStack {
+                        AvatarView(url: user.avatarURL, size: 44)
+                        Text(user.name)
+                    }
+                } else {
+                    Text(viewModel.users.reduce("") { $0 + $1.name + " " }.dropLast())
+                }
             }
         }
     }

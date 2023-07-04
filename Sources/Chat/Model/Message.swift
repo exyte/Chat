@@ -7,13 +7,41 @@
 
 import SwiftUI
 
-public struct Message: Codable, Identifiable, Hashable {
+public struct Message: Identifiable, Hashable {
 
-    public enum Status: Int, Codable {
+    public enum Status: Equatable, Hashable {
         case sending
         case sent
         case read
-        case error
+        case error(DraftMessage)
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .sending:
+                return hasher.combine("sending")
+            case .sent:
+                return hasher.combine("sent")
+            case .read:
+                return hasher.combine("read")
+            case .error:
+                return hasher.combine("error")
+            }
+        }
+
+        public static func == (lhs: Message.Status, rhs: Message.Status) -> Bool {
+            switch (lhs, rhs) {
+            case (.sending, .sending):
+                return true
+            case (.sent, .sent):
+                return true
+            case (.read, .read):
+                return true
+            case ( .error(_), .error(_)):
+                return true
+            default:
+                return false
+            }
+        }
     }
 
     public var id: String
@@ -45,20 +73,29 @@ public struct Message: Codable, Identifiable, Hashable {
         self.replyMessage = replyMessage
     }
 
-    public init(id: String,
-                user: User,
-                status: Status? = nil,
-                draft: DraftMessage) {
+    public static func makeMessage(
+        id: String,
+        user: User,
+        status: Status? = nil,
+        draft: DraftMessage) async -> Message {
+            let attachments = await draft.medias.asyncCompactMap { media -> Attachment? in
+                guard let thumbnailURL = await media.getThumbnailURL() else {
+                    return nil
+                }
 
-        self.id = id
-        self.user = user
-        self.status = status
-        self.createdAt = draft.createdAt
-        self.text = draft.text
-        self.attachments = draft.attachments
-        self.recording = draft.recording
-        self.replyMessage = draft.replyMessage
-    }
+                switch media.type {
+                case .image:
+                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
+                case .video:
+                    guard let fullURL = await media.getURL() else {
+                        return nil
+                    }
+                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
+                }
+            }
+
+            return Message(id: id, user: user, status: status, createdAt: draft.createdAt, text: draft.text, attachments: attachments, recording: draft.recording, replyMessage: draft.replyMessage)
+        }
 }
 
 extension Message {
@@ -77,7 +114,7 @@ public struct ReplyMessage: Codable, Identifiable, Hashable {
     public static func == (lhs: ReplyMessage, rhs: ReplyMessage) -> Bool {
         lhs.id == rhs.id
     }
-    
+
     public var id: String
     public var user: User
 

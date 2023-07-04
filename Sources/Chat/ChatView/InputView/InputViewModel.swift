@@ -189,10 +189,10 @@ private extension InputViewModel {
     func sendMessage() -> AnyCancellable {
         showActivityIndicator = true
         return mapAttachmentsForSend()
-            .compactMap { [attachments] in
+            .compactMap { [attachments] _ in
                 DraftMessage(
                     text: attachments.text,
-                    attachments: $0,
+                    medias: attachments.medias,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,
                     createdAt: Date()

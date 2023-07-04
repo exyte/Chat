@@ -80,6 +80,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     // step 1
                     // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
                     editedSections = applyEdits(tableView: tableView, prevSections: prevSections)
+                    print(prevSections, "\n")
+                    print(editedSections, "\n")
+                    print(sections, "\n")
+                    print("\n\n\n\n")
                     context.coordinator.sections = editedSections
                 } completion: { _ in
                     tableSemaphore.signal()
@@ -164,11 +168,11 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
     }
 
-    func makeCoordinator() -> Coordinator<MessageContent> {
+    func makeCoordinator() -> Coordinator {
         Coordinator(viewModel: viewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
     }
 
-    class Coordinator<MessageContent: View>: NSObject, UITableViewDataSource, UITableViewDelegate {
+    class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
 
         @ObservedObject var viewModel: ChatViewModel
         @ObservedObject var paginationState: PaginationState
@@ -215,7 +219,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     .padding(.bottom, 8)
                     .foregroundColor(.gray)
             ).view
-            header?.backgroundColor = UIColor(mainBackgroundColor)
+            header?.backgroundColor = .clear
             return header
         }
 

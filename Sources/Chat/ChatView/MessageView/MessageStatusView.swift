@@ -46,7 +46,6 @@ struct SwiftUIView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             MessageStatusView(status: .sending, onRetry: {})
-            MessageStatusView(status: .error, onRetry: {})
             MessageStatusView(status: .sent, onRetry: {})
             MessageStatusView(status: .read, onRetry: {})
         }

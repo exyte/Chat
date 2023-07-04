@@ -22,6 +22,10 @@ class SessionManager {
         UIDevice.current.identifierForVendor?.uuidString ?? ""
     }
 
+    var currentUserId: String {
+        currentUser?.id ?? ""
+    }
+
     func storeUser(_ user: User) {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(user) {

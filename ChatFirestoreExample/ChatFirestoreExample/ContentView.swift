@@ -7,9 +7,17 @@
 
 import SwiftUI
 import Chat
+import ExyteMediaPicker
 
-typealias User = Chat.User
-typealias Message = Chat.Message
+struct Collection {
+    static let users = "users"
+    static let conversations = "conversations"
+    static let messages = "messages"
+}
+
+public typealias User = Chat.User
+public typealias Message = Chat.Message
+public typealias Media = ExyteMediaPicker.Media
 
 struct ContentView: View {
 
@@ -18,7 +26,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if hasCurrentSession {
-                UsersView()
+                ConversationsView()
             } else {
                 AuthView()
             }

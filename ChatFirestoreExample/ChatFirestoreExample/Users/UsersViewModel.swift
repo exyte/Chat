@@ -7,30 +7,38 @@
 
 import Foundation
 import FirebaseFirestore
-import Chat
 
-class UsersViewModel: ObservableObject {
-
-    @Published var users: [User] = []
-
-    var collection: CollectionReference {
-        Firestore.firestore()
-            .collection(Collection.users)
+class UsersViewModel: ObservableObject, Hashable {
+    static func == (lhs: UsersViewModel, rhs: UsersViewModel) -> Bool {
+        lhs.allUsers == rhs.allUsers
     }
 
-    func getUsers() {
-        collection.getDocuments { [weak self] (snapshot, _) in
-            self?.users = snapshot?.documents
-                .compactMap { document in
-                    let dict = document.data()
-                    if document.documentID == SessionManager.shared.currentUser?.id {
-                        return nil // exclude current user
+    func hash(into hasher: inout Hasher) {
+        
+    }
+
+    @Published var users: [User] // not including current user
+    @Published var allUsers: [User]
+
+    init(users: [User], allUsers: [User]) {
+        self.users = users
+        self.allUsers = allUsers
+    }
+
+    func createConversation(_ users: [User]) async -> Conversation? {
+        await withCheckedContinuation { continuation in
+            var ref: DocumentReference? = nil
+            ref = Firestore.firestore()
+                .collection(Collection.conversations)
+                .addDocument(data: [
+                    "users": users.map { $0.id } + [SessionManager.shared.currentUserId]
+                ]) { err in
+                    if let _ = err {
+                        continuation.resume(returning: nil)
+                    } else if let id = ref?.documentID {
+                        continuation.resume(returning: Conversation(id: id, users: users))
                     }
-                    if let name = dict["nickname"] as? String {
-                        return User(id: document.documentID, name: name, avatarURL: nil, isCurrentUser: false)
-                    }
-                    return nil
-                } ?? []
+                }
         }
     }
 }

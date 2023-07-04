@@ -8,23 +8,13 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
-
-struct Collection {
-
-    static let users = "users"
-    static let conversations = "conversations"
-    static let messages = "messages"
-}
+import ExyteMediaPicker
 
 class AuthViewModel: ObservableObject {
 
-    var collection: CollectionReference {
+    func auth(nickname: String, avatar: Media?) {
         Firestore.firestore()
             .collection(Collection.users)
-    }
-
-    func auth(nickname: String) {
-        collection
             .whereField("deviceId", isEqualTo: SessionManager.shared.deviceId)
             .whereField("nickname", isEqualTo: nickname)
             .getDocuments { [weak self] (snapshot, _) in
@@ -32,22 +22,27 @@ class AuthViewModel: ObservableObject {
                     let user = User(id: id, name: nickname, avatarURL: nil, isCurrentUser: true)
                     SessionManager.shared.storeUser(user)
                 } else {
-                    self?.createNewUser(nickname: nickname)
+                    self?.createNewUser(nickname: nickname, avatar: avatar)
                 }
             }
     }
 
-    func createNewUser(nickname: String) {
-        var ref: DocumentReference? = nil
-        ref = collection.addDocument(data: [
-            "deviceId": SessionManager.shared.deviceId,
-            "nickname": nickname
-        ]) { err in
-            if let err = err {
-                print("Error adding document: \(err)")
-            } else if let id = ref?.documentID {
-                let user = User(id: id, name: nickname, avatarURL: nil, isCurrentUser: true)
-                SessionManager.shared.storeUser(user)
+    func createNewUser(nickname: String, avatar: Media?) {
+        Task {
+            guard let avatarURL = await UploadingManager.uploadMedia(avatar) else { return }
+            var ref: DocumentReference? = nil
+            ref = Firestore.firestore()
+                .collection(Collection.users).addDocument(data: [
+                "deviceId": SessionManager.shared.deviceId,
+                "nickname": nickname,
+                "avatarURL": avatarURL.absoluteString
+            ]) { err in
+                if let err = err {
+                    print("Error adding document: \(err)")
+                } else if let id = ref?.documentID {
+                    let user = User(id: id, name: nickname, avatarURL: avatarURL, isCurrentUser: true)
+                    SessionManager.shared.storeUser(user)
+                }
             }
         }
     }

@@ -3,25 +3,13 @@
 //
 
 import Foundation
+import ExyteMediaPicker
 
-public struct DraftMessage: Codable {
+public struct DraftMessage {
     public var id: String?
     public let text: String
-    public let attachments: [Attachment]
+    public let medias: [Media]
     public let recording: Recording?
     public let replyMessage: ReplyMessage?
     public let createdAt: Date
-}
-
-extension Message {
-    func toDraft() -> DraftMessage {
-        DraftMessage(
-            id: id,
-            text: text,
-            attachments: attachments,
-            recording: recording,
-            replyMessage: replyMessage,
-            createdAt: Date()
-        )
-    }
 }
