@@ -18,8 +18,13 @@ class AuthViewModel: ObservableObject {
             .whereField("deviceId", isEqualTo: SessionManager.shared.deviceId)
             .whereField("nickname", isEqualTo: nickname)
             .getDocuments { [weak self] (snapshot, _) in
+                let data = snapshot?.documents.first?.data()
                 if let id = snapshot?.documents.first?.documentID {
-                    let user = User(id: id, name: nickname, avatarURL: nil, isCurrentUser: true)
+                    var url: URL? = nil
+                    if let string = data?["avatarURL"] as? String {
+                        url = URL(string: string)
+                    }
+                    let user = User(id: id, name: nickname, avatarURL: url, isCurrentUser: true)
                     SessionManager.shared.storeUser(user)
                 } else {
                     self?.createNewUser(nickname: nickname, avatar: avatar)

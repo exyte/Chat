@@ -39,13 +39,13 @@ class ConversationsViewModel: ObservableObject {
     }
 
     func getMyChats() {
-        individualConversations = []
-        groupConversations = []
-
         Firestore.firestore()
             .collection(Collection.conversations)
             .whereField("users", arrayContains: SessionManager.shared.currentUserId)
-            .getDocuments { [weak self] (snapshot, _) in
+            .addSnapshotListener() { [weak self] (snapshot, _) in
+                self?.individualConversations = []
+                self?.groupConversations = []
+
                 snapshot?.documents
                     .forEach { document in
                         let userIds = document.data()["users"] as? [String] ?? []

@@ -32,9 +32,17 @@ class SessionManager {
             UserDefaults.standard.set(encoded, forKey: currentUserKey)
         }
         UserDefaults.standard.set(true, forKey: hasCurrentSessionKey)
+        currentUser = user
+    }
+
+    func loadUser() {
+        if let data = UserDefaults.standard.data(forKey: "currentUser") {
+            currentUser = try? JSONDecoder().decode(User.self, from: data)
+        }
     }
 
     func logout() {
+        currentUser = nil
         UserDefaults.standard.set(false, forKey: hasCurrentSessionKey)
         UserDefaults.standard.removeObject(forKey: currentUserKey)
     }

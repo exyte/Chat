@@ -27,7 +27,9 @@ class ConversationViewModel: ObservableObject {
 
     var users: [User] // not including current user
     var allUsers: [User]
-    var collection: CollectionReference
+
+    var conversationDocument: DocumentReference
+    var messagesCollection: CollectionReference
 
     @Published var messages: [Message] = []
 
@@ -37,23 +39,25 @@ class ConversationViewModel: ObservableObject {
         if let currentUser = SessionManager.shared.currentUser {
             self.allUsers.append(currentUser)
         }
-        self.collection = Firestore.firestore()
+        self.conversationDocument = Firestore.firestore()
             .collection(Collection.conversations)
             .document(user.id)
+        self.messagesCollection = conversationDocument
             .collection(Collection.messages)
     }
 
     init(conversation: Conversation) {
         self.users = conversation.users.filter { $0.id != SessionManager.shared.currentUserId }
         self.allUsers = conversation.users
-        self.collection = Firestore.firestore()
+        self.conversationDocument = Firestore.firestore()
             .collection(Collection.conversations)
             .document(conversation.id)
+        self.messagesCollection = conversationDocument
             .collection(Collection.messages)
     }
 
     func getConversation() {
-        collection
+        messagesCollection
             .order(by: "createdAt", descending: false)
             .addSnapshotListener() { [weak self] (snapshot, _) in
                 let messages = snapshot?.documents
@@ -83,6 +87,12 @@ class ConversationViewModel: ObservableObject {
 
     func sendMessage(_ draft: DraftMessage) {
         Task {
+            // only create individual conversation when first message is sent
+            // group conversation was created before
+            if users.count == 1, messages.isEmpty {
+                await createIndividualConversation(allUsers)
+            }
+
             guard let user = SessionManager.shared.currentUser else { return }
             let id = UUID().uuidString
             let message = await Message.makeMessage(id: id, user: user, status: .sending, draft: draft)
@@ -99,7 +109,7 @@ class ConversationViewModel: ObservableObject {
                 "mediaURLs": mediaURLs
             ]
 
-            collection.document(id).setData(dict) { [weak self] err in
+            messagesCollection.document(id).setData(dict) { [weak self] err in
                 if let err = err {
                     print("Error adding document: \(err)")
                     if let index = self?.messages.lastIndex(where: { $0.id == id }) {
@@ -111,6 +121,20 @@ class ConversationViewModel: ObservableObject {
                     }
                 }
             }
+        }
+    }
+
+    func createIndividualConversation(_ users: [User]) async {
+        await withCheckedContinuation { continuation in
+            conversationDocument
+                .setData([
+                    "users": users.map { $0.id }
+                ]) { err in
+                    if let err = err {
+                        print(err)
+                    }
+                    continuation.resume()
+                }
         }
     }
 }

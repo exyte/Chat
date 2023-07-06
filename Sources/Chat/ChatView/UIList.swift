@@ -69,22 +69,49 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func updateUIView(_ tableView: UITableView, context: Context) {
+        if context.coordinator.sections == sections {
+            return
+        }
         updatesQueue.async {
             updateSemaphore.wait()
 
+            if context.coordinator.sections == sections {
+                updateSemaphore.signal()
+                return
+            }
+
             let prevSections = context.coordinator.sections
-            var editedSections = [MessagesSection]()
+            var sectionsWithAppliedDeletes: [MessagesSection] = []
+            var sectionsWithAppliedEdits: [MessagesSection] = []
+            // sectionsWithAppliedInserts is just sections
+
+            // wsi = whole section info
+            print("3 updateUIView sections:", "\n")
+            print("wsi previous:\n", prevSections, "\n")
+            print("wsi actual sections:\n", sections, "\n\n")
 
             DispatchQueue.main.async {
                 tableView.performBatchUpdates {
                     // step 1
+                    // remove sections and rows if needed
+                    print("performBatchUpdates step 1")
+                    sectionsWithAppliedDeletes = applyDeletes(tableView: tableView, prevSections: prevSections)
+                    print("wsi applied deletes:\n", sectionsWithAppliedDeletes, "\n")
+                    context.coordinator.sections = sectionsWithAppliedDeletes
+                } completion: { _ in
+                    tableSemaphore.signal()
+                }
+            }
+            tableSemaphore.wait()
+
+            DispatchQueue.main.async {
+                tableView.performBatchUpdates {
+                    // step 2
                     // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
-                    editedSections = applyEdits(tableView: tableView, prevSections: prevSections)
-                    print(prevSections, "\n")
-                    print(editedSections, "\n")
-                    print(sections, "\n")
-                    print("\n\n\n\n")
-                    context.coordinator.sections = editedSections
+                    print("performBatchUpdates step 2")
+                    sectionsWithAppliedEdits = applyEdits(tableView: tableView, prevSections: sectionsWithAppliedDeletes)
+                    print("wsi applied edits:\n", sectionsWithAppliedEdits, "\n")
+                    context.coordinator.sections = sectionsWithAppliedEdits
                 } completion: { _ in
                     tableSemaphore.signal()
                 }
@@ -93,13 +120,14 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             if isScrolledToBottom || isScrolledToTop {
                 DispatchQueue.main.sync {
-                    // step 2
+                    // step 3
                     // apply the rest of the changes to table's dataSource
+                    print("performBatchUpdates step 3")
                     context.coordinator.sections = sections
                     context.coordinator.ids = ids
                     // insert new rows/sections and remove old ones with animation
                     tableView.beginUpdates()
-                    applyInserts(tableView: tableView, prevSections: editedSections)
+                    applyInserts(tableView: tableView, prevSections: sectionsWithAppliedEdits)
                     tableView.endUpdates()
 
                     updateSemaphore.signal()
@@ -114,6 +142,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     func applyEdits(tableView: UITableView, prevSections: [MessagesSection]) -> [MessagesSection] {
         var result = [MessagesSection]()
         let prevDates = prevSections.map { $0.date }
+        print("2 applyEdits dates:\n", prevDates, "\n")
         for iPrevDate in 0..<prevDates.count {
             let prevDate = prevDates[iPrevDate]
             guard let section = sections.first(where: { $0.date == prevDate } ),
@@ -126,6 +155,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                 resultRows.append(row)
 
                 if row != prevRow {
+                    print("2 applyEdits different rows:\n", prevRow, "\n\n", row, "\n")
                     DispatchQueue.main.async {
                         tableView.reloadRows(at: [IndexPath(row: iPrevRow, section: iPrevDate)], with: .none)
                     }
@@ -136,17 +166,76 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         return result
     }
 
+    func applyDeletes(tableView: UITableView, prevSections: [MessagesSection]) -> [MessagesSection] {
+        var result = prevSections
+
+        // compare sections without comparing messages inside them, just dates
+        let dates = sections.map { $0.date }
+        let coordinatorDates = prevSections.map { $0.date }
+        print("1 applyDeletes dates:", "\n")
+        print("sections:", dates, "\n")
+        print("prev:", coordinatorDates, "\n")
+
+        let dif = dates.difference(from: coordinatorDates)
+        var indicesToRemove: [Int] = []
+        print(dif, "\n")
+        for change in dif {
+            switch change {
+            case let .remove(offset, _, _):
+                print("1 applyDeletes remove section", offset, "\n")
+                indicesToRemove.append(offset)
+                tableView.deleteSections([offset], with: .top)
+            case .insert(_, _, _):
+                break
+            }
+        }
+        indicesToRemove.sorted(by: >).forEach {
+            result.remove(at: $0)
+        }
+
+        // compare rows for each section
+        for i in result.indices {
+            let section = result[i]
+            guard let index = prevSections.firstIndex(where: { $0.date == section.date } ) else { continue }
+            let dif = section.rows.difference(from: prevSections[index].rows)
+            indicesToRemove = []
+
+            // animate insertions and removals
+            for change in dif {
+                switch change {
+                case let .remove(offset, _, _):
+                    print("1 remove row", offset, "\n")
+                    indicesToRemove.append(offset)
+                    tableView.deleteRows(at: [IndexPath(row: offset, section: index)], with: .top)
+                case .insert(_, _, _):
+                    break
+                }
+            }
+            indicesToRemove.sorted(by: >).forEach {
+                result[i].rows.remove(at: $0)
+            }
+        }
+        print("\n")
+
+        return result
+    }
+
     func applyInserts(tableView: UITableView, prevSections: [MessagesSection]) {
         // compare sections without comparing messages inside them, just dates
         let dates = sections.map { $0.date }
         let coordinatorDates = prevSections.map { $0.date }
+        print("4 applyInserts dates:", "\n")
+        print(dates, "\n")
+        print(coordinatorDates, "\n")
 
         let dif = dates.difference(from: coordinatorDates)
+        print(dif, "\n")
         for change in dif {
             switch change {
-            case let .remove(offset, _, _):
-                tableView.deleteSections([offset], with: .top)
+            case .remove(_, _, _):
+                break
             case let .insert(offset, _, _):
+                print("4 insert section", offset, "\n")
                 tableView.insertSections([offset], with: .top)
             }
         }
@@ -159,13 +248,15 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             // animate insertions and removals
             for change in dif {
                 switch change {
-                case let .remove(offset, _, _):
-                    tableView.deleteRows(at: [IndexPath(row: offset, section: index)], with: .top)
+                case .remove(_, _, _):
+                    break
                 case let .insert(offset, _, _):
+                    print("4 insert row", offset, "\n")
                     tableView.insertRows(at: [IndexPath(row: offset, section: index)], with: .top)
                 }
             }
         }
+        print("\n\n")
     }
 
     func makeCoordinator() -> Coordinator {

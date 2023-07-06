@@ -32,18 +32,9 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            updateUser(hasCurrentSession)
-        }
-        .onChange(of: hasCurrentSession) { _, hasSession in
-            updateUser(hasSession)
-        }
-    }
-
-    func updateUser(_ hasSession: Bool) {
-        if hasCurrentSession, let data = UserDefaults.standard.data(forKey: "currentUser") {
-            SessionManager.shared.currentUser = try? JSONDecoder().decode(User.self, from: data)
-        } else {
-            SessionManager.shared.currentUser = nil
+            if hasCurrentSession {
+                SessionManager.shared.loadUser()
+            }
         }
     }
 }

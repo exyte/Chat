@@ -34,30 +34,36 @@ struct ConversationsView: View {
 
     var content: some View {
         NavigationStack(path: $navPath) {
-            List(viewModel.groupConversations) { conversation in
-                NavigationLink(value: conversation) {
-                    HStack {
-                        HStack(spacing: -30) {
-                            ForEach(conversation.users) { user in
-                                AvatarView(url: user.avatarURL, size: 40)
-                            }
-                        }
-                        ForEach(conversation.users) { user in
-                            if user.id == conversation.users.last?.id {
-                                Text(user.name)
-                            } else {
-                                Text(user.name + ", ")
+            List {
+                Section {
+                    ForEach(viewModel.groupConversations) { conversation in
+                        NavigationLink(value: conversation) {
+                            HStack {
+                                HStack(spacing: -30) {
+                                    ForEach(conversation.users) { user in
+                                        AvatarView(url: user.avatarURL, size: 40)
+                                    }
+                                }
+                                ForEach(conversation.users) { user in
+                                    if user.id == conversation.users.last?.id {
+                                        Text(user.name)
+                                    } else {
+                                        Text(user.name + ", ")
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
-                ForEach(viewModel.individualConversations) { conversation in
-                    if let user = conversation.users.first {
-                        NavigationLink(value: conversation) {
-                            HStack {
-                                AvatarView(url: user.avatarURL, size: 40)
-                                Text(user.name)
+                Section {
+                    ForEach(viewModel.individualConversations) { conversation in
+                        if let user = conversation.users.first {
+                            NavigationLink(value: conversation) {
+                                HStack {
+                                    AvatarView(url: user.avatarURL, size: 40)
+                                    Text(user.name)
+                                }
                             }
                         }
                     }

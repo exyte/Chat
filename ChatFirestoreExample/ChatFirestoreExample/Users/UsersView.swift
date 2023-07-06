@@ -70,6 +70,7 @@ struct UsersView: View {
                                 showActivityIndicator = false
                                 selectedUsers = []
                                 showSelection = false
+                                navPath.removeLast()
                                 navPath.append(conversation)
                             }
                         }

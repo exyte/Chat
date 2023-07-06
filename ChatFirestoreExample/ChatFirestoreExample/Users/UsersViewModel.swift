@@ -8,14 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-class UsersViewModel: ObservableObject, Hashable {
-    static func == (lhs: UsersViewModel, rhs: UsersViewModel) -> Bool {
-        lhs.allUsers == rhs.allUsers
-    }
-
-    func hash(into hasher: inout Hasher) {
-        
-    }
+class UsersViewModel: ObservableObject {
 
     @Published var users: [User] // not including current user
     @Published var allUsers: [User]
