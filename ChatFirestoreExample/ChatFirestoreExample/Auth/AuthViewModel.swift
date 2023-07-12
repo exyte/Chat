@@ -12,7 +12,10 @@ import ExyteMediaPicker
 
 class AuthViewModel: ObservableObject {
 
+    @Published var showActivityIndicator = false
+
     func auth(nickname: String, avatar: Media?) {
+        showActivityIndicator = true
         Firestore.firestore()
             .collection(Collection.users)
             .whereField("deviceId", isEqualTo: SessionManager.shared.deviceId)
@@ -26,6 +29,7 @@ class AuthViewModel: ObservableObject {
                     }
                     let user = User(id: id, name: nickname, avatarURL: url, isCurrentUser: true)
                     SessionManager.shared.storeUser(user)
+                    self?.showActivityIndicator = false
                 } else {
                     self?.createNewUser(nickname: nickname, avatar: avatar)
                 }
@@ -41,13 +45,14 @@ class AuthViewModel: ObservableObject {
                 "deviceId": SessionManager.shared.deviceId,
                 "nickname": nickname,
                 "avatarURL": avatarURL.absoluteString
-            ]) { err in
+            ]) { [weak self] err in
                 if let err = err {
                     print("Error adding document: \(err)")
                 } else if let id = ref?.documentID {
                     let user = User(id: id, name: nickname, avatarURL: avatarURL, isCurrentUser: true)
                     SessionManager.shared.storeUser(user)
                 }
+                self?.showActivityIndicator = false
             }
         }
     }

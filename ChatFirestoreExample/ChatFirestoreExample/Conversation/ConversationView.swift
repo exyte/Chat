@@ -16,18 +16,32 @@ struct ConversationView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.sendMessage(draft)
         }
+        .mediaPickerTheme(
+            main: .init(
+                text: .white,
+                albumSelectionBackground: .examplePickerBg,
+                fullscreenPhotoBackground: .examplePickerBg
+            ),
+            selection: .init(
+                emptyTint: .white,
+                emptyBackground: .black.opacity(0.25),
+                selectedTint: .exampleBlue,
+                fullscreenTint: .white
+            )
+        )
         .task {
             viewModel.getConversation()
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                if viewModel.users.count == 1, let user = viewModel.users.first {
-                    HStack {
+                HStack {
+                    if let conversation = viewModel.conversation {
+                        AvatarView(url: conversation.pictureURL, size: 44)
+                        Text(conversation.title)
+                    } else if let user = viewModel.users.first {
                         AvatarView(url: user.avatarURL, size: 44)
                         Text(user.name)
                     }
-                } else {
-                    Text(viewModel.users.reduce("") { $0 + $1.name + " " }.dropLast())
                 }
             }
         }

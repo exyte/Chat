@@ -6,15 +6,14 @@
 //
 
 import SwiftUI
-import ActivityIndicatorView
 
 struct UsersView: View {
 
-    @StateObject var viewModel: UsersViewModel
-    @Binding var navPath: NavigationPath
+    @Environment(\.presentationMode) var presentationMode
 
-    @State var showSelection: Bool = false
-    @State var selectedUsers: [User] = []
+    @StateObject var viewModel: UsersViewModel
+    @Binding var isPresented: Bool
+    @Binding var navPath: NavigationPath
 
     @State var showActivityIndicator = false
 
@@ -23,63 +22,72 @@ struct UsersView: View {
             content
 
             if showActivityIndicator {
-                Color.black.opacity(0.8)
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(8)
-                ActivityIndicatorView(isVisible: .constant(true), type: .flickeringDots())
-                    .foregroundColor(.gray)
-                    .frame(width: 50, height: 50)
+                ActivityIndicator()
             }
         }
     }
 
     var content: some View {
-        List(viewModel.users) { user in
-            HStack {
-                AvatarView(url: user.avatarURL, size: 40)
-                Text(user.name)
+        NavigationStack {
+            SearchField(text: $viewModel.searchableText)
+                .padding(.horizontal, 16)
 
-                Spacer()
-
-                if showSelection {
-                    (selectedUsers.contains(user) ? Image(systemName: "checkmark.circle") : Image(systemName: "circle"))
-                        .onTapGesture {
-                            selectedUsers.contains(user) ? selectedUsers.removeAll(where: { $0.id == user.id }) : selectedUsers.append(user)
+            List {
+                NavigationLink {
+                    GroupSelectUsersView(viewModel: viewModel, isPresented: $isPresented, navPath: $navPath)
+                } label: {
+                    HStack {
+                        ZStack {
+                            Circle()
+                                .foregroundColor(.exampleBlue)
+                            Image(.groupChat)
                         }
+                        .frame(width: 48, height: 48)
+                        Text("Create Group")
+                            .font(17, .exampleBlue, .medium)
+                    }
                 }
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                navPath.removeLast()
-                navPath.append(user)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigation) {
-                HStack {
-                    AvatarView(url: SessionManager.shared.currentUser?.avatarURL, size: 44)
-                    Text(SessionManager.shared.currentUser?.name ?? "")
-                }
-            }
-            ToolbarItem {
-                if selectedUsers.count > 1 {
-                    Button("Go") {
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+                .padding(.top, 8)
+                .padding(.horizontal, 16)
+
+                Rectangle()
+                    .foregroundColor(.exampleFieldBorder)
+                    .frame(height: 1)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets())
+
+                ForEach(viewModel.filteredUsers) { user in
+                    HStack {
+                        AvatarView(url: user.avatarURL, size: 48)
+                        Text(user.name)
+                            .font(17, .black, .medium)
+                    }
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets())
+                    .padding([.horizontal, .bottom], 16)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
                         Task {
-                            showActivityIndicator = true
-                            if let conversation = await viewModel.createConversation(selectedUsers) {
-                                showActivityIndicator = false
-                                selectedUsers = []
-                                showSelection = false
-                                navPath.removeLast()
+                            if let conversation = await viewModel.conversationForUsers([user]) {
                                 navPath.append(conversation)
+                            } else {
+                                navPath.append(user)
                             }
+                            isPresented = false
                         }
                     }
-                } else {
-                    Button(showSelection ? "Cancel" : "Group") {
-                        selectedUsers = []
-                        showSelection.toggle()
+                }
+            }
+            .listStyle(.plain)
+            .navigationTitle("New Message")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    Button("Cancel") {            presentationMode.wrappedValue.dismiss()
                     }
+                    .font(17, .black)
                 }
             }
         }

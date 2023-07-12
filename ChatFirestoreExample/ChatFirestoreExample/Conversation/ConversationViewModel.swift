@@ -10,26 +10,14 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 import Chat
 
-public struct FirestoreMessage: Codable {
-
-    @DocumentID public var id: String?
-    public var userId: String
-    @ServerTimestamp public var createdAt: Date?
-
-    public var text: String
-    public var mediaURLs: [String]
-    public var recording: Recording?
-    public var replyMessage: ReplyMessage?
-}
-
 @MainActor
 class ConversationViewModel: ObservableObject {
 
     var users: [User] // not including current user
     var allUsers: [User]
 
-    var conversationDocument: DocumentReference
-    var messagesCollection: CollectionReference
+    var conversation: Conversation?
+    var messagesCollection: CollectionReference?
 
     @Published var messages: [Message] = []
 
@@ -39,25 +27,25 @@ class ConversationViewModel: ObservableObject {
         if let currentUser = SessionManager.shared.currentUser {
             self.allUsers.append(currentUser)
         }
-        self.conversationDocument = Firestore.firestore()
-            .collection(Collection.conversations)
-            .document(user.id)
-        self.messagesCollection = conversationDocument
-            .collection(Collection.messages)
+        // setup conversation and messagesCollection later, after it's created
     }
 
     init(conversation: Conversation) {
         self.users = conversation.users.filter { $0.id != SessionManager.shared.currentUserId }
         self.allUsers = conversation.users
-        self.conversationDocument = Firestore.firestore()
+        self.conversation = conversation
+        self.messagesCollection = makeMessagesCollectionRef(conversation)
+    }
+
+    func makeMessagesCollectionRef(_ conversation: Conversation) -> CollectionReference {
+        Firestore.firestore()
             .collection(Collection.conversations)
             .document(conversation.id)
-        self.messagesCollection = conversationDocument
             .collection(Collection.messages)
     }
 
     func getConversation() {
-        messagesCollection
+        messagesCollection?
             .order(by: "createdAt", descending: false)
             .addSnapshotListener() { [weak self] (snapshot, _) in
                 let messages = snapshot?.documents
@@ -88,9 +76,12 @@ class ConversationViewModel: ObservableObject {
     func sendMessage(_ draft: DraftMessage) {
         Task {
             // only create individual conversation when first message is sent
-            // group conversation was created before
-            if users.count == 1, messages.isEmpty {
-                await createIndividualConversation(allUsers)
+            // group conversation was created before (UsersViewModel)
+            if users.count == 1, messages.isEmpty,
+               let user = users.first,
+               let conversation = await createIndividualConversation(user) {
+                self.conversation = conversation
+                self.messagesCollection = makeMessagesCollectionRef(conversation)
             }
 
             guard let user = SessionManager.shared.currentUser else { return }
@@ -109,31 +100,44 @@ class ConversationViewModel: ObservableObject {
                 "mediaURLs": mediaURLs
             ]
 
-            messagesCollection.document(id).setData(dict) { [weak self] err in
-                if let err = err {
-                    print("Error adding document: \(err)")
-                    if let index = self?.messages.lastIndex(where: { $0.id == id }) {
-                        self?.messages[index].status = .error(draft)
-                    }
-                } else {
-                    if let index = self?.messages.lastIndex(where: { $0.id == id }) {
-                        self?.messages[index].status = .sent
-                    }
+            do {
+                try await messagesCollection?.document(id).setData(dict)
+                if let index = messages.lastIndex(where: { $0.id == id }) {
+                    messages[index].status = .sent
                 }
+            } catch {
+                print("Error adding document: \(error)")
+                if let index = messages.lastIndex(where: { $0.id == id }) {
+                    messages[index].status = .error(draft)
+                }
+            }
+
+            if let id = conversation?.id {
+                try await Firestore.firestore()
+                    .collection(Collection.conversations)
+                    .document(id)
+                    .updateData(["latestMessage" : dict])
             }
         }
     }
 
-    func createIndividualConversation(_ users: [User]) async {
-        await withCheckedContinuation { continuation in
-            conversationDocument
-                .setData([
-                    "users": users.map { $0.id }
-                ]) { err in
-                    if let err = err {
-                        print(err)
+    private func createIndividualConversation(_ user: User) async -> Conversation? {
+        let dict: [String : Any] = [
+            "users": allUsers.map { $0.id },
+            "pictureURL": user.avatarURL?.absoluteString ?? "",
+            "title": user.name
+        ]
+
+        return await withCheckedContinuation { continuation in
+            var ref: DocumentReference? = nil
+            ref = Firestore.firestore()
+                .collection(Collection.conversations)
+                .addDocument(data: dict) { err in
+                    if let _ = err {
+                        continuation.resume(returning: nil)
+                    } else if let id = ref?.documentID {
+                        continuation.resume(returning: Conversation(id: id, users: self.allUsers, pictureURL: user.avatarURL, title: user.name, latestMessage: nil))
                     }
-                    continuation.resume()
                 }
         }
     }
