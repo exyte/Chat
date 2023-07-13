@@ -29,9 +29,6 @@ struct ConversationView: View {
                 fullscreenTint: .white
             )
         )
-        .task {
-            viewModel.getConversation()
-        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack {

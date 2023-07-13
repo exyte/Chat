@@ -17,15 +17,25 @@ public struct FirestoreMessage: Codable, Hashable {
     @ServerTimestamp public var createdAt: Date?
 
     public var text: String
-    public var mediaURLs: [String]
+    public var attachments: [FirestoreAttachment]
     public var recording: Recording?
-    public var replyMessage: ReplyMessage?
+    public var replyMessage: FirestoreReply?
 }
 
-public struct LatestMessageInChat: Hashable {
+public struct FirestoreAttachment: Codable, Hashable {
 
-    public var senderName: String
-    public var createdAt: Date?
-    public var text: String?
-    public var subtext: String?
+    //public let thumbnail: URL
+    public let url: String
+    public let type: AttachmentType
+}
+
+public struct FirestoreReply: Codable, Hashable {
+
+    @DocumentID public var id: String?
+    public var userId: String
+
+    public var text: String
+    public var attachments: [FirestoreAttachment]
+    public var recording: Recording?
+
 }

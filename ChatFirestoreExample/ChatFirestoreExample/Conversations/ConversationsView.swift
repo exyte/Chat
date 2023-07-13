@@ -97,7 +97,7 @@ struct ConversationsView: View {
             }
         }
         .sheet(isPresented: $showUsersList) {
-            UsersView(viewModel: UsersViewModel(users: viewModel.users, conversations: viewModel.conversations), isPresented: $showUsersList, navPath: $navPath)
+            UsersView(viewModel: UsersViewModel(), isPresented: $showUsersList, navPath: $navPath)
         }
     }
 }

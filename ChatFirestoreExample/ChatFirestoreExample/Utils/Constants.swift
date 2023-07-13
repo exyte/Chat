@@ -15,6 +15,8 @@ struct Collection {
     static let messages = "messages"
 }
 
+var dataStorage = DataStorageManager.shared
+
 public typealias User = Chat.User
 public typealias Message = Chat.Message
 public typealias Media = ExyteMediaPicker.Media

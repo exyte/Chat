@@ -18,6 +18,13 @@ public struct Conversation: Identifiable, Hashable {
     public let latestMessage: LatestMessageInChat?
 }
 
+public struct LatestMessageInChat: Hashable {
+    public var senderName: String
+    public var createdAt: Date?
+    public var text: String?
+    public var subtext: String?
+}
+
 public struct FirestoreConversation: Codable, Identifiable, Hashable {
     @DocumentID public var id: String?
     public let users: [String]

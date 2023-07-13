@@ -19,24 +19,16 @@ class UsersViewModel: ObservableObject {
 
     var filteredUsers: [User] {
         if searchableText.isEmpty {
-            return users
+            return dataStorage.users
         }
-        return users.filter {
+        return dataStorage.users.filter {
             $0.name.lowercased().contains(searchableText.lowercased())
         }
     }
 
-    @Published private var users: [User] // not including current user
-    @Published private var conversations: [Conversation]
-
-    init(users: [User], conversations: [Conversation]) {
-        self.users = users
-        self.conversations = conversations
-    }
-
     func conversationForUsers(_ users: [User]) async -> Conversation? {
         // search in exsisting conversations
-        for conversation in conversations {
+        for conversation in dataStorage.conversations {
             if conversation.users.count - 1 == users.count { // without current user
                 var foundIt = true
                 for user in users {
