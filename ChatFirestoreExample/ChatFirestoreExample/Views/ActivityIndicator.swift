@@ -21,7 +21,3 @@ struct ActivityIndicator: View {
         }
     }
 }
-
-#Preview {
-    ActivityIndicator()
-}

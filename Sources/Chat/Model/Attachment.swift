@@ -12,9 +12,9 @@ public enum AttachmentType: String, Codable {
     public var title: String {
         switch self {
         case .image:
-            "Image"
+            return "Image"
         default:
-            "Video"
+            return "Video"
         }
     }
 
