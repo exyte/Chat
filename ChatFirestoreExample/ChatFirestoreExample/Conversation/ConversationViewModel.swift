@@ -78,6 +78,13 @@ class ConversationViewModel: ObservableObject {
                             }
                         }
 
+                        let convertRecording: (FirestoreRecording?) -> Recording? = { recording in
+                            if let recording = recording {
+                                return Recording(duration: recording.duration, waveformSamples: recording.waveformSamples, url: recording.url.toURL())
+                            }
+                            return nil
+                        }
+
                         var replyMessage: ReplyMessage?
                         if let reply = firestoreMessage.replyMessage,
                            let replyId = reply.id,
@@ -87,7 +94,7 @@ class ConversationViewModel: ObservableObject {
                                 user: replyUser,
                                 text: reply.text,
                                 attachments: convertAttachments(reply.attachments),
-                                recording: nil)
+                                recording: convertRecording(reply.recording))
                         }
 
                         return Message(
@@ -97,7 +104,7 @@ class ConversationViewModel: ObservableObject {
                             createdAt: date,
                             text: firestoreMessage.text,
                             attachments: convertAttachments(firestoreMessage.attachments),
-                            recording: firestoreMessage.recording,
+                            recording: convertRecording(firestoreMessage.recording),
                             replyMessage: replyMessage)
                     }
                 self?.messages = messages ?? []
@@ -125,7 +132,7 @@ class ConversationViewModel: ObservableObject {
             /// convert to Firestore dictionary: replace users with userIds, upload medias and get urls, replace urls with strings
             let dict = await makeDraftMessageDictionary(draft)
 
-            /// upload dictionary with the same id we fixed earlier, so Caht knows it's still the same message
+            /// upload dictionary with the same id we fixed earlier, so Chat knows it's still the same message
             do {
                 try await messagesCollection?.document(id).setData(dict)
                 if let index = messages.lastIndex(where: { $0.id == id }) {
@@ -152,8 +159,7 @@ class ConversationViewModel: ObservableObject {
         guard let user = SessionManager.shared.currentUser else { return [:] }
         var attachments = [[String: Any]]()
         for media in draft.medias {
-            let url = await UploadingManager.uploadMedia(media)
-            if let url = url {
+            if let url = await UploadingManager.uploadMedia(media) {
                 attachments.append([
                     "url": url.absoluteString,
                     "type": AttachmentType(mediaType: media.type).rawValue
@@ -161,8 +167,26 @@ class ConversationViewModel: ObservableObject {
             }
         }
 
+        var recordingDict: [String: Any]? = nil
+        if let recording = draft.recording, let url = await UploadingManager.uploadRecording(recording) {
+            recordingDict = [
+                "duration": recording.duration,
+                "waveformSamples": recording.waveformSamples,
+                "url": url.absoluteString
+            ]
+        }
+
         var replyDict: [String: Any]? = nil
         if let reply = draft.replyMessage {
+            var replyRecordingDict: [String: Any]? = nil
+            if let recording = reply.recording {
+                replyRecordingDict = [
+                    "duration": recording.duration,
+                    "waveformSamples": recording.waveformSamples,
+                    "url": recording.url?.absoluteString ?? ""
+                ]
+            }
+
             replyDict = [
                 "id": reply.id,
                 "userId": reply.user.id,
@@ -171,6 +195,7 @@ class ConversationViewModel: ObservableObject {
                     "url": $0.full.absoluteString,
                     "type": $0.type.rawValue
                 ] },
+                "recording": replyRecordingDict as Any
             ]
         }
 
@@ -179,6 +204,7 @@ class ConversationViewModel: ObservableObject {
             "createdAt": Timestamp(date: draft.createdAt),
             "text": draft.text,
             "attachments": attachments,
+            "recording": recordingDict as Any,
             "replyMessage": replyDict as Any
         ]
     }

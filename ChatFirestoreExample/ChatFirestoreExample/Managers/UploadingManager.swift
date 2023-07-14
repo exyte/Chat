@@ -10,12 +10,22 @@ import FirebaseStorage
 
 class UploadingManager {
 
-   static func uploadMedia(_ media: Media?) async -> URL? {
+    static func uploadMedia(_ media: Media?) async -> URL? {
         guard let data = await media?.getData() else { return nil }
         let ref = Storage.storage().reference()
             .child("\(UUID().uuidString).jpg")
+        return await uploadData(data, ref)
+    }
 
-        return await withCheckedContinuation { continuation in
+    static func uploadRecording(_ recording: Recording?) async -> URL? {
+        guard let url = recording?.url, let data = try? Data(contentsOf: url) else { return nil }
+        let ref = Storage.storage().reference()
+            .child("\(UUID().uuidString).aac")
+        return await uploadData(data, ref)
+    }
+
+    static func uploadData(_ data: Data, _ ref: StorageReference) async -> URL? {
+        await withCheckedContinuation { continuation in
             ref.putData(data, metadata: nil) { metadata, error in
                 guard let _ = metadata else {
                     print(error.debugDescription)

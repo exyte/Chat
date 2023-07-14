@@ -18,7 +18,7 @@ public struct FirestoreMessage: Codable, Hashable {
 
     public var text: String
     public var attachments: [FirestoreAttachment]
-    public var recording: Recording?
+    public var recording: FirestoreRecording?
     public var replyMessage: FirestoreReply?
 }
 
@@ -36,6 +36,11 @@ public struct FirestoreReply: Codable, Hashable {
 
     public var text: String
     public var attachments: [FirestoreAttachment]
-    public var recording: Recording?
+    public var recording: FirestoreRecording?
+}
 
+public struct FirestoreRecording: Codable, Hashable {
+    public var duration: CGFloat
+    public var waveformSamples: [CGFloat]
+    public var url: String
 }

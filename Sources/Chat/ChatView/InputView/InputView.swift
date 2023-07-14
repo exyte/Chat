@@ -65,12 +65,6 @@ public struct InputViewAttachments {
     public var replyMessage: ReplyMessage?
 }
 
-public struct Recording: Codable, Hashable {
-    public var duration: Double = 0.0
-    public var waveformSamples: [CGFloat] = []
-    public var url: URL?
-}
-
 struct InputView: View {
 
     @Environment(\.chatTheme) private var theme
