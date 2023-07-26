@@ -107,7 +107,6 @@ struct InputView: View {
             viewOnTop
             HStack(alignment: .bottom, spacing: 10) {
                 HStack(alignment: .bottom, spacing: 0) {
-                    leftView
                     middleView
                     rightView
                 }
@@ -168,7 +167,7 @@ struct InputView: View {
             switch state {
             case .empty, .waitingForRecordingPermission:
                 if case .message = style {
-                    cameraButton
+
                 }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
@@ -195,8 +194,7 @@ struct InputView: View {
                 if state.canSend {
                     sendButton
                 } else {
-                    recordButton
-                        .highPriorityGesture(dragGesture())
+                    inactiveSendButton
                 }
             }
             .compositingGroup()
@@ -316,6 +314,16 @@ struct InputView: View {
             theme.images.inputView.arrowSend
                 .viewSize(48)
                 .circleBackground(theme.colors.sendButtonBackground)
+        }
+    }
+    
+    var inactiveSendButton: some View {
+        Button {
+           
+        } label: {
+            theme.images.inputView.arrowSend
+                .viewSize(48)
+                .circleBackground(Color.gray)
         }
     }
 
