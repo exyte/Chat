@@ -227,7 +227,7 @@ class ConversationViewModel: ObservableObject {
     private func conversationForUser(_ user: User) -> Conversation? {
         // check in case the other user sent a message while this user had the empty conversation open
         for conversation in dataStorage.conversations {
-            if conversation.users.count == 2, conversation.users.contains(user) {
+            if conversation.isPrivate, conversation.users.contains(user) {
                 return conversation
             }
         }

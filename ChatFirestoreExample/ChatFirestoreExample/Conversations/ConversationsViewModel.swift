@@ -33,5 +33,10 @@ class ConversationsViewModel: ObservableObject {
 
     func subscribeToUpdates() {
         dataStorage.subscribeToUpdates()
+
+        /// ------------------
+        /// FAKE conversations created HERE
+        FakeConversationsManager().createFakesIfNeeded()
+        /// ------------------
     }
 }

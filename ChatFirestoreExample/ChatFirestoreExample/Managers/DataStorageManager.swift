@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-class DataStorageManager {
+class DataStorageManager: ObservableObject {
 
     static var shared = DataStorageManager()
 
@@ -53,29 +53,35 @@ class DataStorageManager {
 
     private func storeUsers(_ snapshot: QuerySnapshot?) {
         guard let currentUser = SessionManager.shared.currentUser else { return }
-        users = snapshot?.documents
-            .compactMap { document in
-                let dict = document.data()
-                if document.documentID == currentUser.id {
-                    return nil // skip current user
-                }
-                if let name = dict["nickname"] as? String {
-                    let avatarURL = dict["avatarURL"] as? String
-                    return User(id: document.documentID, name: name, avatarURL: URL(string: avatarURL ?? ""), isCurrentUser: false)
-                }
-                return nil
-            } ?? []
-        allUsers = users + [currentUser]
+        DispatchQueue.main.async { [weak self] in
+            let users: [User] = snapshot?.documents
+                .compactMap { document in
+                    let dict = document.data()
+                    if document.documentID == currentUser.id {
+                        return nil // skip current user
+                    }
+                    if let name = dict["nickname"] as? String {
+                        let avatarURL = dict["avatarURL"] as? String
+                        return User(id: document.documentID, name: name, avatarURL: URL(string: avatarURL ?? ""), isCurrentUser: false)
+                    }
+                    return nil
+                } ?? []
+
+            self?.users = users
+            self?.allUsers = users + [currentUser]
+        }
     }
 
     private func storeConversations(_ snapshot: QuerySnapshot?) {
-        conversations = snapshot?.documents
-            .compactMap { [weak self] document in
-                if let firestoreConversation = try? document.data(as: FirestoreConversation.self) {
-                    return self?.makeConversation(document.documentID, firestoreConversation)
-                }
-                return nil
-            } ?? []
+        DispatchQueue.main.async { [weak self] in
+            self?.conversations = snapshot?.documents
+                .compactMap { [weak self] document in
+                    if let firestoreConversation = try? document.data(as: FirestoreConversation.self) {
+                        return self?.makeConversation(document.documentID, firestoreConversation)
+                    }
+                    return nil
+                } ?? []
+        }
     }
 
     private func makeConversation(_ id: String, _ firestoreConversation: FirestoreConversation) -> Conversation {
@@ -89,7 +95,7 @@ class DataStorageManager {
                 subtext = "Voice recording"
             }
             message = LatestMessageInChat(
-                senderName: user.id == SessionManager.shared.currentUserId ? "You" : user.name,
+                senderName: user.name,
                 createdAt: flm.createdAt,
                 text: flm.text.isEmpty ? nil : flm.text,
                 subtext: subtext

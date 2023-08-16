@@ -10,6 +10,8 @@ import Chat
 
 struct ConversationView: View {
 
+    @Environment(\.presentationMode) var presentationMode
+
     @StateObject var viewModel: ConversationViewModel
 
     var body: some View {
@@ -29,10 +31,18 @@ struct ConversationView: View {
                 fullscreenTint: .white
             )
         )
+        .navigationBarBackButtonHidden()
         .toolbar {
-            ToolbarItem(placement: .principal) {
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(.navigateBack)
+                }
+            }
+            ToolbarItem(placement: .navigation) {
                 HStack {
-                    if let conversation = viewModel.conversation {
+                    if let conversation = viewModel.conversation, viewModel.users.count > 1 {
                         AvatarView(url: conversation.pictureURL, size: 44)
                         Text(conversation.title)
                     } else if let user = viewModel.users.first {

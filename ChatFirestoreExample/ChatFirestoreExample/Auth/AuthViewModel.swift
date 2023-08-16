@@ -38,13 +38,13 @@ class AuthViewModel: ObservableObject {
 
     func createNewUser(nickname: String, avatar: Media?) {
         Task {
-            guard let avatarURL = await UploadingManager.uploadMedia(avatar) else { return }
+            let avatarURL = await UploadingManager.uploadMedia(avatar)
             var ref: DocumentReference? = nil
             ref = Firestore.firestore()
                 .collection(Collection.users).addDocument(data: [
                 "deviceId": SessionManager.shared.deviceId,
                 "nickname": nickname,
-                "avatarURL": avatarURL.absoluteString
+                "avatarURL": avatarURL?.absoluteString
             ]) { [weak self] err in
                 if let err = err {
                     print("Error adding document: \(err)")

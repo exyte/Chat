@@ -59,6 +59,7 @@ struct AuthView: View {
             }
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
+            .showLiveCameraCell()
         }
     }
 
@@ -76,9 +77,6 @@ struct AuthView: View {
             }
             .frame(width: 146, height: 146)
             .clipShape(Circle())
-            .onTapGesture {
-                showPicker = true
-            }
 
             ZStack {
                 Circle()
@@ -87,6 +85,9 @@ struct AuthView: View {
                     .frame(width: 48, height: 48)
                 Image(.photoIcon)
             }
+        }
+        .onTapGesture {
+            showPicker = true
         }
     }
 

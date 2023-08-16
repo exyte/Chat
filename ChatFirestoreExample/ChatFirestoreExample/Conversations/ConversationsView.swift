@@ -10,6 +10,7 @@ import ActivityIndicatorView
 
 struct ConversationsView: View {
 
+    @ObservedObject var dataStorage = DataStorageManager.shared
     @StateObject var viewModel = ConversationsViewModel()
 
     @State var showUsersList = false
@@ -34,44 +35,52 @@ struct ConversationsView: View {
                 .padding(.horizontal, 12)
 
             List(viewModel.filteredConversations) { conversation in
-                NavigationLink(value: conversation) {
-                    HStack {
-                        if let url = conversation.pictureURL {
-                            AvatarView(url: url, size: 56)
-                        } else {
-                            HStack(spacing: -30) {
-                                ForEach(conversation.users) { user in
-                                    AvatarView(url: user.avatarURL, size: 56)
-                                }
+                HStack {
+                    if let url = conversation.pictureURL {
+                        AvatarView(url: url, size: 56)
+                    } else {
+                        HStack(spacing: -30) {
+                            ForEach(conversation.notMeUsers) { user in
+                                AvatarView(url: user.avatarURL, size: 56)
                             }
                         }
+                    }
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(conversation.title)
-                                .font(17, .black, .medium)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(conversation.displayTitle)
+                            .font(17, .black, .medium)
 
-                            if let latest = conversation.latestMessage {
-                                HStack(alignment: .bottom, spacing: 0) {
+                        if let latest = conversation.latestMessage {
+                            HStack(alignment: .bottom, spacing: 0) {
+                                if !conversation.isPrivate {
                                     Text("\(latest.senderName): ")
                                         .font(15, .exampleTetriaryText)
-                                    if let text = latest.text {
-                                        Text(text)
-                                            .lineLimit(1)
-                                            .font(15, .exampleSecondaryText)
-                                    }
-                                    if let subtext = latest.subtext {
-                                        Text(subtext)
-                                            .font(15, .exampleBlue)
-                                    }
-                                    if let date = latest.createdAt?.timeAgoFormat() {
-                                        Text(" · \(date)")
-                                            .font(13, .exampleTetriaryText)
-                                    }
+                                } else if latest.isMyMessage {
+                                    Text("You: ")
+                                        .font(15, .exampleTetriaryText)
+                                }
+
+                                if let text = latest.text {
+                                    Text(text)
+                                        .lineLimit(1)
+                                        .font(15, .exampleSecondaryText)
+                                }
+                                if let subtext = latest.subtext {
+                                    Text(subtext)
+                                        .font(15, .exampleBlue)
+                                }
+                                if let date = latest.createdAt?.timeAgoFormat() {
+                                    Text(" · \(date)")
+                                        .font(13, .exampleTetriaryText)
                                 }
                             }
                         }
                     }
                 }
+                .background(
+                    NavigationLink("", value: conversation)
+                        .opacity(0)
+                )
                 .listRowSeparator(.hidden)
             }
             .refreshable {
@@ -92,6 +101,13 @@ struct ConversationsView: View {
                         showUsersList = true
                     } label: {
                         Image(.newChat)
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem {
+                    Button("Logout") {
+                        SessionManager.shared.logout()
                     }
                 }
             }

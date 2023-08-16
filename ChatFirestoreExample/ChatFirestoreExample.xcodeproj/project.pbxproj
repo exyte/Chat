@@ -38,6 +38,7 @@
 		5B9920F02A405B5500995901 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9920EF2A405B5500995901 /* Utils.swift */; };
 		5B9920F32A405BB800995901 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9920F22A405BB800995901 /* AvatarView.swift */; };
 		5BAEBAC82A418DA2005D9DF7 /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BAEBAC72A418DA2005D9DF7 /* Conversation.swift */; };
+		5BB99CE72A614A040011F32D /* FakeConversationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB99CE62A614A040011F32D /* FakeConversationsManager.swift */; };
 		5BC3ED022A5E8F86001481BA /* FirestoreMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3ED012A5E8F86001481BA /* FirestoreMessage.swift */; };
 		5BDBC2C92A6010490073B259 /* DataStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDBC2C82A6010490073B259 /* DataStorageManager.swift */; };
 /* End PBXBuildFile section */
@@ -57,6 +58,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5B1A8F982A6172ED00C4FD2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5B2D82662A5C1A90009D26A5 /* GroupCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupCreateView.swift; sourceTree = "<group>"; };
 		5B2EC2DE2A528DBB00BD253A /* ConversationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsView.swift; sourceTree = "<group>"; };
 		5B2EC2E02A528DC400BD253A /* ConversationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsViewModel.swift; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 		5B9920EF2A405B5500995901 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		5B9920F22A405BB800995901 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		5BAEBAC72A418DA2005D9DF7 /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
+		5BB99CE62A614A040011F32D /* FakeConversationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeConversationsManager.swift; sourceTree = "<group>"; };
 		5BC3ED012A5E8F86001481BA /* FirestoreMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreMessage.swift; sourceTree = "<group>"; };
 		5BDBC2C82A6010490073B259 /* DataStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -146,6 +149,7 @@
 				5B55902E2A384091008E13E2 /* SessionManager.swift */,
 				5B4E1BA92A495FD500E3B27C /* UploadingManager.swift */,
 				5BDBC2C82A6010490073B259 /* DataStorageManager.swift */,
+				5BB99CE62A614A040011F32D /* FakeConversationsManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -180,6 +184,7 @@
 		5B57482E2A3707850033C808 /* ChatFirestoreExample */ = {
 			isa = PBXGroup;
 			children = (
+				5B1A8F982A6172ED00C4FD2F /* Info.plist */,
 				5B34D8F22A3721990013A15A /* Auth */,
 				5B2EC2DD2A528D5100BD253A /* Conversations */,
 				5B34D8F32A3721AA0013A15A /* Users */,
@@ -327,6 +332,7 @@
 				5B73CB432A5D465C007D80B0 /* SearchField.swift in Sources */,
 				5B5748302A3707850033C808 /* ChatFirestoreExampleApp.swift in Sources */,
 				5B9920F32A405BB800995901 /* AvatarView.swift in Sources */,
+				5BB99CE72A614A040011F32D /* FakeConversationsManager.swift in Sources */,
 				5B8D762F2A5C18EA00EDE1B7 /* ButtonStyle.swift in Sources */,
 				5B2EC2DF2A528DBB00BD253A /* ConversationsView.swift in Sources */,
 				5B2EC2E12A528DC400BD253A /* ConversationsViewModel.swift in Sources */,
@@ -472,14 +478,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatFirestoreExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FZXCM5CJ7P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChatFirestoreExample/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Grant access to camera to be able to take photos and videos";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Grant access to microphone to be able to take videos";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Grant access to photo library to be able to select photos";
@@ -498,7 +505,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.exyte.chatFirestoreExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Chat example Firestore AppStore";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Chat example Firestore Dev";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -512,12 +519,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatFirestoreExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FZXCM5CJ7P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChatFirestoreExample/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Grant access to camera to be able to take photos and videos";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Grant access to microphone to be able to take videos";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Grant access to photo library to be able to select photos";

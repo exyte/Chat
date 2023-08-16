@@ -81,14 +81,13 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             }
 
             let prevSections = context.coordinator.sections
-            var sectionsWithAppliedDeletes: [MessagesSection] = []
-            var sectionsWithAppliedEdits: [MessagesSection] = []
-            // sectionsWithAppliedInserts is just sections
+            var sectionsWithAppliedDeletes: [MessagesSection] = [] // prev sections + deletes
+            var sectionsWithAppliedEdits: [MessagesSection] = [] // prev sections + deletes + edits
+            // prev sections + deletes + edits + inserts == section
 
-            // wsi = whole section info
             printListLogs("3 updateUIView sections:", "\n")
-            printListLogs("wsi previous:\n", prevSections, "\n")
-            printListLogs("wsi actual sections:\n", sections, "\n\n")
+            printListLogs("whole previous:\n", prevSections, "\n")
+            printListLogs("whole actual sections:\n", sections, "\n\n")
 
             DispatchQueue.main.async {
                 tableView.performBatchUpdates {
@@ -96,7 +95,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     // remove sections and rows if needed
                     printListLogs("performBatchUpdates step 1")
                     sectionsWithAppliedDeletes = applyDeletes(tableView: tableView, prevSections: prevSections)
-                    printListLogs("wsi applied deletes:\n", sectionsWithAppliedDeletes, "\n")
+                    printListLogs("whole applied deletes:\n", sectionsWithAppliedDeletes, "\n")
                     context.coordinator.sections = sectionsWithAppliedDeletes
                 } completion: { _ in
                     tableSemaphore.signal()
@@ -110,7 +109,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
                     printListLogs("performBatchUpdates step 2")
                     sectionsWithAppliedEdits = applyEdits(tableView: tableView, prevSections: sectionsWithAppliedDeletes)
-                    printListLogs("wsi applied edits:\n", sectionsWithAppliedEdits, "\n")
+                    printListLogs("whole applied edits:\n", sectionsWithAppliedEdits, "\n")
                     context.coordinator.sections = sectionsWithAppliedEdits
                 } completion: { _ in
                     tableSemaphore.signal()

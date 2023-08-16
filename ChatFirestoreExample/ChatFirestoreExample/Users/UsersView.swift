@@ -10,6 +10,7 @@ import SwiftUI
 struct UsersView: View {
 
     @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var dataStorage = DataStorageManager.shared
 
     @StateObject var viewModel: UsersViewModel
     @Binding var isPresented: Bool

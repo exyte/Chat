@@ -24,7 +24,14 @@ class UploadingManager {
         return await uploadData(data, ref)
     }
 
-    static func uploadData(_ data: Data, _ ref: StorageReference) async -> URL? {
+    static func uploadImageData(_ data: Data?) async -> URL? {
+        guard let data = data else { return nil }
+        let ref = Storage.storage().reference()
+            .child("\(UUID().uuidString).jpg")
+        return await uploadData(data, ref)
+    }
+
+    static private func uploadData(_ data: Data, _ ref: StorageReference) async -> URL? {
         await withCheckedContinuation { continuation in
             ref.putData(data, metadata: nil) { metadata, error in
                 guard let _ = metadata else {

@@ -16,6 +16,21 @@ public struct Conversation: Identifiable, Hashable {
     public let title: String
 
     public let latestMessage: LatestMessageInChat?
+
+    var isPrivate: Bool {
+        users.count == 2
+    }
+
+    var notMeUsers: [User] {
+        users.filter { $0.id != SessionManager.shared.currentUserId }
+    }
+
+    var displayTitle: String {
+        if isPrivate, let user = notMeUsers.first {
+            return user.name
+        }
+        return title
+    }
 }
 
 public struct LatestMessageInChat: Hashable {
@@ -23,6 +38,10 @@ public struct LatestMessageInChat: Hashable {
     public var createdAt: Date?
     public var text: String?
     public var subtext: String?
+
+    var isMyMessage: Bool {
+        SessionManager.shared.currentUser?.name == senderName
+    }
 }
 
 public struct FirestoreConversation: Codable, Identifiable, Hashable {
