@@ -44,7 +44,7 @@ struct GroupSelectUsersView: View {
                     GroupCreateView(viewModel: viewModel, isPresented: $isPresented, navPath: $navPath)
                 }
                 .buttonStyle(BlueButton())
-                .disabled(viewModel.selectedUsers.count < 2)
+                .disabled(viewModel.selectedUsers.count < 1)
                 .padding(.horizontal, 12)
             }
         }

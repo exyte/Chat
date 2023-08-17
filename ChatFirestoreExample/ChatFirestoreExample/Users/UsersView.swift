@@ -86,7 +86,8 @@ struct UsersView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigation) {
-                    Button("Cancel") {            presentationMode.wrappedValue.dismiss()
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
                     }
                     .font(17, .black)
                 }

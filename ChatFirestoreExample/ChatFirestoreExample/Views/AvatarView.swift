@@ -19,10 +19,14 @@ struct AvatarView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             } placeholder: {
-                Color.gray
+                Image(.placeholderAvatar)
+                    .resizable()
             }
             .frame(width: size, height: size)
             .clipShape(Circle())
+        } else {
+            Image(.placeholderAvatar)
+                .resizable()
         }
     }
 }

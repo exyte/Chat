@@ -12,21 +12,18 @@ import FirebaseFirestoreSwift
 public struct Conversation: Identifiable, Hashable {
     public let id: String
     public let users: [User]
+    public let isGroup: Bool
     public let pictureURL: URL?
     public let title: String
 
     public let latestMessage: LatestMessageInChat?
-
-    var isPrivate: Bool {
-        users.count == 2
-    }
 
     var notMeUsers: [User] {
         users.filter { $0.id != SessionManager.shared.currentUserId }
     }
 
     var displayTitle: String {
-        if isPrivate, let user = notMeUsers.first {
+        if !isGroup, let user = notMeUsers.first {
             return user.name
         }
         return title
@@ -47,6 +44,7 @@ public struct LatestMessageInChat: Hashable {
 public struct FirestoreConversation: Codable, Identifiable, Hashable {
     @DocumentID public var id: String?
     public let users: [String]
+    public let isGroup: Bool
     public let pictureURL: String?
     public let title: String
     public let latestMessage: FirestoreMessage?

@@ -30,6 +30,24 @@ extension View {
     }
 }
 
+extension View {
+    @ViewBuilder
+    func forceRotation(orientation: UIInterfaceOrientationMask) -> some View {
+        self.onAppear() {
+            AppDelegate.orientationLock = orientation
+        }
+        .onDisappear() {
+            AppDelegate.orientationLock = .all
+        }
+    }
+}
+
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
 extension String {
     func toURL() -> URL? {
         URL(string: self)

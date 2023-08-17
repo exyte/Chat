@@ -51,8 +51,8 @@ struct ConversationsView: View {
                             .font(17, .black, .medium)
 
                         if let latest = conversation.latestMessage {
-                            HStack(alignment: .bottom, spacing: 0) {
-                                if !conversation.isPrivate {
+                            HStack(spacing: 0) {
+                                if conversation.isGroup {
                                     Text("\(latest.senderName): ")
                                         .font(15, .exampleTetriaryText)
                                 } else if latest.isMyMessage {
@@ -60,18 +60,22 @@ struct ConversationsView: View {
                                         .font(15, .exampleTetriaryText)
                                 }
 
-                                if let text = latest.text {
-                                    Text(text)
-                                        .lineLimit(1)
-                                        .font(15, .exampleSecondaryText)
-                                }
-                                if let subtext = latest.subtext {
-                                    Text(subtext)
-                                        .font(15, .exampleBlue)
-                                }
-                                if let date = latest.createdAt?.timeAgoFormat() {
-                                    Text(" · \(date)")
-                                        .font(13, .exampleTetriaryText)
+                                HStack(spacing: 4) {
+                                    if let subtext = latest.subtext {
+                                        Text(subtext)
+                                            .font(15, .exampleBlue)
+                                    }
+                                    if let text = latest.text {
+                                        Text(text)
+                                            .lineLimit(1)
+                                            .font(15, .exampleSecondaryText)
+                                    }
+                                    if let date = latest.createdAt?.timeAgoFormat() {
+                                        Text("·")
+                                            .font(13, .exampleTetriaryText)
+                                        Text(date)
+                                            .font(13, .exampleTetriaryText)
+                                    }
                                 }
                             }
                         }
@@ -105,10 +109,11 @@ struct ConversationsView: View {
                 }
             }
             .toolbar {
-                ToolbarItem {
+                ToolbarItem(placement: .navigation) {
                     Button("Logout") {
                         SessionManager.shared.logout()
                     }
+                    .font(17, .black)
                 }
             }
         }

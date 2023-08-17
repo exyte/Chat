@@ -77,6 +77,7 @@ struct GroupCreateView: View {
             }
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
+            .forceRotation(orientation: .portrait)
         }
     }
 

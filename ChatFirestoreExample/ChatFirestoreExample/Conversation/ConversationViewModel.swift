@@ -227,7 +227,7 @@ class ConversationViewModel: ObservableObject {
     private func conversationForUser(_ user: User) -> Conversation? {
         // check in case the other user sent a message while this user had the empty conversation open
         for conversation in dataStorage.conversations {
-            if conversation.isPrivate, conversation.users.contains(user) {
+            if !conversation.isGroup, conversation.users.contains(user) {
                 return conversation
             }
         }
@@ -238,6 +238,7 @@ class ConversationViewModel: ObservableObject {
         subscribtionToConversationCreation = nil
         let dict: [String : Any] = [
             "users": allUsers.map { $0.id },
+            "isGroup": false,
             "title": user.name
         ]
 
@@ -249,7 +250,7 @@ class ConversationViewModel: ObservableObject {
                     if let _ = err {
                         continuation.resume(returning: nil)
                     } else if let id = ref?.documentID {
-                        continuation.resume(returning: Conversation(id: id, users: self.allUsers, pictureURL: nil, title: "", latestMessage: nil))
+                        continuation.resume(returning: Conversation(id: id, users: self.allUsers, isGroup: false, pictureURL: nil, title: "", latestMessage: nil))
                     }
                 }
         }

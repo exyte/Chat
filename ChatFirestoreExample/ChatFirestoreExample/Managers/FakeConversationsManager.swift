@@ -76,21 +76,55 @@ class FakeConversationsManager {
     }
 
     private func createIndividualConversation(_ userId: String) {
-        print("create conv")
-        guard let currentUser = SessionManager.shared.currentUser else { return }
-        let dict: [String : Any] = [
-            "users": [userId, currentUser.id],
-            "title": "a"
+        Task {
+            guard let currentUser = SessionManager.shared.currentUser else { return }
+            let dict: [String : Any] = [
+                "users": [userId, currentUser.id],
+                "isGroup": false,
+                "title": "a"
+            ]
+            
+            let conversation = try await Firestore.firestore()
+                .collection(Collection.conversations)
+                .addDocument(data: dict)
+
+            print("created", [userId, currentUser.id])
+
+            try await conversation
+                .collection(Collection.messages)
+                .addDocument(data: fakeMessageDict(userId: userId, index: 0))
+
+            let latestDict = fakeMessageDict(userId: userId, index: 1)
+            try await conversation
+                .collection(Collection.messages)
+                .addDocument(data: latestDict)
+
+            try await conversation
+                .updateData(["latestMessage" : latestDict])
+        }
+    }
+
+    func fakeMessageDict(userId: String, index: Int) -> [String: Any] {
+        let texts = [
+            "Bob": [
+                "Hello",
+                "Welcome to Firestore chat example"
+            ],
+            "Steve": [
+                "How's it going",
+                "I'm a bot, but you can send messages to me"
+            ],
+            "Tim": [
+                "Morning!",
+                "You look great today!"
+            ]
         ]
 
-        Firestore.firestore()
-            .collection(Collection.conversations)
-            .addDocument(data: dict) { err in
-                if let err = err {
-                    print("Error adding document: \(err)")
-                } else {
-                    print("created", [userId, currentUser.id])
-                }
-            }
+        return [
+            "userId": userId,
+            "createdAt": Timestamp(date: Date()),
+            "text": texts[userId]?[index] ?? "",
+            "attachments": []
+        ]
     }
 }

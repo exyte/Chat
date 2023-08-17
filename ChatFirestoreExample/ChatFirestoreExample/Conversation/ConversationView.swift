@@ -42,7 +42,7 @@ struct ConversationView: View {
             }
             ToolbarItem(placement: .navigation) {
                 HStack {
-                    if let conversation = viewModel.conversation, viewModel.users.count > 1 {
+                    if let conversation = viewModel.conversation, conversation.isGroup {
                         AvatarView(url: conversation.pictureURL, size: 44)
                         Text(conversation.title)
                     } else if let user = viewModel.users.first {

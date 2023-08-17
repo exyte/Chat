@@ -107,6 +107,7 @@ class DataStorageManager: ObservableObject {
         let conversation = Conversation(
             id: id,
             users: users,
+            isGroup: firestoreConversation.isGroup,
             pictureURL: firestoreConversation.pictureURL?.toURL(),
             title: firestoreConversation.title,
             latestMessage: message

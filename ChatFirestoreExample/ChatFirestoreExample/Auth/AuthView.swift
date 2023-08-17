@@ -29,27 +29,33 @@ struct AuthView: View {
     }
 
     var content: some View {
-        VStack(spacing: 0) {
-            Text("Welcome!\nCreate a test account")
-                .font(20, .black, .medium)
-                .multilineTextAlignment(.center)
-                .fixedSize()
-
-            pickAvatarView
-                .padding(.top, 80)
-
-            CustomTextField(placeholder: "Nickname", text: $name)
-                .padding(.top, 44)
-
-            createButton
-                .padding(.top, 16)
-
-            Spacer()
-
-            Image(.logo)
+        ZStack {
+            VStack(spacing: 0) {
+                Text("Welcome!\nCreate a test account")
+                    .font(20, .black, .medium)
+                    .multilineTextAlignment(.center)
+                    .fixedSize()
+                
+                pickAvatarView
+                    .padding(.top, 80)
+                
+                CustomTextField(placeholder: "Nickname", text: $name)
+                    .padding(.top, 44)
+                
+                createButton
+                    .padding(.top, 16)
+                
+                Spacer()
+                
+                Image(.logo)
+            }
+            .padding(12)
+            .padding(.top, 70)
         }
-        .padding(12)
-        .padding(.top, 70)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            hideKeyboard()
+        }
         .fullScreenCover(isPresented: $showPicker) {
             MediaPicker(isPresented: $showPicker) { media in
                 avatar = media.first
@@ -60,6 +66,7 @@ struct AuthView: View {
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
             .showLiveCameraCell()
+            .forceRotation(orientation: .portrait)
         }
     }
 
@@ -104,5 +111,6 @@ struct AuthView: View {
                         .foregroundColor(name.isEmpty ? .exampleMidGray : .exampleBlue)
                 }
         }
+        .disabled(name.isEmpty)
     }
 }
