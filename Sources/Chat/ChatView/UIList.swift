@@ -113,14 +113,20 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         for iPrevDate in 0..<prevDates.count {
             let prevDate = prevDates[iPrevDate]
             guard let section = sections.first(where: { $0.date == prevDate } ),
-                  let prevSection = prevSections.first(where: { $0.date == prevDate } ) else { continue }
-
+                  let prevSection = prevSections.first(where: { $0.date == prevDate } ) else {
+                tableView.deleteSections([iPrevDate], with: .automatic)
+                continue
+            }
+            
             var resultRows = [MessageRow]()
             for iPrevRow in 0..<prevSection.rows.count {
                 let prevRow = prevSection.rows[iPrevRow]
-                guard let row = section.rows.first(where: { $0.message.id == prevRow.message.id } ) else { continue }
+                guard let row = section.rows.first(where: { $0.message.id == prevRow.message.id } ) else {
+                    tableView.deleteRows(at: [IndexPath(row: iPrevRow, section: iPrevDate)], with: .automatic)
+                    continue
+                }
                 resultRows.append(row)
-
+                
                 if row != prevRow {
                     DispatchQueue.main.async {
                         tableView.reloadRows(at: [IndexPath(row: iPrevRow, section: iPrevDate)], with: .none)
