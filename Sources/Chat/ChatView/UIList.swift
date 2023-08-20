@@ -52,21 +52,18 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.scrollsToTop = false
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
-            DispatchQueue.main.async {
-                if !context.coordinator.sections.isEmpty {
-                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
-                }
+            if !context.coordinator.sections.isEmpty {
+                tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
             }
         }
 
-        DispatchQueue.main.async {
-            shouldScrollToTop = {
-                tableView.contentOffset = CGPoint(x: 0, y: tableView.contentSize.height - tableView.frame.height)
-            }
+        shouldScrollToTop = {
+            tableView.contentOffset = CGPoint(x: 0, y: tableView.contentSize.height - tableView.frame.height)
         }
 
         return tableView
     }
+
 
     func updateUIView(_ tableView: UITableView, context: Context) {
         updatesQueue.async {
@@ -139,12 +136,12 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func applyInserts(tableView: UITableView, prevSections: [MessagesSection]) {
-        // compare sections without comparing messages inside them, just dates
+        // Compare sections without comparing messages inside them, based on dates
         let dates = sections.map { $0.date }
         let coordinatorDates = prevSections.map { $0.date }
 
-        let dif = dates.difference(from: coordinatorDates)
-        for change in dif {
+        let sectionDiff = dates.difference(from: coordinatorDates)
+        for change in sectionDiff {
             switch change {
             case let .remove(offset, _, _):
                 tableView.deleteSections([offset], with: .top)
@@ -153,22 +150,36 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             }
         }
 
-        // compare rows for each section
+        // Compare rows for each section
         for section in sections {
             guard let index = prevSections.firstIndex(where: { $0.date == section.date } ) else { continue }
-            let dif = section.rows.difference(from: prevSections[index].rows)
+            let rowDiff = section.rows.difference(from: prevSections[index].rows)
 
-            // animate insertions and removals
-            for change in dif {
+            // Animate insertions and removals
+            var insertIndexPaths = [IndexPath]()
+            var removeIndexPaths = [IndexPath]()
+
+            for change in rowDiff {
                 switch change {
                 case let .remove(offset, _, _):
-                    tableView.deleteRows(at: [IndexPath(row: offset, section: index)], with: .top)
-                case let .insert(offset, _, _):
-                    tableView.insertRows(at: [IndexPath(row: offset, section: index)], with: .top)
+                    let adjustedIndexPath = IndexPath(row: offset, section: index)
+                    removeIndexPaths.append(adjustedIndexPath)
+                case let .insert(offset, element, _):
+                    let adjustedIndexPath = IndexPath(row: offset, section: index)
+                    insertIndexPaths.append(adjustedIndexPath)
                 }
+            }
+
+            if !removeIndexPaths.isEmpty {
+                tableView.deleteRows(at: removeIndexPaths, with: .top)
+            }
+
+            if !insertIndexPaths.isEmpty {
+                tableView.insertRows(at: insertIndexPaths, with: .top)
             }
         }
     }
+
 
     func makeCoordinator() -> Coordinator<MessageContent> {
         Coordinator(viewModel: viewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
