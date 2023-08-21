@@ -31,6 +31,9 @@ struct ConversationView: View {
                 fullscreenTint: .white
             )
         )
+        .onDisappear {
+            viewModel.resetUnreadCounter()
+        }
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .navigation) {

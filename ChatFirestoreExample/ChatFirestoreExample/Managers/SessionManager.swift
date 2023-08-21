@@ -16,15 +16,19 @@ class SessionManager {
 
     static let shared = SessionManager()
 
-    @Published var currentUser: User?
-    
+    static var currentUserId: String {
+        shared.currentUser?.id ?? ""
+    }
+
+    static var currentUser: User? {
+        shared.currentUser
+    }
+
     var deviceId: String {
         UIDevice.current.identifierForVendor?.uuidString ?? ""
     }
 
-    var currentUserId: String {
-        currentUser?.id ?? ""
-    }
+    @Published private var currentUser: User?
 
     func storeUser(_ user: User) {
         let encoder = JSONEncoder()

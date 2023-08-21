@@ -12,14 +12,25 @@ import FirebaseFirestoreSwift
 public struct Conversation: Identifiable, Hashable {
     public let id: String
     public let users: [User]
+    public let usersUnreadCountInfo: [String: Int]
     public let isGroup: Bool
     public let pictureURL: URL?
     public let title: String
 
     public let latestMessage: LatestMessageInChat?
 
+    init(id: String, users: [User], usersUnreadCountInfo: [String: Int]? = nil, isGroup: Bool, pictureURL: URL? = nil, title: String = "", latestMessage: LatestMessageInChat? = nil) {
+        self.id = id
+        self.users = users
+        self.usersUnreadCountInfo = usersUnreadCountInfo ?? Dictionary(uniqueKeysWithValues: users.map { ($0.id, 0) } )
+        self.isGroup = isGroup
+        self.pictureURL = pictureURL
+        self.title = title
+        self.latestMessage = latestMessage
+    }
+
     var notMeUsers: [User] {
-        users.filter { $0.id != SessionManager.shared.currentUserId }
+        users.filter { $0.id != SessionManager.currentUserId }
     }
 
     var displayTitle: String {
@@ -37,13 +48,14 @@ public struct LatestMessageInChat: Hashable {
     public var subtext: String?
 
     var isMyMessage: Bool {
-        SessionManager.shared.currentUser?.name == senderName
+        SessionManager.currentUser?.name == senderName
     }
 }
 
 public struct FirestoreConversation: Codable, Identifiable, Hashable {
     @DocumentID public var id: String?
     public let users: [String]
+    public let usersUnreadCountInfo: [String: Int]?
     public let isGroup: Bool
     public let pictureURL: String?
     public let title: String

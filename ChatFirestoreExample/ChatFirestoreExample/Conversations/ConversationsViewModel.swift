@@ -36,7 +36,7 @@ class ConversationsViewModel: ObservableObject {
 
         /// ------------------
         /// FAKE conversations created HERE
-        FakeConversationsManager().createFakesIfNeeded()
+        //FakeConversationsManager().createFakesIfNeeded()
         /// ------------------
     }
 }

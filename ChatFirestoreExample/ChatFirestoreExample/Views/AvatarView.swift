@@ -27,6 +27,7 @@ struct AvatarView: View {
         } else {
             Image(.placeholderAvatar)
                 .resizable()
+                .frame(width: size, height: size)
         }
     }
 }

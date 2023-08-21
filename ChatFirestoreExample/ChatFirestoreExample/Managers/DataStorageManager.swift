@@ -27,7 +27,7 @@ class DataStorageManager: ObservableObject {
     func getConversations() async {
         let snapshot = try? await Firestore.firestore()
             .collection(Collection.conversations)
-            .whereField("users", arrayContains: SessionManager.shared.currentUserId)
+            .whereField("users", arrayContains: SessionManager.currentUserId)
             .getDocuments()
         storeConversations(snapshot)
     }
@@ -45,14 +45,14 @@ class DataStorageManager: ObservableObject {
 
         Firestore.firestore()
             .collection(Collection.conversations)
-            .whereField("users", arrayContains: SessionManager.shared.currentUserId)
+            .whereField("users", arrayContains: SessionManager.currentUserId)
             .addSnapshotListener() { [weak self] (snapshot, _) in
                 self?.storeConversations(snapshot)
             }
     }
 
     private func storeUsers(_ snapshot: QuerySnapshot?) {
-        guard let currentUser = SessionManager.shared.currentUser else { return }
+        guard let currentUser = SessionManager.currentUser else { return }
         DispatchQueue.main.async { [weak self] in
             let users: [User] = snapshot?.documents
                 .compactMap { document in
@@ -76,9 +76,13 @@ class DataStorageManager: ObservableObject {
         DispatchQueue.main.async { [weak self] in
             self?.conversations = snapshot?.documents
                 .compactMap { [weak self] document in
-                    if let firestoreConversation = try? document.data(as: FirestoreConversation.self) {
+                    do {
+                        let firestoreConversation = try document.data(as: FirestoreConversation.self)
                         return self?.makeConversation(document.documentID, firestoreConversation)
+                    } catch {
+                        print(error)
                     }
+
                     return nil
                 } ?? []
         }
@@ -107,6 +111,7 @@ class DataStorageManager: ObservableObject {
         let conversation = Conversation(
             id: id,
             users: users,
+            usersUnreadCountInfo: firestoreConversation.usersUnreadCountInfo,
             isGroup: firestoreConversation.isGroup,
             pictureURL: firestoreConversation.pictureURL?.toURL(),
             title: firestoreConversation.title,

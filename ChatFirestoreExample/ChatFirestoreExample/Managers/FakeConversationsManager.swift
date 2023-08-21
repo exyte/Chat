@@ -29,7 +29,7 @@ class FakeConversationsManager {
             // if yes - check if conversations were alreay created
             let snapshot = try? await Firestore.firestore()
                 .collection(Collection.conversations)
-                .whereField("users", arrayContains: SessionManager.shared.currentUserId)
+                .whereField("users", arrayContains: SessionManager.currentUserId)
                 .getDocuments()
 
             // if not - create conversations with current user and every fake user
@@ -77,9 +77,11 @@ class FakeConversationsManager {
 
     private func createIndividualConversation(_ userId: String) {
         Task {
-            guard let currentUser = SessionManager.shared.currentUser else { return }
+            guard let currentUser = SessionManager.currentUser else { return }
+            let allUserIds = [userId, currentUser.id]
             let dict: [String : Any] = [
-                "users": [userId, currentUser.id],
+                "users": allUserIds,
+                "usersUnreadCountInfo": Dictionary(uniqueKeysWithValues: allUserIds.map { ($0, 0) } ),
                 "isGroup": false,
                 "title": "a"
             ]

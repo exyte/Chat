@@ -16,8 +16,16 @@ class ConversationViewModel: ObservableObject {
     var users: [User] // not including current user
     var allUsers: [User]
 
-    var conversation: Conversation?
-    var messagesCollection: CollectionReference?
+    var conversationId: String?
+    var conversation: Conversation? {
+        if let id = conversationId {
+            return dataStorage.conversations.first(where: { $0.id == id })
+        }
+        return nil
+    }
+
+    private var conversationDocument: DocumentReference?
+    private var messagesCollection: CollectionReference?
 
     @Published var messages: [Message] = []
 
@@ -26,7 +34,7 @@ class ConversationViewModel: ObservableObject {
     init(user: User) {
         self.users = [user]
         self.allUsers = [user]
-        if let currentUser = SessionManager.shared.currentUser {
+        if let currentUser = SessionManager.currentUser {
             self.allUsers.append(currentUser)
         }
         // setup conversation and messagesCollection later, after it's created
@@ -36,22 +44,41 @@ class ConversationViewModel: ObservableObject {
     }
 
     init(conversation: Conversation) {
-        self.users = conversation.users.filter { $0.id != SessionManager.shared.currentUserId }
+        self.users = conversation.users.filter { $0.id != SessionManager.currentUserId }
         self.allUsers = conversation.users
         updateForConversation(conversation)
     }
 
     func updateForConversation(_ conversation: Conversation) {
-        self.conversation = conversation
-        self.messagesCollection = makeMessagesCollectionRef(conversation)
+        self.conversationId = conversation.id
+        makeFirestoreReferences(conversation.id)
         subscribeToMessages()
     }
 
-    func makeMessagesCollectionRef(_ conversation: Conversation) -> CollectionReference {
-        Firestore.firestore()
+    func makeFirestoreReferences(_ conversationId: String) {
+        self.conversationDocument = Firestore.firestore()
             .collection(Collection.conversations)
-            .document(conversation.id)
+            .document(conversationId)
+
+        self.messagesCollection = Firestore.firestore()
+            .collection(Collection.conversations)
+            .document(conversationId)
             .collection(Collection.messages)
+    }
+
+    func resetUnreadCounter() {
+        if var usersUnreadCountInfo = conversation?.usersUnreadCountInfo {
+            usersUnreadCountInfo[SessionManager.currentUserId] = 0
+            conversationDocument?.updateData(["usersUnreadCountInfo" : usersUnreadCountInfo])
+        }
+    }
+
+    func bumpUnreadCounters() {
+        if var usersUnreadCountInfo = conversation?.usersUnreadCountInfo {
+            usersUnreadCountInfo = usersUnreadCountInfo.mapValues { $0 + 1 }
+            usersUnreadCountInfo[SessionManager.currentUserId] = 0
+            conversationDocument?.updateData(["usersUnreadCountInfo" : usersUnreadCountInfo])
+        }
     }
 
     // MARK: - get/send messages
@@ -124,7 +151,7 @@ class ConversationViewModel: ObservableObject {
             }
 
             /// precreate message with fixed id and .sending status
-            guard let user = SessionManager.shared.currentUser else { return }
+            guard let user = SessionManager.currentUser else { return }
             let id = UUID().uuidString
             let message = await Message.makeMessage(id: id, user: user, status: .sending, draft: draft)
             messages.append(message)
@@ -152,11 +179,14 @@ class ConversationViewModel: ObservableObject {
                     .document(id)
                     .updateData(["latestMessage" : dict])
             }
+
+            /// update unread message counters for other participants
+            bumpUnreadCounters()
         }
     }
 
     private func makeDraftMessageDictionary(_ draft: DraftMessage) async -> [String: Any] {
-        guard let user = SessionManager.shared.currentUser else { return [:] }
+        guard let user = SessionManager.currentUser else { return [:] }
         var attachments = [[String: Any]]()
         for media in draft.medias {
             if let url = await UploadingManager.uploadMedia(media) {
@@ -202,6 +232,7 @@ class ConversationViewModel: ObservableObject {
         return [
             "userId": user.id,
             "createdAt": Timestamp(date: draft.createdAt),
+            "isRead": Timestamp(date: draft.createdAt),
             "text": draft.text,
             "attachments": attachments,
             "recording": recordingDict as Any,
@@ -214,7 +245,7 @@ class ConversationViewModel: ObservableObject {
     func subscribeToConversationCreation(user: User) {
         subscribtionToConversationCreation = Firestore.firestore()
             .collection(Collection.conversations)
-            .whereField("users", arrayContains: SessionManager.shared.currentUserId)
+            .whereField("users", arrayContains: SessionManager.currentUserId)
             .addSnapshotListener() { [weak self] (snapshot, _) in
                 // check if this convesation was created by another user already
                 if let conversation = self?.conversationForUser(user) {
@@ -236,8 +267,10 @@ class ConversationViewModel: ObservableObject {
 
     private func createIndividualConversation(_ user: User) async -> Conversation? {
         subscribtionToConversationCreation = nil
+        let allUserIds = allUsers.map { $0.id }
         let dict: [String : Any] = [
-            "users": allUsers.map { $0.id },
+            "users": allUserIds,
+            "usersUnreadCountInfo": Dictionary(uniqueKeysWithValues: allUserIds.map { ($0, 0) } ),
             "isGroup": false,
             "title": user.name
         ]
@@ -250,7 +283,7 @@ class ConversationViewModel: ObservableObject {
                     if let _ = err {
                         continuation.resume(returning: nil)
                     } else if let id = ref?.documentID {
-                        continuation.resume(returning: Conversation(id: id, users: self.allUsers, isGroup: false, pictureURL: nil, title: "", latestMessage: nil))
+                        continuation.resume(returning: Conversation(id: id, users: self.allUsers, isGroup: false))
                     }
                 }
         }

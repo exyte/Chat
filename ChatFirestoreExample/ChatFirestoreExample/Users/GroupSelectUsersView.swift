@@ -39,6 +39,7 @@ struct GroupSelectUsersView: View {
                     }
                     .listRowSeparator(.hidden)
                 }
+                .padding(.bottom, 60)
 
                 NavigationLink("Next") {
                     GroupCreateView(viewModel: viewModel, isPresented: $isPresented, navPath: $navPath)
@@ -46,6 +47,7 @@ struct GroupSelectUsersView: View {
                 .buttonStyle(BlueButton())
                 .disabled(viewModel.selectedUsers.count < 1)
                 .padding(.horizontal, 12)
+                .padding(.bottom, 10)
             }
         }
         .listStyle(.plain)

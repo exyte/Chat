@@ -58,8 +58,10 @@ class UsersViewModel: ObservableObject {
     }
 
     private func createConversation(_ users: [User], _ pictureURL: URL?) async -> Conversation? {
+        let allUserIds = users.map { $0.id } + [SessionManager.currentUserId]
         let dict: [String : Any] = [
-            "users": users.map { $0.id } + [SessionManager.shared.currentUserId],
+            "users": allUserIds,
+            "usersUnreadCountInfo": Dictionary(uniqueKeysWithValues: allUserIds.map { ($0, 0) } ),
             "isGroup": true,
             "pictureURL": pictureURL?.absoluteString ?? "",
             "title": title
@@ -73,8 +75,8 @@ class UsersViewModel: ObservableObject {
                     if let _ = err {
                         continuation.resume(returning: nil)
                     } else if let id = ref?.documentID {
-                        if let current = SessionManager.shared.currentUser {
-                            continuation.resume(returning: Conversation(id: id, users: users + [current], isGroup: true, pictureURL: pictureURL, title: self.title, latestMessage: nil))
+                        if let current = SessionManager.currentUser {
+                            continuation.resume(returning: Conversation(id: id, users: users + [current], isGroup: true, pictureURL: pictureURL, title: self.title))
                         }
                     }
                 }

@@ -80,6 +80,18 @@ struct ConversationsView: View {
                             }
                         }
                     }
+
+                    Spacer()
+
+                    if let unreadCounter = conversation.usersUnreadCountInfo[SessionManager.currentUserId], unreadCounter != 0 {
+                        Text("\(unreadCounter)")
+                            .font(15, .white, .semibold)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 2)
+                            .background {
+                                Color.exampleBlue.cornerRadius(.infinity)
+                            }
+                    }
                 }
                 .background(
                     NavigationLink("", value: conversation)
