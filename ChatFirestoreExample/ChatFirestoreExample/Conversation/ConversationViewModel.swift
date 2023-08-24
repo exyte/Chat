@@ -29,6 +29,8 @@ class ConversationViewModel: ObservableObject {
 
     @Published var messages: [Message] = []
 
+    var lock = NSRecursiveLock()
+
     private var subscribtionToConversationCreation: ListenerRegistration?
 
     init(user: User) {
@@ -87,12 +89,13 @@ class ConversationViewModel: ObservableObject {
         messagesCollection?
             .order(by: "createdAt", descending: false)
             .addSnapshotListener() { [weak self] (snapshot, _) in
+                guard let self = self else { return }
                 let messages = snapshot?.documents
                     .compactMap { try? $0.data(as: FirestoreMessage.self) }
                     .compactMap { firestoreMessage -> Message? in
                         guard
                             let id = firestoreMessage.id,
-                            let user = self?.allUsers.first(where: { $0.id == firestoreMessage.userId }),
+                            let user = self.allUsers.first(where: { $0.id == firestoreMessage.userId }),
                             let date = firestoreMessage.createdAt
                         else { return nil }
 
@@ -115,7 +118,7 @@ class ConversationViewModel: ObservableObject {
                         var replyMessage: ReplyMessage?
                         if let reply = firestoreMessage.replyMessage,
                            let replyId = reply.id,
-                           let replyUser = self?.allUsers.first(where: { $0.id == reply.userId }) {
+                           let replyUser = self.allUsers.first(where: { $0.id == reply.userId }) {
                             replyMessage = ReplyMessage(
                                 id: replyId,
                                 user: replyUser,
@@ -133,8 +136,18 @@ class ConversationViewModel: ObservableObject {
                             attachments: convertAttachments(firestoreMessage.attachments),
                             recording: convertRecording(firestoreMessage.recording),
                             replyMessage: replyMessage)
-                    }
-                self?.messages = messages ?? []
+                    } ?? []
+                self.lock.withLock {
+                    let localMessages = self.messages
+                        .filter { $0.status != .sent }
+                        .filter { localMessage in
+                            messages.firstIndex { message in
+                                message.id == localMessage.id
+                            } == nil
+                        }
+                        .sorted { $0.createdAt < $1.createdAt }
+                    self.messages = messages + localMessages
+                }
             }
     }
 
@@ -154,7 +167,9 @@ class ConversationViewModel: ObservableObject {
             guard let user = SessionManager.currentUser else { return }
             let id = UUID().uuidString
             let message = await Message.makeMessage(id: id, user: user, status: .sending, draft: draft)
-            messages.append(message)
+            lock.withLock {
+                messages.append(message)
+            }
 
             /// convert to Firestore dictionary: replace users with userIds, upload medias and get urls, replace urls with strings
             let dict = await makeDraftMessageDictionary(draft)
@@ -162,13 +177,14 @@ class ConversationViewModel: ObservableObject {
             /// upload dictionary with the same id we fixed earlier, so Chat knows it's still the same message
             do {
                 try await messagesCollection?.document(id).setData(dict)
-                if let index = messages.lastIndex(where: { $0.id == id }) {
-                    messages[index].status = .sent
-                }
+                // no need to set .sent status, every message coming from firestore has .sent status (it was set at line 133). so as soon as this message gets to firestore, subscription will update messages array with this message with .sent status
             } catch {
                 print("Error adding document: \(error)")
-                if let index = messages.lastIndex(where: { $0.id == id }) {
-                    messages[index].status = .error(draft)
+                lock.withLock {
+                    if let index = messages.lastIndex(where: { $0.id == id }) {
+                        messages[index].status = .error(draft)
+                        print("alisaM error ", messages)
+                    }
                 }
             }
 
