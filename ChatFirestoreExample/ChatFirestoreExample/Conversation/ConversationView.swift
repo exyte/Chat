@@ -18,6 +18,12 @@ struct ConversationView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.sendMessage(draft)
         }
+        .orientationHandler { mode in
+            switch mode {
+            case .lock: AppDelegate.lockOrientationToPortrait()
+            case .unlock: AppDelegate.unlockOrientation()
+            }
+        }
         .mediaPickerTheme(
             main: .init(
                 text: .white,

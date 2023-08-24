@@ -66,7 +66,12 @@ struct AuthView: View {
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
             .showLiveCameraCell()
-            .forceRotation(orientation: .portrait)
+            .orientationHandler {
+                switch $0 {
+                case .lock: AppDelegate.lockOrientationToPortrait()
+                case .unlock: AppDelegate.unlockOrientation()
+                }
+            }
         }
     }
 

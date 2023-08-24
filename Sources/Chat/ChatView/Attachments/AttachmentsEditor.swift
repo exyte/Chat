@@ -22,6 +22,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var assetsPickerLimit: Int
     var chatTitle: String?
     var messageUseMarkdown: Bool
+    var orientationHandler: MediaPickerOrientationHandler
 
     @State private var seletedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -46,38 +47,44 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     }
 
     var mediaPicker: some View {
-        MediaPicker(isPresented: $inputViewModel.showPicker) {
-            seletedMedias = $0
-            assembleSelectedMedia()
-        } albumSelectionBuilder: { _, albumSelectionView, _ in
-            VStack {
-                albumSelectionHeaderView
-                albumSelectionView
-                Spacer()
-                inputView
+        GeometryReader { g in
+            MediaPicker(isPresented: $inputViewModel.showPicker) {
+                seletedMedias = $0
+                assembleSelectedMedia()
+            } albumSelectionBuilder: { _, albumSelectionView, _ in
+                VStack {
+                    albumSelectionHeaderView
+                    albumSelectionView
+                    Spacer()
+                    inputView
+                }
+                .padding(.top, g.safeAreaInsets.top)
+                .padding(.bottom, g.safeAreaInsets.bottom)
+                .background(pickerTheme.main.albumSelectionBackground)
+            } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
+                VStack {
+                    cameraSelectionHeaderView(cancelClosure: cancelClosure)
+                    cameraSelectionView
+                    Spacer()
+                    inputView
+                }
+                .padding(.top, g.safeAreaInsets.top)
+                .padding(.bottom, g.safeAreaInsets.bottom)
             }
-            .background(pickerTheme.main.albumSelectionBackground)
-        } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
-            VStack {
-                cameraSelectionHeaderView(cancelClosure: cancelClosure)
-                cameraSelectionView
-                Spacer()
-                inputView
+            .didPressCancelCamera {
+                inputViewModel.showPicker = false
             }
+            .currentFullscreenMedia($currentFullscreenMedia)
+            .showLiveCameraCell()
+            .mediaSelectionLimit(assetsPickerLimit)
+            .pickerMode($inputViewModel.mediaPickerMode)
+            .orientationHandler(orientationHandler)
+            .padding(.top)
             .background(pickerTheme.main.albumSelectionBackground)
-        }
-        .didPressCancelCamera {
-            inputViewModel.showPicker = false
-        }
-        .currentFullscreenMedia($currentFullscreenMedia)
-        .showLiveCameraCell()
-        .mediaSelectionLimit(assetsPickerLimit)
-        .pickerMode($inputViewModel.mediaPickerMode)
-        .padding(.top)
-        .background(pickerTheme.main.albumSelectionBackground)
-        .ignoresSafeArea(.all)
-        .onChange(of: currentFullscreenMedia) { newValue in
-            assembleSelectedMedia()
+            .ignoresSafeArea(.all)
+            .onChange(of: currentFullscreenMedia) { newValue in
+                assembleSelectedMedia()
+            }
         }
     }
 

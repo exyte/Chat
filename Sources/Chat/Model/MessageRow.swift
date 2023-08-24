@@ -26,3 +26,9 @@ extension MessageRow: Identifiable {
         return message.id
     }
 }
+
+extension MessageRow {
+    func toString() -> String {
+        String("id: \(id) status: \(message.status) date: \(message.createdAt) position: \(positionInGroup)")
+    }
+}

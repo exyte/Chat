@@ -8,6 +8,7 @@
 import SwiftUI
 import FloatingButton
 import Introspect
+import ExyteMediaPicker
 
 public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
@@ -35,6 +36,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var avatarSize: CGFloat = 32
     var assetsPickerLimit: Int = 10
     var messageUseMarkdown: Bool = false
+    var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
 
     private let sections: [MessagesSection]
@@ -124,7 +126,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             }
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown)
+            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {
@@ -330,15 +332,21 @@ public extension ChatView {
         return view
     }
 
+    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
+        var view = self
+        view.assetsPickerLimit = assetsPickerLimit
+        return view
+    }
+
     func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
         return view
     }
 
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
+    func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
         var view = self
-        view.assetsPickerLimit = assetsPickerLimit
+        view.orientationHandler = orientationHandler
         return view
     }
 

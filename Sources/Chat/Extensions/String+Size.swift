@@ -25,9 +25,9 @@ extension String {
     public func lastLineWidth(labelWidth: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
         // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
         let attrString = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown)
-        let labelSize = CGSize(width: labelWidth, height: .infinity)
+        let availableSize = CGSize(width: labelWidth, height: .infinity)
         let layoutManager = NSLayoutManager()
-        let textContainer = NSTextContainer(size: labelSize)
+        let textContainer = NSTextContainer(size: availableSize)
         let textStorage = NSTextStorage(attributedString: attrString)
 
         // Configure layoutManager and textStorage
@@ -45,5 +45,13 @@ extension String {
             effectiveRange: nil)
 
         return lastLineFragmentRect.maxX
+    }
+
+    func numberOfLines(labelWidth: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> Int {
+        let attrString = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown)
+        let availableSize = CGSize(width: labelWidth, height: .infinity)
+        let textSize = attrString.boundingRect(with: availableSize, options: .usesLineFragmentOrigin, context: nil)
+        let lineHeight = font.lineHeight
+        return Int(ceil(textSize.height/lineHeight))
     }
 }

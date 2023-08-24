@@ -84,7 +84,13 @@ class DataStorageManager: ObservableObject {
                     }
 
                     return nil
-                } ?? []
+                }.sorted {
+                    if let date1 = $0.latestMessage?.createdAt, let date2 = $1.latestMessage?.createdAt {
+                        return date1 > date2
+                    }
+                    return $0.displayTitle < $1.displayTitle
+                }
+            ?? []
         }
     }
 

@@ -12,6 +12,23 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
     static var orientationLock = UIInterfaceOrientationMask.all
 
+    static func lockOrientationToPortrait() {
+        orientationLock = .portrait
+        if #available(iOS 16, *) {
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                scene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+            }
+            UIViewController.attemptRotationToDeviceOrientation()
+        } else {
+            UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
+        }
+    }
+
+    static func unlockOrientation() {
+        orientationLock = .all
+        UIViewController.attemptRotationToDeviceOrientation()
+    }
+
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return AppDelegate.orientationLock
     }

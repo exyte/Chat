@@ -30,7 +30,7 @@ struct MessageView: View {
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
 
-    let fontSize: CGFloat = 15
+    let font = UIFont.systemFont(ofSize: 15)
 
     enum DateArrangment {
         case hstack, vstack, overlay
@@ -45,14 +45,15 @@ struct MessageView: View {
         - MessageView.horizontalBubblePadding
         - textPaddings
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
-        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize), messageUseMarkdown: messageUseMarkdown)
-        let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: UIFont.systemFont(ofSize: fontSize), messageUseMarkdown: messageUseMarkdown)
+        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
+        let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
+        let numberOfLines = message.text.numberOfLines(labelWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
 
+        if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
+            return .hstack
+        }
         if lastLineWidth + CGFloat(timeWidth) < finalWidth {
             return .overlay
-        }
-        if finalWidth + CGFloat(timeWidth) < maxWidth {
-            return .hstack
         }
         return .vstack
     }
@@ -106,7 +107,7 @@ struct MessageView: View {
 
             if !message.text.isEmpty {
                 textWithTimeView(message)
-                    .font(.system(size: fontSize))
+                    .font(Font(font))
             }
 
             if let recording = message.recording {
@@ -179,20 +180,30 @@ struct MessageView: View {
     @ViewBuilder
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-            .alignLeft(message)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, MessageView.horizontalTextPadding)
 
         let timeView = messageTimeView()
-            .alignRight(message)
             .padding(.trailing, 12)
 
         Group {
             switch dateArrangment {
-            case .vstack, .hstack: // TODO: fix new cell insertion animation glith when using hstack and restore hstack case
-                VStack(alignment: .trailing, spacing: 4) {
+            case .hstack:
+                HStack(alignment: .lastTextBaseline, spacing: 12) {
                     messageView
+                    if !message.attachments.isEmpty {
+                        Spacer()
+                    }
                     timeView
-                        .padding(.leading, 12)
+                }
+                .padding(.vertical, 8)
+            case .vstack:
+                VStack(alignment: .leading, spacing: 4) {
+                    messageView
+                    HStack(spacing: 0) {
+                        Spacer()
+                        timeView
+                    }
                 }
                 .padding(.vertical, 8)
             case .overlay:
@@ -246,24 +257,6 @@ extension View {
                 }
             }
             .cornerRadius(radius)
-    }
-
-    func alignLeft(_ message: Message) -> some View {
-        HStack {
-            self
-            if !message.attachments.isEmpty {
-                Spacer()
-            }
-        }
-    }
-
-    func alignRight(_ message: Message) -> some View {
-        HStack {
-            if !message.attachments.isEmpty {
-                Spacer()
-            }
-            self
-        }
     }
 }
 

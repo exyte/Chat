@@ -63,7 +63,8 @@ struct GroupCreateView: View {
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                Button("Cancel") {            presentationMode.wrappedValue.dismiss()
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
                 }
                 .font(17, .black)
             }
@@ -77,7 +78,13 @@ struct GroupCreateView: View {
             }
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
-            .forceRotation(orientation: .portrait)
+            .showLiveCameraCell()
+            .orientationHandler {
+                switch $0 {
+                case .lock: AppDelegate.lockOrientationToPortrait()
+                case .unlock: AppDelegate.unlockOrientation()
+                }
+            }
         }
     }
 

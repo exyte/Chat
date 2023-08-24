@@ -171,7 +171,7 @@ struct InputView: View {
             case .playingRecording, .pausedRecording:
                 recordDurationLeft
             default:
-                EmptyView()
+                Color.clear.frame(width: 8, height: 1)
             }
         }
         .frame(minHeight: 48)
