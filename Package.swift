@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "ExyteChat",
-            targets: ["Chat"]),
+            targets: ["ExyteChat"]),
     ],
     dependencies: [
         .package(
@@ -33,7 +33,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Chat",
+            name: "ExyteChat",
             dependencies: [
                 .product(name: "Introspect", package: "SwiftUI-Introspect"),
                 .product(name: "ExyteMediaPicker", package: "MediaPicker"),
@@ -42,7 +42,7 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "ChatTests",
-            dependencies: ["Chat"]),
+            name: "ExyteChatTests",
+            dependencies: ["ExyteChat"]),
     ]
 )
