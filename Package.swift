@@ -10,7 +10,7 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Chat",
+            name: "ExyteChat",
             targets: ["Chat"]),
     ],
     dependencies: [
