@@ -4,13 +4,14 @@
 
 import Foundation
 import Combine
+import Chat
 
 protocol ChatInteractorProtocol {
     var messages: AnyPublisher<[MockMessage], Never> { get }
     var senders: [MockUser] { get }
     var otherSenders: [MockUser] { get }
 
-    func send(message: MockCreateMessage)
+    func send(draftMessage: Chat.DraftMessage)
 
     func connect()
     func disconnect()

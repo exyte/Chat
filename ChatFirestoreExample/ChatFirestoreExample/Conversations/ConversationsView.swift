@@ -122,10 +122,11 @@ struct ConversationsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigation) {
-                    Button("Logout") {
+                    Button("Log out") {
                         SessionManager.shared.logout()
                     }
                     .font(17, .black)
+                    .padding(.leading, 8)
                 }
             }
         }

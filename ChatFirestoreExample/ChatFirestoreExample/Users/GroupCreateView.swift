@@ -56,6 +56,7 @@ struct GroupCreateView: View {
             }
             .buttonStyle(BlueButton())
             .disabled(viewModel.title.isEmpty)
+            .padding(.bottom, 10)
         }
         .padding(.horizontal, 12)
         .navigationTitle("Create Group")

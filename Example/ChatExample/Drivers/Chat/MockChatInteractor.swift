@@ -4,6 +4,7 @@
 
 import Foundation
 import Combine
+import Chat
 
 final class MockChatInteractor: ChatInteractorProtocol {
     private lazy var chatData = MockChatData()
@@ -37,16 +38,25 @@ final class MockChatInteractor: ChatInteractorProtocol {
 
     /// TODO: Generate error with random chance
     /// TODO: Save images from url to files. Imitate upload process
-    func send(message: MockCreateMessage) {
-        if message.uid != nil {
-            guard let index = chatState.value.firstIndex(where: { $0.uid == message.uid }) else {
+    func send(draftMessage: Chat.DraftMessage) {
+        if draftMessage.id != nil {
+            guard let index = chatState.value.firstIndex(where: { $0.uid == draftMessage.id }) else {
                 // TODO: Create error
                 return
             }
             chatState.value.remove(at: index)
         }
-        let message = message.toMockMessage(id: message.uid ?? UUID().uuidString, user: chatData.tim, status: .sending)
-        chatState.value.append(message)
+
+        Task {
+            var status: Message.Status = .sending
+            if Int.random(min: 0, max: 20) == 0 {
+                status = .error(draftMessage)
+            }
+            let message = await draftMessage.toMockMessage(user: chatData.tim, status: status)
+            DispatchQueue.main.async { [weak self] in
+                self?.chatState.value.append(message)
+            }
+        }
     }
 
     func connect() {
@@ -106,11 +116,7 @@ private extension MockChatInteractor {
         let updated = chatState.value.map {
             var message = $0
             if message.status == .sending {
-                if Int.random(min: 0, max: 20) == 0 {
-                    message.status = .error
-                } else {
-                    message.status = .sent
-                }
+                message.status = .sent
             } else if message.status == .sent {
                 message.status = .read
             }

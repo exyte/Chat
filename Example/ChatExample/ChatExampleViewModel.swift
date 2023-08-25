@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import Chat
+import ExyteMediaPicker
 
 final class ChatExampleViewModel: ObservableObject {
     @Published var messages: [Message] = []
@@ -27,7 +28,7 @@ final class ChatExampleViewModel: ObservableObject {
     }
 
     func send(draft: DraftMessage) {
-        interactor.send(message: draft.toMockCreateMessage())
+        interactor.send(draftMessage: draft)
     }
     
     func onStart() {
@@ -51,59 +52,60 @@ final class ChatExampleViewModel: ObservableObject {
     }
 }
 
-struct MockCreateMessage {
-    let uid: String?
-    let createdAt: Date
+extension DraftMessage {
+    func makeMockImages() async -> [MockImage] {
+        await medias
+            .filter { $0.type == .image }
+            .asyncMap { (media : Media) -> (Media, URL?, URL?) in
+                (media, await media.getThumbnailURL(), await media.getURL())
+            }
+            .filter { (media: Media, thumb: URL?, full: URL?) -> Bool in
+                thumb != nil && full != nil
+            }
+            .map { media, thumb, full in
+                MockImage(id: media.id.uuidString, thumbnail: thumb!, full: full!)
+            }
+    }
 
-    let text: String
-    let images: [MockImage]
-    let videos: [MockVideo]
-    let recording: Recording?
-    let replyMessage: ReplyMessage?
-}
+    func makeMockVideos() async -> [MockVideo] {
+        await medias
+            .filter { $0.type == .video }
+            .asyncMap { (media : Media) -> (Media, URL?, URL?) in
+                (media, await media.getThumbnailURL(), await media.getURL())
+            }
+            .filter { (media: Media, thumb: URL?, full: URL?) -> Bool in
+                thumb != nil && full != nil
+            }
+            .map { media, thumb, full in
+                MockVideo(id: media.id.uuidString, thumbnail: thumb!, full: full!)
+            }
+    }
 
-extension MockCreateMessage {
-    func toMockMessage(id: String, user: MockUser, status: Message.Status = .read) -> MockMessage {
+    func toMockMessage(user: MockUser, status: Message.Status = .read) async -> MockMessage {
         MockMessage(
-            uid: id,
+            uid: id ?? UUID().uuidString,
             sender: user,
             createdAt: createdAt,
             status: user.isCurrentUser ? status : nil,
             text: text,
-            images: images,
-            videos: videos,
+            images: await makeMockImages(),
+            videos: await makeMockVideos(),
             recording: recording,
             replyMessage: replyMessage
         )
     }
 }
 
-extension DraftMessage {
-    func makeMockImages() -> [MockImage] {
-        attachments
-            .compactMap { $0 as? ImageAttachment }
-            .map {
-                MockImage(id: $0.id, thumbnail: $0.thumbnail, full: $0.full)
-            }
-    }
+extension Sequence {
+    func asyncMap<T>(
+        _ transform: (Element) async throws -> T
+    ) async rethrows -> [T] {
+        var values = [T]()
 
-    func makeMockVideos() -> [MockVideo] {
-        attachments
-            .compactMap { $0 as? VideoAttachment }
-            .map {
-                MockVideo(id: $0.id, thumbnail: $0.thumbnail, full: $0.full)
-            }
-    }
+        for element in self {
+            try await values.append(transform(element))
+        }
 
-    func toMockCreateMessage() -> MockCreateMessage {
-        MockCreateMessage(
-            uid: id,
-            createdAt: createdAt,
-            text: text,
-            images: makeMockImages(),
-            videos: makeMockVideos(),
-            recording: recording,
-            replyMessage: replyMessage
-        )
+        return values
     }
 }
