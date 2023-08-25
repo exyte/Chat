@@ -15,7 +15,6 @@
 		135987BD2869F6F2006388CF /* ChatInteractorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987BC2869F6F2006388CF /* ChatInteractorProtocol.swift */; };
 		135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987BE2869F704006388CF /* MockChatInteractor.swift */; };
 		1376133E28782F8E00E7CF67 /* Date+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376133D28782F8E00E7CF67 /* Date+Random.swift */; };
-		1376F7AB286467700016CD1B /* Chat in Frameworks */ = {isa = PBXBuildFile; productRef = 1376F7AA286467700016CD1B /* Chat */; };
 		1376F7BB286472530016CD1B /* ChatError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376F7BA286472530016CD1B /* ChatError.swift */; };
 		13DF042D2864790B0043DBBC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DF042C2864790B0043DBBC /* ContentView.swift */; };
 		13DF043228647C070043DBBC /* ChatExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DF043128647C070043DBBC /* ChatExampleViewModel.swift */; };
@@ -23,7 +22,7 @@
 		13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6E2869E983004DF140 /* MockChatData.swift */; };
 		13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */; };
 		13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */; };
-		5B06E7922991116F002C7061 /* Chat in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 1376F7AA286467700016CD1B /* Chat */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5B35D75C2A989D70006A1A67 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B35D75B2A989D70006A1A67 /* ExyteChat */; };
 		5B6D3A732987D85A00765148 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+Extension.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +33,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5B06E7922991116F002C7061 /* Chat in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1376F7AB286467700016CD1B /* Chat in Frameworks */,
+				5B35D75C2A989D70006A1A67 /* ExyteChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,7 +204,7 @@
 			);
 			name = ChatExample;
 			packageProductDependencies = (
-				1376F7AA286467700016CD1B /* Chat */,
+				5B35D75B2A989D70006A1A67 /* ExyteChat */,
 			);
 			productName = ChatExample;
 			productReference = 135549302864620900C9459A /* ChatExample.app */;
@@ -498,9 +496,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1376F7AA286467700016CD1B /* Chat */ = {
+		5B35D75B2A989D70006A1A67 /* ExyteChat */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Chat;
+			productName = ExyteChat;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

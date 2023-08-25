@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Chat
+import ExyteChat
 import UIKit
 
 let hasCurrentSessionKey = "hasCurrentSession"

@@ -4,14 +4,14 @@
 
 import Foundation
 import Combine
-import Chat
+import ExyteChat
 
 protocol ChatInteractorProtocol {
     var messages: AnyPublisher<[MockMessage], Never> { get }
     var senders: [MockUser] { get }
     var otherSenders: [MockUser] { get }
 
-    func send(draftMessage: Chat.DraftMessage)
+    func send(draftMessage: ExyteChat.DraftMessage)
 
     func connect()
     func disconnect()

@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
-import Chat
+import ExyteChat
 
 @MainActor
 class ConversationViewModel: ObservableObject {

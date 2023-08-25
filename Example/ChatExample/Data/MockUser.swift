@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import Chat
+import ExyteChat
 
 struct MockUser: Equatable {
     let uid: String
@@ -24,7 +24,7 @@ extension MockUser {
 }
 
 extension MockUser {
-    func toChatUser() -> Chat.User {
-        Chat.User(id: uid, name: name, avatarURL: avatar, isCurrentUser: isCurrentUser)
+    func toChatUser() -> ExyteChat.User {
+        ExyteChat.User(id: uid, name: name, avatarURL: avatar, isCurrentUser: isCurrentUser)
     }
 }

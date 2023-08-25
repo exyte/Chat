@@ -4,7 +4,7 @@
 
 import Foundation
 import SwiftUI
-import Chat
+import ExyteChat
 
 struct ChatExampleView: View {
 

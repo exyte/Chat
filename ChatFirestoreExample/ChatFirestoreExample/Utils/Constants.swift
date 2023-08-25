@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Chat
+import ExyteChat
 import ExyteMediaPicker
 
 struct Collection {
@@ -47,7 +47,7 @@ extension String {
 
 var dataStorage = DataStorageManager.shared
 
-public typealias User = Chat.User
-public typealias Message = Chat.Message
-public typealias Recording = Chat.Recording
+public typealias User = ExyteChat.User
+public typealias Message = ExyteChat.Message
+public typealias Recording = ExyteChat.Recording
 public typealias Media = ExyteMediaPicker.Media

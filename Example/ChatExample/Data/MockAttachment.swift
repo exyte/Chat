@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import Chat
+import ExyteChat
 
 struct MockImage {
     let id: String

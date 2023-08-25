@@ -4,7 +4,7 @@
 
 import Foundation
 import Combine
-import Chat
+import ExyteChat
 
 final class MockChatInteractor: ChatInteractorProtocol {
     private lazy var chatData = MockChatData()
@@ -38,7 +38,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
 
     /// TODO: Generate error with random chance
     /// TODO: Save images from url to files. Imitate upload process
-    func send(draftMessage: Chat.DraftMessage) {
+    func send(draftMessage: ExyteChat.DraftMessage) {
         if draftMessage.id != nil {
             guard let index = chatState.value.firstIndex(where: { $0.uid == draftMessage.id }) else {
                 // TODO: Create error

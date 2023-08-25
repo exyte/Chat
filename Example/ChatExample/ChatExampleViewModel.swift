@@ -4,7 +4,7 @@
 
 import Foundation
 import Combine
-import Chat
+import ExyteChat
 import ExyteMediaPicker
 
 final class ChatExampleViewModel: ObservableObject {

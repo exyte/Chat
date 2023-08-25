@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import Chat
+import ExyteChat
 
 struct MockMessage {
     let uid: String
@@ -19,8 +19,8 @@ struct MockMessage {
 }
 
 extension MockMessage {
-    func toChatMessage() -> Chat.Message {
-        Chat.Message(
+    func toChatMessage() -> ExyteChat.Message {
+        ExyteChat.Message(
             id: uid,
             user: sender.toChatUser(),
             status: status,

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Chat
+import ExyteChat
 
 struct ConversationView: View {
 

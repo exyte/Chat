@@ -1,6 +1,6 @@
 import XCTest
 import SwiftUI
-@testable import Chat
+@testable import ExyteChat
 
 final class ExampleChatTests: XCTestCase {
     func testSomeInnerLogic() {
