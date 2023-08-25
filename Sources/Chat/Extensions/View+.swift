@@ -17,4 +17,13 @@ extension View {
             Circle().fill(color)
         }
     }
+
+    @ViewBuilder
+    func applyIf<T: View>(_ condition: Bool, apply: (Self) -> T) -> some View {
+        if condition {
+            apply(self)
+        } else {
+            self
+        }
+    }
 }

@@ -101,8 +101,8 @@ class ConversationViewModel: ObservableObject {
 
                         let convertAttachments: ([FirestoreAttachment]) -> [Attachment] = { attachments in
                             attachments.compactMap {
-                                if let url = $0.url.toURL() {
-                                    return Attachment(id: UUID().uuidString, url: url, type: $0.type)
+                                if let thumbURL = $0.thumbURL.toURL(), let url = $0.url.toURL() {
+                                    return Attachment(id: UUID().uuidString, thumbnail: thumbURL, full: url, type: $0.type)
                                 }
                                 return nil
                             }
@@ -205,9 +205,19 @@ class ConversationViewModel: ObservableObject {
         guard let user = SessionManager.currentUser else { return [:] }
         var attachments = [[String: Any]]()
         for media in draft.medias {
-            if let url = await UploadingManager.uploadMedia(media) {
+            let thumbURL, fullURL : URL?
+            switch media.type {
+            case .image:
+                thumbURL = await UploadingManager.uploadImageMedia(media)
+                fullURL = thumbURL
+            case .video:
+                (thumbURL, fullURL) = await UploadingManager.uploadVideoMedia(media)
+            }
+
+            if let thumbURL, let fullURL {
                 attachments.append([
-                    "url": url.absoluteString,
+                    "thumbURL": thumbURL.absoluteString,
+                    "url": fullURL.absoluteString,
                     "type": AttachmentType(mediaType: media.type).rawValue
                 ])
             }

@@ -20,7 +20,7 @@ struct RecordWaveformWithButtons: View {
     var colorWaveform: Color
 
     var duration: Int {
-        Int(recordPlayer.secondsLeft != 0 ? recordPlayer.secondsLeft : recording.duration)
+        max(Int((recordPlayer.secondsLeft != 0 ? recordPlayer.secondsLeft : recording.duration) - 0.5), 0)
     }
 
     var body: some View {
@@ -60,7 +60,7 @@ struct RecordWaveformPlaying: View {
     var addExtraDots: Bool
 
     var maxLength: CGFloat {
-        (RecordWaveform.spacing + RecordWaveform.width) * CGFloat(samples.count)
+        max((RecordWaveform.spacing + RecordWaveform.width) * CGFloat(samples.count) - RecordWaveform.spacing, 0)
     }
 
     var body: some View {
@@ -79,6 +79,9 @@ struct RecordWaveformPlaying: View {
             .frame(height: RecordWaveform.maxSampleHeight)
         }
         .frame(height: RecordWaveform.maxSampleHeight)
+        .applyIf(!addExtraDots) {
+            $0.frame(width: maxLength)
+        }
         .frame(maxWidth: addExtraDots ? .infinity : maxLength)
         .fixedSize(horizontal: !addExtraDots, vertical: true)
     }

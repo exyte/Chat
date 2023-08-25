@@ -13,7 +13,7 @@ final class Recorder {
     // duration and waveform samples
     typealias ProgressHandler = (Double, [CGFloat]) -> Void
 
-    private let audioSession = AVAudioSession.sharedInstance()
+    private let audioSession = AVAudioSession()
     private var audioRecorder: AVAudioRecorder?
     private var audioTimer: Timer?
 
@@ -51,7 +51,7 @@ final class Recorder {
         let recordingUrl = FileManager.tempAudioFile
 
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.setCategory(.record, mode: .default)
             try audioSession.setActive(true)
             audioRecorder = try AVAudioRecorder(url: recordingUrl, settings: settings)
             audioRecorder?.isMeteringEnabled = true

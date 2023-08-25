@@ -38,22 +38,22 @@ class AuthViewModel: ObservableObject {
 
     func createNewUser(nickname: String, avatar: Media?) {
         Task {
-            let avatarURL = await UploadingManager.uploadMedia(avatar)
+            let avatarURL = await UploadingManager.uploadImageMedia(avatar)
             var ref: DocumentReference? = nil
             ref = Firestore.firestore()
                 .collection(Collection.users).addDocument(data: [
-                "deviceId": SessionManager.shared.deviceId,
-                "nickname": nickname,
-                "avatarURL": avatarURL?.absoluteString
-            ]) { [weak self] err in
-                if let err = err {
-                    print("Error adding document: \(err)")
-                } else if let id = ref?.documentID {
-                    let user = User(id: id, name: nickname, avatarURL: avatarURL, isCurrentUser: true)
-                    SessionManager.shared.storeUser(user)
+                    "deviceId": SessionManager.shared.deviceId,
+                    "nickname": nickname,
+                    "avatarURL": avatarURL?.absoluteString
+                ]) { [weak self] err in
+                    if let err = err {
+                        print("Error adding document: \(err)")
+                    } else if let id = ref?.documentID {
+                        let user = User(id: id, name: nickname, avatarURL: avatarURL, isCurrentUser: true)
+                        SessionManager.shared.storeUser(user)
+                    }
+                    self?.showActivityIndicator = false
                 }
-                self?.showActivityIndicator = false
-            }
         }
     }
 }

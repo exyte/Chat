@@ -29,6 +29,7 @@ extension Color {
 
 extension String {
     static var avatarPlaceholder = "avatarPlaceholder"
+    static var placeholderAvatar = "placeholderAvatar"
     static var bob = "bob"
     static var checkSelected = "checkSelected"
     static var checkUnselected = "checkUnselected"
@@ -48,4 +49,5 @@ var dataStorage = DataStorageManager.shared
 
 public typealias User = Chat.User
 public typealias Message = Chat.Message
+public typealias Recording = Chat.Recording
 public typealias Media = ExyteMediaPicker.Media

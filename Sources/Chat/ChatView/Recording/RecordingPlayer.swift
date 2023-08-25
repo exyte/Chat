@@ -15,12 +15,19 @@ final class RecordingPlayer: ObservableObject {
     @Published var secondsLeft: Double = 0.0
     @Published var progress: Double = 0.0
 
+    private let audioSession = AVAudioSession()
+
     var didPlayTillEnd = PassthroughSubject<Void, Never>()
 
     private var recording: Recording?
 
     private var player: AVPlayer?
     private var timeObserver: Any?
+
+    init() {
+        try? audioSession.setCategory(.playback)
+        try? audioSession.overrideOutputAudioPort(.speaker)
+    }
 
     func play(_ recording: Recording) {
         self.recording = recording
@@ -61,9 +68,7 @@ final class RecordingPlayer: ObservableObject {
     }
 
     private func play() {
-        try? AVAudioSession.sharedInstance().setCategory(.playback)
-        try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
-        try? AVAudioSession.sharedInstance().setActive(true)
+        try? audioSession.setActive(true)
         player?.play()
         playing = true
     }

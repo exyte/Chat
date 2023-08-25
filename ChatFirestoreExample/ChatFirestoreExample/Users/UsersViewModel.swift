@@ -53,7 +53,7 @@ class UsersViewModel: ObservableObject {
     }
 
     func createConversation(_ users: [User]) async -> Conversation? {
-        let pictureURL = await UploadingManager.uploadMedia(picture)
+        let pictureURL = await UploadingManager.uploadImageMedia(picture)
         return await createConversation(users, pictureURL)
     }
 

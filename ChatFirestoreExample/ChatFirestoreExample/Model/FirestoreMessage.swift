@@ -24,7 +24,7 @@ public struct FirestoreMessage: Codable, Hashable {
 
 public struct FirestoreAttachment: Codable, Hashable {
 
-    //public let thumbnail: URL
+    public let thumbURL: String
     public let url: String
     public let type: AttachmentType
 }
