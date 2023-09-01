@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import ActivityIndicatorView
 
 struct ConversationsView: View {
 

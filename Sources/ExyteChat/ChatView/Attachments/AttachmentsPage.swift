@@ -20,7 +20,7 @@ struct AttachmentsPage: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 default:
-                    Color.clear
+                    ActivityIndicator()
                 }
             }
         } else if attachment.type == .video {

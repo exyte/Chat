@@ -36,12 +36,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             mediaPicker
 
             if inputViewModel.showActivityIndicator {
-                Color.black.opacity(0.8)
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(8)
-                ActivityIndicatorView(isVisible: .constant(true), type: .flickeringDots())
-                    .foregroundColor(theme.colors.sendButtonBackground)
-                    .frame(width: 50, height: 50)
+                ActivityIndicator()
             }
         }
     }

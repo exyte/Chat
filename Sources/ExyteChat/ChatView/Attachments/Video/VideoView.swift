@@ -14,10 +14,10 @@ struct VideoView: View {
 
     var body: some View {
         Group {
-            if let player = viewModel.player {
+            if let player = viewModel.player, player.currentItem?.status == .readyToPlay {
                 content(for: player)
             } else {
-                ProgressView()
+                ActivityIndicator()
             }
         }
         .contentShape(Rectangle())

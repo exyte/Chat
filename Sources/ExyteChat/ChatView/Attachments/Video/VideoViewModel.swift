@@ -22,6 +22,7 @@ final class VideoViewModel: ObservableObject {
     func onStart() {
         if player == nil {
             self.player = AVPlayer(url: attachment.full)
+            player?.play() // doesn't atually start playing, but sets status to readyToPlay
 
             NotificationCenter.default.addObserver(self, selector: #selector(finishVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }

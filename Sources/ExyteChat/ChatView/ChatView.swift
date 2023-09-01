@@ -46,6 +46,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var paginationState = PaginationState()
+    @StateObject private var networkMonitor = NetworkMonitor()
 
     @State private var inputFieldId = UUID()
 
@@ -75,6 +76,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     public var body: some View {
         VStack {
+            if !networkMonitor.isConnected {
+                waitingForNetwork
+            }
+
             ZStack(alignment: .bottomTrailing) {
                 list
 
@@ -134,6 +139,25 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 globalFocusState.focus = nil
             }
         }
+    }
+
+    var waitingForNetwork: some View {
+        VStack {
+            Rectangle()
+                .foregroundColor(.black.opacity(0.12))
+                .frame(height: 1)
+            HStack {
+                Spacer()
+                Image("waiting", bundle: .current)
+                Text("Waiting for network")
+                Spacer()
+            }
+            .padding(.top, 6)
+            Rectangle()
+                .foregroundColor(.black.opacity(0.12))
+                .frame(height: 1)
+        }
+        .padding(.top, 8)
     }
 
     @ViewBuilder
