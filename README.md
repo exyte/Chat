@@ -120,7 +120,7 @@ If you are not using your own `messageBuilder`:
 ## Examples
 There are 2 example projects:    
 - One has a simple bot posting random text/media messages every 2 seconds. It has no back end and no local storage. Every new start is clean and fresh.     
-- Another has an integration with Firestore data base. It has all the necessary back end support, including storing media and audio messages, unread messages counters, etc. You'll have to create your own Firestore app and DB. Also replace `GoogleService-Info` with oyur won. After that you can test on multiple sims/devices.    
+- Another has an integration with Firestore data base. It has all the necessary back end support, including storing media and audio messages, unread messages counters, etc. You'll have to create your own Firestore app and DB. Also replace `GoogleService-Info` with your own. After that you can test on multiple sims/devices.    
 
 Create your firestore app
 https://console.firebase.google.com/?authuser=0&_gl=1*1yxcr7j*_ga*MTE4ODIyOTk5NC4xNjg0NDAyODQ5*_ga_CW55HF8NVT*MTY5Mjc3NTczMC41Mi4xLjE2OTI3NzcwNDcuMC4wLjA.
