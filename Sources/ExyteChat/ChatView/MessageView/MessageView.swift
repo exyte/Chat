@@ -36,6 +36,10 @@ struct MessageView: View {
         case hstack, vstack, overlay
     }
 
+    var additionalMediaInset: CGFloat {
+        message.attachments.count > 1 ? 2 : 0
+    }
+
     var dateArrangment: DateArrangment {
         let timeWidth = timeSize.width + 10
         let textPaddings = MessageView.horizontalTextPadding * 2
@@ -44,6 +48,7 @@ struct MessageView: View {
         - statusSize.width
         - MessageView.horizontalBubblePadding
         - textPaddings
+
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
         let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
         let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
@@ -74,12 +79,14 @@ struct MessageView: View {
 
             VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 2) {
                 if !isDisplayingMessageMenu, let reply = message.replyMessage?.toMessage() {
-                    HStack(spacing: 8) {
-                        Capsule()
-                            .foregroundColor(theme.colors.buttonBackground)
-                            .frame(width: 2)
-                        replyBubbleView(reply)
-                    }
+                    replyBubbleView(reply)
+                        .opacity(0.5)
+                        .padding(message.user.isCurrentUser ? .trailing : .leading, 10)
+                        .overlay(alignment: message.user.isCurrentUser ? .trailing : .leading) {
+                            Capsule()
+                                .foregroundColor(theme.colors.buttonBackground)
+                                .frame(width: 2)
+                        }
                 }
                 bubbleView(message)
             }
@@ -146,7 +153,7 @@ struct MessageView: View {
         }
         .font(.caption2)
         .padding(.vertical, 8)
-        .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
+        .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
         .bubbleBackground(message, theme: theme, isReply: true)
     }
 
@@ -167,6 +174,11 @@ struct MessageView: View {
     func attachmentsView(_ message: Message) -> some View {
         AttachmentsGrid(attachments: message.attachments) {
             viewModel.presentAttachmentFullScreen($0)
+        }
+        .applyIf(message.attachments.count > 1) {
+            $0
+                .padding(.top, 1)
+                .padding(.horizontal, 1)
         }
         .overlay(alignment: .bottomTrailing) {
             if message.text.isEmpty {
@@ -246,8 +258,9 @@ extension View {
     @ViewBuilder
     func bubbleBackground(_ message: Message, theme: ChatTheme, isReply: Bool = false) -> some View {
         let radius: CGFloat = !message.attachments.isEmpty ? 12 : 20
+        let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
         self
-            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia)
+            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
                 if isReply || !message.text.isEmpty || message.recording != nil {
@@ -262,12 +275,15 @@ extension View {
 
 #if DEBUG
 struct MessageView_Preview: PreviewProvider {
+    static let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
+    static let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
+
     static private var shortMessage = "Hi, buddy!"
     static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
 
-    static private var message = Message(
+    static private var replyedMessage = Message(
         id: UUID().uuidString,
-        user: User(id: UUID().uuidString, name: "Stan", avatarURL: nil, isCurrentUser: false),
+        user: stan,
         status: .read,
         text: longMessage,
         attachments: [
@@ -279,15 +295,27 @@ struct MessageView_Preview: PreviewProvider {
         ]
     )
 
+    static private var message = Message(
+        id: UUID().uuidString,
+        user: stan,
+        status: .read,
+        text: shortMessage,
+        replyMessage: replyedMessage.toReplyMessage()
+    )
+
     static var previews: some View {
-        MessageView(
-            viewModel: ChatViewModel(),
-            message: message,
-            positionInGroup: .single,
-            avatarSize: 32,
-            messageUseMarkdown: false,
-            isDisplayingMessageMenu: false
-        )
+        ZStack {
+            Color.yellow.ignoresSafeArea()
+
+            MessageView(
+                viewModel: ChatViewModel(),
+                message: replyedMessage,
+                positionInGroup: .single,
+                avatarSize: 32,
+                messageUseMarkdown: false,
+                isDisplayingMessageMenu: false
+            )
+        }
     }
 }
 #endif

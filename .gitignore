@@ -2,3 +2,5 @@
 .idea
 **/xcuserdata/*
 Package.resolved
+
+/.build/

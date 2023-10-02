@@ -47,6 +47,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var paginationState = PaginationState()
     @StateObject private var networkMonitor = NetworkMonitor()
+    @StateObject private var keyboardState = KeyboardState()
 
     @State private var inputFieldId = UUID()
 
@@ -139,6 +140,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 globalFocusState.focus = nil
             }
         }
+        .environmentObject(keyboardState)
     }
 
     var waitingForNetwork: some View {
