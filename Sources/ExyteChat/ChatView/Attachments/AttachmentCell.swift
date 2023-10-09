@@ -43,6 +43,7 @@ struct AttachmentCell: View {
 
 struct AsyncImageView: View {
 
+    @Environment(\.chatTheme) var theme
     let url: URL
 
     var body: some View {
@@ -51,9 +52,12 @@ struct AsyncImageView: View {
                 .resizable()
                 .scaledToFill()
         } placeholder: {
-            Rectangle()
-                .foregroundColor(Color.gray)
-                .frame(minWidth: 100, minHeight: 100)
+            ZStack {
+                Rectangle()
+                    .foregroundColor(theme.colors.inputLightContextBackground)
+                    .frame(minWidth: 100, minHeight: 100)
+                ActivityIndicator(size: 30, showBackground: false)
+            }
         }
     }
 }

@@ -16,6 +16,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var pickerTheme
 
+    @EnvironmentObject private var keyboardState: KeyboardState
+
     @ObservedObject var inputViewModel: InputViewModel
 
     var inputViewBuilder: InputViewBuilderClosure?
@@ -56,6 +58,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 .padding(.top, g.safeAreaInsets.top)
                 .padding(.bottom, g.safeAreaInsets.bottom)
                 .background(pickerTheme.main.albumSelectionBackground)
+                .ignoresSafeArea(.keyboard)
             } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
                 VStack {
                     cameraSelectionHeaderView(cancelClosure: cancelClosure)
@@ -65,6 +68,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 }
                 .padding(.top, g.safeAreaInsets.top)
                 .padding(.bottom, g.safeAreaInsets.bottom)
+                .ignoresSafeArea(.keyboard)
             }
             .didPressCancelCamera {
                 inputViewModel.showPicker = false

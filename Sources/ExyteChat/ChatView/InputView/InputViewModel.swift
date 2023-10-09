@@ -79,6 +79,7 @@ final class InputViewModel: ObservableObject {
             if let _ = attachments.recording {
                 state = .hasRecording
             }
+            recordingPlayer?.reset()
         case .deleteRecord:
             unsubscribeRecordPlayer()
             recorder.stopRecording()
