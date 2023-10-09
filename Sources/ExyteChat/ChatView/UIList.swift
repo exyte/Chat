@@ -384,7 +384,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func formatRow(_ row: MessageRow) -> String {
-        String("id: \(row.id) text: \(row.message.text) status: \(row.message.status) date: \(row.message.createdAt) position: \(row.positionInGroup)")
+        if let status = row.message.status {
+            return String("id: \(row.id) text: \(row.message.text) status: \(status) date: \(row.message.createdAt) position: \(row.positionInGroup)")
+        }
+        return ""
     }
 
     func formatSections(_ sections: [MessagesSection]) -> String {

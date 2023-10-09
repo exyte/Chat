@@ -56,7 +56,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputView
                 }
                 .padding(.top, g.safeAreaInsets.top)
-                .padding(.bottom, keyboardState.isShown ? g.safeAreaInsets.bottom - 18 : g.safeAreaInsets.bottom) // TODO: Fix hack
+                .padding(.bottom, g.safeAreaInsets.bottom)
                 .background(pickerTheme.main.albumSelectionBackground)
                 .ignoresSafeArea(.keyboard)
             } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
@@ -67,7 +67,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputView
                 }
                 .padding(.top, g.safeAreaInsets.top)
-                .padding(.bottom, keyboardState.isShown ? g.safeAreaInsets.bottom - 18 : g.safeAreaInsets.bottom) // TODO: Fix hack
+                .padding(.bottom, g.safeAreaInsets.bottom)
                 .ignoresSafeArea(.keyboard)
             }
             .didPressCancelCamera {

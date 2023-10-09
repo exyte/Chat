@@ -27,6 +27,7 @@ private extension KeyboardState {
                 .publisher(for: UIResponder.keyboardWillHideNotification)
                 .map { _ in false }
         )
+        .receive(on: RunLoop.main)
         .assign(to: \.isShown, on: self)
         .store(in: &subscribtions)
     }

@@ -26,6 +26,7 @@ struct MessageView: View {
     static let widthWithMedia: CGFloat = 204
     static let horizontalAvatarPadding: CGFloat = 8
     static let horizontalTextPadding: CGFloat = 12
+    static let horizontalAttachmentPadding: CGFloat = 1 // for multiple attachments
     static let statusViewSize: CGFloat = 14
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
@@ -37,7 +38,7 @@ struct MessageView: View {
     }
 
     var additionalMediaInset: CGFloat {
-        message.attachments.count > 1 ? 2 : 0
+        message.attachments.count > 1 ? MessageView.horizontalAttachmentPadding * 2 : 0
     }
 
     var dateArrangment: DateArrangment {
@@ -177,8 +178,8 @@ struct MessageView: View {
         }
         .applyIf(message.attachments.count > 1) {
             $0
-                .padding(.top, 1)
-                .padding(.horizontal, 1)
+                .padding(.top, MessageView.horizontalAttachmentPadding)
+                .padding(.horizontal, MessageView.horizontalAttachmentPadding)
         }
         .overlay(alignment: .bottomTrailing) {
             if message.text.isEmpty {
@@ -270,6 +271,7 @@ extension View {
                 }
             }
             .cornerRadius(radius)
+            .border(Color.red, width: 2)
     }
 }
 
