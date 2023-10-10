@@ -271,7 +271,6 @@ extension View {
                 }
             }
             .cornerRadius(radius)
-            .border(Color.red, width: 2)
     }
 }
 
