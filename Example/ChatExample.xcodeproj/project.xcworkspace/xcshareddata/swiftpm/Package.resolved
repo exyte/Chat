@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/FloatingButton",
       "state" : {
-        "revision" : "0fcbf6c1eed0450382fb8b0efd07f3d82a35da6d",
-        "version" : "1.1.5"
+        "revision" : "88963d159b80f4993fc71b42100a08c10849c68e",
+        "version" : "1.2.0"
       }
     },
     {
