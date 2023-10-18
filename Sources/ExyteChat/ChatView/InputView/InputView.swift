@@ -478,7 +478,7 @@ struct InputView: View {
                     dragStart = Date()
                     cancelGesture = false
                     tapDelayTimer = Timer.scheduledTimer(withTimeInterval: tapDelay, repeats: false) { _ in
-                        if state != .isRecordingTap {
+                        if state != .isRecordingTap, state != .waitingForRecordingPermission {
                             self.onAction(.recordAudioHold)
                         }
                     }

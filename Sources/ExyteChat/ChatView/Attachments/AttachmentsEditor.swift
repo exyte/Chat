@@ -51,24 +51,24 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             } albumSelectionBuilder: { _, albumSelectionView, _ in
                 VStack {
                     albumSelectionHeaderView
+                        .padding(.top, g.safeAreaInsets.top)
                     albumSelectionView
                     Spacer()
                     inputView
+                        .padding(.bottom, g.safeAreaInsets.bottom)
                 }
-                .padding(.top, g.safeAreaInsets.top)
-                .padding(.bottom, g.safeAreaInsets.bottom)
                 .background(pickerTheme.main.albumSelectionBackground)
-                .ignoresSafeArea(.keyboard)
+                .ignoresSafeArea()
             } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
                 VStack {
                     cameraSelectionHeaderView(cancelClosure: cancelClosure)
+                        .padding(.top, g.safeAreaInsets.top)
                     cameraSelectionView
                     Spacer()
                     inputView
+                        .padding(.bottom, g.safeAreaInsets.bottom)
                 }
-                .padding(.top, g.safeAreaInsets.top)
-                .padding(.bottom, g.safeAreaInsets.bottom)
-                .ignoresSafeArea(.keyboard)
+                .ignoresSafeArea()
             }
             .didPressCancelCamera {
                 inputViewModel.showPicker = false
@@ -140,7 +140,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .frame(maxWidth: .infinity)
         }
         .padding(.horizontal)
-        .padding(.bottom, 10)
+        .padding(.bottom, 5)
     }
 
     func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {

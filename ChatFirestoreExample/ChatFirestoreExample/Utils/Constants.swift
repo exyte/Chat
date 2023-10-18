@@ -15,17 +15,17 @@ struct Collection {
     static let messages = "messages"
 }
 
-extension Color {
-    static var exampleBlue = Color("exampleBlue")
-    static var exampleDarkGray = Color("exampleDarkGray")
-    static var exampleFieldBorder = Color("exampleFieldBorder")
-    static var exampleLightGray = Color("exampleLightGray")
-    static var exampleMidGray = Color("exampleMidGray")
-    static var examplePickerBg = Color("examplePickerBg")
-    static var exampleSearchField = Color("exampleSearchField")
-    static var exampleSecondaryText = Color("exampleSecondaryText")
-    static var exampleTetriaryText = Color("exampleTetriaryText")
-}
+//extension Color {
+//    static var exampleBlue = Color("exampleBlue")
+//    static var exampleDarkGray = Color("exampleDarkGray")
+//    static var exampleFieldBorder = Color("exampleFieldBorder")
+//    static var exampleLightGray = Color("exampleLightGray")
+//    static var exampleMidGray = Color("exampleMidGray")
+//    static var examplePickerBg = Color("examplePickerBg")
+//    static var exampleSearchField = Color("exampleSearchField")
+//    static var exampleSecondaryText = Color("exampleSecondaryText")
+//    static var exampleTetriaryText = Color("exampleTetriaryText")
+//}
 
 extension String {
     static var avatarPlaceholder = "avatarPlaceholder"

@@ -11,6 +11,7 @@ struct ConversationsView: View {
 
     @ObservedObject var dataStorage = DataStorageManager.shared
     @StateObject var viewModel = ConversationsViewModel()
+    @StateObject var networkMonitor = NetworkMonitor()
 
     @State var showUsersList = false
     @State var navPath = NavigationPath()
@@ -30,6 +31,10 @@ struct ConversationsView: View {
 
     var content: some View {
         NavigationStack(path: $navPath) {
+            if !networkMonitor.isConnected {
+                waitingForNetwork
+            }
+            
             SearchField(text: $viewModel.searchText)
                 .padding(.horizontal, 12)
 
@@ -132,5 +137,24 @@ struct ConversationsView: View {
         .sheet(isPresented: $showUsersList) {
             UsersView(viewModel: UsersViewModel(), isPresented: $showUsersList, navPath: $navPath)
         }
+    }
+
+    var waitingForNetwork: some View {
+        VStack {
+            Rectangle()
+                .foregroundColor(.black.opacity(0.12))
+                .frame(height: 1)
+            HStack {
+                Spacer()
+                Image("waiting", bundle: .current)
+                Text("Waiting for network")
+                Spacer()
+            }
+            .padding(.top, 6)
+            Rectangle()
+                .foregroundColor(.black.opacity(0.12))
+                .frame(height: 1)
+        }
+        .padding(.top, 8)
     }
 }

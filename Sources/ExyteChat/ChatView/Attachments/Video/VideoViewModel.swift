@@ -15,6 +15,9 @@ final class VideoViewModel: ObservableObject {
     @Published var isPlaying = false
     @Published var isMuted = false
 
+    private var subscriptions = Set<AnyCancellable>()
+    @Published var status: AVPlayer.Status = .unknown
+
     init(attachment: Attachment) {
         self.attachment = attachment
     }
@@ -22,7 +25,8 @@ final class VideoViewModel: ObservableObject {
     func onStart() {
         if player == nil {
             self.player = AVPlayer(url: attachment.full)
-            player?.play() // doesn't atually start playing, but sets status to readyToPlay
+            self.player?.publisher(for: \.status)
+                .assign(to: &$status)
 
             NotificationCenter.default.addObserver(self, selector: #selector(finishVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         }
@@ -44,22 +48,19 @@ final class VideoViewModel: ObservableObject {
         player?.isMuted.toggle()
         isMuted = player?.isMuted ?? false
     }
-}
-
-private extension VideoViewModel {
 
     func playVideo() {
         player?.play()
         isPlaying = player?.isPlaying ?? false
     }
 
-    @objc func finishVideo() {
-        player?.seek(to: CMTime(seconds: 0, preferredTimescale: 10))
-        isPlaying = false
-    }
-
     func pauseVideo() {
         player?.pause()
         isPlaying = player?.isPlaying ?? false
+    }
+
+    @objc func finishVideo() {
+        player?.seek(to: CMTime(seconds: 0, preferredTimescale: 10))
+        isPlaying = false
     }
 }

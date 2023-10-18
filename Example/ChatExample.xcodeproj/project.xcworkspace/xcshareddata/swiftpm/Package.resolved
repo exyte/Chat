@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "revision" : "e5cae02a7a16d5544acd6f7dc78995672fc83ed1",
-        "version" : "1.3.0"
+        "revision" : "9947ee56c440ca412720e2244e1fb82f8f5d8531",
+        "version" : "1.3.3"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect.git",
       "state" : {
-        "revision" : "c29b50a475120fdfa22573622464a7346aaf99a4",
-        "version" : "0.6.0"
+        "revision" : "121c146fe591b1320238d054ae35c81ffa45f45a",
+        "version" : "0.12.0"
       }
     }
   ],

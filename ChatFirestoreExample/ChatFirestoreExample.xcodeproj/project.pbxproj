@@ -40,6 +40,7 @@
 		5BB99CE72A614A040011F32D /* FakeConversationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB99CE62A614A040011F32D /* FakeConversationsManager.swift */; };
 		5BC3ED022A5E8F86001481BA /* FirestoreMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC3ED012A5E8F86001481BA /* FirestoreMessage.swift */; };
 		5BDBC2C92A6010490073B259 /* DataStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDBC2C82A6010490073B259 /* DataStorageManager.swift */; };
+		5BF334D02ADD3F13004B0F78 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF334CF2ADD3F13004B0F78 /* NetworkMonitor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -87,6 +88,7 @@
 		5BB99CE62A614A040011F32D /* FakeConversationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeConversationsManager.swift; sourceTree = "<group>"; };
 		5BC3ED012A5E8F86001481BA /* FirestoreMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreMessage.swift; sourceTree = "<group>"; };
 		5BDBC2C82A6010490073B259 /* DataStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageManager.swift; sourceTree = "<group>"; };
+		5BF334CF2ADD3F13004B0F78 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,6 +227,7 @@
 			children = (
 				5B8D76202A5BC8CF00EDE1B7 /* Constants.swift */,
 				5B9920EF2A405B5500995901 /* Utils.swift */,
+				5BF334CF2ADD3F13004B0F78 /* NetworkMonitor.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -342,6 +345,7 @@
 				5BC3ED022A5E8F86001481BA /* FirestoreMessage.swift in Sources */,
 				5B55902D2A383FE5008E13E2 /* ConversationViewModel.swift in Sources */,
 				5B34D8F52A3721B80013A15A /* UsersViewModel.swift in Sources */,
+				5BF334D02ADD3F13004B0F78 /* NetworkMonitor.swift in Sources */,
 				5BAEBAC82A418DA2005D9DF7 /* Conversation.swift in Sources */,
 				5B34D8F72A3721BC0013A15A /* UsersView.swift in Sources */,
 				5B4E1BAA2A495FD500E3B27C /* UploadingManager.swift in Sources */,
@@ -478,7 +482,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatFirestoreExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FZXCM5CJ7P;
@@ -517,7 +521,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatFirestoreExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FZXCM5CJ7P;

@@ -14,7 +14,7 @@ struct VideoView: View {
 
     var body: some View {
         Group {
-            if let player = viewModel.player, player.currentItem?.status == .readyToPlay {
+            if let player = viewModel.player, viewModel.status == .readyToPlay {
                 content(for: player)
             } else {
                 ActivityIndicator()
@@ -39,6 +39,11 @@ struct VideoView: View {
         }
         .onChange(of: viewModel.isMuted) { newValue in
             mediaPagesViewModel.videoMuted = newValue
+        }
+        .onChange(of: viewModel.status) { status in
+            if status == .readyToPlay {
+                viewModel.togglePlay()
+            }
         }
     }
 
