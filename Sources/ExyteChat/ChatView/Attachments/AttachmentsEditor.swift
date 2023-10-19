@@ -25,7 +25,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var chatTitle: String?
     var messageUseMarkdown: Bool
     var orientationHandler: MediaPickerOrientationHandler
-    var mediaPickerSelectionParameters: ExyteMediaPicker.SelectionParamsHolder?
+    var mediaPickerSelectionParameters: MediaPickerParameters?
 
     @State private var seletedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?

@@ -10,7 +10,7 @@ import FloatingButton
 import Introspect
 import ExyteMediaPicker
 
-public typealias MediaPickerParameters = ExyteMediaPicker.SelectionParamsHolder
+public typealias MediaPickerParameters = SelectionParamsHolder
 
 public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
