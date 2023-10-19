@@ -17,14 +17,15 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @Environment(\.mediaPickerTheme) var pickerTheme
 
     @EnvironmentObject private var keyboardState: KeyboardState
+    @EnvironmentObject private var globalFocusState: GlobalFocusState
 
     @ObservedObject var inputViewModel: InputViewModel
 
     var inputViewBuilder: InputViewBuilderClosure?
-    var assetsPickerLimit: Int
     var chatTitle: String?
     var messageUseMarkdown: Bool
     var orientationHandler: MediaPickerOrientationHandler
+    var mediaPickerSelectionParameters: ExyteMediaPicker.SelectionParamsHolder?
 
     @State private var seletedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -75,7 +76,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
             .currentFullscreenMedia($currentFullscreenMedia)
             .showLiveCameraCell()
-            .mediaSelectionLimit(assetsPickerLimit)
+            .setSelectionParameters(mediaPickerSelectionParameters)
             .pickerMode($inputViewModel.mediaPickerMode)
             .orientationHandler(orientationHandler)
             .padding(.top)
@@ -101,7 +102,9 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var inputView: some View {
         Group {
             if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction())
+                inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction()) {
+                    globalFocusState.focus = nil
+                }
             } else {
                 InputView(
                     viewModel: inputViewModel,

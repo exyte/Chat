@@ -20,7 +20,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
-            from: "1.2.8"
+            from: "2.0.0"
         ),
         .package(
             url: "https://github.com/exyte/FloatingButton",

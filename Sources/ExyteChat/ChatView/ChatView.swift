@@ -10,6 +10,8 @@ import FloatingButton
 import Introspect
 import ExyteMediaPicker
 
+public typealias MediaPickerParameters = ExyteMediaPicker.SelectionParamsHolder
+
 public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     /// To build a custom message view use the following parameters passed by this closure:
@@ -18,14 +20,28 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
     public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (Attachment) -> Void) -> MessageContent)
 
+    /// To build a custom input view use the following parameters passed by this closure:
+    /// - binding to the text in input view
+    /// - InputViewAttachments to store the attachments from external pickers
+    /// - Current input view state
+    /// - .message for main input view mode and .signature for input view in media picker mode
+    /// - closure to pass user interaction, .recordAudioTap for example
+    /// - dismiss keyboard closure
     public typealias InputViewBuilderClosure = ((
-        Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void) -> InputViewContent)
+        Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void, ()->()) -> InputViewContent)
+
+    /// User and MessageId
+    public typealias TapAvatarClosure = (User, String) -> ()
 
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
 
+    // MARK: - Parameters
+
     let didSendMessage: (DraftMessage) -> Void
+
+    // MARK: - View builders
 
     /// provide custom message view builder
     var messageBuilder: MessageBuilderClosure? = nil
@@ -33,9 +49,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     /// provide custom input view builder
     var inputViewBuilder: InputViewBuilderClosure? = nil
 
+    // MARK: - Customization
+
     var avatarSize: CGFloat = 32
-    var assetsPickerLimit: Int = 10
     var messageUseMarkdown: Bool = false
+    var tapAvatarClosure: TapAvatarClosure?
+    var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
 
@@ -98,7 +117,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
             Group {
                 if let inputViewBuilder = inputViewBuilder {
-                    inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction())
+                    inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
+                        globalFocusState.focus = nil
+                    }
                 } else {
                     InputView(
                         viewModel: inputViewModel,
@@ -132,7 +153,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             }
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, assetsPickerLimit: assetsPickerLimit, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler)
+            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {
@@ -170,6 +191,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                shouldScrollToTop: $shouldScrollToTop,
                messageBuilder: messageBuilder,
                avatarSize: avatarSize,
+               tapAvatarClosure: tapAvatarClosure,
                messageUseMarkdown: messageUseMarkdown,
                sections: sections,
                ids: ids
@@ -236,7 +258,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true)
                     .onTapGesture {
                         hideMessageMenu()
                     }
@@ -358,15 +380,28 @@ public extension ChatView {
         return view
     }
 
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
-        var view = self
-        view.assetsPickerLimit = assetsPickerLimit
-        return view
-    }
-
     func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
+        return view
+    }
+
+    func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
+        var view = self
+        view.tapAvatarClosure = closure
+        return view
+    }
+
+    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
+        var view = self
+        view.mediaPickerSelectionParameters = MediaPickerParameters()
+        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
+        return view
+    }
+
+    func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
+        var view = self
+        view.mediaPickerSelectionParameters = params
         return view
     }
 

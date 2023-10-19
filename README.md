@@ -67,7 +67,7 @@ You may customize the input view (a text field with buttons at the bottom) like 
 ```swift
 ChatView(messages: viewModel.messages) { draft in
     viewModel.send(draft: draft)
-} inputViewBuilder: { textBinding, attachments, state, style, actionClosure in
+} inputViewBuilder: { textBinding, attachments, state, style, actionClosure, dismissKeyboardClosure in
     Group {
         switch style {
         case .message: // input view on chat screen
@@ -96,6 +96,7 @@ ChatView(messages: viewModel.messages) { draft in
 - `state` - the state of the input view that is controled by the library automatically if possible or through your calls of `actionClosure`
 - `style` - `.message` or `.signature` (the chat screen or the photo selection screen)   
 - `actionClosure` is called on taps on your custom buttons. For example, call `actionClosure(.send)` if you want to send your message, then the library will reset the text and attachments and call the `didSendMessage` sending closure
+- `dismissKeyboardClosure` - call this to dismiss keyboard
 
 ## Supported content types
 This library allows to send the following content in messages in any combination:
@@ -110,7 +111,9 @@ This library allows to send the following content in messages in any combination
 ### Modifiers
 If you are not using your own `messageBuilder`:   
 `avatarSize` - the default avatar is a circle, you can specify its diameter here   
-`messageUseMarkdown` - whether the default message cell uses markdown     
+`tapAvatarClosure` - closure to call on avatar tap   
+`messageUseMarkdown` - whether the default message cell uses markdown    
+`mediaPickerSelectionParameters`  - a struct holding MediaPicker selection parameters (mediaType, selectionStyle, etc.)
 `assetsPickerLimit` - the maximum media count that the user can select in the media picker      
 `enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages       
 `chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass the info for the Chat's navigation bar  

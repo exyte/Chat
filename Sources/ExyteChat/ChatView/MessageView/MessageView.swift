@@ -16,6 +16,7 @@ struct MessageView: View {
     let message: Message
     let positionInGroup: PositionInGroup
     let avatarSize: CGFloat
+    let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
     let isDisplayingMessageMenu: Bool
 
@@ -163,6 +164,10 @@ struct MessageView: View {
         Group {
             if showAvatar {
                 AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
+                    .contentShape(Circle())
+                    .onTapGesture {
+                        tapAvatarClosure?(message.user, message.id)
+                    }
             } else {
                 Color.clear.viewSize(avatarSize)
             }
@@ -313,6 +318,7 @@ struct MessageView_Preview: PreviewProvider {
                 message: replyedMessage,
                 positionInGroup: .single,
                 avatarSize: 32,
+                tapAvatarClosure: nil,
                 messageUseMarkdown: false,
                 isDisplayingMessageMenu: false
             )
