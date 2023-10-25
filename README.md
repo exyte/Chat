@@ -3,7 +3,32 @@
 <a href="https://exyte.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/exyte/media/master/common/our-site-dark.png" width="80" height="16"><img src="https://raw.githubusercontent.com/exyte/media/master/common/our-site-light.png" width="80" height="16"></picture></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://twitter.com/exyteHQ"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/exyte/media/master/common/twitter-dark.png" width="74" height="16"><img src="https://raw.githubusercontent.com/exyte/media/master/common/twitter-light.png" width="74" height="16">
 </picture></a> <a href="https://exyte.com/contacts"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/exyte/media/master/common/get-in-touch-dark.png" width="128" height="24" align="right"><img src="https://raw.githubusercontent.com/exyte/media/master/common/get-in-touch-light.png" width="128" height="24" align="right"></picture></a>
 
-<img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic1.png">
+<table>
+    <thead>
+        <tr>
+            <th>Chat</th>
+            <th>Media</th>
+            <th>Audio</th>
+            <th>Extra</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <img src="https://github.com/exyte/Chat/assets/1358172/067381ca-4e96-4272-89a2-423241ce5e92" />
+            </td>
+            <td>
+                <img src="https://github.com/exyte/Chat/assets/1358172/07ab4cad-106d-4ed1-b1e9-a6e50337bdc6" />
+            </td>
+            <td>
+                <img src="https://github.com/exyte/Chat/assets/1358172/843072cb-4a06-4677-8c12-23a12f0ffd27" />
+            </td>
+            <td>
+                <img src="https://github.com/exyte/Chat/assets/1358172/8d700d3a-eecf-4776-bafd-b6507073b847" />
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 <p><h1>Chat</h1></p>
 <p><h4>A SwiftUI Chat UI framework with fully customizable message cells and a built-in media picker</h4></p>
