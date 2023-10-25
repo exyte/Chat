@@ -8,23 +8,23 @@
         <tr>
             <th>Chat</th>
             <th>Media</th>
-            <th>Audio</th>
+            <th>Audio Messages</th>
             <th>Extra</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/067381ca-4e96-4272-89a2-423241ce5e92" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/5666c490-bd4a-4c97-b3e5-688737d75668" />
             </td>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/07ab4cad-106d-4ed1-b1e9-a6e50337bdc6" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/4bcb7fc9-2995-46bc-b07d-92ae0e7c93b9" />
             </td>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/843072cb-4a06-4677-8c12-23a12f0ffd27" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/151695ae-f399-4046-94c4-5f1f27001d8f" />
             </td>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/8d700d3a-eecf-4776-bafd-b6507073b847" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/176cd325-7e10-405a-ad14-144fb0a4238d" />
             </td>
         </tr>
     </tbody>
