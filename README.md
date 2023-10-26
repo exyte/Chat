@@ -15,16 +15,16 @@
     <tbody>
         <tr>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/5666c490-bd4a-4c97-b3e5-688737d75668" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/baf0167f-b3e0-4df2-bd3b-b6b1c4ee385d" />
             </td>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/4bcb7fc9-2995-46bc-b07d-92ae0e7c93b9" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/d62876ef-4475-4f07-933a-9d9366b02e28" />
             </td>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/151695ae-f399-4046-94c4-5f1f27001d8f" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/ebd2040d-1cf0-4066-9391-592af1426571" />
             </td>
             <td>
-                <img src="https://github.com/exyte/Chat/assets/1358172/176cd325-7e10-405a-ad14-144fb0a4238d" />
+                <img src="https://github.com/exyte/Chat/assets/1358172/053bcd73-0db7-44da-abd6-0a57f0f88a4b" />
             </td>
         </tr>
     </tbody>
