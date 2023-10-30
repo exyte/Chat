@@ -152,7 +152,9 @@ There are 2 example projects:
 
 Create your firestore app
 https://console.firebase.google.com/
-Create cloud firestore database
+Create firesote database (for light weight text data)
+https://firebase.google.com/docs/firestore/manage-data/add-data
+Create cloud firestore database (for images and voice recordings)
 https://firebase.google.com/docs/storage/web/start
 
 ## Example
