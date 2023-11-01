@@ -3,6 +3,7 @@
 //  Chat
 //
 //  Created by Alisa Mylnikova on 20.04.2022.
+//  Modified by Adriano Leal Ramos on 01.11.2023.
 //
 
 import SwiftUI
