@@ -108,6 +108,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     }
                 } completion: { _ in
                     tableSemaphore.signal()
+                    //print("2 finished delete")
                 }
             }
             tableSemaphore.wait()
@@ -124,6 +125,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     }
                 } completion: { _ in
                     tableSemaphore.signal()
+                    //print("3 finished swaps")
                 }
             }
             tableSemaphore.wait()
@@ -139,6 +141,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     }
                 } completion: { _ in
                     tableSemaphore.signal()
+                    //print("4 finished edits")
                 }
             }
             tableSemaphore.wait()
@@ -250,8 +253,15 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             }
             for rowId in rowIDsToInsert {
                 if let index = newRows.firstIndex(where: { $0.id == rowId }) {
-                    newRows.remove(at: index) // remove for now, leaving only 'duplicates'
-                    insertOperations.append(.insert(newIndex, index)) // this row was not in old section, should add it to final result
+                    // this row was not in old section, should add it to final result
+                    insertOperations.append(.insert(newIndex, index))
+                }
+            }
+
+            for rowId in rowIDsToInsert {
+                if let index = newRows.firstIndex(where: { $0.id == rowId }) {
+                    // remove for now, leaving only 'duplicates'
+                    newRows.remove(at: index)
                 }
             }
 
