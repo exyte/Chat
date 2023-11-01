@@ -62,17 +62,17 @@ public struct ChatTheme {
 
         public init(
             grayStatus: Color = Color(hex: "AFB3B8"),
-            errorStatus: Color = Color.red,
+            errorStatus: Color = Color(hex: "C82B28"), // Fire Engine Red
             inputLightContextBackground: Color = Color(hex: "F2F3F5"),
             inputDarkContextBackground: Color = Color(hex: "F2F3F5").opacity(0.12),
-            mainBackground: Color = .white,
+            mainBackground: Color = Color(hex: "E4E4E4"), // Electric Indigo
             buttonBackground: Color = Color(hex: "989EAC"),
             addButtonBackground: Color = Color(hex: "#4F5055"),
             sendButtonBackground: Color = Color(hex: "#4962FF"),
-            myMessage: Color = Color(hex: "4962FF"),
-            friendMessage: Color = Color(hex: "EBEDF0"),
-            textLightContext: Color = Color.black,
-            textDarkContext: Color = Color.white,
+            myMessage: Color = Color.white,
+            friendMessage: Color = Color(hex: "5F22D9"),
+            textLightContext: Color = Color.white,
+            textDarkContext: Color = Color.black,
             textMediaPicker: Color = Color(hex: "818C99"),
             recordDot: Color = Color(hex: "F62121")
         ) {
