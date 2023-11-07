@@ -24,7 +24,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/exyte/FloatingButton",
-            from: "1.0.1"
+            from: "1.2.2"
         ),
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",
