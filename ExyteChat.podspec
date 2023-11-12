@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
      'Sources/**/*.swift'
   ]
 
-  s.dependency 'Introspect'
+  s.dependency 'SwiftUIIntrospect'
   s.dependency 'ExyteMediaPicker'
   s.dependency 'FloatingButton'
   s.dependency 'ActivityIndicatorView'
