@@ -6,26 +6,36 @@ import SwiftUI
 
 struct AvatarView: View {
 
-    let url: URL?
+	let avatar: User.Avatar?
     let avatarSize: CGFloat
 
     var body: some View {
-        CachedAsyncImage(url: url, urlCache: .imageCache) { image in
-            image
-                .resizable()
-                .scaledToFill()
-        } placeholder: {
-            Rectangle().fill(Color.gray)
-        }
-        .viewSize(avatarSize)
-        .clipShape(Circle())
+		switch avatar {
+		case .remote(let url):
+			CachedAsyncImage(url: url, urlCache: .imageCache) { image in
+				image
+					.resizable()
+					.scaledToFill()
+			} placeholder: {
+				Rectangle().fill(Color.gray)
+			}
+			.viewSize(avatarSize)
+			.clipShape(Circle())
+		case .image(let image):
+			Image(uiImage: image)
+				.resizable()
+				.scaledToFill()
+				.viewSize(avatarSize)
+				.clipShape(Circle())
+		case .none: Rectangle().fill(Color.gray)
+		}
     }
 }
 
 struct AvatarView_Previews: PreviewProvider {
     static var previews: some View {
         AvatarView(
-            url: URL(string: "https://placeimg.com/640/480/sepia"),
+			avatar: .remote(URL(string: "https://placeimg.com/640/480/sepia")!),
             avatarSize: 32
         )
     }
