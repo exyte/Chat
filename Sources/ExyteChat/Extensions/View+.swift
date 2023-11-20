@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  View+.swift
+//
 //
 //  Created by Alisa Mylnikova on 09.03.2023.
 //
