@@ -273,7 +273,7 @@ class ConversationViewModel: ObservableObject {
             .collection(Collection.conversations)
             .whereField("users", arrayContains: SessionManager.currentUserId)
             .addSnapshotListener() { [weak self] (snapshot, _) in
-                // check if this convesation was created by another user already
+                // check if this conversation was created by another user already
                 if let conversation = self?.conversationForUser(user) {
                     self?.updateForConversation(conversation)
                     self?.subscriptionToConversationCreation = nil
