@@ -31,7 +31,7 @@ class ConversationViewModel: ObservableObject {
 
     var lock = NSRecursiveLock()
 
-    private var subscribtionToConversationCreation: ListenerRegistration?
+    private var subscriptionToConversationCreation: ListenerRegistration?
 
     init(user: User) {
         self.users = [user]
@@ -269,14 +269,14 @@ class ConversationViewModel: ObservableObject {
     // MARK: - conversation life management
 
     func subscribeToConversationCreation(user: User) {
-        subscribtionToConversationCreation = Firestore.firestore()
+        subscriptionToConversationCreation = Firestore.firestore()
             .collection(Collection.conversations)
             .whereField("users", arrayContains: SessionManager.currentUserId)
             .addSnapshotListener() { [weak self] (snapshot, _) in
                 // check if this convesation was created by another user already
                 if let conversation = self?.conversationForUser(user) {
                     self?.updateForConversation(conversation)
-                    self?.subscribtionToConversationCreation = nil
+                    self?.subscriptionToConversationCreation = nil
                 }
             }
     }
@@ -292,7 +292,7 @@ class ConversationViewModel: ObservableObject {
     }
 
     private func createIndividualConversation(_ user: User) async -> Conversation? {
-        subscribtionToConversationCreation = nil
+        subscriptionToConversationCreation = nil
         let allUserIds = allUsers.map { $0.id }
         let dict: [String : Any] = [
             "users": allUserIds,
