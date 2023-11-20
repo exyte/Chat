@@ -203,7 +203,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     func operationsSplit(oldSections: [MessagesSection], newSections: [MessagesSection]) -> ([MessagesSection], [MessagesSection], [Operation], [Operation], [Operation], [Operation]) {
         var appliedDeletes = oldSections // start with old sections, remove rows that need to be deleted
         var appliedDeletesSwapsAndEdits = newSections // take new sections and remove rows that need to be inserted for now, then we'll get array with all the changes except for inserts
-        // apliedDeletesSwapsEditsAndInserts == newSection
+        // appliedDeletesSwapsEditsAndInserts == newSection
 
         var deleteOperations = [Operation]()
         var swapOperations = [Operation]()
