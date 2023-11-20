@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  View+StatusBar.swift
 //  
 //
 //  Created by Alisa Mylnikova on 02.06.2023.
