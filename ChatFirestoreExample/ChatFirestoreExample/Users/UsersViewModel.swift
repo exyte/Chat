@@ -27,7 +27,7 @@ class UsersViewModel: ObservableObject {
     }
 
     func conversationForUsers(_ users: [User]) async -> Conversation? {
-        // search in exsisting conversations
+        // search in existing conversations
         for conversation in dataStorage.conversations {
             if conversation.users.count - 1 == users.count { // without current user
                 var foundIt = true
