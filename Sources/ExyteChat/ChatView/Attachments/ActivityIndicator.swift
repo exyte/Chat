@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  ActivityIndicator.swift
+//
 //
 //  Created by Alisa Mylnikova on 01.09.2023.
 //

@@ -26,7 +26,7 @@ class FakeConversationsManager {
                 return
             }
 
-            // if yes - check if conversations were alreay created
+            // if yes - check if conversations were already created
             let snapshot = try? await Firestore.firestore()
                 .collection(Collection.conversations)
                 .whereField("users", arrayContains: SessionManager.currentUserId)

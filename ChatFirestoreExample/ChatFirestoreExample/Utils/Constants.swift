@@ -25,7 +25,7 @@ extension Color {
     static var examplePickerBg = Color("examplePickerBg")
     static var exampleSearchField = Color("exampleSearchField")
     static var exampleSecondaryText = Color("exampleSecondaryText")
-    static var exampleTetriaryText = Color("exampleTetriaryText")
+    static var exampleTertiaryText = Color("exampleTertiaryText")
 }
 }
 #endif
