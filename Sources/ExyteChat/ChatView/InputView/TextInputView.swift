@@ -13,9 +13,17 @@ struct TextInputView: View {
     @Binding var text: String
     var inputFieldId: UUID
     var style: InputViewStyle
+    
+    var textField: TextField<Text> {
+        if #available(iOS 16.0, *) {
+            TextField("", text: $text, axis: .vertical)
+        } else {
+            TextField("", text: $text)
+        }
+    }
 
     var body: some View {
-        TextField("", text: $text, axis: .vertical)
+        textField
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
             .placeholder(when: text.isEmpty) {
                 Text(style.placeholder)

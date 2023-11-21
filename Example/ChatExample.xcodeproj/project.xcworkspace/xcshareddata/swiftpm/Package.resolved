@@ -10,12 +10,21 @@
       }
     },
     {
+      "identity" : "chat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/Chat",
+      "state" : {
+        "revision" : "ee6d6a89a649fa7ca8d4e69a2c05e7e7aa74dba0",
+        "version" : "1.2.4"
+      }
+    },
+    {
       "identity" : "floatingbutton",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/FloatingButton",
       "state" : {
-        "revision" : "88963d159b80f4993fc71b42100a08c10849c68e",
-        "version" : "1.2.0"
+        "revision" : "301fba68ed56c68c04af0b40a4eb422518c8eaf8",
+        "version" : "1.2.2"
       }
     },
     {
@@ -23,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "revision" : "f493425514490b0629725387122d15d2876aeff5",
-        "version" : "2.1.1"
+        "revision" : "3cb62be1813c1a53a9b6bd60b2ca31763efd623c",
+        "version" : "2.2.1"
       }
     },
     {
