@@ -15,6 +15,7 @@ struct MessageView: View {
 
     let message: Message
     let positionInGroup: PositionInGroup
+    let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
@@ -66,11 +67,19 @@ struct MessageView: View {
     }
 
     var showAvatar: Bool {
-        positionInGroup == .single || positionInGroup == .last
+        positionInGroup == .single
+        || (chatType == .chat && positionInGroup == .last)
+        || (chatType == .comments && positionInGroup == .first)
     }
 
     var topPadding: CGFloat {
-        positionInGroup == .first || positionInGroup == .single ? 8 : 4
+        if chatType == .comments { return 0 }
+        return positionInGroup == .single || positionInGroup == .first ? 8 : 4
+    }
+
+    var bottomPadding: CGFloat {
+        if chatType == .chat { return 0 }
+        return positionInGroup == .single || positionInGroup == .first ? 8 : 4
     }
 
     var body: some View {
@@ -103,6 +112,7 @@ struct MessageView: View {
             }
         }
         .padding(.top, topPadding)
+        .padding(.bottom, bottomPadding)
         .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
         .frame(maxWidth: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
     }
@@ -317,6 +327,7 @@ struct MessageView_Preview: PreviewProvider {
                 viewModel: ChatViewModel(),
                 message: replyedMessage,
                 positionInGroup: .single,
+                chatType: .chat,
                 avatarSize: 32,
                 tapAvatarClosure: nil,
                 messageUseMarkdown: false,

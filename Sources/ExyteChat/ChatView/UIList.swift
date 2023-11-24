@@ -25,6 +25,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     var messageBuilder: MessageBuilderClosure?
 
+    let type: ChatType
+    let showDateHeaders: Bool
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
@@ -44,10 +46,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.dataSource = context.coordinator
         tableView.delegate = context.coordinator
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        tableView.transform = CGAffineTransform(rotationAngle: .pi)
+        tableView.transform = CGAffineTransform(rotationAngle: (type == .chat ? .pi : 0))
 
         tableView.showsVerticalScrollIndicator = false
-        tableView.estimatedSectionHeaderHeight = 0
+        tableView.estimatedSectionHeaderHeight = 1
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
         tableView.backgroundColor = UIColor(theme.colors.mainBackground)
         tableView.scrollsToTop = false
@@ -303,7 +305,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
+        Coordinator(viewModel: viewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -316,6 +318,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         var messageBuilder: MessageBuilderClosure?
 
+        let chatTheme: ChatTheme
+        let type: ChatType
+        let showDateHeaders: Bool
         let avatarSize: CGFloat
         let tapAvatarClosure: ChatView.TapAvatarClosure?
         let messageUseMarkdown: Bool
@@ -324,12 +329,15 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         let mainBackgroundColor: Color
 
-        init(viewModel: ChatViewModel, paginationState: PaginationState, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, avatarSize: CGFloat, tapAvatarClosure: ChatView.TapAvatarClosure?, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
+        init(viewModel: ChatViewModel, paginationState: PaginationState, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, tapAvatarClosure: ChatView.TapAvatarClosure?, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
             self.viewModel = viewModel
             self.paginationState = paginationState
             self._isScrolledToBottom = isScrolledToBottom
             self._isScrolledToTop = isScrolledToTop
             self.messageBuilder = messageBuilder
+            self.chatTheme = chatTheme
+            self.type = type
+            self.showDateHeaders = showDateHeaders
             self.avatarSize = avatarSize
             self.tapAvatarClosure = tapAvatarClosure
             self.messageUseMarkdown = messageUseMarkdown
@@ -346,21 +354,45 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             sections[section].rows.count
         }
 
+        func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+            if showDateHeaders, type == .comments {
+                return dateView(section)
+            }
+            return nil
+        }
+
         func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+            if showDateHeaders, type == .chat {
+                return dateView(section)
+            }
+            return nil
+        }
+
+        func dateView(_ section: Int) -> UIView? {
             let header = UIHostingController(rootView:
                 Text(sections[section].formattedDate)
                     .font(.system(size: 11))
-                    .rotationEffect(Angle(degrees: 180))
+                    .rotationEffect(Angle(degrees: (type == .chat ? 180 : 0)))
                     .padding(10)
                     .padding(.bottom, 8)
                     .foregroundColor(.gray)
             ).view
-            header?.backgroundColor = .clear
+            header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
             return header
         }
 
         func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-            0.1
+            if !showDateHeaders {
+                return 0.1
+            }
+            return type == .chat ? 0.1 : UITableView.automaticDimension
+        }
+
+        func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+            if !showDateHeaders {
+                return 0.1
+            }
+            return type == .chat ? UITableView.automaticDimension : 0.1
         }
 
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -371,9 +403,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: false)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: false)
                     .background(MessageMenuPreferenceViewSetter(id: row.id))
-                    .rotationEffect(Angle(degrees: 180))
+                    .rotationEffect(Angle(degrees: (type == .chat ? 180 : 0)))
                     .onTapGesture { }
                     .onLongPressGesture {
                         self.viewModel.messageMenuRow = row
