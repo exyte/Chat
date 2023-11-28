@@ -18,6 +18,8 @@ struct ConversationView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.sendMessage(draft)
         }
+        .chatType(.comments)
+        .scrollInputView(scrollInputView: true)
         .orientationHandler { mode in
             switch mode {
             case .lock: AppDelegate.lockOrientationToPortrait()

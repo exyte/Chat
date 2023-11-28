@@ -11,9 +11,9 @@ public extension Notification.Name {
     static let onScrollToBottom = Notification.Name("onScrollToBottom")
 }
 
-struct UIList<MessageContent: View>: UIViewRepresentable {
+struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
-    typealias MessageBuilderClosure = ChatView<MessageContent, EmptyView>.MessageBuilderClosure
+    typealias MessageBuilderClosure = ChatView<MessageContent, InputView>.MessageBuilderClosure
 
     @Environment(\.chatTheme) private var theme
 
@@ -22,11 +22,14 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     @Binding var isScrolledToBottom: Bool
     @Binding var shouldScrollToTop: () -> ()
+    @Binding var tableContentHeight: CGFloat
 
     var messageBuilder: MessageBuilderClosure?
+    var inputView: InputView
 
     let type: ChatType
     let showDateHeaders: Bool
+    let isScrollEnabled: Bool
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
@@ -53,6 +56,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
         tableView.backgroundColor = UIColor(theme.colors.mainBackground)
         tableView.scrollsToTop = false
+        tableView.isScrollEnabled = isScrollEnabled
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
@@ -72,6 +76,15 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func updateUIView(_ tableView: UITableView, context: Context) {
+      //  tableView.tableHeaderView?.frame.size.height = inputViewHeight
+//        print(Unmanaged.passUnretained(tableView.tableHeaderView ?? UIView()).toOpaque())
+
+        if !isScrollEnabled {
+            DispatchQueue.main.async {
+                tableContentHeight = tableView.contentSize.height
+            }
+        }
+
         if context.coordinator.sections == sections {
             return
         }
@@ -162,6 +175,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     }
                     tableView.endUpdates()
 
+                    if !isScrollEnabled {
+                        tableContentHeight = tableView.contentSize.height
+                    }
+
                     updateSemaphore.signal()
                 }
             } else {
@@ -184,21 +201,22 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     func applyOperation(_ operation: Operation, tableView: UITableView) {
+        let animation: UITableView.RowAnimation = type == .chat ? .top : .top
         switch operation {
         case .deleteSection(let section):
-            tableView.deleteSections([section], with: .top)
+            tableView.deleteSections([section], with: animation)
         case .insertSection(let section):
-            tableView.insertSections([section], with: .top)
+            tableView.insertSections([section], with: animation)
 
         case .delete(let section, let row):
-            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: .top)
+            tableView.deleteRows(at: [IndexPath(row: row, section: section)], with: animation)
         case .insert(let section, let row):
-            tableView.insertRows(at: [IndexPath(row: row, section: section)], with: .top)
+            tableView.insertRows(at: [IndexPath(row: row, section: section)], with: animation)
         case .edit(let section, let row):
             tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
         case .swap(let section, let rowFrom, let rowTo):
-            tableView.deleteRows(at: [IndexPath(row: rowFrom, section: section)], with: .top)
-            tableView.insertRows(at: [IndexPath(row: rowTo, section: section)], with: .top)
+            tableView.deleteRows(at: [IndexPath(row: rowFrom, section: section)], with: animation)
+            tableView.insertRows(at: [IndexPath(row: rowTo, section: section)], with: animation)
         }
     }
 
@@ -417,10 +435,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             return tableViewCell
         }
 
-        func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            let row = sections[indexPath.section].rows[indexPath.row]
-            paginationState.handle(row.message, ids: ids)
-        }
+//        func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//            let row = sections[indexPath.section].rows[indexPath.row]
+//            paginationState.handle(row.message, ids: ids)
+//        }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             isScrolledToBottom = scrollView.contentOffset.y <= 0

@@ -7,7 +7,8 @@ import Combine
 import ExyteMediaPicker
 
 final class InputViewModel: ObservableObject {
-    
+
+    @Published var text = ""
     @Published var attachments = InputViewAttachments()
     @Published var state: InputViewState = .empty
 
@@ -35,6 +36,11 @@ final class InputViewModel: ObservableObject {
 
     func reset() {
         DispatchQueue.main.async { [weak self] in
+//            self?.attachments.text = ""
+//            self?.attachments.recording = nil
+//            self?.attachments.medias = []
+//            self?.attachments.replyMessage = nil
+            self?.text = ""
             self?.attachments = InputViewAttachments()
             self?.showPicker = false
             self?.state = .empty
@@ -121,9 +127,9 @@ private extension InputViewModel {
     func validateDraft() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            if !self.attachments.text.isEmpty || !self.attachments.medias.isEmpty {
+            if !self.text.isEmpty || !self.attachments.medias.isEmpty {
                 self.state = .hasTextOrMedia
-            } else if self.attachments.text.isEmpty,
+            } else if self.text.isEmpty,
                       self.attachments.medias.isEmpty,
                       self.attachments.recording == nil {
                 self.state = .empty
@@ -192,7 +198,7 @@ private extension InputViewModel {
         return mapAttachmentsForSend()
             .compactMap { [attachments] _ in
                 DraftMessage(
-                    text: attachments.text,
+                    text: self.text,
                     medias: attachments.medias,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,

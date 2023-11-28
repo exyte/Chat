@@ -60,6 +60,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     var type: ChatType = .chat
     var showDateHeaders: Bool = true
+    var isScrollEnabled: Bool = false
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
@@ -83,6 +84,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @State private var needsScrollView = false
     @State private var readyToShowScrollView = false
     @State private var menuButtonsSize: CGSize = .zero
+    @State private var tableContentHeight: CGFloat = 0
+    @State private var inputViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
     @State private var menuCellPosition: CGPoint = .zero
     @State private var menuBgOpacity: CGFloat = 0
@@ -128,9 +131,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             case .comments:
                 inputView
                 list
+                    .ignoresSafeArea()
             }
-
         }
+        .ignoresSafeArea()
         .background(theme.colors.mainBackground)
         .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
             let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
@@ -186,16 +190,20 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         UIList(viewModel: viewModel,
                paginationState: paginationState,
                isScrolledToBottom: $isScrolledToBottom,
-               shouldScrollToTop: $shouldScrollToTop,
-               messageBuilder: messageBuilder, 
+               shouldScrollToTop: $shouldScrollToTop, 
+               tableContentHeight: $tableContentHeight,
+               messageBuilder: messageBuilder,
+               inputView: inputView,
                type: type,
                showDateHeaders: showDateHeaders,
+               isScrollEnabled: isScrollEnabled,
                avatarSize: avatarSize,
                tapAvatarClosure: tapAvatarClosure,
                messageUseMarkdown: messageUseMarkdown,
                sections: sections,
                ids: ids
         )
+        .frame(height: tableContentHeight)
         .onStatusBarTap {
             shouldScrollToTop()
         }
@@ -244,8 +252,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             viewModel.didSendMessage = didSendMessage
             inputViewModel.didSendMessage = { value in
                 didSendMessage(value)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                if type == .chat {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                    }
                 }
             }
         }
@@ -254,7 +264,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var inputView: some View {
         Group {
             if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
+                inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
                     globalFocusState.focus = nil
                 }
             } else {
@@ -266,6 +276,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 )
             }
         }
+        .onChange(of: inputViewModel.text) { a in
+            print(a)
+        }
+        .sizeGetter($inputViewSize)
         .environmentObject(globalFocusState)
         .onAppear(perform: inputViewModel.onStart)
         .onDisappear(perform: inputViewModel.onStop)
@@ -400,9 +414,15 @@ public extension ChatView {
         return view
     }
 
-    func showDateHeaders(showDateHeaders: Bool) -> ChatView {
+    func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
         var view = self
         view.showDateHeaders = showDateHeaders
+        return view
+    }
+
+    func isScrollEnabled(_ isScrollEnabled: Bool) -> ChatView {
+        var view = self
+        view.isScrollEnabled = isScrollEnabled
         return view
     }
 

@@ -102,7 +102,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var inputView: some View {
         Group {
             if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction()) {
+                inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction()) {
                     globalFocusState.focus = nil
                 }
             } else {

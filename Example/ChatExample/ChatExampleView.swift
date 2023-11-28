@@ -21,6 +21,9 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
         }
+        .chatType(.comments)
+        .showDateHeaders(showDateHeaders: false)
+        
 //        messageBuilder: { message, _, _ in
 //            Text(message.text)
 //                .background(Color.green)

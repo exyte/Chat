@@ -59,7 +59,7 @@ public enum InputViewState {
 }
 
 public struct InputViewAttachments {
-    public var text: String = ""
+   // public var text: String = ""
     public var medias: [Media] = []
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
@@ -150,7 +150,7 @@ struct InputView: View {
             case .isRecordingTap:
                 recordingInProgress
             default:
-                TextInputView(text: $viewModel.attachments.text, inputFieldId: inputFieldId, style: style)
+                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style)
             }
         }
         .frame(minHeight: 48)
