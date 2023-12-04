@@ -210,11 +210,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                         ScrollView {
                             messageMenu(row)
                         }
-						.introspect(.scrollView, on: .iOS(.v16, .v17), customize: { scrollView in
-							DispatchQueue.main.async {
-								self.menuScrollView = scrollView
-							}
-						})
+                        .introspect(.scrollView, on: .iOS(.v16, .v17)) { scrollView in
+                            DispatchQueue.main.async {
+                                self.menuScrollView = scrollView
+                            }
+                        }
                         .opacity(readyToShowScrollView ? 1 : 0)
                     }
                     if !needsScrollView || !readyToShowScrollView {
