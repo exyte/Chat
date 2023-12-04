@@ -9,7 +9,7 @@ import UIKit
 public final class KeyboardState: ObservableObject {
     @Published private(set) public var isShown: Bool = false
 
-    private var subscribtions = Set<AnyCancellable>()
+    private var subscriptions = Set<AnyCancellable>()
 
     init() {
         subscribeKeyboardNotifications()
@@ -29,6 +29,6 @@ private extension KeyboardState {
         )
         .receive(on: RunLoop.main)
         .assign(to: \.isShown, on: self)
-        .store(in: &subscribtions)
+        .store(in: &subscriptions)
     }
 }

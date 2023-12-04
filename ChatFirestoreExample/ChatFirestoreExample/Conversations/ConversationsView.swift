@@ -58,10 +58,10 @@ struct ConversationsView: View {
                             HStack(spacing: 0) {
                                 if conversation.isGroup {
                                     Text("\(latest.senderName): ")
-                                        .font(15, .exampleTetriaryText)
+                                        .font(15, .exampleTertiaryText)
                                 } else if latest.isMyMessage {
                                     Text("You: ")
-                                        .font(15, .exampleTetriaryText)
+                                        .font(15, .exampleTertiaryText)
                                 }
 
                                 HStack(spacing: 4) {
@@ -76,9 +76,9 @@ struct ConversationsView: View {
                                     }
                                     if let date = latest.createdAt?.timeAgoFormat() {
                                         Text("·")
-                                            .font(13, .exampleTetriaryText)
+                                            .font(13, .exampleTertiaryText)
                                         Text(date)
-                                            .font(13, .exampleTetriaryText)
+                                            .font(13, .exampleTertiaryText)
                                     }
                                 }
                             }

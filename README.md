@@ -135,6 +135,10 @@ This library allows to send the following content in messages in any combination
 
 ### Modifiers
 If you are not using your own `messageBuilder`:   
+`type` - type of chat, available options:      
+    - chat: input view and the latest message at the bottom      
+    - comments: input view and the latest message on top    
+`showDateHeaders` - show section headers with dates between days, default is `true`    
 `avatarSize` - the default avatar is a circle, you can specify its diameter here   
 `tapAvatarClosure` - closure to call on avatar tap   
 `messageUseMarkdown` - whether the default message cell uses markdown    

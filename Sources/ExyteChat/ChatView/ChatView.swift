@@ -12,6 +12,11 @@ import ExyteMediaPicker
 
 public typealias MediaPickerParameters = SelectionParamsHolder
 
+public enum ChatType {
+    case chat // input view and the latest message at the bottom
+    case comments // input view and the latest message on top
+}
+
 public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     /// To build a custom message view use the following parameters passed by this closure:
@@ -39,7 +44,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     // MARK: - Parameters
 
-    let didSendMessage: (DraftMessage) -> Void
+    private let sections: [MessagesSection]
+    private let ids: [String]
+    private let didSendMessage: (DraftMessage) -> Void
 
     // MARK: - View builders
 
@@ -51,15 +58,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     // MARK: - Customization
 
+    var type: ChatType = .chat
+    var showDateHeaders: Bool = true
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
-
-    private let sections: [MessagesSection]
-    private let ids: [String]
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -100,38 +106,30 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 waitingForNetwork
             }
 
-            ZStack(alignment: .bottomTrailing) {
+            switch type {
+            case .chat:
+                ZStack(alignment: .bottomTrailing) {
+                    list
+
+                    if !isScrolledToBottom {
+                        Button {
+                            NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                        } label: {
+                            theme.images.scrollToBottom
+                                .frame(width: 40, height: 40)
+                                .circleBackground(theme.colors.friendMessage)
+                        }
+                        .padding(8)
+                    }
+                }
+
+                inputView
+
+            case .comments:
+                inputView
                 list
-
-                if !isScrolledToBottom {
-                    Button {
-                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
-                    } label: {
-                        theme.images.scrollToBottom
-                            .frame(width: 40, height: 40)
-                            .circleBackground(theme.colors.friendMessage)
-                    }
-                    .padding(8)
-                }
             }
 
-            Group {
-                if let inputViewBuilder = inputViewBuilder {
-                    inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
-                        globalFocusState.focus = nil
-                    }
-                } else {
-                    InputView(
-                        viewModel: inputViewModel,
-                        inputFieldId: inputFieldId,
-                        style: .message,
-                        messageUseMarkdown: messageUseMarkdown
-                    )
-                }
-            }
-            .environmentObject(globalFocusState)
-            .onAppear(perform: inputViewModel.onStart)
-            .onDisappear(perform: inputViewModel.onStop)
         }
         .background(theme.colors.mainBackground)
         .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
@@ -189,7 +187,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                paginationState: paginationState,
                isScrolledToBottom: $isScrolledToBottom,
                shouldScrollToTop: $shouldScrollToTop,
-               messageBuilder: messageBuilder,
+               messageBuilder: messageBuilder, 
+               type: type,
+               showDateHeaders: showDateHeaders,
                avatarSize: avatarSize,
                tapAvatarClosure: tapAvatarClosure,
                messageUseMarkdown: messageUseMarkdown,
@@ -251,6 +251,26 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         }
     }
 
+    var inputView: some View {
+        Group {
+            if let inputViewBuilder = inputViewBuilder {
+                inputViewBuilder($inputViewModel.attachments.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
+                    globalFocusState.focus = nil
+                }
+            } else {
+                InputView(
+                    viewModel: inputViewModel,
+                    inputFieldId: inputFieldId,
+                    style: .message,
+                    messageUseMarkdown: messageUseMarkdown
+                )
+            }
+        }
+        .environmentObject(globalFocusState)
+        .onAppear(perform: inputViewModel.onStart)
+        .onDisappear(perform: inputViewModel.onStop)
+    }
+
     func messageMenu(_ row: MessageRow) -> some View {
         MessageMenu(
             isShowingMenu: $isShowingMenu,
@@ -258,7 +278,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true)
                     .onTapGesture {
                         hideMessageMenu()
                     }
@@ -373,6 +393,18 @@ private extension ChatView {
 }
 
 public extension ChatView {
+
+    func chatType(_ type: ChatType) -> ChatView {
+        var view = self
+        view.type = type
+        return view
+    }
+
+    func showDateHeaders(showDateHeaders: Bool) -> ChatView {
+        var view = self
+        view.showDateHeaders = showDateHeaders
+        return view
+    }
 
     func avatarSize(avatarSize: CGFloat) -> ChatView {
         var view = self
