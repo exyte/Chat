@@ -9,7 +9,7 @@ import SwiftUI
 import FloatingButton
 import enum FloatingButton.Alignment
 
-enum MessageMenuAction {
+public enum MessageMenuAction {
     case reply
 }
 

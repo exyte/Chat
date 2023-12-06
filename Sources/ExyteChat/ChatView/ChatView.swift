@@ -17,13 +17,20 @@ public enum ChatType {
     case comments // input view and the latest message on top
 }
 
-public struct ChatView<MessageContent: View, InputViewContent: View>: View {
+public enum ReplyMode {
+    case quote // when replying to message A, new message will appear as the newest message, quoting message A in its body
+    case answer // when replying to message A, new message with appear direclty below message A as a separate cell without duplication message A in its body
+}
+
+public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyContent: View>: View {
 
     /// To build a custom message view use the following parameters passed by this closure:
     /// - message containing user, attachments, etc.
     /// - position of message in its continuous group of messages from the same user
+    /// - position of message in its continuous group of comments (only works for .comments ReplyMode, nil for .quote mode)
+    /// - closure to pass user interaction, .reply for example
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
-    public typealias MessageBuilderClosure = ((Message, PositionInGroup, @escaping (Attachment) -> Void) -> MessageContent)
+    public typealias MessageBuilderClosure = ((Message, PositionInGroup, PositionInCommentsGroup?, @escaping (Message, MessageMenuAction) -> Void, @escaping (Attachment) -> Void) -> MessageContent)
 
     /// To build a custom input view use the following parameters passed by this closure:
     /// - binding to the text in input view
@@ -32,8 +39,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     /// - .message for main input view mode and .signature for input view in media picker mode
     /// - closure to pass user interaction, .recordAudioTap for example
     /// - dismiss keyboard closure
-    public typealias InputViewBuilderClosure = ((
-        Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void, ()->()) -> InputViewContent)
+    public typealias InputViewBuilderClosure = (Binding<String>, InputViewAttachments, InputViewState, InputViewStyle, @escaping (InputViewAction) -> Void, ()->()) -> InputViewContent
+
+    /// To place input view and main chat view (e.g. in your own ScrollView)
+    /// You can still pass your own builders or just place built-in ones
+    /// - main chat list of messages
+    /// - input view
+    public typealias MainBodyBuilderClosure = (AnyView, AnyView) -> MainBodyContent
 
     /// User and MessageId
     public typealias TapAvatarClosure = (User, String) -> ()
@@ -44,9 +56,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     // MARK: - Parameters
 
-    private let sections: [MessagesSection]
-    private let ids: [String]
-    private let didSendMessage: (DraftMessage) -> Void
+    let type: ChatType
+    let sections: [MessagesSection]
+    let ids: [String]
+    let didSendMessage: (DraftMessage) -> Void
 
     // MARK: - View builders
 
@@ -56,9 +69,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     /// provide custom input view builder
     var inputViewBuilder: InputViewBuilderClosure? = nil
 
+    /// organize main chat component using this closure
+    var mainBodyBuilder: MainBodyBuilderClosure? = nil
+
     // MARK: - Customization
 
-    var type: ChatType = .chat
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = false
     var avatarSize: CGFloat = 32
@@ -74,8 +89,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @StateObject private var paginationState = PaginationState()
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
-
-    @State private var inputFieldId = UUID()
 
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
@@ -93,48 +106,29 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @State private var menuScrollView: UIScrollView?
 
     public init(messages: [Message],
+                chatType: ChatType = .chat,
+                replyMode: ReplyMode = .quote,
                 didSendMessage: @escaping (DraftMessage) -> Void,
                 messageBuilder: @escaping MessageBuilderClosure,
-                inputViewBuilder: @escaping InputViewBuilderClosure) {
+                inputViewBuilder: @escaping InputViewBuilderClosure,
+                mainBodyBuilder: @escaping MainBodyBuilderClosure) {
+        self.type = chatType
         self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages)
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
+        self.mainBodyBuilder = mainBodyBuilder
     }
 
     public var body: some View {
-        VStack {
-            if !networkMonitor.isConnected {
-                waitingForNetwork
-            }
-
-            switch type {
-            case .chat:
-                ZStack(alignment: .bottomTrailing) {
-                    list
-
-                    if !isScrolledToBottom {
-                        Button {
-                            NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
-                        } label: {
-                            theme.images.scrollToBottom
-                                .frame(width: 40, height: 40)
-                                .circleBackground(theme.colors.friendMessage)
-                        }
-                        .padding(8)
-                    }
-                }
-
-                inputView
-
-            case .comments:
-                inputView
-                list
-                    .ignoresSafeArea()
+        Group {
+            if let mainBodyBuilder {
+                mainBodyBuilder(AnyView(list), AnyView(inputView))
+            } else {
+                defaultBody
             }
         }
-        .ignoresSafeArea()
         .background(theme.colors.mainBackground)
         .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
             let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
@@ -166,6 +160,40 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         .environmentObject(keyboardState)
     }
 
+    var defaultBody: some View {
+        VStack {
+            if !networkMonitor.isConnected {
+                waitingForNetwork
+            }
+
+            switch type {
+            case .chat:
+                ZStack(alignment: .bottomTrailing) {
+                    list
+
+                    if !isScrolledToBottom {
+                        Button {
+                            NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                        } label: {
+                            theme.images.scrollToBottom
+                                .frame(width: 40, height: 40)
+                                .circleBackground(theme.colors.friendMessage)
+                        }
+                        .padding(8)
+                    }
+                }
+
+                inputView
+
+            case .comments:
+                inputView
+                list
+                    .ignoresSafeArea()
+            }
+        }
+        .ignoresSafeArea()
+    }
+
     var waitingForNetwork: some View {
         VStack {
             Rectangle()
@@ -188,6 +216,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     @ViewBuilder
     var list: some View {
         UIList(viewModel: viewModel,
+               inputViewModel: inputViewModel,
                paginationState: paginationState,
                isScrolledToBottom: $isScrolledToBottom,
                shouldScrollToTop: $shouldScrollToTop, 
@@ -250,6 +279,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
         }
         .onAppear {
             viewModel.didSendMessage = didSendMessage
+            viewModel.inputViewModel = inputViewModel
+            viewModel.globalFocusState = globalFocusState
+
             inputViewModel.didSendMessage = { value in
                 didSendMessage(value)
                 if type == .chat {
@@ -270,14 +302,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             } else {
                 InputView(
                     viewModel: inputViewModel,
-                    inputFieldId: inputFieldId,
+                    inputFieldId: viewModel.inputFieldId,
                     style: .message,
                     messageUseMarkdown: messageUseMarkdown
                 )
             }
-        }
-        .onChange(of: inputViewModel.text) { a in
-            print(a)
         }
         .sizeGetter($inputViewSize)
         .environmentObject(globalFocusState)
@@ -297,7 +326,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                         hideMessageMenu()
                     }
             } onAction: { action in
-                onMessageMenuAction(row: row, action: action)
+                hideMessageMenu()
+                viewModel.messageMenuActionInternal(message: row.message, action: action)
             }
             .frame(height: menuButtonsSize.height + (cellFrames[row.id]?.height ?? 0), alignment: .top)
             .opacity(menuCellOpacity)
@@ -351,68 +381,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             readyToShowScrollView = false
         }
     }
-
-    func onMessageMenuAction(row: MessageRow, action: MessageMenuAction) {
-        hideMessageMenu()
-
-        switch action {
-        case .reply:
-            inputViewModel.attachments.replyMessage = row.message.toReplyMessage()
-            globalFocusState.focus = .uuid(inputFieldId)
-        }
-    }
-}
-
-private extension ChatView {
-    static func mapMessages(_ messages: [Message]) -> [MessagesSection] {
-        let dates = Set(messages.map({ $0.createdAt.startOfDay() }))
-            .sorted()
-            .reversed()
-        var result: [MessagesSection] = []
-
-        for date in dates {
-            let section = MessagesSection(
-                date: date,
-                rows: wrapMessages(messages.filter({ $0.createdAt.isSameDay(date) }))
-            )
-            result.append(section)
-        }
-
-        return result
-    }
-
-    static func wrapMessages(_ messages: [Message]) -> [MessageRow] {
-        messages
-            .enumerated()
-            .map {
-                let nextMessageExists = messages[safe: $0.offset + 1] != nil
-                let nextMessageIsSameUser = messages[safe: $0.offset + 1]?.user.id == $0.element.user.id
-                let prevMessageIsSameUser = messages[safe: $0.offset - 1]?.user.id == $0.element.user.id
-
-                let position: PositionInGroup
-                if nextMessageExists, nextMessageIsSameUser, prevMessageIsSameUser {
-                    position = .middle
-                } else if !nextMessageExists || !nextMessageIsSameUser, !prevMessageIsSameUser {
-                    position = .single
-                } else if nextMessageExists, nextMessageIsSameUser {
-                    position = .first
-                } else {
-                    position = .last
-                }
-
-                return MessageRow(message: $0.element, positionInGroup: position)
-            }
-            .reversed()
-    }
 }
 
 public extension ChatView {
-
-    func chatType(_ type: ChatType) -> ChatView {
-        var view = self
-        view.type = type
-        return view
-    }
 
     func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
         var view = self
@@ -476,38 +447,3 @@ public extension ChatView {
         return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
     }
 }
-
-public extension ChatView where MessageContent == EmptyView {
-
-    init(messages: [Message],
-         didSendMessage: @escaping (DraftMessage) -> Void,
-         inputViewBuilder: @escaping InputViewBuilderClosure) {
-        self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages)
-        self.ids = messages.map { $0.id }
-        self.inputViewBuilder = inputViewBuilder
-    }
-}
-
-public extension ChatView where InputViewContent == EmptyView {
-
-    init(messages: [Message],
-         didSendMessage: @escaping (DraftMessage) -> Void,
-         messageBuilder: @escaping MessageBuilderClosure) {
-        self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages)
-        self.ids = messages.map { $0.id }
-        self.messageBuilder = messageBuilder
-    }
-}
-
-public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView {
-
-    init(messages: [Message],
-         didSendMessage: @escaping (DraftMessage) -> Void) {
-        self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages)
-        self.ids = messages.map { $0.id }
-    }
-}
-

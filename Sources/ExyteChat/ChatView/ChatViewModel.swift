@@ -14,8 +14,12 @@ final class ChatViewModel: ObservableObject {
 
     @Published var messageMenuRow: MessageRow?
 
-    public var didSendMessage: (DraftMessage) -> Void = {_ in}
-    
+    let inputFieldId = UUID()
+
+    var didSendMessage: (DraftMessage) -> Void = {_ in}
+    var inputViewModel: InputViewModel?
+    var globalFocusState: GlobalFocusState?
+
     func presentAttachmentFullScreen(_ attachment: Attachment) {
         fullscreenAttachmentItem = attachment
         fullscreenAttachmentPresented = true
@@ -29,4 +33,19 @@ final class ChatViewModel: ObservableObject {
     func sendMessage(_ message: DraftMessage) {
         didSendMessage(message)
     }
+
+    func messageMenuAction() -> (Message, MessageMenuAction) -> Void {
+        { [weak self] in
+            self?.messageMenuActionInternal(message: $0, action: $1)
+        }
+    }
+
+    func messageMenuActionInternal(message: Message, action: MessageMenuAction) {
+        switch action {
+        case .reply:
+            inputViewModel?.attachments.replyMessage = message.toReplyMessage()
+            globalFocusState?.focus = .uuid(inputFieldId)
+        }
+    }
+
 }

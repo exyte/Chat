@@ -183,7 +183,6 @@ class ConversationViewModel: ObservableObject {
                 lock.withLock {
                     if let index = messages.lastIndex(where: { $0.id == id }) {
                         messages[index].status = .error(draft)
-                        print("alisaM error ", messages)
                     }
                 }
             }

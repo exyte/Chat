@@ -54,6 +54,8 @@ public struct Message: Identifiable, Hashable {
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
 
+    public var triggerRedraw: UUID?
+
     public init(id: String,
                 user: User,
                 status: Status? = nil,

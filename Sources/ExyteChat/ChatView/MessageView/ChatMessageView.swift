@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ChatMessageView<MessageContent: View>: View {
 
-    typealias MessageBuilderClosure = ChatView<MessageContent, EmptyView>.MessageBuilderClosure
+    typealias MessageBuilderClosure = ChatView<MessageContent, EmptyView, EmptyView>.MessageBuilderClosure
 
     @ObservedObject var viewModel: ChatViewModel
 
@@ -25,7 +25,7 @@ struct ChatMessageView<MessageContent: View>: View {
     var body: some View {
         Group {
             if let messageBuilder = messageBuilder {
-                messageBuilder(row.message, row.positionInGroup) { attachment in
+                messageBuilder(row.message, row.positionInGroup, row.positionInCommentsGroup, viewModel.messageMenuAction()) { attachment in
                     self.viewModel.presentAttachmentFullScreen(attachment)
                 }
             } else {
