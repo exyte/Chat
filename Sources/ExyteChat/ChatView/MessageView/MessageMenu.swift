@@ -30,7 +30,7 @@ struct MessageMenu<MainButton: View>: View {
             menuButton(title: "Reply", icon: theme.images.messageMenu.reply, action: .reply)
         ], isOpen: $isShowingMenu)
         .straight()
-        .mainZStackAlignment(.top)
+        //.mainZStackAlignment(.top)
         .initialOpacity(0)
         .direction(.bottom)
         .alignment(alignment)

@@ -62,6 +62,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var showDateHeaders: Bool = true
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
+    var showMessageMenuOnLongPress: Bool = true
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
@@ -191,6 +192,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                type: type,
                showDateHeaders: showDateHeaders,
                avatarSize: avatarSize,
+               showMessageMenuOnLongPress: showMessageMenuOnLongPress,
                tapAvatarClosure: tapAvatarClosure,
                messageUseMarkdown: messageUseMarkdown,
                sections: sections,
@@ -415,6 +417,12 @@ public extension ChatView {
     func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
+        return view
+    }
+
+    func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
+        var view = self
+        view.showMessageMenuOnLongPress = show
         return view
     }
 
