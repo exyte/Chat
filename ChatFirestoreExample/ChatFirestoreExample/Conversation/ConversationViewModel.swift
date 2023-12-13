@@ -137,7 +137,9 @@ class ConversationViewModel: ObservableObject {
                             recording: convertRecording(firestoreMessage.recording),
                             replyMessage: replyMessage)
                     } ?? []
+
                 self.lock.withLock {
+                    // insert messages which are still sending
                     let localMessages = self.messages
                         .filter { $0.status != .sent }
                         .filter { localMessage in

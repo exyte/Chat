@@ -46,11 +46,11 @@ struct SizeGetter: ViewModifier {
 
 extension View {
 
-    public func frameGetter(_ frame: Binding<CGRect>) -> some View {
+    func frameGetter(_ frame: Binding<CGRect>) -> some View {
         modifier(FrameGetter(frame: frame))
     }
 
-    public func sizeGetter(_ size: Binding<CGSize>) -> some View {
+    func sizeGetter(_ size: Binding<CGSize>) -> some View {
         modifier(SizeGetter(size: size))
     }
 }
