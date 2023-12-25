@@ -44,7 +44,7 @@ class AuthViewModel: ObservableObject {
                 .collection(Collection.users).addDocument(data: [
                     "deviceId": SessionManager.shared.deviceId,
                     "nickname": nickname,
-                    "avatarURL": avatarURL?.absoluteString
+                    "avatarURL": avatarURL?.absoluteString as Any
                 ]) { [weak self] err in
                     if let err = err {
                         print("Error adding document: \(err)")

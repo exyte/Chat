@@ -353,6 +353,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
 private extension ChatView {
     static func mapMessages(_ messages: [Message]) -> [MessagesSection] {
+        guard messages.hasUniqueIDs() else {
+            fatalError("Messages can not have duplicate ids, please make sure every message gets a unique id")
+        }
         let dates = Set(messages.map({ $0.createdAt.startOfDay() }))
             .sorted()
             .reversed()

@@ -246,8 +246,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             var newRows = appliedDeletesSwapsAndEdits[newIndex].rows
             let oldRowIDs = Set(oldRows.map { $0.id })
             let newRowIDs = Set(newRows.map { $0.id })
-            let rowIDsToDelete = oldRowIDs.symmetricDifference(newRowIDs)
-            let rowIDsToInsert = newRowIDs.symmetricDifference(oldRowIDs) // TODO is order important?
+            let rowIDsToDelete = oldRowIDs.subtracting(newRowIDs)
+            let rowIDsToInsert = newRowIDs.subtracting(oldRowIDs) // TODO is order important?
             for rowId in rowIDsToDelete {
                 if let index = oldRows.firstIndex(where: { $0.id == rowId }) {
                     oldRows.remove(at: index)
