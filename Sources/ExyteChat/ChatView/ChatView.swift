@@ -7,7 +7,7 @@
 
 import SwiftUI
 import FloatingButton
-import Introspect
+import SwiftUIIntrospect
 import ExyteMediaPicker
 
 public typealias MediaPickerParameters = SelectionParamsHolder
@@ -78,6 +78,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     var isScrollEnabled: Bool = false
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
+    var showMessageMenuOnLongPress: Bool = true
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
@@ -227,6 +228,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                showDateHeaders: showDateHeaders,
                isScrollEnabled: isScrollEnabled,
                avatarSize: avatarSize,
+               showMessageMenuOnLongPress: showMessageMenuOnLongPress,
                tapAvatarClosure: tapAvatarClosure,
                messageUseMarkdown: messageUseMarkdown,
                sections: sections,
@@ -247,7 +249,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                         ScrollView {
                             messageMenu(row)
                         }
-                        .introspectScrollView { scrollView in
+                        .introspect(.scrollView, on: .iOS(.v16, .v17)) { scrollView in
                             DispatchQueue.main.async {
                                 self.menuScrollView = scrollView
                             }
@@ -406,6 +408,12 @@ public extension ChatView {
     func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
+        return view
+    }
+
+    func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
+        var view = self
+        view.showMessageMenuOnLongPress = show
         return view
     }
 
