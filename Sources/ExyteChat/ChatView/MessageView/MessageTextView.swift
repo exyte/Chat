@@ -21,7 +21,15 @@ struct MessageTextView: View {
     @ViewBuilder
     private func textView(_ text: String) -> some View {
         if messageUseMarkdown,
-           let attributed = try? AttributedString(markdown: text) {
+           let attributed = try? AttributedString(
+               markdown: text,
+               options: AttributedString.MarkdownParsingOptions(
+                   allowsExtendedAttributes: false,
+                   interpretedSyntax: .inlineOnlyPreservingWhitespace,
+                   failurePolicy: .returnPartiallyParsedIfPossible,
+                   languageCode: nil
+               )
+           ) {
             Text(attributed)
         } else {
             Text(text)

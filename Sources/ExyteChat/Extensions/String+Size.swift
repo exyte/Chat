@@ -17,7 +17,13 @@ extension String {
     }
 
     func toAttrString(font: UIFont, messageUseMarkdown: Bool) -> NSAttributedString {
-        var str = messageUseMarkdown ? (try? AttributedString(markdown: self)) ?? AttributedString(self) : AttributedString(self)
+        let markdownOptions = AttributedString.MarkdownParsingOptions(
+            allowsExtendedAttributes: false,
+            interpretedSyntax: .inlineOnlyPreservingWhitespace,
+            failurePolicy: .returnPartiallyParsedIfPossible,
+            languageCode: nil
+        )
+        var str = messageUseMarkdown ? (try? AttributedString(markdown: self, options: markdownOptions)) ?? AttributedString(self) : AttributedString(self)
         str.setAttributes(AttributeContainer([.font: font]))
         return NSAttributedString(str)
     }
