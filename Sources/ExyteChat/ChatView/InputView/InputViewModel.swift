@@ -36,7 +36,6 @@ final class InputViewModel: ObservableObject {
 
     func reset() {
         DispatchQueue.main.async { [weak self] in
-//            self?.attachments.text = ""
 //            self?.attachments.recording = nil
 //            self?.attachments.medias = []
 //            self?.attachments.replyMessage = nil
@@ -139,6 +138,11 @@ private extension InputViewModel {
 
     func subscribeValidation() {
         $attachments.sink { [weak self] _ in
+            self?.validateDraft()
+        }
+        .store(in: &subscriptions)
+
+        $text.sink { [weak self] _ in
             self?.validateDraft()
         }
         .store(in: &subscriptions)

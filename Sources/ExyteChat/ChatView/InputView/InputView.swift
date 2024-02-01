@@ -59,7 +59,6 @@ public enum InputViewState {
 }
 
 public struct InputViewAttachments {
-   // public var text: String = ""
     public var medias: [Media] = []
     public var recording: Recording?
     public var replyMessage: ReplyMessage?

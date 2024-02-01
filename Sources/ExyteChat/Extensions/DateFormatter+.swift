@@ -14,6 +14,16 @@ extension DateFormatter {
         return formatter
     }()
 
+    static let relativeDateFormatter = {
+        let relativeDateFormatter = DateFormatter()
+        relativeDateFormatter.timeStyle = .none
+        relativeDateFormatter.dateStyle = .full
+        relativeDateFormatter.locale = Locale(identifier: "en_US")
+        relativeDateFormatter.doesRelativeDateFormatting = true
+
+        return relativeDateFormatter
+    }()
+
     static func timeString(_ seconds: Int) -> String {
         let hour = Int(seconds) / 3600
         let minute = Int(seconds) / 60 % 60

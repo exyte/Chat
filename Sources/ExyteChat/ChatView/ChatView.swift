@@ -75,7 +75,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     // MARK: - Customization
 
     var showDateHeaders: Bool = true
-    var isScrollEnabled: Bool = false
+    var isScrollEnabled: Bool = true
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var showMessageMenuOnLongPress: Bool = true
@@ -192,7 +192,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                     .ignoresSafeArea()
             }
         }
-        .ignoresSafeArea()
     }
 
     var waitingForNetwork: some View {
@@ -234,7 +233,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                sections: sections,
                ids: ids
         )
-        .frame(height: tableContentHeight)
+        .applyIf(!isScrollEnabled) {
+            $0.frame(height: tableContentHeight)
+        }
         .onStatusBarTap {
             shouldScrollToTop()
         }
