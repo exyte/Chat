@@ -26,6 +26,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     @Binding var tableContentHeight: CGFloat
 
     var messageBuilder: MessageBuilderClosure?
+    var headerBuilder: ((Date)->AnyView)?
     var inputView: InputView
 
     let type: ChatType
@@ -326,7 +327,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
+        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, headerBuilder: headerBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -339,6 +340,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         @Binding var isScrolledToTop: Bool
 
         var messageBuilder: MessageBuilderClosure?
+        var headerBuilder: ((Date)->AnyView)?
 
         let chatTheme: ChatTheme
         let type: ChatType
@@ -352,13 +354,14 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
         let mainBackgroundColor: Color
 
-        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, paginationState: PaginationState, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
+        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, paginationState: PaginationState, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, headerBuilder: ((Date)->AnyView)?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
             self.paginationState = paginationState
             self._isScrolledToBottom = isScrolledToBottom
             self._isScrolledToTop = isScrolledToTop
             self.messageBuilder = messageBuilder
+            self.headerBuilder = headerBuilder
             self.chatTheme = chatTheme
             self.type = type
             self.showDateHeaders = showDateHeaders
@@ -394,6 +397,15 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func dateView(_ section: Int) -> UIView? {
+            if let headerBuilder {
+                let header = UIHostingController(rootView:
+                    headerBuilder(sections[section].date)
+                        .rotationEffect(Angle(degrees: (type == .chat ? 180 : 0)))
+                ).view
+                header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
+                return header
+            }
+
             let header = UIHostingController(rootView:
                 Text(sections[section].formattedDate)
                     .font(.system(size: 11))

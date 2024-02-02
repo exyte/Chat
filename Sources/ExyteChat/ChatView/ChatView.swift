@@ -72,6 +72,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     /// organize main chat component using this closure
     var mainBodyBuilder: MainBodyBuilderClosure? = nil
 
+    /// date section header builder
+    var headerBuilder: ((Date)->AnyView)?
+
     // MARK: - Customization
 
     var showDateHeaders: Bool = true
@@ -222,6 +225,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                shouldScrollToTop: $shouldScrollToTop, 
                tableContentHeight: $tableContentHeight,
                messageBuilder: messageBuilder,
+               headerBuilder: headerBuilder,
                inputView: inputView,
                type: type,
                showDateHeaders: showDateHeaders,
@@ -391,6 +395,14 @@ public extension ChatView {
     func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
         var view = self
         view.showDateHeaders = showDateHeaders
+        return view
+    }
+
+    func headerBuilder<V: View>(_ builder: @escaping (Date)->V) -> ChatView {
+        var view = self
+        view.headerBuilder = { date in
+            AnyView(builder(date))
+        }
         return view
     }
 
