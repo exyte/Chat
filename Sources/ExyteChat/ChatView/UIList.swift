@@ -19,7 +19,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
     @ObservedObject var viewModel: ChatViewModel
     @ObservedObject var inputViewModel: InputViewModel
-    @ObservedObject var paginationState: PaginationState
 
     @Binding var isScrolledToBottom: Bool
     @Binding var shouldScrollToTop: () -> ()
@@ -35,10 +34,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let avatarSize: CGFloat
     let showMessageMenuOnLongPress: Bool
     let tapAvatarClosure: ChatView.TapAvatarClosure?
+    let paginationHandler: PaginationHandler?
     let messageUseMarkdown: Bool
     let sections: [MessagesSection]
     let ids: [String]
 
+    @State private var targetNumberOfSections: Int?
     @State private var isScrolledToTop = false
 
     private let updatesQueue = DispatchQueue(label: "updatesQueue", qos: .utility)
@@ -96,6 +97,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 return
             }
 
+            if let lastSection = sections.last {
+                context.coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+            }
+
             let prevSections = context.coordinator.sections
             let (appliedDeletes, appliedDeletesSwapsAndEdits, deleteOperations, swapOperations, editOperations, insertOperations) = operationsSplit(oldSections: prevSections, newSections: sections)
 
@@ -107,10 +112,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             //print("whole appliedDeletesSwapsAndEdits:\n", formatSections(appliedDeletesSwapsAndEdits), "\n")
             //print("whole final sections:\n", formatSections(sections), "\n")
 
-            //print("operations delete:\n", deleteOperations)
-            //print("operations swap:\n", swapOperations)
-            //print("operations edit:\n", editOperations)
-            //print("operations insert:\n", insertOperations)
+            //print("operations delete:\n", deleteOperations.map { $0.description })
+            //print("operations swap:\n", swapOperations.map { $0.description })
+            //print("operations edit:\n", editOperations.map { $0.description })
+            //print("operations insert:\n", insertOperations.map { $0.description })
 
             DispatchQueue.main.async {
                 tableView.performBatchUpdates {
@@ -171,7 +176,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     // apply the rest of the changes to table's dataSource, i.e. inserts
                     //print("5 apply inserts")
                     context.coordinator.sections = sections
-                    context.coordinator.ids = ids
 
                     tableView.beginUpdates()
                     for operation in insertOperations {
@@ -186,7 +190,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     updateSemaphore.signal()
                 }
             } else {
-                context.coordinator.ids = ids
                 updateSemaphore.signal()
             }
         }
@@ -202,6 +205,23 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         case insert(Int, Int) // insert with animation
         case swap(Int, Int, Int) // delete first with animation, then insert it into new position with animation. do not do anything with the second for now
         case edit(Int, Int) // reload the element without animation
+
+        var description: String {
+            switch self {
+            case .deleteSection(let int):
+                return "deleteSection \(int)"
+            case .insertSection(let int):
+                return "insertSection \(int)"
+            case .delete(let int, let int2):
+                return "delete section \(int) row \(int2)"
+            case .insert(let int, let int2):
+                return "insert section \(int) row \(int2)"
+            case .swap(let int, let int2, let int3):
+                return "swap section \(int) rowFrom \(int2) rowTo \(int3)"
+            case .edit(let int, let int2):
+                return "edit section \(int) row \(int2)"
+            }
+        }
     }
 
     func applyOperation(_ operation: Operation, tableView: UITableView) {
@@ -265,10 +285,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
             var oldRows = appliedDeletes[oldIndex].rows
             var newRows = appliedDeletesSwapsAndEdits[newIndex].rows
-            let oldRowIDs = Set(oldRows.map { $0.id })
-            let newRowIDs = Set(newRows.map { $0.id })
-            let rowIDsToDelete = oldRowIDs.subtracting(newRowIDs)
-            let rowIDsToInsert = newRowIDs.subtracting(oldRowIDs) // TODO is order important?
+            let oldRowIDs = oldRows.map { $0.id }
+            let newRowIDs = newRows.map { $0.id }
+            let rowIDsToDelete = oldRowIDs.filter { !newRowIDs.contains($0) }.reversed()
+            let rowIDsToInsert = newRowIDs.filter { !oldRowIDs.contains($0) }
             for rowId in rowIDsToDelete {
                 if let index = oldRows.firstIndex(where: { $0.id == rowId }) {
                     oldRows.remove(at: index)
@@ -327,20 +347,19 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, paginationState: paginationState, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, headerBuilder: headerBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
+        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, headerBuilder: headerBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler, messageUseMarkdown: messageUseMarkdown, mainBackgroundColor: theme.colors.mainBackground, sections: sections)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
 
         @ObservedObject var viewModel: ChatViewModel
         @ObservedObject var inputViewModel: InputViewModel
-        @ObservedObject var paginationState: PaginationState
 
         @Binding var isScrolledToBottom: Bool
         @Binding var isScrolledToTop: Bool
 
-        var messageBuilder: MessageBuilderClosure?
-        var headerBuilder: ((Date)->AnyView)?
+        let messageBuilder: MessageBuilderClosure?
+        let headerBuilder: ((Date)->AnyView)?
 
         let chatTheme: ChatTheme
         let type: ChatType
@@ -348,16 +367,18 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let avatarSize: CGFloat
         let showMessageMenuOnLongPress: Bool
         let tapAvatarClosure: ChatView.TapAvatarClosure?
+        let paginationHandler: PaginationHandler?
         let messageUseMarkdown: Bool
-        var sections: [MessagesSection]
-        var ids: [String]
-
         let mainBackgroundColor: Color
 
-        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, paginationState: PaginationState, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, headerBuilder: ((Date)->AnyView)?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, messageUseMarkdown: Bool, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color) {
+        var sections: [MessagesSection]
+        /// call pagination handler when this row is reached
+        /// without this there is a bug: during new cells insertion willDisplay is called one extra time for the cell which used to be the last one while it is being updated (its position in group is changed from first to middle)
+        var paginationTargetIndexPath: IndexPath?
+
+        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, headerBuilder: ((Date)->AnyView)?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?, messageUseMarkdown: Bool, mainBackgroundColor: Color, sections: [MessagesSection]) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
-            self.paginationState = paginationState
             self._isScrolledToBottom = isScrolledToBottom
             self._isScrolledToTop = isScrolledToTop
             self.messageBuilder = messageBuilder
@@ -368,10 +389,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.avatarSize = avatarSize
             self.showMessageMenuOnLongPress = showMessageMenuOnLongPress
             self.tapAvatarClosure = tapAvatarClosure
+            self.paginationHandler = paginationHandler
             self.messageUseMarkdown = messageUseMarkdown
-            self.sections = sections
-            self.ids = ids
             self.mainBackgroundColor = mainBackgroundColor
+            self.sections = sections
         }
 
         func numberOfSections(in tableView: UITableView) -> Int {
@@ -458,8 +479,13 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            let row = sections[indexPath.section].rows[indexPath.row]
-            paginationState.handle(row.message, ids: ids)
+            guard let paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
+                return
+            }
+            let row = self.sections[indexPath.section].rows[indexPath.row]
+            Task.detached {
+                await paginationHandler.handleClosure(row.message)
+            }
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {

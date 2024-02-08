@@ -86,11 +86,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
+    var paginationHandler: PaginationHandler?
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
-    @StateObject private var paginationState = PaginationState()
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
 
@@ -220,7 +220,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     var list: some View {
         UIList(viewModel: viewModel,
                inputViewModel: inputViewModel,
-               paginationState: paginationState,
                isScrolledToBottom: $isScrolledToBottom,
                shouldScrollToTop: $shouldScrollToTop, 
                tableContentHeight: $tableContentHeight,
@@ -233,6 +232,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                avatarSize: avatarSize,
                showMessageMenuOnLongPress: showMessageMenuOnLongPress,
                tapAvatarClosure: tapAvatarClosure,
+               paginationHandler: paginationHandler,
                messageUseMarkdown: messageUseMarkdown,
                sections: sections,
                ids: ids
@@ -455,10 +455,10 @@ public extension ChatView {
         return view
     }
 
-    /// when user scrolls to `offset`-th meassage from the end, call the handler function, so user can load more messages
-    func enableLoadMore(offset: Int = 0, handler: @escaping ChatPaginationClosure) -> ChatView {
+    /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
+    func enableLoadMore(pageSize: Int, handler: @escaping ChatPaginationClosure) -> ChatView {
         var view = self
-        view._paginationState = StateObject(wrappedValue: PaginationState(onEvent: handler, offset: offset))
+        view.paginationHandler = PaginationHandler(handleClosure: handler, pageSize: pageSize)
         return view
     }
 

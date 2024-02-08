@@ -4,25 +4,18 @@
 
 import Foundation
 
-final class PaginationState: ObservableObject {
-    var onEvent: ChatPaginationClosure?
-    var offset: Int
+public typealias ChatPaginationClosure = (Message) async -> Void
 
-    var shouldHandlePagination: Bool {
-        onEvent != nil
+final class PaginationHandler: ObservableObject {
+    var handleClosure: ChatPaginationClosure
+    var pageSize: Int
+
+    init(handleClosure: @escaping ChatPaginationClosure, pageSize: Int) {
+        self.handleClosure = handleClosure
+        self.pageSize = pageSize
     }
 
-    init(onEvent: ChatPaginationClosure? = nil, offset: Int = 0) {
-        self.onEvent = onEvent
-        self.offset = offset
-    }
-
-    func handle(_ message: Message, ids: [String]) {
-        guard shouldHandlePagination else {
-            return
-        }
-        if ids.prefix(offset + 1).contains(message.id) {
-            onEvent?(message)
-        }
+    func handle(_ message: Message) async {
+        await handleClosure(message)
     }
 }
