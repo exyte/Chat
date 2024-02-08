@@ -39,7 +39,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let sections: [MessagesSection]
     let ids: [String]
 
-    @State private var targetNumberOfSections: Int?
     @State private var isScrolledToTop = false
 
     private let updatesQueue = DispatchQueue(label: "updatesQueue", qos: .utility)
