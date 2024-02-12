@@ -13,7 +13,7 @@ import ExyteMediaPicker
 public typealias MediaPickerParameters = SelectionParamsHolder
 
 public enum ChatType {
-    case chat // input view and the latest message at the bottom
+    case conversation // input view and the latest message at the bottom
     case comments // input view and the latest message on top
 }
 
@@ -110,7 +110,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     @State private var menuScrollView: UIScrollView?
 
     public init(messages: [Message],
-                chatType: ChatType = .chat,
+                chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
                 didSendMessage: @escaping (DraftMessage) -> Void,
                 messageBuilder: @escaping MessageBuilderClosure,
@@ -171,7 +171,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
             }
 
             switch type {
-            case .chat:
+            case .conversation:
                 ZStack(alignment: .bottomTrailing) {
                     list
 
@@ -291,7 +291,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
 
             inputViewModel.didSendMessage = { value in
                 didSendMessage(value)
-                if type == .chat {
+                if type == .conversation {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                     }
@@ -456,7 +456,8 @@ public extension ChatView {
     }
 
     /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
-    func enableLoadMore(pageSize: Int, handler: @escaping ChatPaginationClosure) -> ChatView {
+    /// NOTE: doesn't work well with `isScrollEnabled` false
+    func enableLoadMore(pageSize: Int, _ handler: @escaping ChatPaginationClosure) -> ChatView {
         var view = self
         view.paginationHandler = PaginationHandler(handleClosure: handler, pageSize: pageSize)
         return view

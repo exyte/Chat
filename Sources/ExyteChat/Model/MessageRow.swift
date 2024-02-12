@@ -35,7 +35,7 @@ public enum PositionInCommentsGroup {
         [.lastComment, .singleFirstLevelPost].contains(self)
     }
 
-    public var isLastestInChat: Bool {
+    public var isLastInChat: Bool {
         [.latestFirstLevelPost, .latestCommentInLatestGroup].contains(self)
     }
 }

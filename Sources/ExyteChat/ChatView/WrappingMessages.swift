@@ -58,7 +58,7 @@ extension ChatView {
             for m in dayFirstLevelMessages {
                 var replies = getRepliesFor(id: m.id, messages: messages)
                 replies.sort { $0.createdAt < $1.createdAt }
-                if chatType == .chat {
+                if chatType == .conversation {
                     dayMessages.append(m)
                 }
                 dayMessages.append(contentsOf: replies)
@@ -87,8 +87,8 @@ extension ChatView {
             .map {
                 let index = $0.offset
                 let message = $0.element
-                let nextMessage = chatType == .chat ? messages[safe: index + 1] : messages[safe: index - 1]
-                let prevMessage = chatType == .chat ? messages[safe: index - 1] : messages[safe: index + 1]
+                let nextMessage = chatType == .conversation ? messages[safe: index + 1] : messages[safe: index - 1]
+                let prevMessage = chatType == .conversation ? messages[safe: index - 1] : messages[safe: index + 1]
 
                 let nextMessageExists = nextMessage != nil
                 let nextMessageIsSameUser = nextMessage?.user.id == message.user.id

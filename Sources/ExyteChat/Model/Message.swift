@@ -131,6 +131,7 @@ public struct ReplyMessage: Codable, Identifiable, Hashable {
 
     public var id: String
     public var user: User
+    public var createdAt: Date
 
     public var text: String
     public var attachments: [Attachment]
@@ -138,25 +139,27 @@ public struct ReplyMessage: Codable, Identifiable, Hashable {
 
     public init(id: String,
                 user: User,
+                createdAt: Date,
                 text: String = "",
                 attachments: [Attachment] = [],
                 recording: Recording? = nil) {
 
         self.id = id
         self.user = user
+        self.createdAt = createdAt
         self.text = text
         self.attachments = attachments
         self.recording = recording
     }
 
     func toMessage() -> Message {
-        Message(id: id, user: user, text: text, attachments: attachments, recording: recording)
+        Message(id: id, user: user, createdAt: createdAt, text: text, attachments: attachments, recording: recording)
     }
 }
 
 public extension Message {
 
     func toReplyMessage() -> ReplyMessage {
-        ReplyMessage(id: id, user: user, text: text, attachments: attachments, recording: recording)
+        ReplyMessage(id: id, user: user, createdAt: createdAt, text: text, attachments: attachments, recording: recording)
     }
 }

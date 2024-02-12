@@ -10,7 +10,7 @@ import SwiftUI
 public extension ChatView where MessageContent == EmptyView, MainBodyContent == EmptyView {
 
     init(messages: [Message],
-         chatType: ChatType = .chat,
+         chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
          inputViewBuilder: @escaping InputViewBuilderClosure) {
@@ -25,7 +25,7 @@ public extension ChatView where MessageContent == EmptyView, MainBodyContent == 
 public extension ChatView where InputViewContent == EmptyView, MainBodyContent == EmptyView {
 
     init(messages: [Message],
-         chatType: ChatType = .chat,
+         chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
          messageBuilder: @escaping MessageBuilderClosure) {
@@ -40,7 +40,7 @@ public extension ChatView where InputViewContent == EmptyView, MainBodyContent =
 public extension ChatView where MainBodyContent == EmptyView {
 
     init(messages: [Message],
-         chatType: ChatType = .chat,
+         chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
          messageBuilder: @escaping MessageBuilderClosure,
@@ -57,7 +57,7 @@ public extension ChatView where MainBodyContent == EmptyView {
 public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MainBodyContent == EmptyView {
 
     init(messages: [Message],
-         chatType: ChatType = .chat,
+         chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void) {
         self.type = chatType

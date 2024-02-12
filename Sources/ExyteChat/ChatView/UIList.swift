@@ -52,7 +52,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.dataSource = context.coordinator
         tableView.delegate = context.coordinator
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        tableView.transform = CGAffineTransform(rotationAngle: (type == .chat ? .pi : 0))
+        tableView.transform = CGAffineTransform(rotationAngle: (type == .conversation ? .pi : 0))
 
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 1
@@ -224,7 +224,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     }
 
     func applyOperation(_ operation: Operation, tableView: UITableView) {
-        let animation: UITableView.RowAnimation = type == .chat ? .top : .top
+        let animation: UITableView.RowAnimation = type == .conversation ? .top : .top
         switch operation {
         case .deleteSection(let section):
             tableView.deleteSections([section], with: animation)
@@ -410,7 +410,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-            if showDateHeaders, type == .chat {
+            if showDateHeaders, type == .conversation {
                 return dateView(section)
             }
             return nil
@@ -420,7 +420,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             if let headerBuilder {
                 let header = UIHostingController(rootView:
                     headerBuilder(sections[section].date)
-                        .rotationEffect(Angle(degrees: (type == .chat ? 180 : 0)))
+                        .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
                 ).view
                 header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
                 return header
@@ -429,7 +429,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             let header = UIHostingController(rootView:
                 Text(sections[section].formattedDate)
                     .font(.system(size: 11))
-                    .rotationEffect(Angle(degrees: (type == .chat ? 180 : 0)))
+                    .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
                     .padding(10)
                     .padding(.bottom, 8)
                     .foregroundColor(.gray)
@@ -442,14 +442,14 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             if !showDateHeaders {
                 return 0.1
             }
-            return type == .chat ? 0.1 : UITableView.automaticDimension
+            return type == .conversation ? 0.1 : UITableView.automaticDimension
         }
 
         func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
             if !showDateHeaders {
                 return 0.1
             }
-            return type == .chat ? UITableView.automaticDimension : 0.1
+            return type == .conversation ? UITableView.automaticDimension : 0.1
         }
 
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -463,7 +463,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: false)
                     .transition(.scale)
                     .background(MessageMenuPreferenceViewSetter(id: row.id))
-                    .rotationEffect(Angle(degrees: (type == .chat ? 180 : 0)))
+                    .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
                     .onTapGesture { }
                     .applyIf(showMessageMenuOnLongPress) {
                         $0.onLongPressGesture {
@@ -478,9 +478,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            guard let paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
+            guard let paginationHandler = self.paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
                 return
             }
+
             let row = self.sections[indexPath.section].rows[indexPath.row]
             Task.detached {
                 await paginationHandler.handleClosure(row.message)

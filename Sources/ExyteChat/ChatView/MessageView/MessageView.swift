@@ -68,7 +68,7 @@ struct MessageView: View {
 
     var showAvatar: Bool {
         positionInGroup == .single
-        || (chatType == .chat && positionInGroup == .last)
+        || (chatType == .conversation && positionInGroup == .last)
         || (chatType == .comments && positionInGroup == .first)
     }
 
@@ -78,7 +78,7 @@ struct MessageView: View {
     }
 
     var bottomPadding: CGFloat {
-        if chatType == .chat { return 0 }
+        if chatType == .conversation { return 0 }
         return positionInGroup == .single || positionInGroup == .first ? 8 : 4
     }
 
@@ -327,7 +327,7 @@ struct MessageView_Preview: PreviewProvider {
                 viewModel: ChatViewModel(),
                 message: replyedMessage,
                 positionInGroup: .single,
-                chatType: .chat,
+                chatType: .conversation,
                 avatarSize: 32,
                 tapAvatarClosure: nil,
                 messageUseMarkdown: false,
