@@ -15,11 +15,11 @@ let package = Package(
     ],
     dependencies: [
                
-        .package(name: "Introspect", url: "https://github.com/moyoteg/SwiftUI-Introspect", .branch("master")),
-        // .package(
-        //     url: "https://github.com/siteline/swiftui-introspect",
-        //     from: "1.0.0"
-        // ),
+        // .package(url: "https://github.com/moyoteg/SwiftUI-Introspect", .branch("master")),
+        .package(
+            url: "https://github.com/siteline/swiftui-introspect",
+            from: "1.1.2"
+        ),
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
             from: "2.0.0"
