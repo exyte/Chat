@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "ExyteChat"
-  s.version          = "1.3.3"
+  s.version          = "1.3.5"
   s.summary          = "Chat with fully customizable message cells and built-in media picker written with SwiftUI"
 
   s.homepage         = 'https://github.com/exyte/Chat.git'
@@ -19,6 +19,8 @@ Pod::Spec.new do |s|
      'Sources/*.swift',
      'Sources/**/*.swift'
   ]
+
+  s.resources = "Sources/ExyteChat/Resources/**/*"
 
   s.dependency 'SwiftUIIntrospect'
   s.dependency 'ExyteMediaPicker'

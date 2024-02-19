@@ -7,6 +7,13 @@ import UIKit
 
 extension String {
 
+    static var markdownOptions = AttributedString.MarkdownParsingOptions(
+        allowsExtendedAttributes: false,
+        interpretedSyntax: .inlineOnlyPreservingWhitespace,
+        failurePolicy: .returnPartiallyParsedIfPossible,
+        languageCode: nil
+    )
+
     func width(withConstrainedWidth width: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingBox = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown).boundingRect(with: constraintRect,
@@ -17,7 +24,7 @@ extension String {
     }
 
     func toAttrString(font: UIFont, messageUseMarkdown: Bool) -> NSAttributedString {
-        var str = messageUseMarkdown ? (try? AttributedString(markdown: self)) ?? AttributedString(self) : AttributedString(self)
+        var str = messageUseMarkdown ? (try? AttributedString(markdown: self, options: String.markdownOptions)) ?? AttributedString(self) : AttributedString(self)
         str.setAttributes(AttributeContainer([.font: font]))
         return NSAttributedString(str)
     }
