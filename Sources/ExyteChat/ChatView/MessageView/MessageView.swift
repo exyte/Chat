@@ -14,7 +14,7 @@ struct MessageView: View {
     @ObservedObject var viewModel: ChatViewModel
 
     let message: Message
-    let positionInGroup: PositionInGroup
+    let positionInUserGroup: PositionInUserGroup
     let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
@@ -67,19 +67,19 @@ struct MessageView: View {
     }
 
     var showAvatar: Bool {
-        positionInGroup == .single
-        || (chatType == .conversation && positionInGroup == .last)
-        || (chatType == .comments && positionInGroup == .first)
+        positionInUserGroup == .single
+        || (chatType == .conversation && positionInUserGroup == .last)
+        || (chatType == .comments && positionInUserGroup == .first)
     }
 
     var topPadding: CGFloat {
         if chatType == .comments { return 0 }
-        return positionInGroup == .single || positionInGroup == .first ? 8 : 4
+        return positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
     }
 
     var bottomPadding: CGFloat {
         if chatType == .conversation { return 0 }
-        return positionInGroup == .single || positionInGroup == .first ? 8 : 4
+        return positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
     }
 
     var body: some View {
@@ -326,7 +326,7 @@ struct MessageView_Preview: PreviewProvider {
             MessageView(
                 viewModel: ChatViewModel(),
                 message: replyedMessage,
-                positionInGroup: .single,
+                positionInUserGroup: .single,
                 chatType: .conversation,
                 avatarSize: 32,
                 tapAvatarClosure: nil,

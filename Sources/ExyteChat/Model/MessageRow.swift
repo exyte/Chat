@@ -4,7 +4,7 @@
 
 import Foundation
 
-public enum PositionInGroup { // group from the same user
+public enum PositionInUserGroup { // group from the same user
     case first
     case middle
     case last
@@ -13,42 +13,56 @@ public enum PositionInGroup { // group from the same user
 
 // for comments reply mode only
 
+public struct CommentsPosition: Equatable {
+    public var inCommentsGroup: PositionInCommentsGroup
+    public var inSection: PositionInSection
+    public var inChat: PositionInChat
+
+    public var isAComment: Bool {
+        [.firstComment, .middleComment, .lastComment].contains(inCommentsGroup)
+    }
+
+    public var isLastInCommentsGroup: Bool {
+        [.lastComment, .singleFirstLevelPost].contains(inCommentsGroup)
+    }
+
+    public var isLastInChat: Bool {
+        [.last, .single].contains(inChat)
+    }
+}
+
 public enum PositionInCommentsGroup {
-    case singleFirstLevelPost // post has no replies
-    case firstLevelPost
-    case latestFirstLevelPost
+    case singleFirstLevelPost // post has no comments
+    case firstLevelPostWithComments
 
     case firstComment
     case middleComment
     case lastComment
-    case latestCommentInLatestGroup
+}
 
-    public var isFirstLevel: Bool {
-        [.singleFirstLevelPost, .firstLevelPost, .latestFirstLevelPost].contains(self)
-    }
+public enum PositionInSection {
+    case first
+    case middle
+    case last
+    case single // the only message in its section
+}
 
-    public var isAReply: Bool {
-        [.firstComment, .middleComment, .lastComment, .latestCommentInLatestGroup].contains(self)
-    }
-
-    public var isLastInGroup: Bool {
-        [.lastComment, .singleFirstLevelPost].contains(self)
-    }
-
-    public var isLastInChat: Bool {
-        [.latestFirstLevelPost, .latestCommentInLatestGroup].contains(self)
-    }
+public enum PositionInChat {
+    case first
+    case middle
+    case last
+    case single // the only message in the chat
 }
 
 struct MessageRow: Equatable {
     let message: Message
-    let positionInGroup: PositionInGroup
-    let positionInCommentsGroup: PositionInCommentsGroup?
+    let positionInUserGroup: PositionInUserGroup
+    let commentsPosition: CommentsPosition?
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
-        && lhs.positionInGroup == rhs.positionInGroup
-        && lhs.positionInCommentsGroup == rhs.positionInCommentsGroup
+        && lhs.positionInUserGroup == rhs.positionInUserGroup
+        && lhs.commentsPosition == rhs.commentsPosition
         && lhs.message.status == rhs.message.status
         && lhs.message.triggerRedraw == rhs.message.triggerRedraw
     }

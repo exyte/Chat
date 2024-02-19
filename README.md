@@ -72,7 +72,7 @@ You may customize message cells like this:
 ```swift
 ChatView(messages: viewModel.messages) { draft in
     viewModel.send(draft: draft)
-} messageBuilder: { message, positionInGroup, showAttachmentClosure in
+} messageBuilder: { message, positionInUserGroup, showAttachmentClosure in
     VStack {
         Text(message.text)
         if !message.attachments.isEmpty {
@@ -85,7 +85,7 @@ ChatView(messages: viewModel.messages) { draft in
 ```
 `messageBuilder`'s parameters:  
 - `message` - the message containing user info, attachments, etc.   
-- `positionInGroup` - the position of the message in its continuous collection of messages from the same user     
+- `positionInUserGroup` - the position of the message in its continuous collection of messages from the same user     
 - `showAttachmentClosure` - you can pass an attachment to this closure to use ChatView's fullscreen media viewer    
 
 You may customize the input view (a text field with buttons at the bottom) like this: 

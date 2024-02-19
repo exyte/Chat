@@ -25,14 +25,14 @@ struct ChatMessageView<MessageContent: View>: View {
     var body: some View {
         Group {
             if let messageBuilder = messageBuilder {
-                messageBuilder(row.message, row.positionInGroup, row.positionInCommentsGroup, viewModel.messageMenuAction()) { attachment in
+                messageBuilder(row.message, row.positionInUserGroup, row.commentsPosition, viewModel.messageMenuAction()) { attachment in
                     self.viewModel.presentAttachmentFullScreen(attachment)
                 }
             } else {
                 MessageView(
                     viewModel: viewModel,
                     message: row.message,
-                    positionInGroup: row.positionInGroup,
+                    positionInUserGroup: row.positionInUserGroup,
                     chatType: chatType,
                     avatarSize: avatarSize,
                     tapAvatarClosure: tapAvatarClosure,

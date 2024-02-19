@@ -34,7 +34,8 @@ extension ChatView {
         for date in dates {
             let section = MessagesSection(
                 date: date,
-                rows: wrapMessages(messages.filter({ $0.createdAt.isSameDay(date) }), chatType: chatType, replyMode: replyMode)
+                // use fake isFirstSection/isLastSection because they are not needed for quote replies
+                rows: wrapSectionMessages(messages.filter({ $0.createdAt.isSameDay(date) }), chatType: chatType, replyMode: replyMode, isFirstSection: false, isLastSection: false)
             )
             result.append(section)
         }
@@ -66,7 +67,11 @@ extension ChatView {
                     dayMessages.append(m)
                 }
             }
-            result.append(MessagesSection(date: date, rows: wrapMessages(dayMessages, chatType: chatType, replyMode: replyMode)))
+
+            let isFirstSection = dates.first == date
+            let isLastSection = dates.last == date
+            let sectionRows = wrapSectionMessages(dayMessages, chatType: chatType, replyMode: replyMode, isFirstSection: isFirstSection, isLastSection: isLastSection)
+            result.append(MessagesSection(date: date, rows: sectionRows))
         }
 
         return result
@@ -81,7 +86,7 @@ extension ChatView {
         }
     }
 
-    static func wrapMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessageRow] {
+    static private func wrapSectionMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode, isFirstSection: Bool, isLastSection: Bool) -> [MessageRow] {
         messages
             .enumerated()
             .map {
@@ -91,10 +96,11 @@ extension ChatView {
                 let prevMessage = chatType == .conversation ? messages[safe: index - 1] : messages[safe: index + 1]
 
                 let nextMessageExists = nextMessage != nil
+                let prevMessageExists = prevMessage != nil
                 let nextMessageIsSameUser = nextMessage?.user.id == message.user.id
                 let prevMessageIsSameUser = prevMessage?.user.id == message.user.id
 
-                let position: PositionInGroup
+                let position: PositionInUserGroup
                 if nextMessageExists, nextMessageIsSameUser, prevMessageIsSameUser {
                     position = .middle
                 } else if !nextMessageExists || !nextMessageIsSameUser, !prevMessageIsSameUser {
@@ -105,19 +111,19 @@ extension ChatView {
                     position = .last
                 }
 
+                if replyMode == .quote {
+                    return MessageRow(message: $0.element, positionInUserGroup: position, commentsPosition: nil)
+                }
+
                 let nextMessageIsAReply = nextMessage?.replyMessage != nil
                 let nextMessageIsFirstLevel = nextMessage?.replyMessage == nil
                 let prevMessageIsFirstLevel = prevMessage?.replyMessage == nil
 
                 let positionInComments: PositionInCommentsGroup
-                if !nextMessageExists, message.replyMessage == nil {
-                    positionInComments = .latestFirstLevelPost
-                } else if !nextMessageExists {
-                    positionInComments = .latestCommentInLatestGroup
-                } else if message.replyMessage == nil && !nextMessageIsAReply {
+                if message.replyMessage == nil && !nextMessageIsAReply {
                     positionInComments = .singleFirstLevelPost
                 } else if message.replyMessage == nil && nextMessageIsAReply {
-                    positionInComments = .firstLevelPost
+                    positionInComments = .firstLevelPostWithComments
                 } else if nextMessageIsFirstLevel {
                     positionInComments = .lastComment
                 } else if prevMessageIsFirstLevel {
@@ -126,7 +132,33 @@ extension ChatView {
                     positionInComments = .middleComment
                 }
 
-                return MessageRow(message: $0.element, positionInGroup: position, positionInCommentsGroup: positionInComments)
+                let positionInSection: PositionInSection
+                if !prevMessageExists, !nextMessageExists {
+                    positionInSection = .single
+                } else if !prevMessageExists {
+                    positionInSection = .first
+                } else if !nextMessageExists {
+                    positionInSection = .last
+                } else {
+                    positionInSection = .middle
+                }
+
+                let positionInChat: PositionInChat
+                if !isFirstSection, !isLastSection {
+                    positionInChat = .middle
+                } else if !prevMessageExists, !nextMessageExists, isFirstSection, isLastSection {
+                    positionInChat = .single
+                } else if !prevMessageExists, isFirstSection {
+                    positionInChat = .first
+                } else if !nextMessageExists, isLastSection {
+                    positionInChat = .last
+                } else {
+                    positionInChat = .middle
+                }
+
+                let commentsPosition = CommentsPosition(inCommentsGroup: positionInComments, inSection: positionInSection, inChat: positionInChat)
+
+                return MessageRow(message: $0.element, positionInUserGroup: position, commentsPosition: commentsPosition)
             }
             .reversed()
     }

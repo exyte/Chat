@@ -30,7 +30,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     /// - position of message in its continuous group of comments (only works for .comments ReplyMode, nil for .quote mode)
     /// - closure to pass user interaction, .reply for example
     /// - pass attachment to this closure to use ChatView's fullscreen media viewer
-    public typealias MessageBuilderClosure = ((Message, PositionInGroup, PositionInCommentsGroup?, @escaping (Message, MessageMenuAction) -> Void, @escaping (Attachment) -> Void) -> MessageContent)
+    public typealias MessageBuilderClosure = ((Message, PositionInUserGroup, CommentsPosition?, @escaping (Message, MessageMenuAction) -> Void, @escaping (Attachment) -> Void) -> MessageContent)
 
     /// To build a custom input view use the following parameters passed by this closure:
     /// - binding to the text in input view

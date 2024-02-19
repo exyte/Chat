@@ -96,6 +96,13 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 return
             }
 
+            if context.coordinator.sections.isEmpty {
+                context.coordinator.sections = sections
+                tableView.reloadData()
+                updateSemaphore.signal()
+                return
+            }
+
             if let lastSection = sections.last {
                 context.coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
             }
@@ -224,7 +231,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     }
 
     func applyOperation(_ operation: Operation, tableView: UITableView) {
-        let animation: UITableView.RowAnimation = type == .conversation ? .top : .top
+        let animation: UITableView.RowAnimation = .top
         switch operation {
         case .deleteSection(let section):
             tableView.deleteSections([section], with: animation)
@@ -496,7 +503,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
     func formatRow(_ row: MessageRow) -> String {
         if let status = row.message.status {
-            return String("id: \(row.id) text: \(row.message.text) status: \(status) date: \(row.message.createdAt) position: \(row.positionInGroup) trigger: \(row.message.triggerRedraw)")
+            return String("id: \(row.id) text: \(row.message.text) status: \(status) date: \(row.message.createdAt) position: \(row.positionInUserGroup) trigger: \(row.message.triggerRedraw)")
         }
         return ""
     }
