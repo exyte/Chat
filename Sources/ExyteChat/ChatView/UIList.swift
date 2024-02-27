@@ -97,9 +97,11 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             }
 
             if context.coordinator.sections.isEmpty {
-                context.coordinator.sections = sections
-                tableView.reloadData()
-                updateSemaphore.signal()
+                DispatchQueue.main.async {
+                    context.coordinator.sections = sections
+                    tableView.reloadData()
+                    updateSemaphore.signal()
+                }
                 return
             }
 

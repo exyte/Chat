@@ -118,10 +118,12 @@ class ConversationViewModel: ObservableObject {
                         var replyMessage: ReplyMessage?
                         if let reply = firestoreMessage.replyMessage,
                            let replyId = reply.id,
+                           let replyCreatedAt = reply.createdAt,
                            let replyUser = self.allUsers.first(where: { $0.id == reply.userId }) {
                             replyMessage = ReplyMessage(
                                 id: replyId,
-                                user: replyUser,
+                                user: replyUser, 
+                                createdAt: replyCreatedAt,
                                 text: reply.text,
                                 attachments: convertAttachments(reply.attachments),
                                 recording: convertRecording(reply.recording))

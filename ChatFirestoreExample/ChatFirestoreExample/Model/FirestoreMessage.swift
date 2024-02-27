@@ -33,6 +33,7 @@ public struct FirestoreReply: Codable, Hashable {
 
     @DocumentID public var id: String?
     public var userId: String
+    @ServerTimestamp public var createdAt: Date?
 
     public var text: String
     public var attachments: [FirestoreAttachment]
