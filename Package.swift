@@ -35,10 +35,11 @@ let package = Package(
         .target(
             name: "ExyteChat",
             dependencies: [
-                .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
+                // .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
                 .product(name: "ExyteMediaPicker", package: "MediaPicker"),
                 .product(name: "FloatingButton", package: "FloatingButton"),
-                .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView")
+                .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
+                "SwiftUIIntrospect",
             ]
         ),
         .testTarget(
