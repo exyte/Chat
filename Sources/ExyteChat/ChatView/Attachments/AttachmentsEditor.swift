@@ -27,7 +27,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
 
-    @State private var seletedMedias: [Media] = []
+    @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
 
     var showingAlbums: Bool {
@@ -47,7 +47,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var mediaPicker: some View {
         GeometryReader { g in
             MediaPicker(isPresented: $inputViewModel.showPicker) {
-                seletedMedias = $0
+                seleсtedMedias = $0
                 assembleSelectedMedia()
             } albumSelectionBuilder: { _, albumSelectionView, _ in
                 VStack {
@@ -85,12 +85,18 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .onChange(of: currentFullscreenMedia) { newValue in
                 assembleSelectedMedia()
             }
+            .onChange(of: inputViewModel.showPicker) { _ in
+                if !seleсtedMedias.isEmpty {
+                    assembleSelectedMedia()
+                    inputViewModel.send()
+                }
+            }
         }
     }
 
     func assembleSelectedMedia() {
-        if !seletedMedias.isEmpty {
-            inputViewModel.attachments.medias = seletedMedias
+        if !seleсtedMedias.isEmpty {
+            inputViewModel.attachments.medias = seleсtedMedias
         } else if let media = currentFullscreenMedia {
             inputViewModel.attachments.medias = [media]
         } else {
@@ -120,6 +126,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         ZStack {
             HStack {
                 Button {
+                    seleсtedMedias = []
                     inputViewModel.showPicker = false
                 } label: {
                     Text("Cancel")
