@@ -21,6 +21,7 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
         }
+        .setMediaPickerSelectionParameters(MediaPickerParameters(mediaType: .photo, showFullscreenPreview: false))
 //        messageBuilder: { message, _, _ in
 //            Text(message.text)
 //                .background(Color.green)

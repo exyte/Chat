@@ -23,7 +23,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "revision" : "f493425514490b0629725387122d15d2876aeff5",
+        "revision" : "467ba6dd686a88584dea5cc82b3b87cbc9f0aa19",
         "version" : "2.1.1"
       }
     },

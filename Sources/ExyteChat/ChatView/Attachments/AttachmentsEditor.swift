@@ -85,6 +85,12 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .onChange(of: currentFullscreenMedia) { newValue in
                 assembleSelectedMedia()
             }
+            .onChange(of: inputViewModel.showPicker) { _ in
+                if !seletedMedias.isEmpty {
+                    assembleSelectedMedia()
+                    inputViewModel.send()
+                }
+            }
         }
     }
 
@@ -120,6 +126,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         ZStack {
             HStack {
                 Button {
+                    seletedMedias = []
                     inputViewModel.showPicker = false
                 } label: {
                     Text("Cancel")
