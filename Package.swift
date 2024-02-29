@@ -18,7 +18,7 @@ let package = Package(
         // .package(url: "https://github.com/moyoteg/SwiftUI-Introspect", .branch("master")),
         .package(
             url: "https://github.com/siteline/swiftui-introspect",
-            from: "1.1.2"
+            from: "1.1.3"
         ),
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
