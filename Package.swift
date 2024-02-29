@@ -37,8 +37,7 @@ let package = Package(
         .target(
             name: "ExyteChat",
             dependencies: [
-                // .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
-                "SwiftUIIntrospect",
+                .product(name: "SwiftUI-Introspect", package: "swiftui-introspect"),
                 .product(name: "ExyteMediaPicker", package: "MediaPicker"),
                 .product(name: "FloatingButton", package: "FloatingButton"),
                 .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView")
