@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
                
-        .package(url: "https://github.com/moyoteg/SwiftUI-Introspect", .branch("master")),
+        .package(url: "https://github.com/moyoteg/SwiftUI-Introspect", branch: "master"),
         // .package(
         //     url: "https://github.com/siteline/swiftui-introspect",
         //     from: "1.1.3"
