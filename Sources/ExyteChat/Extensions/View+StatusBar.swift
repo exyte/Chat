@@ -14,7 +14,7 @@ public extension View {
     func onStatusBarTap(onTap: @escaping () -> ()) -> some View {
         self.overlay {
             StatusBarTabDetector(onTap: onTap)
-                .offset(y: UIScreen.main.bounds.height)
+                .offset(x: UIScreen.main.bounds.width)
         }
     }
 }

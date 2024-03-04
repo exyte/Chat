@@ -100,6 +100,11 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 DispatchQueue.main.async {
                     context.coordinator.sections = sections
                     tableView.reloadData()
+                    if !isScrollEnabled {
+                        DispatchQueue.main.async {
+                            tableContentHeight = tableView.contentSize.height
+                        }
+                    }
                     updateSemaphore.signal()
                 }
                 return
