@@ -260,9 +260,9 @@ struct MessageView: View {
     func messageTimeView(needsCapsule: Bool = false) -> some View {
         Group {
             if needsCapsule {
-                MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser)
+                MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
             } else {
-                MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser)
+                MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
             }
         }
         .sizeGetter($timeSize)

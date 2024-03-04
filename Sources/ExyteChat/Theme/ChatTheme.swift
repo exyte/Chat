@@ -54,11 +54,18 @@ public struct ChatTheme {
         public var myMessage: Color
         public var friendMessage: Color
 
+
         public var textLightContext: Color
         public var textDarkContext: Color
         public var textMediaPicker: Color
 
         public var recordDot: Color
+
+        public var myMessageTime: Color
+        public var frientMessageTime: Color
+
+        public var timeCapsuleBackground: Color
+        public var timeCapsuleForeground: Color
 
         public init(
             grayStatus: Color = Color(hex: "AFB3B8"),
@@ -74,7 +81,11 @@ public struct ChatTheme {
             textLightContext: Color = Color.black,
             textDarkContext: Color = Color.white,
             textMediaPicker: Color = Color(hex: "818C99"),
-            recordDot: Color = Color(hex: "F62121")
+            recordDot: Color = Color(hex: "F62121"),
+            myMessageTime: Color = .white.opacity(0.4),
+            frientMessageTime: Color = .black.opacity(0.4),
+            timeCapsuleBackground: Color = .black.opacity(0.4),
+            timeCapsuleForeground: Color = .white
         ) {
             self.grayStatus = grayStatus
             self.errorStatus = errorStatus
@@ -90,6 +101,10 @@ public struct ChatTheme {
             self.textDarkContext = textDarkContext
             self.textMediaPicker = textMediaPicker
             self.recordDot = recordDot
+            self.myMessageTime = myMessageTime
+            self.frientMessageTime = frientMessageTime
+            self.timeCapsuleBackground = timeCapsuleBackground
+            self.timeCapsuleForeground = timeCapsuleForeground
         }
     }
 
