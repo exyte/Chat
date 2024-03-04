@@ -20,6 +20,7 @@ struct MessageView: View {
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
     let isDisplayingMessageMenu: Bool
+    let showMessageTimeView: Bool
 
     @State var avatarViewSize: CGSize = .zero
     @State var statusSize: CGSize = .zero
@@ -33,7 +34,7 @@ struct MessageView: View {
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
 
-    let font = UIFont.systemFont(ofSize: 15)
+    var font: UIFont
 
     enum DateArrangment {
         case hstack, vstack, overlay
@@ -259,10 +260,12 @@ struct MessageView: View {
 
     func messageTimeView(needsCapsule: Bool = false) -> some View {
         Group {
-            if needsCapsule {
-                MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
-            } else {
-                MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
+            if showMessageTimeView {
+                if needsCapsule {
+                    MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
+                } else {
+                    MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
+                }
             }
         }
         .sizeGetter($timeSize)
@@ -331,7 +334,9 @@ struct MessageView_Preview: PreviewProvider {
                 avatarSize: 32,
                 tapAvatarClosure: nil,
                 messageUseMarkdown: false,
-                isDisplayingMessageMenu: false
+                isDisplayingMessageMenu: false,
+                showMessageTimeView: true,
+                font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
             )
         }
     }

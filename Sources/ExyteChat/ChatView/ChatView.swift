@@ -67,6 +67,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
+    var showMessageTimeView = true
+    var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -195,6 +197,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                showMessageMenuOnLongPress: showMessageMenuOnLongPress,
                tapAvatarClosure: tapAvatarClosure,
                messageUseMarkdown: messageUseMarkdown,
+               showMessageTimeView: showMessageTimeView,
+               messageFont: messageFont,
                sections: sections,
                ids: ids
         )
@@ -280,7 +284,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {
                         hideMessageMenu()
                     }
@@ -465,6 +469,18 @@ public extension ChatView {
         var view = self
         view.chatTitle = title
         return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
+    }
+
+    func showMessageTimeView(_ isShow: Bool) -> ChatView {
+        var view = self
+        view.showMessageTimeView = isShow
+        return view
+    }
+
+    func setMessageFont(_ font: UIFont) -> ChatView {
+        var view = self
+        view.messageFont = font
+        return view
     }
 }
 

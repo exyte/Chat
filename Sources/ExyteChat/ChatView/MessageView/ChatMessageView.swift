@@ -21,6 +21,8 @@ struct ChatMessageView<MessageContent: View>: View {
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
     let isDisplayingMessageMenu: Bool
+    let showMessageTimeView: Bool
+    let messageFont: UIFont
 
     var body: some View {
         Group {
@@ -37,7 +39,9 @@ struct ChatMessageView<MessageContent: View>: View {
                     avatarSize: avatarSize,
                     tapAvatarClosure: tapAvatarClosure,
                     messageUseMarkdown: messageUseMarkdown,
-                    isDisplayingMessageMenu: isDisplayingMessageMenu)
+                    isDisplayingMessageMenu: isDisplayingMessageMenu,
+                    showMessageTimeView: showMessageTimeView,
+                    font: messageFont)
             }
         }
         .id(row.message.id)
