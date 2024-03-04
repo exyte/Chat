@@ -87,7 +87,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 assembleSelectedMedia()
             }
             .onChange(of: inputViewModel.showPicker) { _ in
-                if !seleсtedMedias.isEmpty {
+                if !seleсtedMedias.isEmpty && !inputViewModel.messageIsSended {
                     assembleSelectedMedia()
                     inputViewModel.send()
                 }

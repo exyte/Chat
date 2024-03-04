@@ -18,6 +18,7 @@ final class InputViewModel: ObservableObject {
 
     var recordingPlayer: RecordingPlayer?
     var didSendMessage: ((DraftMessage) -> Void)?
+    var messageIsSended = false
 
     private var recorder = Recorder()
 
@@ -58,11 +59,13 @@ final class InputViewModel: ObservableObject {
         switch action {
         case .photo:
             mediaPickerMode = .photos
+            messageIsSended = false
             showPicker = true
         case .add:
             mediaPickerMode = .camera
         case .camera:
             mediaPickerMode = .camera
+            messageIsSended = false
             showPicker = true
         case .send:
             send()
@@ -203,6 +206,7 @@ private extension InputViewModel {
                 DispatchQueue.main.async { [self, draft] in
                     self?.showActivityIndicator = false
                     self?.didSendMessage?(draft)
+                    self?.messageIsSended = true
                     self?.reset()
                 }
             }
