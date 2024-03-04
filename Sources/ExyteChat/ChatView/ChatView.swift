@@ -69,6 +69,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var chatTitle: String?
     var showMessageTimeView = true
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+    var availablelInput: AvailableInputType = .full
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -154,7 +155,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
             }
         }
         .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters)
+            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput)
                 .environmentObject(globalFocusState)
         }
         .onChange(of: inputViewModel.showPicker) {
@@ -268,6 +269,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                     viewModel: inputViewModel,
                     inputFieldId: inputFieldId,
                     style: .message,
+                    availableInput: availablelInput,
                     messageUseMarkdown: messageUseMarkdown
                 )
             }
@@ -480,6 +482,12 @@ public extension ChatView {
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageFont = font
+        return view
+    }
+
+    func setAvailableInput(_ type: AvailableInputType) -> ChatView {
+        var view = self
+        view.availablelInput = type
         return view
     }
 }

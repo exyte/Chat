@@ -26,6 +26,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var messageUseMarkdown: Bool
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
+    var availableInput: AvailableInputType
 
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -116,6 +117,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     viewModel: inputViewModel,
                     inputFieldId: UUID(),
                     style: .signature,
+                    availableInput: availableInput,
                     messageUseMarkdown: messageUseMarkdown
                 )
             }
