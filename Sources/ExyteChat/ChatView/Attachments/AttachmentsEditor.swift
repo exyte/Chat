@@ -87,7 +87,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 assembleSelectedMedia()
             }
             .onChange(of: inputViewModel.showPicker) { _ in
-                if !seleсtedMedias.isEmpty && !inputViewModel.messageIsSended {
+                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
+                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
+
+                if selectionLimit == 1 && !showFullscreenPreview {
                     assembleSelectedMedia()
                     inputViewModel.send()
                 }
