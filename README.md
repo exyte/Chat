@@ -146,7 +146,10 @@ If you are not using your own `messageBuilder`:
 `mediaPickerSelectionParameters`  - a struct holding MediaPicker selection parameters (mediaType, selectionStyle, etc.)
 `assetsPickerLimit` - the maximum media count that the user can select in the media picker      
 `enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages       
-`chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass the info for the Chat's navigation bar  
+`chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass the info for the Chat's navigation bar 
+`showMessageTimeView` - show timestamp in a corner of message   
+`messageFont` - pass cutom font to use for messages    
+`availablelInput` - full (camera + attachments + text + audio) or textAndAudio
 
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 
