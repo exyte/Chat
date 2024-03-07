@@ -26,6 +26,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var messageUseMarkdown: Bool
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
+    var availableInput: AvailableInputType
 
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -86,7 +87,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 assembleSelectedMedia()
             }
             .onChange(of: inputViewModel.showPicker) { _ in
-                if !seleсtedMedias.isEmpty {
+                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
+                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
+
+                if selectionLimit == 1 && !showFullscreenPreview {
                     assembleSelectedMedia()
                     inputViewModel.send()
                 }
@@ -116,6 +120,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     viewModel: inputViewModel,
                     inputFieldId: UUID(),
                     style: .signature,
+                    availableInput: availableInput,
                     messageUseMarkdown: messageUseMarkdown
                 )
             }

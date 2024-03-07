@@ -58,6 +58,11 @@ public enum InputViewState {
     }
 }
 
+public enum AvailableInputType {
+    case full // Camera + attachments + text + audio
+    case textAndAudio
+}
+
 public struct InputViewAttachments {
     public var text: String = ""
     public var medias: [Media] = []
@@ -73,6 +78,7 @@ struct InputView: View {
     @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
     var style: InputViewStyle
+    var availableInput: AvailableInputType
     var messageUseMarkdown: Bool
 
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -128,7 +134,9 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                attachButton
+                if availableInput == .full {
+                    attachButton
+                }
             case .signature:
                 if viewModel.mediaPickerMode == .cameraSelection {
                     addButton
@@ -150,7 +158,7 @@ struct InputView: View {
             case .isRecordingTap:
                 recordingInProgress
             default:
-                TextInputView(text: $viewModel.attachments.text, inputFieldId: inputFieldId, style: style)
+                TextInputView(text: $viewModel.attachments.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput)
             }
         }
         .frame(minHeight: 48)
@@ -161,7 +169,7 @@ struct InputView: View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                if case .message = style {
+                if case .message = style, availableInput == .full {
                     cameraButton
                 }
             case .isRecordingHold, .isRecordingTap:
