@@ -418,7 +418,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     .onTapGesture { }
                     .applyIf(showMessageMenuOnLongPress) {
                         $0.onLongPressGesture {
-                            self.viewModel.messageMenuRow = row
+                            // As its not need now: "Remove reply on hold message"
+    //                        self.viewModel.messageMenuRow = row
                         }
                     }
             }
