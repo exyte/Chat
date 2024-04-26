@@ -6,7 +6,7 @@ import Foundation
 import Combine
 
 final class ChatViewModel: ObservableObject {
-    
+
     @Published private(set) var fullscreenAttachmentItem: Optional<Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
@@ -32,13 +32,13 @@ final class ChatViewModel: ObservableObject {
         didSendMessage(message)
     }
 
-    func messageMenuAction() -> (Message, MessageMenuAction) -> Void {
+    func messageMenuAction() -> (Message, DefaultMessageMenuAction) -> Void {
         { [weak self] in
             self?.messageMenuActionInternal(message: $0, action: $1)
         }
     }
 
-    func messageMenuActionInternal(message: Message, action: MessageMenuAction) {
+    func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
         switch action {
         case .reply:
             inputViewModel?.attachments.replyMessage = message.toReplyMessage()

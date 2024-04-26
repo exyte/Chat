@@ -54,6 +54,42 @@ public extension ChatView where MainBodyContent == EmptyView {
     }
 }
 
+public extension ChatView where MainBodyContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+
+    init(messages: [Message],
+         chatType: ChatType = .conversation,
+         replyMode: ReplyMode = .quote,
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         messageBuilder: @escaping MessageBuilderClosure,
+         inputViewBuilder: @escaping InputViewBuilderClosure) {
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+        self.messageBuilder = messageBuilder
+        self.inputViewBuilder = inputViewBuilder
+    }
+}
+
+public extension ChatView where MenuAction == DefaultMessageMenuAction {
+
+    init(messages: [Message],
+         chatType: ChatType = .conversation,
+         replyMode: ReplyMode = .quote,
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         messageBuilder: @escaping MessageBuilderClosure,
+         inputViewBuilder: @escaping InputViewBuilderClosure,
+         mainBodyBuilder: @escaping MainBodyBuilderClosure) {
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+        self.messageBuilder = messageBuilder
+        self.inputViewBuilder = inputViewBuilder
+        self.mainBodyBuilder = mainBodyBuilder
+    }
+}
+
 public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MainBodyContent == EmptyView {
 
     init(messages: [Message],

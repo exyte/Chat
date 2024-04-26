@@ -9,11 +9,24 @@ import SwiftUI
 import FloatingButton
 import enum FloatingButton.Alignment
 
-public enum MessageMenuAction {
-    case reply
+public protocol MessageMenuAction: Equatable, CaseIterable {
+    func title() -> String
+    func icon() -> Image
 }
 
-struct MessageMenu<MainButton: View>: View {
+public enum DefaultMessageMenuAction: MessageMenuAction {
+    case reply
+
+    public func title() -> String {
+        "Reply"
+    }
+
+    public func icon() -> Image {
+        Image(.reply)
+    }
+}
+
+struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
 
     @Environment(\.chatTheme) private var theme
 
@@ -22,13 +35,17 @@ struct MessageMenu<MainButton: View>: View {
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
+    var onAction: (ActionEnum) -> ()
     var mainButton: () -> MainButton
-    var onAction: (MessageMenuAction) -> ()
 
     var body: some View {
-        FloatingButton(mainButtonView: mainButton().allowsHitTesting(false), buttons: [
-            menuButton(title: "Reply", icon: theme.images.messageMenu.reply, action: .reply)
-        ], isOpen: $isShowingMenu)
+        FloatingButton(
+            mainButtonView: mainButton().allowsHitTesting(false),
+            buttons: ActionEnum.allCases.map {
+                menuButton(title: $0.title(), icon: $0.icon(), action: $0)
+            },
+            isOpen: $isShowingMenu
+        )
         .straight()
         //.mainZStackAlignment(.top)
         .initialOpacity(0)
@@ -39,7 +56,7 @@ struct MessageMenu<MainButton: View>: View {
         .menuButtonsSize($menuButtonsSize)
     }
 
-    func menuButton(title: String, icon: Image, action: MessageMenuAction) -> some View {
+    func menuButton(title: String, icon: Image, action: ActionEnum) -> some View {
         HStack(spacing: 0) {
             if alignment == .left {
                 Color.clear.viewSize(leadingPadding)

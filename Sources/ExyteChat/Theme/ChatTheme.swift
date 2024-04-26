@@ -50,6 +50,7 @@ public struct ChatTheme {
         public var buttonBackground: Color
         public var addButtonBackground: Color
         public var sendButtonBackground: Color
+        public var messageMenuBackground: Color
 
         public var myMessage: Color
         public var friendMessage: Color
@@ -69,6 +70,7 @@ public struct ChatTheme {
             buttonBackground: Color = Color(hex: "989EAC"),
             addButtonBackground: Color = Color(hex: "#4F5055"),
             sendButtonBackground: Color = Color(hex: "#4962FF"),
+            messageMenuBackground: Color = Color.white,
             myMessage: Color = Color(hex: "4962FF"),
             friendMessage: Color = Color(hex: "EBEDF0"),
             textLightContext: Color = Color.black,
@@ -84,6 +86,7 @@ public struct ChatTheme {
             self.buttonBackground = buttonBackground
             self.addButtonBackground = addButtonBackground
             self.sendButtonBackground = sendButtonBackground
+            self.messageMenuBackground = messageMenuBackground
             self.myMessage = myMessage
             self.friendMessage = friendMessage
             self.textLightContext = textLightContext
@@ -143,7 +146,6 @@ public struct ChatTheme {
             public var delete: Image
             public var edit: Image
             public var forward: Image
-            public var reply: Image
             public var retry: Image
             public var save: Image
             public var select: Image
@@ -209,7 +211,6 @@ public struct ChatTheme {
             delete: Image? = nil,
             edit: Image? = nil,
             forward: Image? = nil,
-            reply: Image? = nil,
             retry: Image? = nil,
             save: Image? = nil,
             select: Image? = nil,
@@ -276,7 +277,6 @@ public struct ChatTheme {
                 delete: delete ?? Image("delete", bundle: .current),
                 edit: edit ?? Image("edit", bundle: .current),
                 forward: forward ?? Image("forward", bundle: .current),
-                reply: reply ?? Image("reply", bundle: .current),
                 retry: retry ?? Image("retry", bundle: .current),
                 save: save ?? Image("save", bundle: .current),
                 select: select ?? Image("select", bundle: .current)

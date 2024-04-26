@@ -13,7 +13,7 @@ public extension Notification.Name {
 
 struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
-    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, EmptyView>.MessageBuilderClosure
+    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, EmptyView, DefaultMessageMenuAction>.MessageBuilderClosure
 
     @Environment(\.chatTheme) private var theme
 
