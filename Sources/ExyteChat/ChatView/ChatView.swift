@@ -62,6 +62,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     /// - input view
     public typealias MainBodyBuilderClosure = (AnyView, AnyView) -> MainBodyContent
 
+    /// To define custom message menu actions
+    /// - enum listing action options
+    /// - message for which the menu is disaplyed
+    /// closure returns the action to perform on selected action tap
+    public typealias MessageMenuActionClosure = ((MenuAction, Message)->Void)
+
     /// User and MessageId
     public typealias TapAvatarClosure = (User, String) -> ()
 
@@ -87,8 +93,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
     /// organize main chat component using this closure
     var mainBodyBuilder: MainBodyBuilderClosure? = nil
 
-    /// message menu customization: create enum copmlying to MessageMenuAction and pass a closure processing your enum cases
-    var messageMenuAction: ((MenuAction)->Void)?
+    /// message menu customization: create enum complying to MessageMenuAction and pass a closure processing your enum cases
+    var messageMenuAction: MessageMenuActionClosure?
 
     /// date section header builder
     var headerBuilder: ((Date)->AnyView)?
@@ -134,7 +140,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
                 mainBodyBuilder: @escaping MainBodyBuilderClosure,
-                messageMenuAction: ((MenuAction)->Void)?) {
+                messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
@@ -360,7 +366,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MainBodyCon
 
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
         if let messageMenuAction {
-            return messageMenuAction
+            return { action in
+                hideMessageMenu()
+                messageMenuAction(action, message)
+            }
         } else if MenuAction.self == DefaultMessageMenuAction.self {
             return { action in
                 hideMessageMenu()
