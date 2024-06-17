@@ -102,3 +102,16 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
         self.ids = messages.map { $0.id }
     }
 }
+
+public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MainBodyContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+
+    init(messages: [Message],
+         chatType: ChatType = .conversation,
+         replyMode: ReplyMode = .quote,
+         didSendMessage: @escaping (DraftMessage) -> Void) {
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+    }
+}
