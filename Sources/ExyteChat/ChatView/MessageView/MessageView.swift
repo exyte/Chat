@@ -103,6 +103,7 @@ struct MessageView: View {
                 bubbleView(message)
             }
 
+            // Ditch the status
             if message.user.isCurrentUser, let status = message.status {
                 MessageStatusView(status: status) {
                     if case let .error(draft) = status {
@@ -110,6 +111,7 @@ struct MessageView: View {
                     }
                 }
                 .sizeGetter($statusSize)
+                .opacity(0)
             }
         }
         .padding(.top, topPadding)
