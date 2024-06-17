@@ -63,6 +63,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var showMessageMenuOnLongPress: Bool = true
+    var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
@@ -106,7 +107,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     public var body: some View {
         VStack {
-            if !networkMonitor.isConnected {
+            if showNetworkConnectionProblem, !networkMonitor.isConnected {
                 waitingForNetwork
             }
 
@@ -432,6 +433,12 @@ public extension ChatView {
     func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
         var view = self
         view.showMessageMenuOnLongPress = show
+        return view
+    }
+
+    func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
+        var view = self
+        view.showNetworkConnectionProblem = show
         return view
     }
 

@@ -141,6 +141,7 @@ If you are not using your own `messageBuilder`:
 `showDateHeaders` - show section headers with dates between days, default is `true`    
 `avatarSize` - the default avatar is a circle, you can specify its diameter here   
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
+`showNetworkConnectionProblem` - display network error on/off    
 `tapAvatarClosure` - closure to call on avatar tap   
 `messageUseMarkdown` - whether the default message cell uses markdown    
 `mediaPickerSelectionParameters`  - a struct holding MediaPicker selection parameters (mediaType, selectionStyle, etc.)
