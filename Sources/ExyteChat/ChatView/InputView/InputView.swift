@@ -100,7 +100,7 @@ struct InputView: View {
     @State private var dragStart: Date?
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
-    let tapDelay = 0.2
+    private let tapDelay = 0.2
 
     var body: some View {
         VStack {

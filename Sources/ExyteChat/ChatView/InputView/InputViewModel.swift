@@ -7,7 +7,7 @@ import Combine
 import ExyteMediaPicker
 
 final class InputViewModel: ObservableObject {
-    
+
     @Published var attachments = InputViewAttachments()
     @Published var state: InputViewState = .empty
 
@@ -34,11 +34,9 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
-        DispatchQueue.main.async { [weak self] in
-            self?.attachments = InputViewAttachments()
-            self?.showPicker = false
-            self?.state = .empty
-        }
+        showPicker = false
+        attachments = InputViewAttachments()
+        subscribeValidation()
     }
 
     func send() {
@@ -200,9 +198,9 @@ private extension InputViewModel {
                 )
             }
             .sink { [weak self] draft in
-                DispatchQueue.main.async { [self, draft] in
+                self?.didSendMessage?(draft)
+                DispatchQueue.main.async { [weak self] in
                     self?.showActivityIndicator = false
-                    self?.didSendMessage?(draft)
                     self?.reset()
                 }
             }
