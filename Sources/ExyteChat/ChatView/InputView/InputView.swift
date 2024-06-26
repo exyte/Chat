@@ -59,8 +59,18 @@ public enum InputViewState {
 }
 
 public enum AvailableInputType {
-    case full // Camera + attachments + text + audio
+    case full // media + text + audio
+    case textAndMedia
     case textAndAudio
+    case textOnly
+
+    var isMediaAvailable: Bool {
+        [.full, .textAndMedia].contains(self)
+    }
+
+    var isAudioAvailable: Bool {
+        [.full, .textAndAudio].contains(self)
+    }
 }
 
 public struct InputViewAttachments {
@@ -116,7 +126,7 @@ struct InputView: View {
                         .fill(fieldBackgroundColor)
                 }
 
-                rigthOutsideButton
+                rightOutsideButton
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -134,7 +144,7 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                if availableInput == .full {
+                if availableInput.isMediaAvailable {
                     attachButton
                 }
             case .signature:
@@ -169,7 +179,7 @@ struct InputView: View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                if case .message = style, availableInput == .full {
+                if case .message = style, availableInput.isMediaAvailable {
                     cameraButton
                 }
             case .isRecordingHold, .isRecordingTap:
@@ -186,7 +196,7 @@ struct InputView: View {
     }
 
     @ViewBuilder
-    var rigthOutsideButton: some View {
+    var rightOutsideButton: some View {
         ZStack {
             if [.isRecordingTap, .isRecordingHold].contains(state) {
                 RecordIndicator()
@@ -194,8 +204,9 @@ struct InputView: View {
                     .foregroundColor(theme.colors.sendButtonBackground)
             }
             Group {
-                if state.canSend {
+                if state.canSend || availableInput == .textOnly {
                     sendButton
+                        .disabled(!state.canSend)
                 } else {
                     recordButton
                         .highPriorityGesture(dragGesture())
