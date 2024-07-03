@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "ExyteChat"
-  s.version          = "1.3.5"
+  s.version          = "1.4.0"
   s.summary          = "Chat with fully customizable message cells and built-in media picker written with SwiftUI"
 
   s.homepage         = 'https://github.com/exyte/Chat.git'

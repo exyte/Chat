@@ -13,7 +13,7 @@ public extension Notification.Name {
 
 struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
-    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, EmptyView, DefaultMessageMenuAction>.MessageBuilderClosure
+    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderClosure
 
     @Environment(\.chatTheme) private var theme
 
@@ -25,6 +25,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     @Binding var tableContentHeight: CGFloat
 
     var messageBuilder: MessageBuilderClosure?
+    var mainHeaderBuilder: (()->AnyView)?
     var headerBuilder: ((Date)->AnyView)?
     var inputView: InputView
 
@@ -36,6 +37,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let paginationHandler: PaginationHandler?
     let messageUseMarkdown: Bool
+    let showMessageTimeView: Bool
+    let messageFont: UIFont
     let sections: [MessagesSection]
     let ids: [String]
 
@@ -360,7 +363,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, headerBuilder: headerBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler, messageUseMarkdown: messageUseMarkdown, mainBackgroundColor: theme.colors.mainBackground, sections: sections)
+        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder, headerBuilder: headerBuilder, chatTheme: theme, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler, messageUseMarkdown: messageUseMarkdown, showMessageTimeView: showMessageTimeView, messageFont: messageFont, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBackground)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -372,6 +375,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         @Binding var isScrolledToTop: Bool
 
         let messageBuilder: MessageBuilderClosure?
+        let mainHeaderBuilder: (()->AnyView)?
         let headerBuilder: ((Date)->AnyView)?
 
         let chatTheme: ChatTheme
@@ -382,19 +386,19 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let tapAvatarClosure: ChatView.TapAvatarClosure?
         let paginationHandler: PaginationHandler?
         let messageUseMarkdown: Bool
+        let showMessageTimeView: Bool
+        let messageFont: UIFont
+        var sections: [MessagesSection]
+        let ids: [String]
         let mainBackgroundColor: Color
 
-        var sections: [MessagesSection]
-        /// call pagination handler when this row is reached
-        /// without this there is a bug: during new cells insertion willDisplay is called one extra time for the cell which used to be the last one while it is being updated (its position in group is changed from first to middle)
-        var paginationTargetIndexPath: IndexPath?
-
-        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, headerBuilder: ((Date)->AnyView)?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?, messageUseMarkdown: Bool, mainBackgroundColor: Color, sections: [MessagesSection]) {
+        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (()->AnyView)?, headerBuilder: ((Date)->AnyView)?, chatTheme: ChatTheme, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?, messageUseMarkdown: Bool, showMessageTimeView: Bool, messageFont: UIFont, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
             self._isScrolledToBottom = isScrolledToBottom
             self._isScrolledToTop = isScrolledToTop
             self.messageBuilder = messageBuilder
+            self.mainHeaderBuilder = mainHeaderBuilder
             self.headerBuilder = headerBuilder
             self.chatTheme = chatTheme
             self.type = type
@@ -404,9 +408,17 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.tapAvatarClosure = tapAvatarClosure
             self.paginationHandler = paginationHandler
             self.messageUseMarkdown = messageUseMarkdown
-            self.mainBackgroundColor = mainBackgroundColor
+            self.showMessageTimeView = showMessageTimeView
+            self.messageFont = messageFont
             self.sections = sections
+            self.ids = ids
+            self.mainBackgroundColor = mainBackgroundColor
+            self.paginationTargetIndexPath = paginationTargetIndexPath
         }
+
+        /// call pagination handler when this row is reached
+        /// without this there is a bug: during new cells insertion willDisplay is called one extra time for the cell which used to be the last one while it is being updated (its position in group is changed from first to middle)
+        var paginationTargetIndexPath: IndexPath?
 
         func numberOfSections(in tableView: UITableView) -> Int {
             sections.count
@@ -417,53 +429,72 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-            if showDateHeaders, type == .comments {
-                return dateView(section)
+            if type == .comments {
+                return sectionHeaderView(section)
             }
             return nil
         }
 
         func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-            if showDateHeaders, type == .conversation {
-                return dateView(section)
+            if type == .conversation {
+                return sectionHeaderView(section)
             }
             return nil
         }
 
-        func dateView(_ section: Int) -> UIView? {
-            if let headerBuilder {
-                let header = UIHostingController(rootView:
-                    headerBuilder(sections[section].date)
-                        .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
-                ).view
-                header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
-                return header
-            }
-
-            let header = UIHostingController(rootView:
-                Text(sections[section].formattedDate)
-                    .font(.system(size: 11))
-                    .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
-                    .padding(10)
-                    .padding(.bottom, 8)
-                    .foregroundColor(.gray)
-            ).view
-            header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
-            return header
-        }
-
         func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-            if !showDateHeaders {
+            if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
                 return 0.1
             }
             return type == .conversation ? 0.1 : UITableView.automaticDimension
         }
 
         func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-            if !showDateHeaders {
+            if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
                 return 0.1
             }
             return type == .conversation ? UITableView.automaticDimension : 0.1
+        }
+
+        func sectionHeaderView(_ section: Int) -> UIView? {
+            if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
+                return nil
+            }
+
+            let header = UIHostingController(rootView:
+                sectionHeaderViewBuilder(section)
+                    .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
+            ).view
+            header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
+            return header
+        }
+
+        @ViewBuilder
+        func sectionHeaderViewBuilder(_ section: Int) -> some View {
+            if let mainHeaderBuilder, section == 0 {
+                VStack(spacing: 0) {
+                    mainHeaderBuilder()
+                    dateViewBuilder(section)
+                }
+            } else {
+                dateViewBuilder(section)
+            }
+        }
+
+        @ViewBuilder
+        func dateViewBuilder(_ section: Int) -> some View {
+            if showDateHeaders {
+                if let headerBuilder {
+                    headerBuilder(sections[section].date)
+                } else {
+                    Text(sections[section].formattedDate)
+                        .font(.system(size: 11))
+                        .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
+                        .padding(10)
+                        .padding(.bottom, 8)
+                        .foregroundColor(.gray)
+                }
+            }
         }
 
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -474,7 +505,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: false)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: false, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .transition(.scale)
                     .background(MessageMenuPreferenceViewSetter(id: row.id))
                     .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))

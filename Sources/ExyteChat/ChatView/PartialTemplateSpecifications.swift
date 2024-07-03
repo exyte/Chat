@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public extension ChatView where MessageContent == EmptyView, MainBodyContent == EmptyView {
+public extension ChatView where MessageContent == EmptyView {
 
     init(messages: [Message],
          chatType: ChatType = .conversation,
@@ -22,7 +22,7 @@ public extension ChatView where MessageContent == EmptyView, MainBodyContent == 
     }
 }
 
-public extension ChatView where InputViewContent == EmptyView, MainBodyContent == EmptyView {
+public extension ChatView where InputViewContent == EmptyView {
 
     init(messages: [Message],
          chatType: ChatType = .conversation,
@@ -37,40 +37,6 @@ public extension ChatView where InputViewContent == EmptyView, MainBodyContent =
     }
 }
 
-public extension ChatView where MainBodyContent == EmptyView {
-
-    init(messages: [Message],
-         chatType: ChatType = .conversation,
-         replyMode: ReplyMode = .quote,
-         didSendMessage: @escaping (DraftMessage) -> Void,
-         messageBuilder: @escaping MessageBuilderClosure,
-         inputViewBuilder: @escaping InputViewBuilderClosure) {
-        self.type = chatType
-        self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-        self.ids = messages.map { $0.id }
-        self.messageBuilder = messageBuilder
-        self.inputViewBuilder = inputViewBuilder
-    }
-}
-
-public extension ChatView where MainBodyContent == EmptyView, MenuAction == DefaultMessageMenuAction {
-
-    init(messages: [Message],
-         chatType: ChatType = .conversation,
-         replyMode: ReplyMode = .quote,
-         didSendMessage: @escaping (DraftMessage) -> Void,
-         messageBuilder: @escaping MessageBuilderClosure,
-         inputViewBuilder: @escaping InputViewBuilderClosure) {
-        self.type = chatType
-        self.didSendMessage = didSendMessage
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-        self.ids = messages.map { $0.id }
-        self.messageBuilder = messageBuilder
-        self.inputViewBuilder = inputViewBuilder
-    }
-}
-
 public extension ChatView where MenuAction == DefaultMessageMenuAction {
 
     init(messages: [Message],
@@ -78,19 +44,17 @@ public extension ChatView where MenuAction == DefaultMessageMenuAction {
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
          messageBuilder: @escaping MessageBuilderClosure,
-         inputViewBuilder: @escaping InputViewBuilderClosure,
-         mainBodyBuilder: @escaping MainBodyBuilderClosure) {
+         inputViewBuilder: @escaping InputViewBuilderClosure) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
-        self.mainBodyBuilder = mainBodyBuilder
     }
 }
 
-public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MainBodyContent == EmptyView {
+public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView {
 
     init(messages: [Message],
          chatType: ChatType = .conversation,
@@ -103,7 +67,37 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
     }
 }
 
-public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MainBodyContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+public extension ChatView where InputViewContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+
+    init(messages: [Message],
+         chatType: ChatType = .conversation,
+         replyMode: ReplyMode = .quote,
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         messageBuilder: @escaping MessageBuilderClosure) {
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+        self.messageBuilder = messageBuilder
+    }
+}
+
+public extension ChatView where MessageContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+
+    init(messages: [Message],
+         chatType: ChatType = .conversation,
+         replyMode: ReplyMode = .quote,
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         inputViewBuilder: @escaping InputViewBuilderClosure) {
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+        self.inputViewBuilder = inputViewBuilder
+    }
+}
+
+public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MenuAction == DefaultMessageMenuAction {
 
     init(messages: [Message],
          chatType: ChatType = .conversation,

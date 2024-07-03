@@ -58,6 +58,21 @@ public enum InputViewState {
     }
 }
 
+public enum AvailableInputType {
+    case full // media + text + audio
+    case textAndMedia
+    case textAndAudio
+    case textOnly
+
+    var isMediaAvailable: Bool {
+        [.full, .textAndMedia].contains(self)
+    }
+
+    var isAudioAvailable: Bool {
+        [.full, .textAndAudio].contains(self)
+    }
+}
+
 public struct InputViewAttachments {
     public var medias: [Media] = []
     public var recording: Recording?
@@ -72,6 +87,7 @@ struct InputView: View {
     @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
     var style: InputViewStyle
+    var availableInput: AvailableInputType
     var messageUseMarkdown: Bool
 
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -93,7 +109,7 @@ struct InputView: View {
     @State private var dragStart: Date?
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
-    let tapDelay = 0.2
+    private let tapDelay = 0.2
 
     var body: some View {
         VStack {
@@ -109,7 +125,7 @@ struct InputView: View {
                         .fill(fieldBackgroundColor)
                 }
 
-                rigthOutsideButton
+                rightOutsideButton
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -127,7 +143,9 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                attachButton
+                if availableInput.isMediaAvailable {
+                    attachButton
+                }
             case .signature:
                 if viewModel.mediaPickerMode == .cameraSelection {
                     addButton
@@ -149,7 +167,7 @@ struct InputView: View {
             case .isRecordingTap:
                 recordingInProgress
             default:
-                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style)
+                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput)
             }
         }
         .frame(minHeight: 48)
@@ -160,7 +178,7 @@ struct InputView: View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                if case .message = style {
+                if case .message = style, availableInput.isMediaAvailable {
                     cameraButton
                 }
             case .isRecordingHold, .isRecordingTap:
@@ -177,7 +195,7 @@ struct InputView: View {
     }
 
     @ViewBuilder
-    var rigthOutsideButton: some View {
+    var rightOutsideButton: some View {
         ZStack {
             if [.isRecordingTap, .isRecordingHold].contains(state) {
                 RecordIndicator()
@@ -185,8 +203,9 @@ struct InputView: View {
                     .foregroundColor(theme.colors.sendButtonBackground)
             }
             Group {
-                if state.canSend {
+                if state.canSend || availableInput == .textOnly {
                     sendButton
+                        .disabled(!state.canSend)
                 } else {
                     recordButton
                         .highPriorityGesture(dragGesture())

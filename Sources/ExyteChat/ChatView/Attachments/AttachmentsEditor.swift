@@ -11,7 +11,7 @@ import ActivityIndicatorView
 
 struct AttachmentsEditor<InputViewContent: View>: View {
 
-    typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent, EmptyView, DefaultMessageMenuAction>.InputViewBuilderClosure
+    typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderClosure
 
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var pickerTheme
@@ -26,8 +26,9 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var messageUseMarkdown: Bool
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
+    var availableInput: AvailableInputType
 
-    @State private var seletedMedias: [Media] = []
+    @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
 
     var showingAlbums: Bool {
@@ -47,7 +48,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var mediaPicker: some View {
         GeometryReader { g in
             MediaPicker(isPresented: $inputViewModel.showPicker) {
-                seletedMedias = $0
+                seleсtedMedias = $0
                 assembleSelectedMedia()
             } albumSelectionBuilder: { _, albumSelectionView, _ in
                 VStack {
@@ -85,12 +86,21 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .onChange(of: currentFullscreenMedia) { newValue in
                 assembleSelectedMedia()
             }
+            .onChange(of: inputViewModel.showPicker) { _ in
+                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
+                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
+
+                if selectionLimit == 1 && !showFullscreenPreview {
+                    assembleSelectedMedia()
+                    inputViewModel.send()
+                }
+            }
         }
     }
 
     func assembleSelectedMedia() {
-        if !seletedMedias.isEmpty {
-            inputViewModel.attachments.medias = seletedMedias
+        if !seleсtedMedias.isEmpty {
+            inputViewModel.attachments.medias = seleсtedMedias
         } else if let media = currentFullscreenMedia {
             inputViewModel.attachments.medias = [media]
         } else {
@@ -110,6 +120,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     viewModel: inputViewModel,
                     inputFieldId: UUID(),
                     style: .signature,
+                    availableInput: availableInput,
                     messageUseMarkdown: messageUseMarkdown
                 )
             }
@@ -120,6 +131,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         ZStack {
             HStack {
                 Button {
+                    seleсtedMedias = []
                     inputViewModel.showPicker = false
                 } label: {
                     Text("Cancel")

@@ -20,12 +20,14 @@ struct MessageView: View {
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageUseMarkdown: Bool
     let isDisplayingMessageMenu: Bool
+    let showMessageTimeView: Bool
 
     @State var avatarViewSize: CGSize = .zero
     @State var statusSize: CGSize = .zero
     @State var timeSize: CGSize = .zero
 
     static let widthWithMedia: CGFloat = 204
+    static let horizontalNoAvatarPadding: CGFloat = 8
     static let horizontalAvatarPadding: CGFloat = 8
     static let horizontalTextPadding: CGFloat = 12
     static let horizontalAttachmentPadding: CGFloat = 1 // for multiple attachments
@@ -33,9 +35,9 @@ struct MessageView: View {
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
 
-    let font = UIFont.systemFont(ofSize: 15)
+    var font: UIFont
 
-    enum DateArrangment {
+    enum DateArrangement {
         case hstack, vstack, overlay
     }
 
@@ -43,11 +45,11 @@ struct MessageView: View {
         message.attachments.count > 1 ? MessageView.horizontalAttachmentPadding * 2 : 0
     }
 
-    var dateArrangment: DateArrangment {
+    var dateArrangement: DateArrangement {
         let timeWidth = timeSize.width + 10
         let textPaddings = MessageView.horizontalTextPadding * 2
         let widthWithoutMedia = UIScreen.main.bounds.width
-        - avatarViewSize.width
+        - (message.user.isCurrentUser ? MessageView.horizontalNoAvatarPadding : avatarViewSize.width)
         - statusSize.width
         - MessageView.horizontalBubblePadding
         - textPaddings
@@ -113,6 +115,7 @@ struct MessageView: View {
         }
         .padding(.top, topPadding)
         .padding(.bottom, bottomPadding)
+        .padding(.trailing, message.user.isCurrentUser ? MessageView.horizontalNoAvatarPadding : 0)
         .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
         .frame(maxWidth: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
     }
@@ -215,7 +218,7 @@ struct MessageView: View {
             .padding(.trailing, 12)
 
         Group {
-            switch dateArrangment {
+            switch dateArrangement {
             case .hstack:
                 HStack(alignment: .lastTextBaseline, spacing: 12) {
                     messageView
@@ -259,10 +262,12 @@ struct MessageView: View {
 
     func messageTimeView(needsCapsule: Bool = false) -> some View {
         Group {
-            if needsCapsule {
-                MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser)
-            } else {
-                MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser)
+            if showMessageTimeView {
+                if needsCapsule {
+                    MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
+                } else {
+                    MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
+                }
             }
         }
         .sizeGetter($timeSize)
@@ -331,7 +336,9 @@ struct MessageView_Preview: PreviewProvider {
                 avatarSize: 32,
                 tapAvatarClosure: nil,
                 messageUseMarkdown: false,
-                isDisplayingMessageMenu: false
+                isDisplayingMessageMenu: false,
+                showMessageTimeView: true,
+                font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
             )
         }
     }

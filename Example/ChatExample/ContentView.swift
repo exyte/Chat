@@ -16,8 +16,12 @@ struct ContentView: View {
                         )
                     }
                     
-                    NavigationLink("Simple example") {
+                    NavigationLink("Simple chat example") {
                         ChatExampleView(title: "Simple example")
+                    }
+
+                    NavigationLink("Simple comments example") {
+                        CommentsExampleView()
                     }
                 } header: {
                     Text("Basic examples")

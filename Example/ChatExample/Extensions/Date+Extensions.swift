@@ -14,3 +14,18 @@ extension Date {
         return Calendar.current.date(from: components)!
     }
 }
+
+class DateFormatting {
+    static var agoFormatter = RelativeDateTimeFormatter()
+}
+
+extension Date {
+    // 1 hour ago, 2 days ago...
+    func formatAgo() -> String {
+        let result = DateFormatting.agoFormatter.localizedString(for: self, relativeTo: Date())
+        if result.contains("second") {
+            return "Just now"
+        }
+        return result
+    }
+}
