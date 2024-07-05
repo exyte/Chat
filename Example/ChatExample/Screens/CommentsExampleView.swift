@@ -8,6 +8,36 @@
 import SwiftUI
 import ExyteChat
 
+enum Action: MessageMenuAction {
+    case reply, edit, delete, print
+
+    func title() -> String {
+        switch self {
+        case .reply:
+            "Reply"
+        case .edit:
+            "Edit"
+        case .delete:
+            "Delete"
+        case .print:
+            "Print"
+        }
+    }
+    
+    func icon() -> Image {
+        switch self {
+        case .reply:
+            Image(systemName: "arrowshape.turn.up.left")
+        case .edit:
+            Image(systemName: "square.and.pencil")
+        case .delete:
+            Image(systemName: "xmark.bin")
+        case .print:
+            Image(systemName: "printer")
+        }
+    }
+}
+
 struct CommentsExampleView: View {
 
     @StateObject var viewModel = CommentsExampleViewModel()
@@ -28,6 +58,23 @@ struct CommentsExampleView: View {
                 viewModel.send(draft: draft)
             } messageBuilder: { message, positionInGroup, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
                 messageCell(message, positionInCommentsGroup, showMenuClosure: showContextMenuClosure, actionClosure: messageActionClosure, attachmentClosure: showAttachmentClosure)
+            } messageMenuAction: { (action: Action, defaultActionClosure, message) in
+                switch action {
+                case .reply:
+                    defaultActionClosure(message, .reply)
+                case .edit:
+                    defaultActionClosure(message, .edit { editedText in
+                        // update this message's text on your BE
+                        print(editedText)
+                    })
+                case .delete:
+                    defaultActionClosure(message, .delete(confirmClosure: {
+                        // delete this message on your BE
+                        print("deleted")
+                    }))
+                case .print:
+                    print(message.text)
+                }
             }
             .showDateHeaders(false)
         }

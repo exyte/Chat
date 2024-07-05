@@ -13,12 +13,14 @@ public extension ChatView where MessageContent == EmptyView {
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
-         inputViewBuilder: @escaping InputViewBuilderClosure) {
+         inputViewBuilder: @escaping InputViewBuilderClosure,
+         messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.inputViewBuilder = inputViewBuilder
+        self.messageMenuAction = messageMenuAction
     }
 }
 
@@ -28,12 +30,14 @@ public extension ChatView where InputViewContent == EmptyView {
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
-         messageBuilder: @escaping MessageBuilderClosure) {
+         messageBuilder: @escaping MessageBuilderClosure,
+         messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
+        self.messageMenuAction = messageMenuAction
     }
 }
 
@@ -59,11 +63,13 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
-         didSendMessage: @escaping (DraftMessage) -> Void) {
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
+        self.messageMenuAction = messageMenuAction
     }
 }
 

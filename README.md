@@ -149,6 +149,52 @@ ChatView(messages: viewModel.messages) { draft in
 - `inputViewActionClosure` for calling on taps on your custom buttons. For example, call `inputViewActionClosure(.send)` if you want to send your message with your own button, then the library will reset the text and attachments and call the `didSendMessage` sending closure   
 - `dismissKeyboardClosure` - call this to dismiss keyboard    
 
+## Custom message menu
+Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callbcak will be called. Here is a simple example:
+```swift
+enum Action: MessageMenuAction {
+    case reply, edit
+
+    func title() -> String {
+        switch self {
+        case .reply:
+            "Reply"
+        case .edit:
+            "Edit"
+        }
+    }
+    
+    func icon() -> Image {
+        switch self {
+        case .reply:
+            Image(systemName: "arrowshape.turn.up.left")
+        case .edit:
+            Image(systemName: "square.and.pencil")
+        }
+    }
+}
+
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+} messageMenuAction: { (action: Action, defaultActionClosure, message) in // <-- here: specify the name of your `MessageMenuAction` enum
+    switch action {
+    case .reply:
+        defaultActionClosure(message, .reply)
+    case .edit:
+        defaultActionClosure(message, .edit { editedText in
+            // update this message's text on your BE
+            print(editedText)
+        })
+    }
+}
+```
+`messageMenuAction`'s parameters:  
+- `selectedMenuAction` - action selected by the user from the menu. NOTE: when declaring this variable, specify its type (your custom descendant of MessageMenuAction) explicitly    
+- `defaultActionClosure` - a closure taking a case of default implementation of MessageMenuAction which provides simple actions handlers; you call this closure passing the selected message and choosing one of the default actions if you need them; or you can write a custom implementation for all your actions, in that case just ignore this closure
+- `message` - message for which the menu is displayed
+    
+When implementing your own `MessageMenuActionClosure`, write a switch statement passing through all the cases of your `MessageMenuAction`, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for `.edit` you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.
+
 ## Small view builders:
 These use `AnyView`, so please try to keep them easy enough
 - `betweenListAndInputViewBuilder` - content to display in between the chat list view and the input view   

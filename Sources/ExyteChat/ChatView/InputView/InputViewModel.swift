@@ -22,6 +22,8 @@ final class InputViewModel: ObservableObject {
 
     private var recorder = Recorder()
 
+    private var saveEditingClosure: ((String) -> Void)?
+
     private var recordPlayerSubscription: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
 
@@ -35,10 +37,14 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
-        showPicker = false
-        text = ""
-        attachments = InputViewAttachments()
-        subscribeValidation()
+        DispatchQueue.main.async { [weak self] in
+            self?.showPicker = false
+            self?.text = ""
+            self?.saveEditingClosure = nil
+            self?.attachments = InputViewAttachments()
+            self?.subscribeValidation()
+            self?.state = .empty
+        }
     }
 
     func send() {
@@ -48,13 +54,18 @@ final class InputViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
+    func edit(_ closure: @escaping (String) -> Void) {
+        saveEditingClosure = closure
+        state = .editing
+    }
+
     func inputViewAction() -> (InputViewAction) -> Void {
         { [weak self] in
             self?.inputViewActionInternal($0)
         }
     }
 
-    func inputViewActionInternal(_ action: InputViewAction) {
+    private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
         case .photo:
             mediaPickerMode = .photos
@@ -93,10 +104,15 @@ final class InputViewModel: ObservableObject {
         case .pauseRecord:
             state = .pausedRecording
             recordingPlayer?.pause()
+        case .saveEdit:
+            saveEditingClosure?(text)
+            reset()
+        case .cancelEdit:
+            reset()
         }
     }
 
-    func recordAudio() {
+    private func recordAudio() {
         if recorder.isRecording {
             return
         }
@@ -121,6 +137,7 @@ private extension InputViewModel {
     func validateDraft() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            guard state != .editing else { return } // special case
             if !self.text.isEmpty || !self.attachments.medias.isEmpty {
                 self.state = .hasTextOrMedia
             } else if self.text.isEmpty,

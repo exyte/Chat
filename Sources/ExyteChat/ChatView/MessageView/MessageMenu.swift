@@ -15,15 +15,49 @@ public protocol MessageMenuAction: Equatable, CaseIterable {
 }
 
 public enum DefaultMessageMenuAction: MessageMenuAction {
+
     case reply
+    case edit(saveClosure: (String)->Void)
+    case delete(confirmClosure: ()->Void)
 
     public func title() -> String {
-        "Reply"
+        switch self {
+        case .reply:
+            "Reply"
+        case .edit:
+            "Edit"
+        case .delete:
+            "Delete"
+        }
     }
 
     public func icon() -> Image {
-        Image(.reply)
+        switch self {
+        case .reply:
+            Image(.reply)
+        case .edit:
+            Image(.edit)
+        case .delete:
+            Image(.delete)
+        }
     }
+
+    public static func == (lhs: DefaultMessageMenuAction, rhs: DefaultMessageMenuAction) -> Bool {
+        if case .reply = lhs, case .reply = rhs {
+            return true
+        }
+        if case .edit(_) = lhs, case .edit(_) = rhs {
+            return true
+        }
+        if case .delete(_) = lhs, case .delete(_) = rhs {
+            return true
+        }
+        return false
+    }
+
+    public static var allCases: [DefaultMessageMenuAction] = [
+        .reply, .edit(saveClosure: {_ in}), .delete(confirmClosure: {})
+    ]
 }
 
 struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
