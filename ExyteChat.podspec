@@ -26,5 +26,6 @@ Pod::Spec.new do |s|
   s.dependency 'ExyteMediaPicker'
   s.dependency 'FloatingButton'
   s.dependency 'ActivityIndicatorView'
+  s.dependency 'ExytePopupView'
 
 end
