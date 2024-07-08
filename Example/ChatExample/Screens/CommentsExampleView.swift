@@ -68,10 +68,7 @@ struct CommentsExampleView: View {
                         print(editedText)
                     })
                 case .delete:
-                    defaultActionClosure(message, .delete(confirmClosure: {
-                        // delete this message on your BE
-                        print("deleted")
-                    }))
+                    print("deleted")
                 case .print:
                     print(message.text)
                 }

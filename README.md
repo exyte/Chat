@@ -190,7 +190,7 @@ ChatView(messages: viewModel.messages) { draft in
 ```
 `messageMenuAction`'s parameters:  
 - `selectedMenuAction` - action selected by the user from the menu. NOTE: when declaring this variable, specify its type (your custom descendant of MessageMenuAction) explicitly    
-- `defaultActionClosure` - a closure taking a case of default implementation of MessageMenuAction which provides simple actions handlers; you call this closure passing the selected message and choosing one of the default actions if you need them; or you can write a custom implementation for all your actions, in that case just ignore this closure
+- `defaultActionClosure` - a closure taking a case of default implementation of MessageMenuAction which provides simple actions handlers; you call this closure passing the selected message and choosing one of the default actions (.reply, .edit) if you need them; or you can write a custom implementation for all your actions, in that case just ignore this closure
 - `message` - message for which the menu is displayed
     
 When implementing your own `MessageMenuActionClosure`, write a switch statement passing through all the cases of your `MessageMenuAction`, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for `.edit` you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.

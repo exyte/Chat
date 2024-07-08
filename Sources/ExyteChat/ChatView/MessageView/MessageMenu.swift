@@ -18,7 +18,6 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
 
     case reply
     case edit(saveClosure: (String)->Void)
-    case delete(confirmClosure: ()->Void)
 
     public func title() -> String {
         switch self {
@@ -26,8 +25,6 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
             "Reply"
         case .edit:
             "Edit"
-        case .delete:
-            "Delete"
         }
     }
 
@@ -37,8 +34,6 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
             Image(.reply)
         case .edit:
             Image(.edit)
-        case .delete:
-            Image(.delete)
         }
     }
 
@@ -49,14 +44,11 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         if case .edit(_) = lhs, case .edit(_) = rhs {
             return true
         }
-        if case .delete(_) = lhs, case .delete(_) = rhs {
-            return true
-        }
         return false
     }
 
     public static var allCases: [DefaultMessageMenuAction] = [
-        .reply, .edit(saveClosure: {_ in}), .delete(confirmClosure: {})
+        .reply, .edit(saveClosure: {_ in})
     ]
 }
 

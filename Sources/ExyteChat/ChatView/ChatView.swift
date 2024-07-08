@@ -9,7 +9,6 @@ import SwiftUI
 import FloatingButton
 import SwiftUIIntrospect
 import ExyteMediaPicker
-import PopupView
 
 public typealias MediaPickerParameters = SelectionParamsHolder
 
@@ -190,36 +189,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
-
-            .popup(isPresented: $viewModel.showConfirmDeleteMessage) {
-                VStack(spacing: 0) {
-                    Text("Are you sure you want to delete this message?")
-                        .multilineTextAlignment(.center)
-                        .padding(15)
-
-                    Divider()
-
-                    Button("Delete", role: .destructive) {
-                        viewModel.confirmDeleteMessageClosure?()
-                        viewModel.showConfirmDeleteMessage = false
-                    }
-                    .padding(15)
-
-                    Divider()
-
-                    Button("Cancel", role: .cancel) {
-                        viewModel.confirmDeleteMessageClosure = nil
-                        viewModel.showConfirmDeleteMessage = false
-                    }
-                    .padding(15)
-                }
-                .background(.ultraThickMaterial)
-                .cornerRadius(10)
-                .padding(.horizontal, 30)
-            } customize: {
-                $0.type(.floater())
-                    .closeOnTap(false)
-            }
     }
 
     var mainView: some View {
@@ -328,7 +297,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         ScrollView {
                             messageMenu(row)
                         }
-                        .introspect(.scrollView, on: .iOS(.v16, .v17)) { scrollView in
+                        .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { scrollView in
                             DispatchQueue.main.async {
                                 self.menuScrollView = scrollView
                             }

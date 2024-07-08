@@ -18,9 +18,6 @@ final class ChatViewModel: ObservableObject {
     var inputViewModel: InputViewModel?
     var globalFocusState: GlobalFocusState?
 
-    @Published var showConfirmDeleteMessage = false
-    @Published var confirmDeleteMessageClosure: (() -> Void)?
-
     func presentAttachmentFullScreen(_ attachment: Attachment) {
         fullscreenAttachmentItem = attachment
         fullscreenAttachmentPresented = true
@@ -53,9 +50,6 @@ final class ChatViewModel: ObservableObject {
             inputViewModel?.text = message.text
             inputViewModel?.edit(saveClosure)
             globalFocusState?.focus = .uuid(inputFieldId)
-        case .delete(let confirmClosure):
-            showConfirmDeleteMessage = true
-            confirmDeleteMessageClosure = confirmClosure
         }
     }
 }
