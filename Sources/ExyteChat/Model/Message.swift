@@ -108,7 +108,14 @@ extension Message {
 
 extension Message: Equatable {
     public static func == (lhs: Message, rhs: Message) -> Bool {
-        lhs.id == rhs.id && lhs.status == rhs.status
+        lhs.id == rhs.id &&
+        lhs.user == rhs.user &&
+        lhs.status == rhs.status &&
+        lhs.createdAt == rhs.createdAt &&
+        lhs.text == rhs.text &&
+        lhs.attachments == rhs.attachments &&
+        lhs.recording == rhs.recording &&
+        lhs.replyMessage == rhs.replyMessage
     }
 }
 
@@ -126,7 +133,12 @@ public struct Recording: Codable, Hashable {
 
 public struct ReplyMessage: Codable, Identifiable, Hashable {
     public static func == (lhs: ReplyMessage, rhs: ReplyMessage) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id &&
+        lhs.user == rhs.user &&
+        lhs.createdAt == rhs.createdAt &&
+        lhs.text == rhs.text &&
+        lhs.attachments == rhs.attachments &&
+        lhs.recording == rhs.recording
     }
 
     public var id: String
