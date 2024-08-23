@@ -530,6 +530,7 @@ public extension ChatView {
         return view
     }
 
+    @available(*, deprecated)
     func chatNavigation(title: String, status: String? = nil, cover: URL? = nil) -> some View {
         var view = self
         view.chatTitle = title
