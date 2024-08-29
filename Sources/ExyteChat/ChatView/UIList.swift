@@ -388,7 +388,13 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let messageUseMarkdown: Bool
         let showMessageTimeView: Bool
         let messageFont: UIFont
-        var sections: [MessagesSection]
+        var sections: [MessagesSection] {
+            didSet {
+                if let lastSection = sections.last {
+                    paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+                }
+            }
+        }
         let ids: [String]
         let mainBackgroundColor: Color
 
