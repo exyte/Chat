@@ -55,6 +55,7 @@ public struct Message: Identifiable, Hashable {
     public var replyMessage: ReplyMessage?
 
     public var triggerRedraw: UUID?
+    public var chatId: String?
 
     public init(id: String,
                 user: User,
@@ -63,7 +64,8 @@ public struct Message: Identifiable, Hashable {
                 text: String = "",
                 attachments: [Attachment] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
+                replyMessage: ReplyMessage? = nil,
+                chatId: String? = nil) {
 
         self.id = id
         self.user = user
@@ -73,6 +75,7 @@ public struct Message: Identifiable, Hashable {
         self.attachments = attachments
         self.recording = recording
         self.replyMessage = replyMessage
+        self.chatId = chatId
     }
 
     public static func makeMessage(
