@@ -186,7 +186,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             }
             tableSemaphore.wait()
 
-            if isScrolledToBottom || isScrolledToTop {
+//            if isScrolledToBottom || isScrolledToTop {
                 DispatchQueue.main.sync {
                     // step 5
                     // apply the rest of the changes to table's dataSource, i.e. inserts
@@ -205,9 +205,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
                     updateSemaphore.signal()
                 }
-            } else {
-                updateSemaphore.signal()
-            }
+//            } else {
+//                updateSemaphore.signal()
+//            }
         }
     }
 
