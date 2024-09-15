@@ -117,6 +117,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var showMessageTimeView = true
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availablelInput: AvailableInputType = .full
+    
+    var recorderSetting: RecorderSetting? = RecorderSetting()
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -355,7 +357,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputFieldId: viewModel.inputFieldId,
                     style: .message,
                     availableInput: availablelInput,
-                    messageUseMarkdown: messageUseMarkdown
+                    messageUseMarkdown: messageUseMarkdown,
+                    recorderSetting: recorderSetting
                 )
             }
         }
@@ -576,4 +579,5 @@ public extension ChatView {
         view.availablelInput = type
         return view
     }
+    
 }

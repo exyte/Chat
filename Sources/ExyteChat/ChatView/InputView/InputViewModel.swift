@@ -26,6 +26,10 @@ final class InputViewModel: ObservableObject {
 
     private var recordPlayerSubscription: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
+    
+    func setRecorderSetting(recorderSetting:RecorderSetting? = RecorderSetting()){
+        self.recorder.recorderSetting = recorderSetting!
+    }
 
     func onStart() {
         subscribeValidation()
@@ -64,7 +68,7 @@ final class InputViewModel: ObservableObject {
             self?.inputViewActionInternal($0)
         }
     }
-
+    
     private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
         case .photo:

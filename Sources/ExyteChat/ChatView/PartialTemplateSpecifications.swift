@@ -29,6 +29,7 @@ public extension ChatView where InputViewContent == EmptyView {
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         recorderSetting:RecorderSetting? = RecorderSetting(),
          didSendMessage: @escaping (DraftMessage) -> Void,
          messageBuilder: @escaping MessageBuilderClosure,
          messageMenuAction: MessageMenuActionClosure?) {
@@ -38,6 +39,7 @@ public extension ChatView where InputViewContent == EmptyView {
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.messageMenuAction = messageMenuAction
+        self.recorderSetting = recorderSetting
     }
 }
 
@@ -63,6 +65,7 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         recorderSetting:RecorderSetting? = RecorderSetting(),
          didSendMessage: @escaping (DraftMessage) -> Void,
          messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
@@ -70,6 +73,7 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageMenuAction = messageMenuAction
+        self.recorderSetting = recorderSetting
     }
 }
 
@@ -78,6 +82,7 @@ public extension ChatView where InputViewContent == EmptyView, MenuAction == Def
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         recorderSetting:RecorderSetting? = RecorderSetting(),
          didSendMessage: @escaping (DraftMessage) -> Void,
          messageBuilder: @escaping MessageBuilderClosure) {
         self.type = chatType
@@ -85,6 +90,7 @@ public extension ChatView where InputViewContent == EmptyView, MenuAction == Def
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
+        self.recorderSetting = recorderSetting
     }
 }
 
@@ -108,10 +114,12 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         recorderSetting:RecorderSetting? = RecorderSetting(),
          didSendMessage: @escaping (DraftMessage) -> Void) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
+        self.recorderSetting = recorderSetting
     }
 }

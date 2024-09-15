@@ -13,14 +13,15 @@ struct ChatExampleView: View {
     @StateObject private var viewModel: ChatExampleViewModel
     
     private let title: String
-
+    let recorderSetting = RecorderSetting(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
+    
     init(viewModel: ChatExampleViewModel = ChatExampleViewModel(), title: String) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.title = title
     }
     
     var body: some View {
-        ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
+        ChatView(messages: viewModel.messages, chatType: .conversation, recorderSetting: recorderSetting) { draft in
             viewModel.send(draft: draft)
         }
         .enableLoadMore(pageSize: 3) { message in
