@@ -27,8 +27,8 @@ final class InputViewModel: ObservableObject {
     private var recordPlayerSubscription: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
     
-    func setRecorderSetting(recorderSetting:RecorderSetting? = RecorderSetting()){
-        self.recorder.recorderSetting = recorderSetting!
+    func setRecorderSettings(recorderSettings: RecorderSettings = RecorderSettings()) {
+        self.recorder.recorderSettings = recorderSettings
     }
 
     func onStart() {

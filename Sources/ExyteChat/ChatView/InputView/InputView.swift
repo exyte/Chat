@@ -94,7 +94,7 @@ struct InputView: View {
     var style: InputViewStyle
     var availableInput: AvailableInputType
     var messageUseMarkdown: Bool
-    var recorderSetting:RecorderSetting? = RecorderSetting()
+    var recorderSettings: RecorderSettings = RecorderSettings()
     
     @StateObject var recordingPlayer = RecordingPlayer()
 
@@ -139,7 +139,7 @@ struct InputView: View {
         .background(backgroundColor)
         .onAppear {
             viewModel.recordingPlayer = recordingPlayer
-            viewModel.setRecorderSetting(recorderSetting: recorderSetting)
+            viewModel.setRecorderSettings(recorderSettings: recorderSettings)
         }
     }
 
