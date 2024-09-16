@@ -18,6 +18,7 @@ final class Recorder {
     private var audioTimer: Timer?
 
     private var soundSamples: [CGFloat] = []
+    internal var recorderSetting = RecorderSetting()
 
     var isAllowedToRecordAudio: Bool {
         audioSession.recordPermission == .granted
@@ -38,12 +39,13 @@ final class Recorder {
             return startRecordingInternal(durationProgressHandler)
         }
     }
-
+    
     private func startRecordingInternal(_ durationProgressHandler: @escaping ProgressHandler) -> URL? {
-        let settings = [
+        let settings: [String : Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
-            AVNumberOfChannelsKey: 1,
+            AVSampleRateKey: recorderSetting.sampleRate,
+            AVNumberOfChannelsKey: recorderSetting.numberOfChannels,
+            AVLinearPCMBitDepthKey: recorderSetting.linearPCMBitDepth,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 
@@ -88,6 +90,19 @@ final class Recorder {
         audioRecorder = nil
         audioTimer?.invalidate()
         audioTimer = nil
+    }
+}
+
+public struct RecorderSetting : Codable,Hashable {
+    
+    var sampleRate: CGFloat
+    var numberOfChannels: Int
+    var linearPCMBitDepth: Int
+    
+    public init(sampleRate: CGFloat = 12000, numberOfChannels: Int = 1, linearPCMBitDepth: Int = 16) {
+        self.sampleRate = sampleRate
+        self.numberOfChannels = numberOfChannels
+        self.linearPCMBitDepth = linearPCMBitDepth
     }
 }
 
