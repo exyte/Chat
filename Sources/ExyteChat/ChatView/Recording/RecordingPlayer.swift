@@ -71,6 +71,7 @@ final class RecordingPlayer: ObservableObject {
         try? audioSession.setActive(true)
         player?.play()
         playing = true
+        NotificationCenter.default.post(name: .chatAudioIsPlaying, object: self)
     }
 
     private func setupPlayer(for url: URL, trackDuration: Double) {
@@ -83,6 +84,15 @@ final class RecordingPlayer: ObservableObject {
 
         let playerItem = AVPlayerItem(url: url)
         player = AVPlayer(playerItem: playerItem)
+        
+        NotificationCenter.default.addObserver(forName: .chatAudioIsPlaying, object: nil, queue: .main) { notification in
+            if let sender = notification.object as? RecordingPlayer {
+                if sender.recording?.url == self.recording?.url {
+                    return
+                }
+                self.pause()
+            }
+        }
 
         NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
