@@ -12,9 +12,11 @@ struct RecordWaveformWithButtons: View {
     @Environment(\.chatTheme) private var theme
 
     @StateObject var recordPlayer = RecordingPlayer()
-    //160 is screen left-padding/right-padding and playButton's width.
-    //To ensure that the view does not exceed the screen, need to subtract
-    static let viewPadding:CGFloat = 160
+
+    // 160 is screen left-padding/right-padding and playButton's width.
+    // ensure that the view does not exceed the screen, need to subtract
+    // TODO: do not hardcode this value
+    static let viewPadding: CGFloat = 160
 
     var recording: Recording
 
@@ -56,7 +58,6 @@ struct RecordWaveformWithButtons: View {
 }
 
 struct RecordWaveformPlaying: View {
-    
     var samples: [CGFloat] // 0...1
     var progress: CGFloat
     var color: Color
@@ -75,7 +76,6 @@ struct RecordWaveformPlaying: View {
     }
 
     var body: some View {
-        
         GeometryReader { g in
             ZStack {
                 let adjusted = addExtraDots ? adjustedSamples(g.size.width) : adjustedSamples
@@ -100,14 +100,14 @@ struct RecordWaveformPlaying: View {
     }
 
     func adjustedSamples(_ maxWidth: CGFloat) -> [CGFloat] {
-        
         let maxSamples = Int((maxWidth - RecordWaveformWithButtons.viewPadding) / (RecordWaveform.width + RecordWaveform.spacing))
         let temp = samples
         
         if temp.count <= maxSamples {
             return temp
         }
-        //Use ceil to ensure that the adjusted.count will not be greater than maxSamples
+
+        // use ceil to ensure that the adjusted.count will not be greater than maxSamples
         let ratio = Int(ceil( Double(temp.count) / Double(maxSamples) ))
         let adjusted = stride(from: 0, to: temp.count, by: ratio).map {
             temp[$0]
