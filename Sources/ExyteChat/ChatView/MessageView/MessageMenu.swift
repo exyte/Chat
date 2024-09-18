@@ -16,11 +16,14 @@ public protocol MessageMenuAction: Equatable, CaseIterable {
 
 public enum DefaultMessageMenuAction: MessageMenuAction {
 
+    case copy
     case reply
     case edit(saveClosure: (String)->Void)
 
     public func title() -> String {
         switch self {
+        case .copy:
+            "Copy"
         case .reply:
             "Reply"
         case .edit:
@@ -30,6 +33,8 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
 
     public func icon() -> Image {
         switch self {
+        case .copy:
+            Image(systemName: "doc.on.doc")
         case .reply:
             Image(.reply)
         case .edit:
@@ -38,17 +43,18 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
     }
 
     public static func == (lhs: DefaultMessageMenuAction, rhs: DefaultMessageMenuAction) -> Bool {
-        if case .reply = lhs, case .reply = rhs {
+        switch (lhs, rhs) {
+        case (.copy, .copy),
+             (.reply, .reply),
+             (.edit(_), .edit(_)):
             return true
+        default:
+            return false
         }
-        if case .edit(_) = lhs, case .edit(_) = rhs {
-            return true
-        }
-        return false
     }
 
     public static var allCases: [DefaultMessageMenuAction] = [
-        .reply, .edit(saveClosure: {_ in})
+        .copy, .reply, .edit(saveClosure: {_ in})
     ]
 }
 
