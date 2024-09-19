@@ -47,7 +47,9 @@ struct RecordWaveformWithButtons: View {
             }
             
             VStack(alignment: .leading, spacing: 5) {
-                RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false)
+                RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false) { progress in
+                    recordPlayer.seek(with: recording, to: progress)
+                }
                 Text(DateFormatter.timeString(duration))
                     .font(.caption2)
                     .monospacedDigit()
@@ -63,14 +65,23 @@ struct RecordWaveformPlaying: View {
     var color: Color
     var addExtraDots: Bool
     var maxLength: CGFloat = 0.0
-    
+
+    let progressChangeHandler: (CGFloat) -> Void
+
+    @State private var offset: CGSize = .zero
+
     private var adjustedSamples: [CGFloat] = []
     
-    init(samples: [CGFloat], progress: CGFloat, color: Color, addExtraDots: Bool) {
+    init(samples: [CGFloat],
+         progress: CGFloat,
+         color: Color,
+         addExtraDots: Bool,
+         progressChangeHandler: @escaping (CGFloat) -> Void) {
         self.samples = samples
         self.progress = progress
         self.color = color
         self.addExtraDots = addExtraDots
+        self.progressChangeHandler = progressChangeHandler
         self.adjustedSamples = adjustedSamples(UIScreen.main.bounds.width)
         self.maxLength = max((RecordWaveform.spacing + RecordWaveform.width) * CGFloat(self.adjustedSamples.count) - RecordWaveform.spacing, 0)
     }
@@ -97,6 +108,26 @@ struct RecordWaveformPlaying: View {
         }
         .frame(maxWidth: addExtraDots ? .infinity : maxLength)
         .fixedSize(horizontal: !addExtraDots, vertical: true)
+        .gesture(addDragGesture)
+    }
+
+    private var addDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                offset = value.translation
+            }
+            .onEnded { _ in
+                let currentPosition = maxLength * progress
+                // multiply by 0.5 so that the sliding will not be too sensitive
+                var newPosition: CGFloat = currentPosition + offset.width * 0.5
+                if offset.width > 0 {
+                    newPosition = min(newPosition, maxLength)
+                }else{
+                    newPosition = max(newPosition, 0)
+                }
+                let newProgress = newPosition / maxLength
+                progressChangeHandler(newProgress)
+            }
     }
 
     func adjustedSamples(_ maxWidth: CGFloat) -> [CGFloat] {

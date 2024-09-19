@@ -503,7 +503,9 @@ struct InputView: View {
                 }
                 .frame(width: 20)
 
-                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true)
+                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true) { progress in
+                    recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
+                }
             }
             .padding(.horizontal, 8)
         }
