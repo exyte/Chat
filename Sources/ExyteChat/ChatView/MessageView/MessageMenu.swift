@@ -101,7 +101,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                     .opacity(0.5)
                     .cornerRadius(12)
                 HStack {
-                    Text(title)
+                    Text(LocalizedStringKey(title), bundle: .module)
                         .foregroundColor(theme.colors.textLightContext)
                     Spacer()
                     icon

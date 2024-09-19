@@ -134,7 +134,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     seleсtedMedias = []
                     inputViewModel.showPicker = false
                 } label: {
-                    Text("Cancel")
+                    Text("Cancel", bundle: .module)
                         .foregroundColor(.white.opacity(0.7))
                 }
 
@@ -142,7 +142,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
 
             HStack {
-                Text("Recents")
+                Text("Recents", bundle: .module)
                 Image(systemName: "chevron.down")
                     .rotationEffect(Angle(radians: showingAlbums ? .pi : 0))
             }

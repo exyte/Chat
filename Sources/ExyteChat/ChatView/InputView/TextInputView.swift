@@ -19,7 +19,7 @@ struct TextInputView: View {
         TextField("", text: $text, axis: .vertical)
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
             .placeholder(when: text.isEmpty) {
-                Text(style.placeholder)
+                Text(LocalizedStringKey(style.placeholder), bundle: .module)
                     .foregroundColor(theme.colors.buttonBackground)
             }
             .foregroundColor(style == .message ? theme.colors.textLightContext : theme.colors.textDarkContext)

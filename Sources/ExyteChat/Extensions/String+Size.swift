@@ -7,6 +7,11 @@ import UIKit
 
 extension String {
 
+    static func localizedFormat(key: String, _ args: CVarArg...) -> String {
+        let localizedString = NSLocalizedString(key, comment: "")
+        return String(format: localizedString, arguments: args)
+    }
+
     static var markdownOptions = AttributedString.MarkdownParsingOptions(
         allowsExtendedAttributes: false,
         interpretedSyntax: .inlineOnlyPreservingWhitespace,

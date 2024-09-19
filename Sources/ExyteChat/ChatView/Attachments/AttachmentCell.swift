@@ -26,7 +26,7 @@ struct AttachmentCell: View {
             } else {
                 content
                     .overlay {
-                        Text("Unknown")
+                        Text("Unknown", bundle: .module)
                     }
             }
         }

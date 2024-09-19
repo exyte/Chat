@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Chat",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v16)
     ],
