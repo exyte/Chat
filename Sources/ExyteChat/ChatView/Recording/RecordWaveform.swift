@@ -13,6 +13,11 @@ struct RecordWaveformWithButtons: View {
 
     @StateObject var recordPlayer = RecordingPlayer()
 
+    // 160 is screen left-padding/right-padding and playButton's width.
+    // ensure that the view does not exceed the screen, need to subtract
+    // TODO: do not hardcode this value
+    static let viewPadding: CGFloat = 160
+
     var recording: Recording
 
     var colorButton: Color
@@ -42,7 +47,9 @@ struct RecordWaveformWithButtons: View {
             }
             
             VStack(alignment: .leading, spacing: 5) {
-                RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false)
+                RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false) { progress in
+                    recordPlayer.seek(with: recording, to: progress)
+                }
                 Text(DateFormatter.timeString(duration))
                     .font(.caption2)
                     .monospacedDigit()
@@ -53,20 +60,36 @@ struct RecordWaveformWithButtons: View {
 }
 
 struct RecordWaveformPlaying: View {
-
     var samples: [CGFloat] // 0...1
     var progress: CGFloat
     var color: Color
     var addExtraDots: Bool
+    var maxLength: CGFloat = 0.0
 
-    var maxLength: CGFloat {
-        max((RecordWaveform.spacing + RecordWaveform.width) * CGFloat(samples.count) - RecordWaveform.spacing, 0)
+    let progressChangeHandler: (CGFloat) -> Void
+
+    @State private var offset: CGSize = .zero
+
+    private var adjustedSamples: [CGFloat] = []
+    
+    init(samples: [CGFloat],
+         progress: CGFloat,
+         color: Color,
+         addExtraDots: Bool,
+         progressChangeHandler: @escaping (CGFloat) -> Void) {
+        self.samples = samples
+        self.progress = progress
+        self.color = color
+        self.addExtraDots = addExtraDots
+        self.progressChangeHandler = progressChangeHandler
+        self.adjustedSamples = adjustedSamples(UIScreen.main.bounds.width)
+        self.maxLength = max((RecordWaveform.spacing + RecordWaveform.width) * CGFloat(self.adjustedSamples.count) - RecordWaveform.spacing, 0)
     }
 
     var body: some View {
         GeometryReader { g in
             ZStack {
-                let adjusted = adjustedSamples(g.size.width)
+                let adjusted = addExtraDots ? adjustedSamples(g.size.width) : adjustedSamples
                 RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
                     .foregroundColor(color.opacity(0.4))
                 RecordWaveform(samples: adjusted, addExtraDots: addExtraDots)
@@ -77,6 +100,7 @@ struct RecordWaveformPlaying: View {
                     }
             }
             .frame(height: RecordWaveform.maxSampleHeight)
+            
         }
         .frame(height: RecordWaveform.maxSampleHeight)
         .applyIf(!addExtraDots) {
@@ -84,29 +108,44 @@ struct RecordWaveformPlaying: View {
         }
         .frame(maxWidth: addExtraDots ? .infinity : maxLength)
         .fixedSize(horizontal: !addExtraDots, vertical: true)
+        .gesture(addDragGesture)
     }
 
-    func adjustedSamples(_ width: CGFloat) -> [CGFloat] {
-        let maxWidth = addExtraDots ? width : UIScreen.main.bounds.width
-        let maxSamples = Int(maxWidth / (RecordWaveform.width + RecordWaveform.spacing))
-
-        var adjusted = samples
-        var temp = [CGFloat]()
-        while adjusted.count > maxSamples {
-            var i = 0
-            while i < adjusted.count {
-                if i == adjusted.count - 1 {
-                    temp.append(adjusted[i])
-                    break
-                }
-
-                temp.append((adjusted[i] + adjusted[i+1])/2)
-                i+=2
+    private var addDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                offset = value.translation
             }
-            adjusted = temp
-            temp = []
+            .onEnded { _ in
+                let currentPosition = maxLength * progress
+                // multiply by 0.5 so that the sliding will not be too sensitive
+                var newPosition: CGFloat = currentPosition + offset.width * 0.5
+                if offset.width > 0 {
+                    newPosition = min(newPosition, maxLength)
+                }else{
+                    newPosition = max(newPosition, 0)
+                }
+                let newProgress = newPosition / maxLength
+                progressChangeHandler(newProgress)
+            }
+    }
+
+    func adjustedSamples(_ maxWidth: CGFloat) -> [CGFloat] {
+        let maxSamples = Int((maxWidth - RecordWaveformWithButtons.viewPadding) / (RecordWaveform.width + RecordWaveform.spacing))
+        let temp = samples
+        
+        if temp.count <= maxSamples {
+            return temp
         }
+
+        // use ceil to ensure that the adjusted.count will not be greater than maxSamples
+        let ratio = Int(ceil( Double(temp.count) / Double(maxSamples) ))
+        let adjusted = stride(from: 0, to: temp.count, by: ratio).map {
+            temp[$0]
+        }
+        
         return adjusted
+        
     }
 }
 
@@ -126,9 +165,9 @@ struct RecordWaveform: View {
                     Capsule()
                         .frame(width: RecordWaveform.width, height: RecordWaveform.maxSampleHeight * CGFloat(s))
                 }
-
-                if addExtraDots {
-                    ForEach(samples.count..<Int(g.size.width / (RecordWaveform.width + RecordWaveform.spacing)), id: \.self) { _ in
+                let maxSampleCounts = Int((g.size.width) / (RecordWaveform.width + RecordWaveform.spacing))
+                if addExtraDots && samples.count < maxSampleCounts {
+                    ForEach(samples.count..<maxSampleCounts, id: \.self) { _ in
                         Capsule()
                             .viewSize(RecordWaveform.width)
                     }

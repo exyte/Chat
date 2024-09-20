@@ -280,7 +280,7 @@ struct InputView: View {
                         .foregroundColor(theme.colors.myMessage)
                         .frame(width: 2)
                     VStack(alignment: .leading) {
-                        Text("Reply to \(message.user.name)")
+                        Text(String(localized: "Reply to \(message.user.name)", bundle: .module))
                             .font(.caption2)
                             .foregroundColor(theme.colors.buttonBackground)
                         if !message.text.isEmpty {
@@ -428,7 +428,7 @@ struct InputView: View {
             } label: {
                 HStack {
                     theme.images.recordAudio.cancelRecord
-                    Text("Cancel")
+                    Text("Cancel", bundle: .module)
                         .font(.footnote)
                         .foregroundColor(theme.colors.textLightContext)
                 }
@@ -440,7 +440,7 @@ struct InputView: View {
     var recordingInProgress: some View {
         HStack {
             Spacer()
-            Text("Recording...")
+            Text("Recording...", bundle: .module)
                 .font(.footnote)
                 .foregroundColor(theme.colors.textLightContext)
             Spacer()
@@ -503,7 +503,9 @@ struct InputView: View {
                 }
                 .frame(width: 20)
 
-                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true)
+                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true) { progress in
+                    recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
+                }
             }
             .padding(.horizontal, 8)
         }

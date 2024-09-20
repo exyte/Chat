@@ -1,0 +1,26 @@
+/* 
+  Localizable.strings
+  
+
+  Created by admin on 2024/9/19.
+  
+*/
+
+// attachments directory
+"Unknown" = "未知";
+"Cancel" = "取消";
+"Recents" = "最近";
+// inputView
+"Type a message..." = "输入信息";
+"Add signature..." = "添加签名";
+"Reply to %@" = "回复 %@";
+"Recording..." = "录音中...";
+// messageView
+"Copy" = "复制";
+"Reply" = "回复";
+"Edit" = "修改";
+"Delete" = "删除";
+"Print" = "打印";
+
+"Waiting for network" = "等待网络...";
+

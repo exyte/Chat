@@ -1,0 +1,26 @@
+/* 
+  Localizable.strings
+  
+
+  Created by admin on 2024/9/19.
+  
+*/
+
+// attachments directory
+"Unknown" = "Unknown";
+"Cancel" = "Cancel";
+"Recents" = "Recents";
+// inputView
+"Type a message..." = "Type a message...";
+"Add signature..." = "Add signature...";
+"Reply to %@" = "Reply to %@";
+"Recording..." = "Recording...";
+// messageView
+"Copy" = "Copy";
+"Reply" = "Reply";
+"Edit" = "Edit";
+"Delete" = "Delete";
+"Print" = "Print";
+
+"Waiting for network" = "Waiting for network";
+

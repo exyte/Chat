@@ -53,6 +53,27 @@ final class RecordingPlayer: ObservableObject {
         else { play() }
     }
 
+    func seek(with recording: Recording, to progress: Double) {
+        let goalTime = recording.duration * progress
+        if self.recording == nil {
+            self.recording = recording
+            if let url = recording.url {
+                setupPlayer(for: url, trackDuration: recording.duration)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.player?.seek(to: CMTime(seconds: goalTime, preferredTimescale: 10))
+                if self?.playing == nil || self?.playing == false  {
+                    self?.play()
+                }
+            }
+            return
+        }
+        self.player?.seek(to: CMTime(seconds: goalTime, preferredTimescale: 10))
+        if !self.playing {
+            self.play()
+        }
+    }
+
     func seek(to progress: Double) {
         let goalTime = duration * progress
         player?.seek(to: CMTime(seconds: goalTime, preferredTimescale: 10))
@@ -71,6 +92,7 @@ final class RecordingPlayer: ObservableObject {
         try? audioSession.setActive(true)
         player?.play()
         playing = true
+        NotificationCenter.default.post(name: .chatAudioIsPlaying, object: self)
     }
 
     private func setupPlayer(for url: URL, trackDuration: Double) {
@@ -83,6 +105,15 @@ final class RecordingPlayer: ObservableObject {
 
         let playerItem = AVPlayerItem(url: url)
         player = AVPlayer(playerItem: playerItem)
+        
+        NotificationCenter.default.addObserver(forName: .chatAudioIsPlaying, object: nil, queue: .main) { notification in
+            if let sender = notification.object as? RecordingPlayer {
+                if sender.recording?.url == self.recording?.url {
+                    return
+                }
+                self.pause()
+            }
+        }
 
         NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,

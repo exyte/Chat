@@ -4,6 +4,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 final class ChatViewModel: ObservableObject {
 
@@ -43,6 +44,8 @@ final class ChatViewModel: ObservableObject {
     @MainActor
     func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
         switch action {
+        case .copy:
+            UIPasteboard.general.string = message.text
         case .reply:
             inputViewModel?.attachments.replyMessage = message.toReplyMessage()
             globalFocusState?.focus = .uuid(inputFieldId)
