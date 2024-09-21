@@ -42,15 +42,22 @@ final class Recorder {
     
     private func startRecordingInternal(_ durationProgressHandler: @escaping ProgressHandler) -> URL? {
         let settings: [String : Any] = [
-            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVFormatIDKey: Int(recorderSetting.audioFormatID),
             AVSampleRateKey: recorderSetting.sampleRate,
             AVNumberOfChannelsKey: recorderSetting.numberOfChannels,
+            AVEncoderBitRateKey: recorderSetting.encoderBitRateKey,
             AVLinearPCMBitDepthKey: recorderSetting.linearPCMBitDepth,
+            AVLinearPCMIsFloatKey: recorderSetting.linearPCMIsFloatKey,
+            AVLinearPCMIsBigEndianKey: recorderSetting.linearPCMIsBigEndianKey,
+            AVLinearPCMIsNonInterleaved: recorderSetting.linearPCMIsNonInterleaved,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 
         soundSamples = []
-        let recordingUrl = FileManager.tempAudioFile
+        guard let fileExt = fileExtension(for: recorderSetting.audioFormatID) else{
+            return nil
+        }
+        let recordingUrl = FileManager.tempDirPath.appendingPathComponent(UUID().uuidString + fileExt)
 
         do {
             try audioSession.setCategory(.record, mode: .default)
@@ -91,18 +98,71 @@ final class Recorder {
         audioTimer?.invalidate()
         audioTimer = nil
     }
+
+    private func fileExtension(for formatID: AudioFormatID) -> String? {
+        switch formatID {
+        case kAudioFormatMPEG4AAC:
+            return ".aac"
+        case kAudioFormatLinearPCM:
+            return ".wav"
+        case kAudioFormatMPEGLayer3:
+            return ".mp3"
+        case kAudioFormatAppleLossless:
+            return ".m4a"
+        case kAudioFormatOpus:
+            return ".opus"
+        case kAudioFormatAC3:
+            return ".ac3"
+        case kAudioFormatFLAC:
+            return ".flac"
+        case kAudioFormatAMR:
+            return ".amr"
+        case kAudioFormatMIDIStream:
+            return ".midi"
+        case kAudioFormatULaw:
+            return ".ulaw"
+        case kAudioFormatALaw:
+            return ".alaw"
+        case kAudioFormatAMR_WB:
+            return ".awb"
+        case kAudioFormatEnhancedAC3:
+            return ".eac3"
+        case kAudioFormatiLBC:
+            return ".ilbc"
+        default:
+            return nil
+        }
+    }
+
 }
 
 public struct RecorderSetting : Codable,Hashable {
-    
+    var audioFormatID: AudioFormatID
     var sampleRate: CGFloat
     var numberOfChannels: Int
+    var encoderBitRateKey: Int
+    // pcm
     var linearPCMBitDepth: Int
-    
-    public init(sampleRate: CGFloat = 12000, numberOfChannels: Int = 1, linearPCMBitDepth: Int = 16) {
+    var linearPCMIsFloatKey: Bool
+    var linearPCMIsBigEndianKey: Bool
+    var linearPCMIsNonInterleaved: Bool
+
+    public init(audioFormatID: AudioFormatID = kAudioFormatMPEG4AAC,
+                sampleRate: CGFloat = 12000,
+                numberOfChannels: Int = 1,
+                encoderBitRateKey: Int = 128,
+                linearPCMBitDepth: Int = 16,
+                linearPCMIsFloatKey: Bool = false,
+                linearPCMIsBigEndianKey: Bool = false,
+                linearPCMIsNonInterleaved: Bool = false) {
+        self.audioFormatID = audioFormatID
         self.sampleRate = sampleRate
         self.numberOfChannels = numberOfChannels
+        self.encoderBitRateKey = encoderBitRateKey
         self.linearPCMBitDepth = linearPCMBitDepth
+        self.linearPCMIsFloatKey = linearPCMIsFloatKey
+        self.linearPCMIsBigEndianKey = linearPCMIsBigEndianKey
+        self.linearPCMIsNonInterleaved = linearPCMIsNonInterleaved
     }
 }
 
