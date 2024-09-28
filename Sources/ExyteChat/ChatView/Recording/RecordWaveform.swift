@@ -56,6 +56,9 @@ struct RecordWaveformWithButtons: View {
                     .foregroundColor(colorWaveform)
             }
         }
+        .onDisappear {
+            recordPlayer.pause()
+        }
     }
 }
 
