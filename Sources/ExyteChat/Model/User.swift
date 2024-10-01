@@ -9,11 +9,13 @@ public struct User: Codable, Identifiable, Hashable {
     public let name: String
     public let avatarURL: URL?
     public let isCurrentUser: Bool
+    public let isAdmin: Bool
 
-    public init(id: String, name: String, avatarURL: URL?, isCurrentUser: Bool) {
+    public init(id: String, name: String, avatarURL: URL?, isCurrentUser: Bool, isAdmin: Bool = false) {
         self.id = id
         self.name = name
         self.avatarURL = avatarURL
         self.isCurrentUser = isCurrentUser
+        self.isAdmin = isAdmin
     }
 }

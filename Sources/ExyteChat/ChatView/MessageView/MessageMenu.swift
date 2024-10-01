@@ -11,7 +11,11 @@ import enum FloatingButton.Alignment
 
 public protocol MessageMenuAction: Equatable, CaseIterable {
     func title() -> String
+    func titleColor() -> Color?
     func icon() -> Image
+    func showForCurrentUser() -> Bool
+    func showForOtherUser() -> Bool
+    func showForAdmin() -> Bool
 }
 
 public enum DefaultMessageMenuAction: MessageMenuAction {
@@ -26,6 +30,22 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         case .edit:
             "Edit"
         }
+    }
+    
+    public func titleColor() -> Color? {
+        return nil
+    }
+    
+    public func showForCurrentUser() -> Bool {
+        true
+    }
+    
+    public func showForOtherUser() -> Bool {
+        true
+    }
+    
+    public func showForAdmin() -> Bool {
+        true
     }
 
     public func icon() -> Image {
@@ -61,14 +81,16 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
+    var isCurrentUser: Bool
+    var isAdmin: Bool
     var onAction: (ActionEnum) -> ()
     var mainButton: () -> MainButton
 
     var body: some View {
         FloatingButton(
             mainButtonView: mainButton().allowsHitTesting(false),
-            buttons: ActionEnum.allCases.map {
-                menuButton(title: $0.title(), icon: $0.icon(), action: $0)
+            buttons: ActionEnum.allCases.filter({ isAdmin ? $0.showForAdmin() : isCurrentUser ? $0.showForCurrentUser() : $0.showForOtherUser()}).map {
+                menuButton(title: $0.title(), icon: $0.icon(), color: $0.titleColor(), action: $0)
             },
             isOpen: $isShowingMenu
         )
@@ -82,7 +104,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         .menuButtonsSize($menuButtonsSize)
     }
 
-    func menuButton(title: String, icon: Image, action: ActionEnum) -> some View {
+    func menuButton(title: String, icon: Image, color: Color?, action: ActionEnum) -> some View {
         HStack(spacing: 0) {
             if alignment == .left {
                 Color.clear.viewSize(leadingPadding)
@@ -96,7 +118,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                     .cornerRadius(12)
                 HStack {
                     Text(title)
-                        .foregroundColor(theme.colors.textLightContext)
+                        .foregroundColor(color != nil ? color : theme.colors.textLightContext)
                     Spacer()
                     icon
                 }
