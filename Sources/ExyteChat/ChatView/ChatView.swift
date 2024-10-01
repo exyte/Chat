@@ -117,6 +117,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var showMessageTimeView = true
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availablelInput: AvailableInputType = .full
+    var isChatAdmin: Bool = false
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -372,6 +373,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
+            isCurrentUser: row.message.user.isCurrentUser,
+            isAdmin: isChatAdmin,
             onAction: menuActionClosure(row.message)) {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {
@@ -494,6 +497,12 @@ public extension ChatView {
     func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
         var view = self
         view.showMessageMenuOnLongPress = show
+        return view
+    }
+    
+    func isChatAdmin(_ isAdmin: Bool) -> ChatView {
+        var view = self
+        view.isChatAdmin = isAdmin
         return view
     }
 

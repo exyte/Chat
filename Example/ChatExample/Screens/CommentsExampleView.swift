@@ -36,6 +36,22 @@ enum Action: MessageMenuAction {
             Image(systemName: "printer")
         }
     }
+    
+    func titleColor() -> Color? {
+        return nil
+    }
+    
+    public func showForCurrentUser() -> Bool {
+        true
+    }
+    
+    public func showForOtherUser() -> Bool {
+        true
+    }
+    
+    public func showForAdmin() -> Bool {
+        true
+    }
 }
 
 struct CommentsExampleView: View {
