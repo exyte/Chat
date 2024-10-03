@@ -56,6 +56,8 @@ public struct Message: Identifiable, Hashable {
 
     public var triggerRedraw: UUID?
     public var chatId: String?
+    public var reactionsCount: Int?
+    public var reaction: String?
     public var uploadProgress: Double?
     public var isUploading: Bool = false
     public var uploadingAttachmentIds: [String] = []
