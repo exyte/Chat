@@ -56,9 +56,9 @@ public struct Message: Identifiable, Hashable {
 
     public var triggerRedraw: UUID?
     public var chatId: String?
-    public var reactionsCount: [String:Int]?
-    public var reactions: [String]?
-    public var isMyReaction: [String:Bool] = [:]
+    public var reactionsCount: [String:Int]? = [:]
+    public var reactions: [String]? = []
+    public var isMyReaction: [String:Bool]? = [:]
     public var uploadProgress: Double?
     public var isUploading: Bool = false
     public var uploadingAttachmentIds: [String] = []
@@ -71,6 +71,9 @@ public struct Message: Identifiable, Hashable {
                 attachments: [Attachment] = [],
                 recording: Recording? = nil,
                 replyMessage: ReplyMessage? = nil,
+                reactions: [String]? = nil,
+                reactionsCount: [String:Int]? = nil,
+                isMyReaction: [String:Bool]? = nil,
                 chatId: String? = nil) {
 
         self.id = id
@@ -82,6 +85,9 @@ public struct Message: Identifiable, Hashable {
         self.recording = recording
         self.replyMessage = replyMessage
         self.chatId = chatId
+        self.isMyReaction = isMyReaction
+        self.reactions = reactions
+        self.reactionsCount = reactionsCount
     }
 
     public static func makeMessage(

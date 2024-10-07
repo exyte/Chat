@@ -108,6 +108,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var showMessageMenuOnLongPress: Bool = true
+    var showMessageReactionsMenuOnLongPress: Bool = false
+    var messageReactions: [String] = ["😂", "😁", "❤️", "🤡", "👻"]
+    var onSelectMessageReaction: (String, Message) -> () = { _, _ in }
     var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
@@ -375,6 +378,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
             isCurrentUser: row.message.user.isCurrentUser,
             isAdmin: isChatAdmin,
+            needToShowReactionsView: showMessageReactionsMenuOnLongPress,
+            reactions: messageReactions,
+            selectReactionAction: { reaction in
+                onSelectMessageReaction(reaction, row.message)
+                hideMessageMenu()
+            },
             onAction: menuActionClosure(row.message)) {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {
@@ -499,7 +508,25 @@ public extension ChatView {
         view.showMessageMenuOnLongPress = show
         return view
     }
-    
+
+    func showMessageReactionsMenuOnLongPress(_ show: Bool) -> ChatView {
+        var view = self
+        view.showMessageReactionsMenuOnLongPress = show
+        return view
+    }
+
+    func setMessageReactions(_ reactions: [String]) -> ChatView {
+        var view = self
+        view.messageReactions = reactions
+        return view
+    }
+
+    func onSelectMessageReaction(_ onSelect: @escaping (String, Message) -> ()) -> ChatView {
+        var view = self
+        view.onSelectMessageReaction = onSelect
+        return view
+    }
+
     func isChatAdmin(_ isAdmin: Bool) -> ChatView {
         var view = self
         view.isChatAdmin = isAdmin
