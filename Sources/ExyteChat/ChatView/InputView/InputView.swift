@@ -15,7 +15,7 @@ public enum InputViewStyle {
     var placeholder: String {
         switch self {
         case .message:
-            return "Type a message..."
+            return "Message..."
         case .signature:
             return "Add signature..."
         }
@@ -124,7 +124,6 @@ struct InputView: View {
                 HStack(alignment: .bottom, spacing: 0) {
                     leftView
                     middleView
-                    rightView
                 }
                 .background {
                     RoundedRectangle(cornerRadius: 18)
@@ -243,9 +242,6 @@ struct InputView: View {
                     if state.canSend || availableInput == .textOnly {
                         sendButton
                             .disabled(!state.canSend)
-                    } else {
-                        recordButton
-                            .highPriorityGesture(dragGesture())
                     }
                 }
                 .compositingGroup()
