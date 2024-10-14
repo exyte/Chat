@@ -90,7 +90,23 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var mainButton: () -> MainButton
 
     var body: some View {
-        VStack(spacing: 5) {
+        ZStack(alignment: .top) {
+            FloatingButton(
+                mainButtonView: mainButton().allowsHitTesting(false),
+                buttons: ActionEnum.allCases.filter({ isAdmin ? $0.showForAdmin() : isCurrentUser ? $0.showForCurrentUser() : $0.showForOtherUser()}).map {
+                    menuButton(title: $0.title(), icon: $0.icon(), color: $0.titleColor(), action: $0)
+                },
+                isOpen: $isShowingMenu
+            )
+            .straight()
+            //.mainZStackAlignment(.top)
+            .initialOpacity(0)
+            .direction(.bottom)
+            .alignment(alignment)
+            .spacing(2)
+            .animation(.linear(duration: 0.2))
+            .menuButtonsSize($menuButtonsSize)
+            
             if let reactions, needToShowReactionsView {
                 RoundedRectangle(cornerRadius: 30)
                     .fill(.ultraThinMaterial)
@@ -111,23 +127,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                     }
                     .padding(.horizontal, 40)
                     .frame(maxHeight: 50)
+                    .offset(y: -50)
             }
-
-            FloatingButton(
-                mainButtonView: mainButton().allowsHitTesting(false),
-                buttons: ActionEnum.allCases.filter({ isAdmin ? $0.showForAdmin() : isCurrentUser ? $0.showForCurrentUser() : $0.showForOtherUser()}).map {
-                    menuButton(title: $0.title(), icon: $0.icon(), color: $0.titleColor(), action: $0)
-                },
-                isOpen: $isShowingMenu
-            )
-            .straight()
-            //.mainZStackAlignment(.top)
-            .initialOpacity(0)
-            .direction(.bottom)
-            .alignment(alignment)
-            .spacing(2)
-            .animation(.linear(duration: 0.2))
-            .menuButtonsSize($menuButtonsSize)
         }
     }
 
