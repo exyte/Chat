@@ -158,7 +158,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     public var body: some View {
         mainView
-            .background(theme.colors.mainBackground)
+            .background(backgroudImage)
             .environmentObject(keyboardState)
 
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
@@ -190,6 +190,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
+    }
+    
+    var backgroudImage: some View {
+        Image("bc_messanger")
+            .resizable()
+            .scaledToFill()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     var mainView: some View {
