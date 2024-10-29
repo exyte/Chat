@@ -30,13 +30,13 @@ struct ChatExampleView: View {
         .messageUseMarkdown(messageUseMarkdown: true)
         .setRecorderSettings(recorderSettings)
         .navigationBarBackButtonHidden()
-        .toolbar{
+        .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button { presentationMode.wrappedValue.dismiss() } label: {
                     Image("backArrow", bundle: .current)
                 }
             }
-            
+
             ToolbarItem(placement: .principal) {
                 HStack {
                     if let url = viewModel.chatCover {
