@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct Message: Identifiable, Hashable {
+public struct Message: Identifiable, Hashable, ObservableObject {
 
     public enum Status: Equatable, Hashable {
         case sending
@@ -49,7 +49,7 @@ public struct Message: Identifiable, Hashable {
     public var status: Status?
     public var createdAt: Date
 
-    public var text: String
+    @Published public var text: String
     public var attachments: [Attachment]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
