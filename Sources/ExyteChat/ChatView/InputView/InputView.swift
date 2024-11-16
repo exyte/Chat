@@ -307,7 +307,7 @@ struct InputView: View {
 
     var attachButton: some View {
         Button {
-            onAction(.photo)
+//            onAction(.photo)
         } label: {
             theme.images.inputView.attach
                 .viewSize(24)
