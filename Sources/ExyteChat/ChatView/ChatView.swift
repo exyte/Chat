@@ -158,9 +158,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     public var body: some View {
         mainView
-            .background(backgroudImage)
+            .background(.white)
             .environmentObject(keyboardState)
-
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
@@ -179,12 +178,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .ignoresSafeArea()
                 }
             }
-
             .fullScreenCover(isPresented: $inputViewModel.showPicker) {
                 AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput)
                     .environmentObject(globalFocusState)
             }
-
             .onChange(of: inputViewModel.showPicker) {
                 if $0 {
                     globalFocusState.focus = nil
@@ -246,6 +243,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         case .conversation:
             ZStack(alignment: .bottomTrailing) {
                 list
+                    .padding(.top, -36)
 
                 if !isScrolledToBottom {
                     Button {

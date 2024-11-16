@@ -13,7 +13,7 @@ struct MessageTimeView: View {
     var body: some View {
         Text(text)
             .font(.caption)
-            .foregroundColor(isCurrentUser ? chatTheme.colors.myMessageTime : chatTheme.colors.frientMessageTime)
+            .foregroundColor(Color(hex: "#999BA6"))
     }
 }
 

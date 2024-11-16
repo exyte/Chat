@@ -10,20 +10,20 @@ struct ContentView: View {
         NavigationView {
             List {
                 Section {
-                    NavigationLink("Active chat example") {
-                        ChatExampleView(
-                            viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
-                            title: "Active chat example"
-                        )
-                    }
+//                    NavigationLink("Active chat example") {
+//                        ChatExampleView(
+//                            viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
+//                            title: "Active chat example"
+//                        )
+//                    }
                     
                     NavigationLink("Simple chat example") {
                         ChatExampleView(title: "Simple example")
                     }
 
-                    NavigationLink("Simple comments example") {
-                        CommentsExampleView()
-                    }
+//                    NavigationLink("Simple comments example") {
+//                        CommentsExampleView()
+//                    }
                 } header: {
                     Text("Basic examples")
                 }

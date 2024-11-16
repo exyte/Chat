@@ -60,7 +60,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 1
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
-        tableView.backgroundColor = UIColor(theme.colors.mainBackground)
+        let backgroundImageView = UIImageView(image: UIImage(named: "bc_messanger")!)
+        backgroundImageView.contentMode = .scaleAspectFill
+        tableView.backgroundColor = .clear
+        tableView.backgroundView = backgroundImageView
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = isScrollEnabled
 
@@ -471,7 +474,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 sectionHeaderViewBuilder(section)
                     .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
             ).view
-            header?.backgroundColor = UIColor(chatTheme.colors.mainBackground)
+            header?.backgroundColor = .clear//UIColor(chatTheme.colors.mainBackground)
             return header
         }
 
@@ -506,13 +509,13 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
             let tableViewCell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             tableViewCell.selectionStyle = .none
-            tableViewCell.backgroundColor = UIColor(mainBackgroundColor)
+            tableViewCell.backgroundColor = UIColor.clear
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: false, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .transition(.scale)
-                    .background(MessageMenuPreferenceViewSetter(id: row.id))
+                    .background(MessageMenuPreferenceViewSetter(id: row.id))//here
                     .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
                     .onTapGesture { }
                     .applyIf(showMessageMenuOnLongPress) {

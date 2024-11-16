@@ -233,30 +233,11 @@ struct InputView: View {
         }
         else {
             ZStack {
-                if [.isRecordingTap, .isRecordingHold].contains(state) {
-                    RecordIndicator()
-                        .viewSize(80)
-                        .foregroundColor(theme.colors.sendButtonBackground)
-                }
                 Group {
-                    if state.canSend || availableInput == .textOnly {
-                        sendButton
-                            .disabled(!state.canSend)
-                    }
+                    sendButton
+                        .disabled(!state.canSend)
                 }
                 .compositingGroup()
-                .overlay(alignment: .top) {
-                    Group {
-                        if state == .isRecordingTap {
-                            stopRecordButton
-                        } else if state == .isRecordingHold {
-                            lockRecordButton
-                        }
-                    }
-                    .sizeGetter($overlaySize)
-                    // hardcode 28 for now because sizeGetter returns 0 somehow
-                    .offset(y: (state == .isRecordingTap ? -28 : -overlaySize.height) - 24)
-                }
             }
             .viewSize(48)
         }
