@@ -21,7 +21,6 @@
 		5B5748322A3707850033C808 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5748312A3707850033C808 /* ContentView.swift */; };
 		5B5748342A3707860033C808 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B5748332A3707860033C808 /* Assets.xcassets */; };
 		5B5748372A3707860033C808 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B5748362A3707860033C808 /* Preview Assets.xcassets */; };
-		5B57483E2A370E760033C808 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B57483D2A370E760033C808 /* GoogleService-Info.plist */; };
 		5B5748452A3714AE0033C808 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5748442A3714AE0033C808 /* AuthViewModel.swift */; };
 		5B5748472A3714BA0033C808 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5748462A3714BA0033C808 /* AuthView.swift */; };
 		5B73CB432A5D465C007D80B0 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B73CB422A5D465C007D80B0 /* SearchField.swift */; };
@@ -73,7 +72,6 @@
 		5B5748312A3707850033C808 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5B5748332A3707860033C808 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5B5748362A3707860033C808 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		5B57483D2A370E760033C808 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5B5748442A3714AE0033C808 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		5B5748462A3714BA0033C808 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		5B73CB422A5D465C007D80B0 /* SearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchField.swift; sourceTree = "<group>"; };
@@ -195,7 +193,6 @@
 				5B8D762D2A5C18CB00EDE1B7 /* Views */,
 				5B57482F2A3707850033C808 /* ChatFirestoreExampleApp.swift */,
 				5B5748312A3707850033C808 /* ContentView.swift */,
-				5B57483D2A370E760033C808 /* GoogleService-Info.plist */,
 				5B5748332A3707860033C808 /* Assets.xcassets */,
 				5B5748352A3707860033C808 /* Preview Content */,
 			);
@@ -313,7 +310,6 @@
 			files = (
 				5B5748372A3707860033C808 /* Preview Assets.xcassets in Resources */,
 				5B5748342A3707860033C808 /* Assets.xcassets in Resources */,
-				5B57483E2A370E760033C808 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
