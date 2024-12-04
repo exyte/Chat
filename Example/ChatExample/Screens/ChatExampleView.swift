@@ -27,7 +27,7 @@ struct ChatExampleView: View {
         .enableLoadMore(pageSize: 3) { message in
             viewModel.loadMoreMessage(before: message)
         }
-        .messageUseMarkdown(messageUseMarkdown: true)
+        .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
         .navigationBarBackButtonHidden()
         .toolbar {

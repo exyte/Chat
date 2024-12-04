@@ -555,7 +555,7 @@ public extension ChatView {
         return view
     }
 
-    func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
+    func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
         return view
