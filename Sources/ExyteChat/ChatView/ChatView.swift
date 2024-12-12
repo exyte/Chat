@@ -327,10 +327,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         .onTapGesture {
             globalFocusState.focus = nil
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
-                                          to: nil,
-                                          from: nil,
-                                          for: nil)
+            // UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+            //                               to: nil,
+            //                               from: nil,
+            //                               for: nil)
         }
         .onAppear {
             viewModel.didSendMessage = didSendMessage
