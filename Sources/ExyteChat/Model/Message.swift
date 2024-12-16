@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct Message: Identifiable, Hashable {
+public struct Message: Identifiable {
 
     public enum Status: Equatable, Hashable {
         case sending
@@ -55,6 +55,8 @@ public struct Message: Identifiable, Hashable {
     public var replyMessage: ReplyMessage?
 
     public var triggerRedraw: UUID?
+    
+    public var params: [String: Any]
 
     public init(id: String,
                 user: User,
@@ -63,8 +65,9 @@ public struct Message: Identifiable, Hashable {
                 text: String = "",
                 attachments: [Attachment] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
-
+                replyMessage: ReplyMessage? = nil,
+                params: [String: Any] = [:]
+    ) {
         self.id = id
         self.user = user
         self.status = status
@@ -73,6 +76,7 @@ public struct Message: Identifiable, Hashable {
         self.attachments = attachments
         self.recording = recording
         self.replyMessage = replyMessage
+        self.params = params
     }
 
     public static func makeMessage(
@@ -175,3 +179,4 @@ public extension Message {
         ReplyMessage(id: id, user: user, createdAt: createdAt, text: text, attachments: attachments, recording: recording)
     }
 }
+
