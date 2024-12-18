@@ -248,6 +248,24 @@ Please use `mediaPickerTheme` in a similar fashion to customize the built-in pho
   
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 
+## Localization
+You can localize the library by providing your own strings by providing a `ChatLocalization` struct. Here is an example:
+```swift
+ChatLocalization(
+        inputPlaceholder: "Type a message...",
+        signatureText: "Add signature...",
+        cancelButtonText: "Cancel",
+        recentToggleText: "Recents",
+        waitingForNetwork: "Waiting for network",
+        recordingText: "Recording..."
+    )
+```
+
+Then pass the modifier:
+```swift
+.setChatLocalization(localization)
+```
+
 ## Examples
 There are 2 example projects:    
 - One has a simple bot posting random text/media messages every 2 seconds. It has no back end and no local storage. Every new start is clean and fresh.     
