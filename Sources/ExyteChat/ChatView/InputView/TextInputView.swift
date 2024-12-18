@@ -14,12 +14,13 @@ struct TextInputView: View {
     var inputFieldId: UUID
     var style: InputViewStyle
     var availableInput: AvailableInputType
+    var localization: ChatLocalization
 
     var body: some View {
         TextField("", text: $text, axis: .vertical)
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
             .placeholder(when: text.isEmpty) {
-                Text(style.placeholder)
+                Text(localization.inputPlaceholder)
                     .foregroundColor(theme.colors.buttonBackground)
             }
             .foregroundColor(style == .message ? theme.colors.textLightContext : theme.colors.textDarkContext)

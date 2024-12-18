@@ -99,6 +99,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     /// date section header builder
     var headerBuilder: ((Date)->AnyView)?
+    
+    /// provide strings for the chat view in your preferred language
+    var localization: ChatLocalization = .defaultLocalization
 
     // MARK: - Customization
 
@@ -146,7 +149,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 didSendMessage: @escaping (DraftMessage) -> Void,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?) {
+                messageMenuAction: MessageMenuActionClosure?,
+                localization: ChatLocalization) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
@@ -154,6 +158,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
+        self.localization = localization
     }
 
     public var body: some View {
@@ -181,7 +186,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
 
             .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-                AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput)
+                AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput, localization: localization)
                     .environmentObject(globalFocusState)
             }
 
@@ -222,7 +227,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             HStack {
                 Spacer()
                 Image("waiting", bundle: .current)
-                Text("Waiting for network")
+                Text(localization.waitingForNetwork)
                 Spacer()
             }
             .padding(.top, 6)
@@ -359,7 +364,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     style: .message,
                     availableInput: availablelInput,
                     messageUseMarkdown: messageUseMarkdown,
-                    recorderSettings: recorderSettings
+                    recorderSettings: recorderSettings,
+                    localization: localization
                 )
             }
         }
@@ -570,6 +576,12 @@ public extension ChatView {
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageFont = font
+        return view
+    }
+    
+    func setChatLocalization(_ localization: ChatLocalization) -> ChatView {
+        var view = self
+        view.localization = localization
         return view
     }
 
