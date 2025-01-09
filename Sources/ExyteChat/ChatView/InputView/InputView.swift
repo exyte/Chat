@@ -95,6 +95,7 @@ struct InputView: View {
     var availableInput: AvailableInputType
     var messageUseMarkdown: Bool
     var recorderSettings: RecorderSettings = RecorderSettings()
+    var localization: ChatLocalization
     
     @StateObject var recordingPlayer = RecordingPlayer()
 
@@ -174,7 +175,7 @@ struct InputView: View {
             case .isRecordingTap:
                 recordingInProgress
             default:
-                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput)
+                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput, localization: localization)
             }
         }
         .frame(minHeight: 48)
@@ -240,7 +241,7 @@ struct InputView: View {
                         .foregroundColor(theme.colors.sendButtonBackground)
                 }
                 Group {
-                    if state.canSend || availableInput == .textOnly {
+                    if state.canSend || availableInput == .textOnly || availableInput == .textAndMedia {
                         sendButton
                             .disabled(!state.canSend)
                     } else {
@@ -428,7 +429,7 @@ struct InputView: View {
             } label: {
                 HStack {
                     theme.images.recordAudio.cancelRecord
-                    Text("Cancel")
+                    Text(localization.cancelButtonText)
                         .font(.footnote)
                         .foregroundColor(theme.colors.textLightContext)
                 }
@@ -440,7 +441,7 @@ struct InputView: View {
     var recordingInProgress: some View {
         HStack {
             Spacer()
-            Text("Recording...")
+            Text(localization.recordingText)
                 .font(.footnote)
                 .foregroundColor(theme.colors.textLightContext)
             Spacer()

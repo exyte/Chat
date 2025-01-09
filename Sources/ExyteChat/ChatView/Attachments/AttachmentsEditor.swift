@@ -27,6 +27,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var availableInput: AvailableInputType
+    var localization: ChatLocalization
 
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -121,7 +122,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputFieldId: UUID(),
                     style: .signature,
                     availableInput: availableInput,
-                    messageUseMarkdown: messageUseMarkdown
+                    messageUseMarkdown: messageUseMarkdown,
+                    localization: localization
                 )
             }
         }
@@ -134,7 +136,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     seleсtedMedias = []
                     inputViewModel.showPicker = false
                 } label: {
-                    Text("Cancel")
+                    Text(localization.cancelButtonText)
                         .foregroundColor(.white.opacity(0.7))
                 }
 
@@ -142,7 +144,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
 
             HStack {
-                Text("Recents")
+                Text(localization.recentToggleText)
                 Image(systemName: "chevron.down")
                     .rotationEffect(Angle(radians: showingAlbums ? .pi : 0))
             }
