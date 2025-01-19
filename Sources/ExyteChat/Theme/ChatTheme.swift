@@ -33,6 +33,9 @@ public struct ChatTheme {
     public let colors: ChatTheme.Colors
     public let images: ChatTheme.Images
 
+    /// Exyte Chat Blue
+    public static let ChatBlue:Color = Color(hex: "#4962FF")
+    
     public init(colors: ChatTheme.Colors = .init(),
                 images: ChatTheme.Images = .init()) {
         self.colors = colors
@@ -85,25 +88,25 @@ public struct ChatTheme {
         public var timeCapsuleForeground: Color
 
         public init(
-            grayStatus: Color = Color(hex: "AFB3B8"),
+            grayStatus: Color = Color(UIColor.systemGray2),
             errorStatus: Color = Color.red,
-            inputLightContextBackground: Color = Color(hex: "F2F3F5"),
-            inputDarkContextBackground: Color = Color(hex: "F2F3F5").opacity(0.12),
-            mainBackground: Color = .white,
-            buttonBackground: Color = Color(hex: "989EAC"),
+            inputLightContextBackground: Color = Color(UIColor.secondarySystemBackground),
+            inputDarkContextBackground: Color = Color.primary.opacity(0.1),
+            mainBackground: Color = Color(UIColor.systemBackground),
+            buttonBackground: Color = Color(UIColor.secondaryLabel),
             addButtonBackground: Color = Color(hex: "#4F5055"),
-            sendButtonBackground: Color = Color(hex: "#4962FF"),
-            messageMenuBackground: Color = Color.white,
-            myMessage: Color = Color(hex: "4962FF"),
-            friendMessage: Color = Color(hex: "EBEDF0"),
-            textLightContext: Color = Color.black,
+            sendButtonBackground: Color = ChatTheme.ChatBlue,
+            messageMenuBackground: Color = Color(UIColor.systemBackground),
+            myMessage: Color = ChatTheme.ChatBlue,
+            friendMessage: Color = Color(UIColor.secondarySystemBackground),
+            textLightContext: Color = Color.primary,
             textDarkContext: Color = Color.white,
-            textMediaPicker: Color = Color(hex: "818C99"),
-            recordDot: Color = Color(hex: "F62121"),
-            myMessageTime: Color = .white.opacity(0.4),
-            frientMessageTime: Color = .black.opacity(0.4),
-            timeCapsuleBackground: Color = .black.opacity(0.4),
-            timeCapsuleForeground: Color = .white
+            textMediaPicker: Color = Color(UIColor.systemGray),
+            recordDot: Color = Color(hex: "#F62121"),
+            myMessageTime: Color = Color.white.opacity(0.4),
+            frientMessageTime: Color = Color.primary.opacity(0.4),
+            timeCapsuleBackground: Color = Color(UIColor.systemBackground),
+            timeCapsuleForeground: Color = Color.secondary
         ) {
             self.grayStatus = grayStatus
             self.errorStatus = errorStatus
