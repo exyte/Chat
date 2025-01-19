@@ -104,7 +104,7 @@ public struct ChatTheme {
             textMediaPicker: Color = Color(UIColor.systemGray),
             recordDot: Color = Color(hex: "#F62121"),
             myMessageTime: Color = Color.white.opacity(0.4),
-            frientMessageTime: Color = Color.primary.opacity(0.4),
+            friendMessageTime: Color = Color.primary.opacity(0.4),
             timeCapsuleBackground: Color = Color(UIColor.systemBackground),
             timeCapsuleForeground: Color = Color.secondary
         ) {
@@ -124,7 +124,7 @@ public struct ChatTheme {
             self.textMediaPicker = textMediaPicker
             self.recordDot = recordDot
             self.myMessageTime = myMessageTime
-            self.frientMessageTime = frientMessageTime
+            self.friendMessageTime = friendMessageTime
             self.timeCapsuleBackground = timeCapsuleBackground
             self.timeCapsuleForeground = timeCapsuleForeground
         }
