@@ -74,7 +74,7 @@ struct AttachmentsGrid: View {
                                         Text(hidden)
                                             .font(.body)
                                             .bold()
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(UIColor.systemBackground))
                                     }
                                     .allowsHitTesting(false)
                                 }
