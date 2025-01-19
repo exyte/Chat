@@ -27,7 +27,7 @@ struct FullscreenMediaPages: View {
             }
 
         ZStack {
-            Color.black
+            Color(UIColor.systemBackground)
                 .opacity(max((200.0 - viewModel.offset.height) / 200.0, 0.5))
             VStack {
                 TabView(selection: $viewModel.index) {
@@ -78,7 +78,7 @@ struct FullscreenMediaPages: View {
                             }
                         }
                         .padding([.top, .horizontal], 12)
-                        .background(Color.black)
+                        .background(Color(UIColor.systemBackground))
                         .onAppear {
                             proxy.scrollTo(viewModel.index)
                         }
@@ -97,7 +97,7 @@ struct FullscreenMediaPages: View {
         .overlay(alignment: .top) {
             if viewModel.showMinis {
                 Text("\(viewModel.index + 1)/\(viewModel.attachments.count)")
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
                     .offset(y: safeAreaInsets.top)
             }
         }
@@ -107,7 +107,7 @@ struct FullscreenMediaPages: View {
                     theme.images.mediaPicker.cross
                         .padding(5)
                 }
-                .tint(.white)
+                .tint(.primary)
                 .padding(.leading, 15)
                 .offset(y: safeAreaInsets.top - 5)
             }
@@ -135,7 +135,7 @@ struct FullscreenMediaPages: View {
                             viewModel.toggleVideoMuted()
                         }
                 }
-                .foregroundColor(.white)
+                .foregroundColor(.primary)
                 .padding(.trailing, 10)
                 .offset(y: safeAreaInsets.top - 5)
             }
