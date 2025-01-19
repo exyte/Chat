@@ -23,7 +23,7 @@ struct TextInputView: View {
                 Text(localization.inputPlaceholder)
                     .foregroundColor(theme.colors.buttonBackground)
             }
-            .foregroundColor(style == .message ? theme.colors.textLightContext : theme.colors.textDarkContext)
+            .foregroundColor(.primary)
             .padding(.vertical, 10)
             .padding(.leading, !availableInput.isMediaAvailable ? 12 : 0)
             .onTapGesture {
