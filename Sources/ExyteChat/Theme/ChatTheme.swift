@@ -42,29 +42,46 @@ public struct ChatTheme {
     public struct Colors {
         public var grayStatus: Color
         public var errorStatus: Color
-
+        
+        /// Textfield background
         public var inputLightContextBackground: Color
+        /// Input dark context background
         public var inputDarkContextBackground: Color
 
+        /// Main ChatView background
         public var mainBackground: Color
+        /// Textfeild text color
         public var buttonBackground: Color
+        /// Add button background
         public var addButtonBackground: Color
+        /// Send / Record button background
         public var sendButtonBackground: Color
+        /// Long press message background
         public var messageMenuBackground: Color
 
+        /// Senders message bubble color
         public var myMessage: Color
+        /// Friends message text color
         public var friendMessage: Color
 
+        /// Friends message text color
         public var textLightContext: Color
+        /// Senders message text color
         public var textDarkContext: Color
+        /// Text media picker
         public var textMediaPicker: Color
 
+        /// Recording dot color
         public var recordDot: Color
 
+        /// Senders message time text color
         public var myMessageTime: Color
-        public var frientMessageTime: Color
-
+        /// Friends message time text color
+        public var friendMessageTime: Color
+        
+        /// Time capsule background color
         public var timeCapsuleBackground: Color
+        /// Time capsule foreground color
         public var timeCapsuleForeground: Color
 
         public init(
