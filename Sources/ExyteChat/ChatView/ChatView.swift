@@ -252,6 +252,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         theme.images.scrollToBottom
                             .frame(width: 40, height: 40)
                             .circleBackground(theme.colors.friendMessage)
+                            .foregroundColor(.secondary)
                     }
                     .padding(8)
                 }
