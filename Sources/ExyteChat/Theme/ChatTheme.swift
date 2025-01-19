@@ -292,7 +292,7 @@ public struct ChatTheme {
             self.mediaPicker = MediaPicker(
                 chevronDown: chevronDown ?? Image("chevronDown", bundle: .current),
                 chevronRight: chevronRight ?? Image("chevronRight", bundle: .current),
-                cross: cross ?? Image("cross", bundle: .current)
+                cross: cross ?? Image(systemName: "xmark")
             )
 
             self.message = Message(
