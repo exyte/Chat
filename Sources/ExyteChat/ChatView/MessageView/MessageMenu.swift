@@ -91,7 +91,6 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             ZStack {
                 theme.colors.friendMessage
                     .background(.ultraThinMaterial)
-                    .environment(\.colorScheme, .light)
                     .opacity(0.5)
                     .cornerRadius(12)
                 HStack {
