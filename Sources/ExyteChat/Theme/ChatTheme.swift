@@ -260,8 +260,8 @@ public struct ChatTheme {
             backButton: Image? = nil,
             scrollToBottom: Image? = nil
         ) {
-            self.backButton = backButton ?? Image("backArrow", bundle: .current)
-            self.scrollToBottom = scrollToBottom ?? Image("scrollToBottom", bundle: .current)
+            self.backButton = backButton ?? Image(systemName: "arrow.backward")
+            self.scrollToBottom = scrollToBottom ?? Image(systemName: "chevron.down")
 
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),
