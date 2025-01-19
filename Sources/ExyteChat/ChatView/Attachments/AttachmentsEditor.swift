@@ -137,7 +137,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputViewModel.showPicker = false
                 } label: {
                     Text(localization.cancelButtonText)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(.primary.opacity(0.7))
                 }
 
                 Spacer()
@@ -148,7 +148,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 Image(systemName: "chevron.down")
                     .rotationEffect(Angle(radians: showingAlbums ? .pi : 0))
             }
-            .foregroundColor(.white)
+            .foregroundColor(.primary)
             .onTapGesture {
                 withAnimation {
                     inputViewModel.mediaPickerMode = showingAlbums ? .photos : .albums
