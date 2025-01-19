@@ -69,6 +69,7 @@ struct ChatExampleView: View {
                 .padding(.leading, 10)
             }
         }
+        .navigationBarTitleDisplayMode(.automatic)
         .onAppear(perform: viewModel.onStart)
         .onDisappear(perform: viewModel.onStop)
     }
