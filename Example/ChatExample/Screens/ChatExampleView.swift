@@ -33,7 +33,8 @@ struct ChatExampleView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button { presentationMode.wrappedValue.dismiss() } label: {
-                    Image("backArrow", bundle: .current)
+                    Image(systemName: "arrow.backward")
+                        .foregroundColor(.primary)
                 }
             }
 
@@ -58,10 +59,10 @@ struct ChatExampleView: View {
                         Text(viewModel.chatTitle)
                             .fontWeight(.semibold)
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         Text(viewModel.chatStatus)
                             .font(.footnote)
-                            .foregroundColor(Color(hex: "AFB3B8"))
+                            .foregroundColor(.secondary)
                     }
                     Spacer()
                 }
