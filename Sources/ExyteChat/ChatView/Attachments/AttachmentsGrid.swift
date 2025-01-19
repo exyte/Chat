@@ -64,8 +64,8 @@ struct AttachmentsGrid: View {
                                     ZStack {
                                         RadialGradient(
                                             colors: [
-                                                .black.opacity(0.8),
-                                                .black.opacity(0.6),
+                                                .secondary.opacity(0.7),
+                                                .secondary.opacity(0.3),
                                             ],
                                             center: .center,
                                             startRadius: 0,
