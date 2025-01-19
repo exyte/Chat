@@ -222,7 +222,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var waitingForNetwork: some View {
         VStack {
             Rectangle()
-                .foregroundColor(.black.opacity(0.12))
+                .foregroundColor(.primary.opacity(0.12))
                 .frame(height: 1)
             HStack {
                 Spacer()
@@ -232,7 +232,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
             .padding(.top, 6)
             Rectangle()
-                .foregroundColor(.black.opacity(0.12))
+                .foregroundColor(.primary.opacity(0.12))
                 .frame(height: 1)
         }
         .padding(.top, 8)
