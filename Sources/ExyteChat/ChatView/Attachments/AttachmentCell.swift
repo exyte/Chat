@@ -54,7 +54,7 @@ struct AsyncImageView: View {
         } placeholder: {
             ZStack {
                 Rectangle()
-                    .foregroundColor(theme.colors.inputLightContextBackground)
+                    .foregroundColor(theme.colors.inputBG)
                     .frame(minWidth: 100, minHeight: 100)
                 ActivityIndicator(size: 30, showBackground: false)
             }

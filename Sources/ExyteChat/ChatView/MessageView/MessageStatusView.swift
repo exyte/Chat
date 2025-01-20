@@ -18,15 +18,15 @@ struct MessageStatusView: View {
                 theme.images.message.sending
                     .resizable()
                     .rotationEffect(.degrees(90))
-                    .foregroundColor(theme.colors.grayStatus)
+                    .foregroundColor(theme.colors.statusGray)
             case .sent:
                 theme.images.message.checkmarks
                     .resizable()
-                    .foregroundColor(theme.colors.grayStatus)
+                    .foregroundColor(theme.colors.statusGray)
             case .read:
                 theme.images.message.checkmarks
                     .resizable()
-                    .foregroundColor(theme.colors.myMessage)
+                    .foregroundColor(theme.colors.messageMyBG)
             case .error:
                 Button {
                     onRetry()
@@ -34,7 +34,7 @@ struct MessageStatusView: View {
                     theme.images.message.error
                         .resizable()
                 }
-                .foregroundColor(theme.colors.errorStatus)
+                .foregroundColor(theme.colors.statusError)
             }
         }
         .viewSize(MessageView.statusViewSize)

@@ -44,7 +44,7 @@ struct ChatNavigationModifier: ViewModifier {
                                 .resizable()
                                 .scaledToFill()
                         default:
-                            Rectangle().fill(theme.colors.grayStatus)
+                            Rectangle().fill(theme.colors.mainTint)
                         }
                     }
                     .frame(width: 35, height: 35)
@@ -55,11 +55,11 @@ struct ChatNavigationModifier: ViewModifier {
                     Text(title)
                         .fontWeight(.semibold)
                         .font(.headline)
-                        .foregroundColor(theme.colors.textLightContext)
+                        .foregroundColor(theme.colors.mainText)
                     if let status = status {
                         Text(status)
                             .font(.footnote)
-                            .foregroundColor(theme.colors.grayStatus)
+                            .foregroundColor(theme.colors.statusGray)
                     }
                 }
                 Spacer()

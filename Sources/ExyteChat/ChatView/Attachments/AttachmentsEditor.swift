@@ -60,7 +60,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputView
                         .padding(.bottom, g.safeAreaInsets.bottom)
                 }
-                .background(pickerTheme.main.albumSelectionBackground)
+                .background(theme.colors.mainBG)
                 .ignoresSafeArea()
             } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
                 VStack {
@@ -82,7 +82,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .pickerMode($inputViewModel.mediaPickerMode)
             .orientationHandler(orientationHandler)
             .padding(.top)
-            .background(pickerTheme.main.albumSelectionBackground)
+            .background(theme.colors.mainBG)
             .ignoresSafeArea(.all)
             .onChange(of: currentFullscreenMedia) { newValue in
                 assembleSelectedMedia()
@@ -96,6 +96,15 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputViewModel.send()
                 }
             }
+            .mediaPickerTheme(
+                main: .init(
+                    text: theme.colors.mainText,
+                    albumSelectionBackground: theme.colors.mainBG,
+                    fullscreenPhotoBackground: theme.colors.mainBG,
+                    cameraBackground: theme.colors.mainBG,
+                    cameraSelectionBackground: theme.colors.mainBG),
+                selection: .init(selectedTint: theme.colors.sendButtonBackground)
+            )
         }
     }
 
@@ -137,7 +146,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputViewModel.showPicker = false
                 } label: {
                     Text(localization.cancelButtonText)
-                        .foregroundColor(.white.opacity(0.7))
                 }
 
                 Spacer()
@@ -148,7 +156,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 Image(systemName: "chevron.down")
                     .rotationEffect(Angle(radians: showingAlbums ? .pi : 0))
             }
-            .foregroundColor(.white)
             .onTapGesture {
                 withAnimation {
                     inputViewModel.mediaPickerMode = showingAlbums ? .photos : .albums
@@ -156,6 +163,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
             .frame(maxWidth: .infinity)
         }
+        .foregroundColor(theme.colors.mainText)
         .padding(.horizontal)
         .padding(.bottom, 5)
     }
@@ -173,7 +181,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 theme.images.mediaPicker.chevronRight
                 Text(chatTitle)
                     .font(.title3)
-                    .foregroundColor(theme.colors.textMediaPicker)
+                    .foregroundColor(theme.colors.mainText)
             }
 
             Spacer()

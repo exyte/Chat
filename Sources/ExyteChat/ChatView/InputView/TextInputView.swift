@@ -21,9 +21,9 @@ struct TextInputView: View {
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
             .placeholder(when: text.isEmpty) {
                 Text(localization.inputPlaceholder)
-                    .foregroundColor(theme.colors.buttonBackground)
+                    .foregroundColor(theme.colors.inputPlaceholderText)
             }
-            .foregroundColor(style == .message ? theme.colors.textLightContext : theme.colors.textDarkContext)
+            .foregroundColor(theme.colors.inputText)
             .padding(.vertical, 10)
             .padding(.leading, !availableInput.isMediaAvailable ? 12 : 0)
             .onTapGesture {

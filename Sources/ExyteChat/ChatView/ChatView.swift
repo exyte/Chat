@@ -163,7 +163,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     public var body: some View {
         mainView
-            .background(theme.colors.mainBackground)
+            .background(theme.colors.mainBG)
             .environmentObject(keyboardState)
 
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
@@ -251,7 +251,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     } label: {
                         theme.images.scrollToBottom
                             .frame(width: 40, height: 40)
-                            .circleBackground(theme.colors.friendMessage)
+                            .circleBackground(theme.colors.messageFriendBG)
                     }
                     .padding(8)
                 }
@@ -295,7 +295,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
             if let row = viewModel.messageMenuRow {
                 ZStack(alignment: .topLeading) {
-                    theme.colors.messageMenuBackground
+                    theme.colors.menuBG
                         .opacity(menuBgOpacity)
                         .ignoresSafeArea(.all)
 

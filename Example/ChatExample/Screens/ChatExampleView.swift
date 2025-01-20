@@ -7,7 +7,7 @@ import SwiftUI
 import ExyteChat
 
 struct ChatExampleView: View {
-    
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) private var presentationMode
 
     @StateObject private var viewModel: ChatExampleViewModel
@@ -30,14 +30,17 @@ struct ChatExampleView: View {
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
         .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button { presentationMode.wrappedValue.dismiss() } label: {
                     Image("backArrow", bundle: .current)
+                        .renderingMode(.template)
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
                 }
             }
 
-            ToolbarItem(placement: .principal) {
+            ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
                     if let url = viewModel.chatCover {
                         CachedAsyncImage(url: url, urlCache: .shared) { phase in
@@ -58,7 +61,7 @@ struct ChatExampleView: View {
                         Text(viewModel.chatTitle)
                             .fontWeight(.semibold)
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundStyle(colorScheme == .dark ? .white : .black)
                         Text(viewModel.chatStatus)
                             .font(.footnote)
                             .foregroundColor(Color(hex: "AFB3B8"))
