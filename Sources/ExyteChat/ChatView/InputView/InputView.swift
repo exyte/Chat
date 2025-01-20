@@ -281,7 +281,7 @@ struct InputView: View {
                         .foregroundColor(theme.colors.messageMyBG)
                         .frame(width: 2)
                     VStack(alignment: .leading) {
-                        Text(String(localized: "Reply to \(message.user.name)", bundle: .module))
+                        Text(localization.replyToText + " " + message.user.name)
                             .font(.caption2)
                             .foregroundColor(theme.colors.mainCaptionText)
                         if !message.text.isEmpty {

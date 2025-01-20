@@ -54,7 +54,7 @@ final class Recorder {
         ]
 
         soundSamples = []
-        guard let fileExt = fileExtension(for: recorderSetting.audioFormatID) else{
+        guard let fileExt = fileExtension(for: recorderSettings.audioFormatID) else{
             return nil
         }
         let recordingUrl = FileManager.tempDirPath.appendingPathComponent(UUID().uuidString + fileExt)

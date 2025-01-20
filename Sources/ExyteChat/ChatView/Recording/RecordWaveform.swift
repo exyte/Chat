@@ -105,6 +105,7 @@ struct RecordWaveformPlaying: View {
             .frame(height: RecordWaveform.maxSampleHeight)
             
         }
+        .border(Color.red, width: 2)
         .frame(height: RecordWaveform.maxSampleHeight)
         .applyIf(!addExtraDots) {
             $0.frame(width: maxLength)
@@ -125,7 +126,7 @@ struct RecordWaveformPlaying: View {
                 var newPosition: CGFloat = currentPosition + offset.width * 0.5
                 if offset.width > 0 {
                     newPosition = min(newPosition, maxLength)
-                }else{
+                } else {
                     newPosition = max(newPosition, 0)
                 }
                 let newProgress = newPosition / maxLength
