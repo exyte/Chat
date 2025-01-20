@@ -211,8 +211,26 @@ These use `AnyView`, so please try to keep them easy enough
 `setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (assetsPickerLimit and others like mediaType, selectionStyle, etc.).   
 `orientationHandler` - handle screen rotation
 
-`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages. NOTE: New messages won't appear in the chat unless it's scrolled up to the very top - it's an optimization.       
-`chatNavigation(title: String, status: String? = nil, cover: URL? = nil)` - pass the info for the Chat's navigation bar 
+`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages. NOTE: New messages won't appear in the chat unless it's scrolled up to the very top - it's an optimization. 
+
+### Customize default UI
+You can use `chatTheme` to customize colors and images of default UI. You can pass all/some colors and images:
+
+```swift
+.chatTheme(
+    ChatTheme(
+        colors: .init(
+            mainBackground: .red,
+            buttonBackground: .yellow,
+            addButtonBackground: .purple
+        ),
+        images: .init(
+            camera: Image(systemName: "camera")
+        )
+    )
+)
+```
+Please use `mediaPickerTheme` in a similar fashion to customize the built-in photo picker.      
 
 ### makes sense only for built-in message view
 `avatarSize` - the default avatar is a circle, you can specify its diameter here 
@@ -229,6 +247,24 @@ These use `AnyView`, so please try to keep them easy enough
     - `.textOnly`    
   
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
+
+## Localization
+You can localize the library by providing your own strings by providing a `ChatLocalization` struct. Here is an example:
+```swift
+ChatLocalization(
+        inputPlaceholder: "Type a message...",
+        signatureText: "Add signature...",
+        cancelButtonText: "Cancel",
+        recentToggleText: "Recents",
+        waitingForNetwork: "Waiting for network",
+        recordingText: "Recording..."
+    )
+```
+
+Then pass the modifier:
+```swift
+.setChatLocalization(localization)
+```
 
 ## Examples
 There are 2 example projects:    

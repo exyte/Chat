@@ -94,7 +94,8 @@ struct InputView: View {
     var style: InputViewStyle
     var availableInput: AvailableInputType
     var messageUseMarkdown: Bool
-    var recorderSetting:RecorderSetting? = RecorderSetting()
+    var recorderSettings: RecorderSettings = RecorderSettings()
+    var localization: ChatLocalization
     
     @StateObject var recordingPlayer = RecordingPlayer()
 
@@ -128,7 +129,7 @@ struct InputView: View {
                 }
                 .background {
                     RoundedRectangle(cornerRadius: 18)
-                        .fill(fieldBackgroundColor)
+                        .fill(theme.colors.inputBG)
                 }
 
                 rightOutsideButton
@@ -139,7 +140,7 @@ struct InputView: View {
         .background(backgroundColor)
         .onAppear {
             viewModel.recordingPlayer = recordingPlayer
-            viewModel.setRecorderSetting(recorderSetting: recorderSetting)
+            viewModel.setRecorderSettings(recorderSettings: recorderSettings)
         }
     }
 
@@ -174,7 +175,7 @@ struct InputView: View {
             case .isRecordingTap:
                 recordingInProgress
             default:
-                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput)
+                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput, localization: localization)
             }
         }
         .frame(minHeight: 48)
@@ -240,7 +241,7 @@ struct InputView: View {
                         .foregroundColor(theme.colors.sendButtonBackground)
                 }
                 Group {
-                    if state.canSend || availableInput == .textOnly {
+                    if state.canSend || availableInput == .textOnly || availableInput == .textAndMedia {
                         sendButton
                             .disabled(!state.canSend)
                     } else {
@@ -271,23 +272,23 @@ struct InputView: View {
         if let message = viewModel.attachments.replyMessage {
             VStack(spacing: 8) {
                 Rectangle()
-                    .foregroundColor(theme.colors.friendMessage)
+                    .foregroundColor(theme.colors.messageFriendBG)
                     .frame(height: 2)
 
                 HStack {
                     theme.images.reply.replyToMessage
                     Capsule()
-                        .foregroundColor(theme.colors.myMessage)
+                        .foregroundColor(theme.colors.messageMyBG)
                         .frame(width: 2)
                     VStack(alignment: .leading) {
                         Text(String(localized: "Reply to \(message.user.name)", bundle: .module))
                             .font(.caption2)
-                            .foregroundColor(theme.colors.buttonBackground)
+                            .foregroundColor(theme.colors.mainCaptionText)
                         if !message.text.isEmpty {
                             textView(message.text)
                                 .font(.caption2)
                                 .lineLimit(1)
-                                .foregroundColor(theme.colors.textLightContext)
+                                .foregroundColor(theme.colors.mainText)
                         }
                     }
                     .padding(.vertical, 2)
@@ -304,7 +305,7 @@ struct InputView: View {
                     if let _ = message.recording {
                         theme.images.inputView.microphone
                             .renderingMode(.template)
-                            .foregroundColor(theme.colors.buttonBackground)
+                            .foregroundColor(theme.colors.mainTint)
                     }
 
                     theme.images.reply.cancelReply
@@ -344,7 +345,7 @@ struct InputView: View {
         } label: {
             theme.images.inputView.add
                 .viewSize(24)
-                .circleBackground(theme.colors.addButtonBackground)
+                .circleBackground(theme.colors.sendButtonBackground)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
         }
     }
@@ -428,9 +429,11 @@ struct InputView: View {
             } label: {
                 HStack {
                     theme.images.recordAudio.cancelRecord
-                    Text("Cancel", bundle: .module)
+                        .renderingMode(.template)
+                        .foregroundStyle(theme.colors.mainText)
+                    Text(localization.cancelButtonText)
                         .font(.footnote)
-                        .foregroundColor(theme.colors.textLightContext)
+                        .foregroundColor(theme.colors.mainText)
                 }
             }
             Spacer()
@@ -440,9 +443,9 @@ struct InputView: View {
     var recordingInProgress: some View {
         HStack {
             Spacer()
-            Text("Recording...", bundle: .module)
+            Text(localization.recordingText)
                 .font(.footnote)
-                .foregroundColor(theme.colors.textLightContext)
+                .foregroundColor(theme.colors.mainText)
             Spacer()
         }
     }
@@ -458,7 +461,7 @@ struct InputView: View {
 
     var recordDuration: some View {
         Text(DateFormatter.timeString(Int(viewModel.attachments.recording?.duration ?? 0)))
-            .foregroundColor(theme.colors.textLightContext)
+            .foregroundColor(theme.colors.mainText)
             .opacity(0.6)
             .font(.caption2)
             .monospacedDigit()
@@ -467,7 +470,7 @@ struct InputView: View {
 
     var recordDurationLeft: some View {
         Text(DateFormatter.timeString(Int(recordingPlayer.secondsLeft)))
-            .foregroundColor(theme.colors.textLightContext)
+            .foregroundColor(theme.colors.mainText)
             .opacity(0.6)
             .font(.caption2)
             .monospacedDigit()
@@ -503,7 +506,7 @@ struct InputView: View {
                 }
                 .frame(width: 20)
 
-                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.textLightContext, addExtraDots: true) { progress in
+                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.mainText, addExtraDots: true) { progress in
                     recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
                 }
             }
@@ -511,19 +514,10 @@ struct InputView: View {
         }
     }
 
-    var fieldBackgroundColor: Color {
-        switch style {
-        case .message:
-            return theme.colors.inputLightContextBackground
-        case .signature:
-            return theme.colors.inputDarkContextBackground
-        }
-    }
-
     var backgroundColor: Color {
         switch style {
         case .message:
-            return theme.colors.mainBackground
+            return theme.colors.mainBG
         case .signature:
             return pickerTheme.main.albumSelectionBackground
         }

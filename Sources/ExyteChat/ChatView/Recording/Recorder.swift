@@ -18,7 +18,7 @@ final class Recorder {
     private var audioTimer: Timer?
 
     private var soundSamples: [CGFloat] = []
-    internal var recorderSetting = RecorderSetting()
+    internal var recorderSettings = RecorderSettings()
 
     var isAllowedToRecordAudio: Bool {
         audioSession.recordPermission == .granted
@@ -42,14 +42,14 @@ final class Recorder {
     
     private func startRecordingInternal(_ durationProgressHandler: @escaping ProgressHandler) -> URL? {
         let settings: [String : Any] = [
-            AVFormatIDKey: Int(recorderSetting.audioFormatID),
-            AVSampleRateKey: recorderSetting.sampleRate,
-            AVNumberOfChannelsKey: recorderSetting.numberOfChannels,
-            AVEncoderBitRateKey: recorderSetting.encoderBitRateKey,
-            AVLinearPCMBitDepthKey: recorderSetting.linearPCMBitDepth,
-            AVLinearPCMIsFloatKey: recorderSetting.linearPCMIsFloatKey,
-            AVLinearPCMIsBigEndianKey: recorderSetting.linearPCMIsBigEndianKey,
-            AVLinearPCMIsNonInterleaved: recorderSetting.linearPCMIsNonInterleaved,
+            AVFormatIDKey: Int(recorderSettings.audioFormatID),
+            AVSampleRateKey: recorderSettings.sampleRate,
+            AVNumberOfChannelsKey: recorderSettings.numberOfChannels,
+            AVEncoderBitRateKey: recorderSettings.encoderBitRateKey,
+            AVLinearPCMBitDepthKey: recorderSettings.linearPCMBitDepth,
+            AVLinearPCMIsFloatKey: recorderSettings.linearPCMIsFloatKey,
+            AVLinearPCMIsBigEndianKey: recorderSettings.linearPCMIsBigEndianKey,
+            AVLinearPCMIsNonInterleaved: recorderSettings.linearPCMIsNonInterleaved,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 
@@ -136,7 +136,7 @@ final class Recorder {
 
 }
 
-public struct RecorderSetting : Codable,Hashable {
+public struct RecorderSettings : Codable,Hashable {
     var audioFormatID: AudioFormatID
     var sampleRate: CGFloat
     var numberOfChannels: Int

@@ -99,6 +99,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     /// date section header builder
     var headerBuilder: ((Date)->AnyView)?
+    
+    /// provide strings for the chat view in your preferred language
+    var localization: ChatLocalization = .defaultLocalization
 
     // MARK: - Customization
 
@@ -117,8 +120,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var showMessageTimeView = true
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availablelInput: AvailableInputType = .full
-    
-    var recorderSetting: RecorderSetting? = RecorderSetting()
+    var recorderSettings: RecorderSettings = RecorderSettings()
 
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -147,7 +149,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 didSendMessage: @escaping (DraftMessage) -> Void,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?) {
+                messageMenuAction: MessageMenuActionClosure?,
+                localization: ChatLocalization) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
@@ -155,11 +158,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
+        self.localization = localization
     }
 
     public var body: some View {
         mainView
-            .background(theme.colors.mainBackground)
+            .background(theme.colors.mainBG)
             .environmentObject(keyboardState)
 
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
@@ -182,7 +186,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
 
             .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-                AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput)
+                AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput, localization: localization)
                     .environmentObject(globalFocusState)
             }
 
@@ -223,7 +227,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             HStack {
                 Spacer()
                 Image("waiting", bundle: .current)
-                Text("Waiting for network", bundle: .module)
+                Text(localization.waitingForNetwork)
                 Spacer()
             }
             .padding(.top, 6)
@@ -247,7 +251,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     } label: {
                         theme.images.scrollToBottom
                             .frame(width: 40, height: 40)
-                            .circleBackground(theme.colors.friendMessage)
+                            .circleBackground(theme.colors.messageFriendBG)
                     }
                     .padding(8)
                 }
@@ -291,7 +295,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
             if let row = viewModel.messageMenuRow {
                 ZStack(alignment: .topLeading) {
-                    theme.colors.messageMenuBackground
+                    theme.colors.menuBG
                         .opacity(menuBgOpacity)
                         .ignoresSafeArea(.all)
 
@@ -335,7 +339,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.globalFocusState = globalFocusState
 
             inputViewModel.didSendMessage = { value in
-                didSendMessage(value)
+                Task { @MainActor in
+                    didSendMessage(value)
+                }
                 if type == .conversation {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
@@ -358,7 +364,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     style: .message,
                     availableInput: availablelInput,
                     messageUseMarkdown: messageUseMarkdown,
-                    recorderSetting: recorderSetting
+                    recorderSettings: recorderSettings,
+                    localization: localization
                 )
             }
         }
@@ -554,7 +561,7 @@ public extension ChatView {
         return view
     }
 
-    func messageUseMarkdown(messageUseMarkdown: Bool) -> ChatView {
+    func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
         return view
@@ -571,6 +578,12 @@ public extension ChatView {
         view.messageFont = font
         return view
     }
+    
+    func setChatLocalization(_ localization: ChatLocalization) -> ChatView {
+        var view = self
+        view.localization = localization
+        return view
+    }
 
     // makes sense only for built-in input view
 
@@ -579,5 +592,11 @@ public extension ChatView {
         view.availablelInput = type
         return view
     }
-    
+
+    func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
+        var view = self
+        view.recorderSettings = settings
+        return view
+    }
+
 }

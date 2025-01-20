@@ -95,16 +95,15 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
 
             ZStack {
-                theme.colors.friendMessage
-                    .background(.ultraThinMaterial)
-                    .environment(\.colorScheme, .light)
-                    .opacity(0.5)
+                theme.colors.menuBG
                     .cornerRadius(12)
                 HStack {
-                    Text(LocalizedStringKey(title), bundle: .module)
-                        .foregroundColor(theme.colors.textLightContext)
+                    Text(title)
+                        .foregroundColor(theme.colors.menuText)
                     Spacer()
                     icon
+                        .renderingMode(.template)
+                        .foregroundStyle(theme.colors.menuText)
                 }
                 .padding(.vertical, 11)
                 .padding(.horizontal, 12)

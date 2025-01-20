@@ -97,7 +97,7 @@ struct MessageView: View {
                         .padding(message.user.isCurrentUser ? .trailing : .leading, 10)
                         .overlay(alignment: message.user.isCurrentUser ? .trailing : .leading) {
                             Capsule()
-                                .foregroundColor(theme.colors.buttonBackground)
+                                .foregroundColor(theme.colors.mainTint)
                                 .frame(width: 2)
                         }
                 }
@@ -252,9 +252,9 @@ struct MessageView: View {
     func recordingView(_ recording: Recording) -> some View {
         RecordWaveformWithButtons(
             recording: recording,
-            colorButton: message.user.isCurrentUser ? theme.colors.myMessage : .white,
-            colorButtonBg: message.user.isCurrentUser ? .white : theme.colors.myMessage,
-            colorWaveform: message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext
+            colorButton: message.user.isCurrentUser ? theme.colors.messageMyBG : theme.colors.mainBG,
+            colorButtonBg: message.user.isCurrentUser ? theme.colors.mainBG : theme.colors.messageMyBG,
+            colorWaveform: message.user.isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText
         )
         .padding(.horizontal, MessageView.horizontalTextPadding)
         .padding(.top, 8)
@@ -282,11 +282,11 @@ extension View {
         let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
         self
             .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
-            .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
+            .foregroundColor(message.user.isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText)
             .background {
                 if isReply || !message.text.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: radius)
-                        .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
+                        .foregroundColor(message.user.isCurrentUser ? theme.colors.messageMyBG : theme.colors.messageFriendBG)
                         .opacity(isReply ? 0.5 : 1)
                 }
             }

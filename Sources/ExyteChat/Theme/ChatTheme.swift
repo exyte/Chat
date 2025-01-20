@@ -40,73 +40,75 @@ public struct ChatTheme {
     }
 
     public struct Colors {
-        public var grayStatus: Color
-        public var errorStatus: Color
+        public var mainBG: Color
+        public var mainTint: Color
+        public var mainText: Color
+        public var mainCaptionText: Color
 
-        public var inputLightContextBackground: Color
-        public var inputDarkContextBackground: Color
+        public var messageMyBG: Color
+        public var messageMyText: Color
+        public var messageMyTimeText: Color
 
-        public var mainBackground: Color
-        public var buttonBackground: Color
-        public var addButtonBackground: Color
+        public var messageFriendBG: Color
+        public var messageFriendText: Color
+        public var messageFriendTimeText: Color
+
+        public var inputBG: Color
+        public var inputText: Color
+        public var inputPlaceholderText: Color
+
+        public var menuBG: Color
+        public var menuText: Color
+        public var menuTextDelete: Color
+
+        public var statusError: Color
+        public var statusGray: Color
+
         public var sendButtonBackground: Color
-        public var messageMenuBackground: Color
-
-        public var myMessage: Color
-        public var friendMessage: Color
-
-        public var textLightContext: Color
-        public var textDarkContext: Color
-        public var textMediaPicker: Color
-
         public var recordDot: Color
 
-        public var myMessageTime: Color
-        public var frientMessageTime: Color
-
-        public var timeCapsuleBackground: Color
-        public var timeCapsuleForeground: Color
-
         public init(
-            grayStatus: Color = Color(hex: "AFB3B8"),
-            errorStatus: Color = Color.red,
-            inputLightContextBackground: Color = Color(hex: "F2F3F5"),
-            inputDarkContextBackground: Color = Color(hex: "F2F3F5").opacity(0.12),
-            mainBackground: Color = .white,
-            buttonBackground: Color = Color(hex: "989EAC"),
-            addButtonBackground: Color = Color(hex: "#4F5055"),
-            sendButtonBackground: Color = Color(hex: "#4962FF"),
-            messageMenuBackground: Color = Color.white,
-            myMessage: Color = Color(hex: "4962FF"),
-            friendMessage: Color = Color(hex: "EBEDF0"),
-            textLightContext: Color = Color.black,
-            textDarkContext: Color = Color.white,
-            textMediaPicker: Color = Color(hex: "818C99"),
-            recordDot: Color = Color(hex: "F62121"),
-            myMessageTime: Color = .white.opacity(0.4),
-            frientMessageTime: Color = .black.opacity(0.4),
-            timeCapsuleBackground: Color = .black.opacity(0.4),
-            timeCapsuleForeground: Color = .white
+            mainBG: Color = Color("mainBG", bundle: .current),
+            mainTint: Color = Color("inputPlaceholderText", bundle: .current),
+            mainText: Color = Color("mainText", bundle: .current),
+            mainCaptionText: Color = Color("mainCaptionText", bundle: .current),
+            messageMyBG: Color = Color("messageMyBG", bundle: .current),
+            messageMyText: Color = Color.white,
+            messageMyTimeText: Color = Color("messageMyTimeText", bundle: .current),
+            messageFriendBG: Color = Color("messageFriendBG", bundle: .current),
+            messageFriendText: Color = Color("mainText", bundle: .current),
+            messageFriendTimeText: Color = Color("messageFriendTimeText", bundle: .current),
+            inputBG: Color = Color("inputBG", bundle: .current),
+            inputText: Color = Color("mainText", bundle: .current),
+            inputPlaceholderText: Color = Color("inputPlaceholderText", bundle: .current),
+            menuBG: Color = Color("menuBG", bundle: .current),
+            menuText: Color = Color("menuText", bundle: .current),
+            menuTextDelete: Color = Color("menuTextDelete", bundle: .current),
+            statusError: Color = Color("statusError", bundle: .current),
+            statusGray: Color = Color("statusGray", bundle: .current),
+            sendButtonBackground: Color = Color("messageMyBG", bundle: .current),
+            recordDot: Color = Color("menuTextDelete", bundle: .current)
         ) {
-            self.grayStatus = grayStatus
-            self.errorStatus = errorStatus
-            self.inputLightContextBackground = inputLightContextBackground
-            self.inputDarkContextBackground = inputDarkContextBackground
-            self.mainBackground = mainBackground
-            self.buttonBackground = buttonBackground
-            self.addButtonBackground = addButtonBackground
+            self.mainBG = mainBG
+            self.mainTint = mainTint
+            self.mainText = mainText
+            self.mainCaptionText = mainCaptionText
+            self.messageMyBG = messageMyBG
+            self.messageMyText = messageMyText
+            self.messageMyTimeText = messageMyTimeText
+            self.messageFriendBG = messageFriendBG
+            self.messageFriendText = messageFriendText
+            self.messageFriendTimeText = messageFriendTimeText
+            self.inputBG = inputBG
+            self.inputText = inputText
+            self.inputPlaceholderText = inputPlaceholderText
+            self.menuBG = menuBG
+            self.menuText = menuText
+            self.menuTextDelete = menuTextDelete
+            self.statusError = statusError
+            self.statusGray = statusGray
             self.sendButtonBackground = sendButtonBackground
-            self.messageMenuBackground = messageMenuBackground
-            self.myMessage = myMessage
-            self.friendMessage = friendMessage
-            self.textLightContext = textLightContext
-            self.textDarkContext = textDarkContext
-            self.textMediaPicker = textMediaPicker
             self.recordDot = recordDot
-            self.myMessageTime = myMessageTime
-            self.frientMessageTime = frientMessageTime
-            self.timeCapsuleBackground = timeCapsuleBackground
-            self.timeCapsuleForeground = timeCapsuleForeground
         }
     }
 
