@@ -315,3 +315,32 @@ public struct ChatTheme {
         }
     }
 }
+
+// MARK: Accent Color Theme, with default backgrounds
+
+extension View {
+    public func chatTheme(accentColor: Color) -> some View {
+        return self
+            .chatTheme(ChatTheme(accentColor: accentColor))
+    }
+}
+
+extension ChatTheme {
+    internal init(accentColor: Color) {
+        self.init(
+            colors: .init(
+                mainTint: accentColor,
+                messageMyBG: accentColor,
+                messageMyTimeText: Color.white.opacity(0.5),
+                sendButtonBackground: accentColor
+            ), images: .init(
+                cross: Image(systemName: "xmark"),
+                pauseRecord: Image(systemName: "pause.fill"),
+                playRecord: Image(systemName: "play.fill"),
+                cancelReply: Image(systemName: "x.circle"),
+                replyToMessage: Image(systemName: "arrow.uturn.left"),
+                scrollToBottom: Image(systemName: "chevron.down")
+            )
+        )
+    }
+}
