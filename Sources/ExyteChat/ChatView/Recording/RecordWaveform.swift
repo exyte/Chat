@@ -105,7 +105,7 @@ struct RecordWaveformPlaying: View {
             .frame(height: RecordWaveform.maxSampleHeight)
             
         }
-        .border(Color.red, width: 2)
+        //.border(Color.red, width: 2)
         .frame(height: RecordWaveform.maxSampleHeight)
         .applyIf(!addExtraDots) {
             $0.frame(width: maxLength)
