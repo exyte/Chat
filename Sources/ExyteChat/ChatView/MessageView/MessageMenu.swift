@@ -111,7 +111,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
 
             ZStack {
-                theme.colors.menuBG
+                theme.colors.messageFriendBG
                     .cornerRadius(12)
                 HStack {
                     Text(title)
