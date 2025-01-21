@@ -277,6 +277,7 @@ struct InputView: View {
 
                 HStack {
                     theme.images.reply.replyToMessage
+                        .foregroundStyle(theme.colors.sendButtonBackground)
                     Capsule()
                         .foregroundColor(theme.colors.messageMyBG)
                         .frame(width: 2)
@@ -312,6 +313,7 @@ struct InputView: View {
                         .onTapGesture {
                             viewModel.attachments.replyMessage = nil
                         }
+                        .foregroundStyle(theme.colors.sendButtonBackground)
                 }
                 .padding(.horizontal, 26)
             }
@@ -483,6 +485,7 @@ struct InputView: View {
         } label: {
             theme.images.recordAudio.playRecord
         }
+        .tint(theme.colors.mainText)
     }
 
     var pauseRecordButton: some View {
@@ -491,6 +494,7 @@ struct InputView: View {
         } label: {
             theme.images.recordAudio.pauseRecord
         }
+        .tint(theme.colors.mainText)
     }
 
     @ViewBuilder
