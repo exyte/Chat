@@ -161,8 +161,10 @@ public struct ChatTheme {
         public struct MessageMenu {
             public var delete: Image
             public var edit: Image
+            public var reply: Image
             public var forward: Image
             public var retry: Image
+            public var copy: Image
             public var save: Image
             public var select: Image
         }
@@ -292,8 +294,10 @@ public struct ChatTheme {
             self.messageMenu = MessageMenu(
                 delete: delete ?? Image("delete", bundle: .current),
                 edit: edit ?? Image("edit", bundle: .current),
+                reply: reply ?? Image("reply", bundle: .current),
                 forward: forward ?? Image("forward", bundle: .current),
                 retry: retry ?? Image("retry", bundle: .current),
+                copy: copy ?? Image(systemName: "dov.on.doc"),
                 save: save ?? Image("save", bundle: .current),
                 select: select ?? Image("select", bundle: .current)
             )
