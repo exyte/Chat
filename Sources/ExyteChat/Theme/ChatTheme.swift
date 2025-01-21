@@ -344,6 +344,8 @@ extension ChatTheme {
                 sendButtonBackground: accentColor
             ), images: .init(
                 cross: Image(systemName: "xmark"),
+                edit: Image(systemName: "bubble.and.pencil"),
+                menuReply: Image(systemName: "arrow.uturn.left"),
                 pauseRecord: Image(systemName: "pause.fill"),
                 playRecord: Image(systemName: "play.fill"),
                 cancelReply: Image(systemName: "x.circle"),
@@ -412,6 +414,8 @@ extension ChatTheme {
                 sendButtonBackground: accentColor
             ), images: .init(
                 cross: Image(systemName: "xmark"),
+                edit: Image(systemName: "bubble.and.pencil"),
+                menuReply: Image(systemName: "arrow.uturn.left"),
                 pauseRecord: Image(systemName: "pause.fill"),
                 playRecord: Image(systemName: "play.fill"),
                 cancelReply: Image(systemName: "x.circle"),
