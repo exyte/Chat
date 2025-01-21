@@ -319,6 +319,9 @@ public struct ChatTheme {
 // MARK: Accent Color Theme, with default backgrounds
 
 extension View {
+    /// Creates and applies a `ChatTheme` to your `ChatView` based around the provided `accentColor`
+    /// - Parameters:
+    ///   - color: The main accent color of your `ChatView`
     public func chatTheme(accentColor: Color) -> some View {
         return self
             .chatTheme(ChatTheme(accentColor: accentColor))
