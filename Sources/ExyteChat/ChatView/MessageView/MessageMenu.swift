@@ -36,11 +36,9 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         case .copy:
             Image(systemName: "doc.on.doc")
         case .reply:
-            Image(systemName: "arrowshape.turn.up.left")
-          //  Image(.reply)
+            Image(.reply)
         case .edit:
-            Image(systemName: "bubble.and.pencil")
-           // Image(.edit)
+            Image(.edit)
         }
     }
 
