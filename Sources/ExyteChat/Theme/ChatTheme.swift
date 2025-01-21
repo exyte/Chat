@@ -228,8 +228,10 @@ public struct ChatTheme {
             sending: Image? = nil,
             delete: Image? = nil,
             edit: Image? = nil,
+            menuReply: Image? = nil,
             forward: Image? = nil,
             retry: Image? = nil,
+            copy: Image? = nil,
             save: Image? = nil,
             select: Image? = nil,
             cancelRecord: Image? = nil,
@@ -294,10 +296,10 @@ public struct ChatTheme {
             self.messageMenu = MessageMenu(
                 delete: delete ?? Image("delete", bundle: .current),
                 edit: edit ?? Image("edit", bundle: .current),
-                reply: reply ?? Image("reply", bundle: .current),
+                reply: menuReply ?? Image("reply", bundle: .current),
                 forward: forward ?? Image("forward", bundle: .current),
                 retry: retry ?? Image("retry", bundle: .current),
-                copy: copy ?? Image(systemName: "dov.on.doc"),
+                copy: copy ?? Image(systemName: "doc.on.doc"),
                 save: save ?? Image("save", bundle: .current),
                 select: select ?? Image("select", bundle: .current)
             )
