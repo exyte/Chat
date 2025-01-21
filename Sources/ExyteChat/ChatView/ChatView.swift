@@ -384,6 +384,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
+            font: messageFont,
             onAction: menuActionClosure(row.message)) {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {

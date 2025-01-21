@@ -74,9 +74,18 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
+    var font:UIFont? = nil
     var onAction: (ActionEnum) -> ()
     var mainButton: () -> MainButton
 
+    var getFont: Font? {
+        if let font {
+            return Font(font)
+        } else{
+            return nil
+        }
+    }
+    
     var body: some View {
         FloatingButton(
             mainButtonView: mainButton().allowsHitTesting(false),
@@ -112,6 +121,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                         .renderingMode(.template)
                         .foregroundStyle(theme.colors.menuText)
                 }
+                .font(getFont)
                 .padding(.vertical, 11)
                 .padding(.horizontal, 12)
             }
