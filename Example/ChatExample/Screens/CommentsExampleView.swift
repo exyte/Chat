@@ -24,7 +24,7 @@ enum Action: MessageMenuAction {
         }
     }
     
-    func icon(theme:ChatTheme.Images) -> Image {
+    func icon() -> Image {
         switch self {
         case .reply:
             Image(systemName: "arrowshape.turn.up.left")

@@ -11,7 +11,7 @@ import enum FloatingButton.Alignment
 
 public protocol MessageMenuAction: Equatable, CaseIterable {
     func title() -> String
-    func icon(theme:ChatTheme.Images) -> Image
+    func icon() -> Image
 }
 
 public enum DefaultMessageMenuAction: MessageMenuAction {
@@ -31,14 +31,14 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         }
     }
 
-    public func icon(theme:ChatTheme.Images) -> Image {
+    public func icon() -> Image {
         switch self {
         case .copy:
-            theme.messageMenu.copy
+            Image(systemName: "doc.on.doc")
         case .reply:
-            theme.messageMenu.reply
+            Image(systemName: "arrowshape.turn.up.left")
         case .edit:
-            theme.messageMenu.edit
+            Image(systemName: "bubble.and.pencil")
         }
     }
 
@@ -83,7 +83,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         FloatingButton(
             mainButtonView: mainButton().allowsHitTesting(false),
             buttons: ActionEnum.allCases.map {
-                menuButton(title: $0.title(), icon: $0.icon(theme: theme.images), action: $0)
+                menuButton(title: $0.title(), icon: $0.icon(), action: $0)
             },
             isOpen: $isShowingMenu
         )
