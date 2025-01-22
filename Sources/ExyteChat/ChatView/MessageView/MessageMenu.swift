@@ -67,14 +67,14 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
-    var font:UIFont? = nil
+    var font: UIFont? = nil
     var onAction: (ActionEnum) -> ()
     var mainButton: () -> MainButton
 
     var getFont: Font? {
         if let font {
             return Font(font)
-        } else{
+        } else {
             return nil
         }
     }

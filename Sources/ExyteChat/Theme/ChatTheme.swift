@@ -1,6 +1,6 @@
 //
 //  ChatTheme.swift
-//  
+//
 //
 //  Created by Alisa Mylnikova on 31.01.2023.
 //
