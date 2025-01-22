@@ -1,6 +1,6 @@
 //
 //  ChatTheme.swift
-//  
+//
 //
 //  Created by Alisa Mylnikova on 31.01.2023.
 //
@@ -192,7 +192,6 @@ public struct ChatTheme {
         public var fullscreenMedia: FullscreenMedia
         public var mediaPicker: MediaPicker
         public var message: Message
-        public var messageMenu: MessageMenu
         public var recordAudio: RecordAudio
         public var reply: Reply
 
@@ -226,14 +225,6 @@ public struct ChatTheme {
             playAudio: Image? = nil,
             playVideo: Image? = nil,
             sending: Image? = nil,
-            delete: Image? = nil,
-            edit: Image? = nil,
-            menuReply: Image? = nil,
-            forward: Image? = nil,
-            retry: Image? = nil,
-            copy: Image? = nil,
-            save: Image? = nil,
-            select: Image? = nil,
             cancelRecord: Image? = nil,
             deleteRecord: Image? = nil,
             lockRecord: Image? = nil,
@@ -291,17 +282,6 @@ public struct ChatTheme {
                 playAudio: playAudio ?? Image("playAudio", bundle: .current),
                 playVideo: playVideo ?? Image(systemName: "play.circle.fill"),
                 sending: sending ?? Image("sending", bundle: .current)
-            )
-
-            self.messageMenu = MessageMenu(
-                delete: delete ?? Image("delete", bundle: .current),
-                edit: edit ?? Image("edit", bundle: .current),
-                reply: menuReply ?? Image("reply", bundle: .current),
-                forward: forward ?? Image("forward", bundle: .current),
-                retry: retry ?? Image("retry", bundle: .current),
-                copy: copy ?? Image(systemName: "doc.on.doc"),
-                save: save ?? Image("save", bundle: .current),
-                select: select ?? Image("select", bundle: .current)
             )
 
             self.recordAudio = RecordAudio(
