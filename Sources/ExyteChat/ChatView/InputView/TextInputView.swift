@@ -29,5 +29,6 @@ struct TextInputView: View {
             .onTapGesture {
                 globalFocusState.focus = .uuid(inputFieldId)
             }
+            .tint(theme.colors.sendButtonBackground)
     }
 }

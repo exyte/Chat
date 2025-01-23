@@ -36,9 +36,9 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         case .copy:
             Image(systemName: "doc.on.doc")
         case .reply:
-            Image(.reply)
+            Image(systemName: "arrowshape.turn.up.left")
         case .edit:
-            Image(.edit)
+            Image(systemName: "bubble.and.pencil")
         }
     }
 
@@ -67,9 +67,18 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
+    var font: UIFont? = nil
     var onAction: (ActionEnum) -> ()
     var mainButton: () -> MainButton
 
+    var getFont: Font? {
+        if let font {
+            return Font(font)
+        } else {
+            return nil
+        }
+    }
+    
     var body: some View {
         FloatingButton(
             mainButtonView: mainButton().allowsHitTesting(false),
@@ -95,7 +104,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
 
             ZStack {
-                theme.colors.menuBG
+                theme.colors.messageFriendBG
                     .cornerRadius(12)
                 HStack {
                     Text(title)
@@ -105,6 +114,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                         .renderingMode(.template)
                         .foregroundStyle(theme.colors.menuText)
                 }
+                .font(getFont)
                 .padding(.vertical, 11)
                 .padding(.horizontal, 12)
             }

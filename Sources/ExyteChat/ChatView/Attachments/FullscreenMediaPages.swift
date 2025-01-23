@@ -105,6 +105,7 @@ struct FullscreenMediaPages: View {
             if viewModel.showMinis {
                 Button(action: onClose) {
                     theme.images.mediaPicker.cross
+                        .imageScale(.large)
                         .padding(5)
                 }
                 .tint(.white)

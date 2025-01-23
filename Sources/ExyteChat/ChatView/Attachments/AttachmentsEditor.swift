@@ -103,7 +103,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     fullscreenPhotoBackground: theme.colors.mainBG,
                     cameraBackground: theme.colors.mainBG,
                     cameraSelectionBackground: theme.colors.mainBG),
-                selection: .init(selectedTint: theme.colors.sendButtonBackground)
+                selection: .init(
+                    selectedTint: theme.colors.sendButtonBackground,
+                    fullscreenTint: theme.colors.sendButtonBackground
+                )
             )
         }
     }
