@@ -7,8 +7,8 @@ import ExyteMediaPicker
 
 struct ContentView: View {
     
-    @State private var isAccent:Bool = true
-    @State private var accentColor = Color(red: 83/256, green: 95/256, blue: 249/256)
+    @State private var isAccent: Bool = true
+    @State private var accentColor = Color("messageMyBG", bundle: .current)
     
     var body: some View {
         NavigationView {
