@@ -158,17 +158,6 @@ public struct ChatTheme {
             public var sending: Image
         }
 
-        public struct MessageMenu {
-            public var delete: Image
-            public var edit: Image
-            public var reply: Image
-            public var forward: Image
-            public var retry: Image
-            public var copy: Image
-            public var save: Image
-            public var select: Image
-        }
-
         public struct RecordAudio {
             public var cancelRecord: Image
             public var deleteRecord: Image
