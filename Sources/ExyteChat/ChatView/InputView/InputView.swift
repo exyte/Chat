@@ -142,6 +142,7 @@ struct InputView: View {
             viewModel.recordingPlayer = recordingPlayer
             viewModel.setRecorderSettings(recorderSettings: recorderSettings)
         }
+        .gesture(dismissKeyboardGesture())
     }
 
     @ViewBuilder
@@ -572,6 +573,17 @@ struct InputView: View {
                     }
                 }
                 dragStart = nil
+            }
+    }
+    
+    /// A downward drag that is initiated on the InputView and traverses at least 100 pixels will request the keyboard to be dismissed if active.
+    func dismissKeyboardGesture() -> some Gesture {
+        DragGesture()
+            .onEnded { val in
+                if val.translation.height > 100 {
+                    // dismiss the keyboard
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
             }
     }
 }
