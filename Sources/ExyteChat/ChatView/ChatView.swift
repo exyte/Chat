@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GiphyUISDK
 import FloatingButton
 import SwiftUIIntrospect
 import ExyteMediaPicker
@@ -71,6 +72,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.chatTheme) private var theme
+    @Environment(\.giphyConfig) private var giphyConfig
     @Environment(\.mediaPickerTheme) private var pickerTheme
 
     // MARK: - Parameters
@@ -119,7 +121,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var paginationHandler: PaginationHandler?
     var showMessageTimeView = true
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
-    var availablelInput: AvailableInputType = .full
+    var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
     var recorderSettings: RecorderSettings = RecorderSettings()
 
     @StateObject private var viewModel = ChatViewModel()
@@ -131,6 +133,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
 
+    @State private var giphyConfigured = false
     @State private var isShowingMenu = false
     @State private var needsScrollView = false
     @State private var readyToShowScrollView = false
@@ -142,6 +145,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var menuBgOpacity: CGFloat = 0
     @State private var menuCellOpacity: CGFloat = 0
     @State private var menuScrollView: UIScrollView?
+    @State private var selectedMedia: GPHMedia? = nil
 
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
@@ -184,10 +188,47 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .ignoresSafeArea()
                 }
             }
-
+            .onAppear() {
+              if isGiphyAvailable() {
+                if let giphyKey = giphyConfig.giphyKey {
+                  if !giphyConfigured {
+                    giphyConfigured = true
+                    Giphy.configure(apiKey: giphyKey)
+                  }
+                } else {
+                  print("giphy input available though giphy key not provided")
+                }
+              }
+            }
+            .onChange(of: selectedMedia) { newValue in
+                if let giphyMedia = newValue {
+                  inputViewModel.attachments.giphyMedia = giphyMedia
+                  inputViewModel.send()
+                }
+            }
+            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
+              if giphyConfig.giphyKey != nil {
+                GiphyEditorView(
+                  giphyConfig: giphyConfig,
+                  selectedMedia: $selectedMedia
+                )
+                .environmentObject(globalFocusState)
+              } else {
+                Text("no giphy key found")
+              }
+            }
             .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-                AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput, localization: localization)
-                    .environmentObject(globalFocusState)
+              AttachmentsEditor(
+                inputViewModel: inputViewModel,
+                inputViewBuilder: inputViewBuilder,
+                chatTitle: chatTitle,
+                messageUseMarkdown: messageUseMarkdown,
+                orientationHandler: orientationHandler,
+                mediaPickerSelectionParameters: mediaPickerSelectionParameters,
+                availableInputs: availableInputs,
+                localization: localization
+              )
+                .environmentObject(globalFocusState)
             }
 
             .onChange(of: inputViewModel.showPicker) {
@@ -195,8 +236,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
+            .onChange(of: inputViewModel.showGiphyPicker) {
+                if $0 {
+                    globalFocusState.focus = nil
+                }
+            }
     }
-
+  
     var mainView: some View {
         VStack {
             if !networkMonitor.isConnected, !networkMonitor.isConnected {
@@ -364,7 +410,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     viewModel: inputViewModel,
                     inputFieldId: viewModel.inputFieldId,
                     style: .message,
-                    availableInput: availablelInput,
+                    availableInputs: availableInputs,
                     messageUseMarkdown: messageUseMarkdown,
                     recorderSettings: recorderSettings,
                     localization: localization
@@ -458,10 +504,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             readyToShowScrollView = false
         }
     }
+  
+    private func isGiphyAvailable() -> Bool {
+      return availableInputs.contains(AvailableInputType.giphy)
+    }
 }
 
 public extension ChatView {
-
+    
     func betweenListAndInputViewBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
         var view = self
         view.betweenListAndInputViewBuilder = {
@@ -469,7 +519,7 @@ public extension ChatView {
         }
         return view
     }
-
+    
     func mainHeaderBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
         var view = self
         view.mainHeaderBuilder = {
@@ -477,7 +527,7 @@ public extension ChatView {
         }
         return view
     }
-
+    
     func headerBuilder<V: View>(_ builder: @escaping (Date)->V) -> ChatView {
         var view = self
         view.headerBuilder = { date in
@@ -485,56 +535,56 @@ public extension ChatView {
         }
         return view
     }
-
+    
     func isListAboveInputView(_ isAbove: Bool) -> ChatView {
         var view = self
         view.isListAboveInputView = isAbove
         return view
     }
-
+    
     func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
         var view = self
         view.showDateHeaders = showDateHeaders
         return view
     }
-
+    
     func isScrollEnabled(_ isScrollEnabled: Bool) -> ChatView {
         var view = self
         view.isScrollEnabled = isScrollEnabled
         return view
     }
-
+    
     func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
         var view = self
         view.showMessageMenuOnLongPress = show
         return view
     }
-
+    
     func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
         var view = self
         view.showNetworkConnectionProblem = show
         return view
     }
-
+    
     func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
         var view = self
         view.mediaPickerSelectionParameters = MediaPickerParameters()
         view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
         return view
     }
-
+    
     func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
         var view = self
         view.mediaPickerSelectionParameters = params
         return view
     }
-
+    
     func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
         var view = self
         view.orientationHandler = orientationHandler
         return view
     }
-
+    
     /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
     /// NOTE: doesn't work well with `isScrollEnabled` false
     func enableLoadMore(pageSize: Int, _ handler: @escaping ChatPaginationClosure) -> ChatView {
@@ -542,40 +592,40 @@ public extension ChatView {
         view.paginationHandler = PaginationHandler(handleClosure: handler, pageSize: pageSize)
         return view
     }
-
+    
     @available(*, deprecated)
     func chatNavigation(title: String, status: String? = nil, cover: URL? = nil) -> some View {
         var view = self
         view.chatTitle = title
         return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
     }
-
+    
     // makes sense only for built-in message view
-
+    
     func avatarSize(avatarSize: CGFloat) -> ChatView {
         var view = self
         view.avatarSize = avatarSize
         return view
     }
-
+    
     func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
         var view = self
         view.tapAvatarClosure = closure
         return view
     }
-
+    
     func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
         var view = self
         view.messageUseMarkdown = messageUseMarkdown
         return view
     }
-
+    
     func showMessageTimeView(_ isShow: Bool) -> ChatView {
         var view = self
         view.showMessageTimeView = isShow
         return view
     }
-
+    
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageFont = font
@@ -587,19 +637,20 @@ public extension ChatView {
         view.localization = localization
         return view
     }
-
+    
     // makes sense only for built-in input view
-
-    func setAvailableInput(_ type: AvailableInputType) -> ChatView {
+    
+    func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {
         var view = self
-        view.availablelInput = type
+        view.availableInputs = types
         return view
     }
-
+    
     func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
         var view = self
         view.recorderSettings = settings
         return view
     }
-
+    
 }
+

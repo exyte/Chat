@@ -12,7 +12,9 @@ final class InputViewModel: ObservableObject {
     @Published var attachments = InputViewAttachments()
     @Published var state: InputViewState = .empty
 
+    @Published var showGiphyPicker = false
     @Published var showPicker = false
+  
     @Published var mediaPickerMode = MediaPickerMode.photos
 
     @Published var showActivityIndicator = false
@@ -34,22 +36,24 @@ final class InputViewModel: ObservableObject {
     func onStart() {
         subscribeValidation()
         subscribePicker()
+      subscribeGiphyPicker()
     }
 
     func onStop() {
         subscriptions.removeAll()
     }
 
-    func reset() {
-        DispatchQueue.main.async { [weak self] in
-            self?.showPicker = false
-            self?.text = ""
-            self?.saveEditingClosure = nil
-            self?.attachments = InputViewAttachments()
-            self?.subscribeValidation()
-            self?.state = .empty
-        }
+  func reset() {
+    DispatchQueue.main.async { [weak self] in
+      self?.showPicker = false
+      self?.showGiphyPicker = false
+      self?.text = ""
+      self?.saveEditingClosure = nil
+      self?.attachments = InputViewAttachments()
+      self?.subscribeValidation()
+      self?.state = .empty
     }
+  }
 
     func send() {
         recorder.stopRecording()
@@ -71,6 +75,8 @@ final class InputViewModel: ObservableObject {
     
     private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
+        case .giphy:
+          showGiphyPicker = true
         case .photo:
             mediaPickerMode = .photos
             showPicker = true
@@ -164,6 +170,16 @@ private extension InputViewModel {
         .store(in: &subscriptions)
     }
 
+    func subscribeGiphyPicker() {
+        $showGiphyPicker
+            .sink { [weak self] value in
+                if !value {
+                  self?.attachments.giphyMedia = nil
+                }
+            }
+            .store(in: &subscriptions)
+    }
+  
     func subscribePicker() {
         $showPicker
             .sink { [weak self] value in
@@ -220,6 +236,7 @@ private extension InputViewModel {
                 DraftMessage(
                     text: self.text,
                     medias: attachments.medias,
+                    giphyMedia: attachments.giphyMedia,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,
                     createdAt: Date()
@@ -249,3 +266,4 @@ extension Publisher {
         }
     }
 }
+
