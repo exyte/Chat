@@ -249,22 +249,17 @@ Please use `mediaPickerTheme` in a similar fashion to customize the built-in pho
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 
 ## Localization
-You can localize the library by providing your own strings by providing a `ChatLocalization` struct. Here is an example:
-```swift
-ChatLocalization(
-        inputPlaceholder: "Type a message...",
-        signatureText: "Add signature...",
-        cancelButtonText: "Cancel",
-        recentToggleText: "Recents",
-        waitingForNetwork: "Waiting for network",
-        recordingText: "Recording..."
-    )
-```
 
-Then pass the modifier:
-```swift
-.setChatLocalization(localization)
-```
+You can localize the inputs using the standard SwiftUI localization process, add the input strings to each languages Localizable.strings file.  
+The library uses the following text that can be localized:
+
+- Type a message...
+- Add signature...
+- Cancel
+- Recents
+- Waiting for network
+- Recording...
+- Reply to
 
 ## Examples
 There are 2 example projects:    
