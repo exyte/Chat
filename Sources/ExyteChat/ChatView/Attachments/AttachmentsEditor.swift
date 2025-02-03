@@ -15,12 +15,12 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var pickerTheme
-    
+
     @EnvironmentObject private var keyboardState: KeyboardState
     @EnvironmentObject private var globalFocusState: GlobalFocusState
-    
+
     @ObservedObject var inputViewModel: InputViewModel
-    
+
     var inputViewBuilder: InputViewBuilderClosure?
     var chatTitle: String?
     var messageUseMarkdown: Bool
@@ -28,24 +28,24 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
-    
+
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
-    
+
     var showingAlbums: Bool {
         inputViewModel.mediaPickerMode == .albums
     }
-    
+
     var body: some View {
         ZStack {
             mediaPicker
-            
+
             if inputViewModel.showActivityIndicator {
                 ActivityIndicator()
             }
         }
     }
-    
+
     var mediaPicker: some View {
         GeometryReader { g in
             MediaPicker(isPresented: $inputViewModel.showPicker) {
@@ -90,7 +90,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .onChange(of: inputViewModel.showPicker) { _ in
                 let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
                 let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
-                
+
                 if selectionLimit == 1 && !showFullscreenPreview {
                     assembleSelectedMedia()
                     inputViewModel.send()
@@ -107,7 +107,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             )
         }
     }
-    
+
     func assembleSelectedMedia() {
         if !seleсtedMedias.isEmpty {
             inputViewModel.attachments.medias = seleсtedMedias
@@ -117,12 +117,15 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             inputViewModel.attachments.medias = []
         }
     }
-    
+
     @ViewBuilder
     var inputView: some View {
         Group {
             if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction()) {
+                inputViewBuilder(
+                    $inputViewModel.text, inputViewModel.attachments, inputViewModel.state,
+                    .signature, inputViewModel.inputViewAction()
+                ) {
                     globalFocusState.focus = nil
                 }
             } else {
@@ -137,7 +140,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
         }
     }
-    
+
     var albumSelectionHeaderView: some View {
         ZStack {
             HStack {
@@ -147,10 +150,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 } label: {
                     Text(localization.cancelButtonText)
                 }
-                
+
                 Spacer()
             }
-            
+
             HStack {
                 Text(localization.recentToggleText)
                 Image(systemName: "chevron.down")
@@ -167,8 +170,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         .padding(.horizontal)
         .padding(.bottom, 5)
     }
-    
     func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {
+
         HStack {
             Button {
                 cancelClosure()
@@ -176,18 +179,17 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 theme.images.mediaPicker.cross
             }
             .padding(.trailing, 30)
-            
+
             if let chatTitle = chatTitle {
                 theme.images.mediaPicker.chevronRight
                 Text(chatTitle)
                     .font(.title3)
                     .foregroundColor(theme.colors.mainText)
             }
-            
+
             Spacer()
         }
         .padding(.horizontal)
         .padding(.bottom, 10)
     }
 }
-
