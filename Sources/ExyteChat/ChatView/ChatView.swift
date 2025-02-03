@@ -102,8 +102,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     /// date section header builder
     var headerBuilder: ((Date)->AnyView)?
     
-    /// provide strings for the chat view in your preferred language
-    var localization: ChatLocalization = .defaultLocalization
+    /// provide strings for the chat view, these can be localized in the Localizable.strings files
+    var localization: ChatLocalization = createLocalization()
 
     // MARK: - Customization
 
@@ -153,8 +153,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 didSendMessage: @escaping (DraftMessage) -> Void,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?,
-                localization: ChatLocalization) {
+                messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
@@ -162,7 +161,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
-        self.localization = localization
     }
 
     public var body: some View {
@@ -504,10 +502,23 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             readyToShowScrollView = false
         }
     }
-  
+
     private func isGiphyAvailable() -> Bool {
       return availableInputs.contains(AvailableInputType.giphy)
     }
+    
+    private static func createLocalization() -> ChatLocalization {
+        return ChatLocalization(
+            inputPlaceholder: String(localized: "Type a message..."),
+            signatureText: String(localized: "Add signature..."),
+            cancelButtonText: String(localized: "Cancel"),
+            recentToggleText: String(localized: "Recents"),
+            waitingForNetwork: String(localized: "Waiting for network"),
+            recordingText: String(localized: "Recording..."),
+            replyToText: String(localized: "Reply to")
+        )
+    }
+
 }
 
 public extension ChatView {
@@ -631,13 +642,7 @@ public extension ChatView {
         view.messageFont = font
         return view
     }
-    
-    func setChatLocalization(_ localization: ChatLocalization) -> ChatView {
-        var view = self
-        view.localization = localization
-        return view
-    }
-    
+
     // makes sense only for built-in input view
     
     func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {

@@ -26,15 +26,3 @@ public struct ChatLocalization: Hashable {
         self.replyToText = replyToText
     }
 }
-
-extension ChatLocalization {
-    public static let defaultLocalization = ChatLocalization(
-        inputPlaceholder: "Type a message...",
-        signatureText: "Add signature...",
-        cancelButtonText: "Cancel",
-        recentToggleText: "Recents",
-        waitingForNetwork: "Waiting for network",
-        recordingText: "Recording...",
-        replyToText: "Reply to"
-    )
-}
