@@ -194,7 +194,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     Giphy.configure(apiKey: giphyKey)
                   }
                 } else {
-                  print("giphy input available though giphy key not provided")
+                  print("WARNING: giphy key not provided, please pass a key using giphyConfig")
                 }
               }
             }
