@@ -16,72 +16,76 @@ struct ChatThemeKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    
-  var chatTheme: ChatTheme {
+
+    var chatTheme: ChatTheme {
         get { self[ChatThemeKey.self] }
         set { self[ChatThemeKey.self] = newValue }
-  }
-  
-  var giphyConfig: GiphyConfiguration {
+    }
+
+    var giphyConfig: GiphyConfiguration {
         get { self[GiphyConfigKey.self] }
         set { self[GiphyConfigKey.self] = newValue }
     }
 }
 
-public extension View {
-  
-  func giphyConfig(_ config: GiphyConfiguration) -> some View {
-    self.environment(\.giphyConfig, config)
-  }
-  
-  func chatTheme(_ theme: ChatTheme) -> some View {
-    self.environment(\.chatTheme, theme)
-  }
-  
-  func chatTheme(colors: ChatTheme.Colors = .init(),
-                 images: ChatTheme.Images = .init()) -> some View {
-    self.environment(\.chatTheme, ChatTheme(colors: colors, images: images))
-  }
+extension View {
+
+    public func giphyConfig(_ config: GiphyConfiguration) -> some View {
+        self.environment(\.giphyConfig, config)
+    }
+
+    public func chatTheme(_ theme: ChatTheme) -> some View {
+        self.environment(\.chatTheme, theme)
+    }
+
+    public func chatTheme(
+        colors: ChatTheme.Colors = .init(),
+        images: ChatTheme.Images = .init()
+    ) -> some View {
+        self.environment(\.chatTheme, ChatTheme(colors: colors, images: images))
+    }
 }
 
 public struct ChatTheme {
     public let colors: ChatTheme.Colors
     public let images: ChatTheme.Images
-    
-    public init(colors: ChatTheme.Colors = .init(),
-                images: ChatTheme.Images = .init()) {
+
+    public init(
+        colors: ChatTheme.Colors = .init(),
+        images: ChatTheme.Images = .init()
+    ) {
         self.colors = colors
         self.images = images
     }
-    
+
     public struct Colors {
         public var mainBG: Color
         public var mainTint: Color
         public var mainText: Color
         public var mainCaptionText: Color
-        
+
         public var messageMyBG: Color
         public var messageMyText: Color
         public var messageMyTimeText: Color
-        
+
         public var messageFriendBG: Color
         public var messageFriendText: Color
         public var messageFriendTimeText: Color
-        
+
         public var inputBG: Color
         public var inputText: Color
         public var inputPlaceholderText: Color
-        
+
         public var menuBG: Color
         public var menuText: Color
         public var menuTextDelete: Color
-        
+
         public var statusError: Color
         public var statusGray: Color
-        
+
         public var sendButtonBackground: Color
         public var recordDot: Color
-        
+
         public init(
             mainBG: Color = Color("mainBG", bundle: .current),
             mainTint: Color = Color("inputPlaceholderText", bundle: .current),
@@ -126,9 +130,9 @@ public struct ChatTheme {
             self.recordDot = recordDot
         }
     }
-    
+
     public struct Images {
-        
+
         public struct AttachMenu {
             public var camera: Image
             public var contact: Image
@@ -139,7 +143,7 @@ public struct ChatTheme {
             public var pickLocation: Image
             public var pickPhoto: Image
         }
-        
+
         public struct InputView {
             public var add: Image
             public var arrowSend: Image
@@ -148,20 +152,20 @@ public struct ChatTheme {
             public var attachCamera: Image
             public var microphone: Image
         }
-        
+
         public struct FullscreenMedia {
             public var play: Image
             public var pause: Image
             public var mute: Image
             public var unmute: Image
         }
-        
+
         public struct MediaPicker {
             public var chevronDown: Image
             public var chevronRight: Image
             public var cross: Image
         }
-        
+
         public struct Message {
             public var attachedDocument: Image
             public var checkmarks: Image
@@ -173,7 +177,7 @@ public struct ChatTheme {
             public var playVideo: Image
             public var sending: Image
         }
-        
+
         public struct MessageMenu {
             public var delete: Image
             public var edit: Image
@@ -182,7 +186,7 @@ public struct ChatTheme {
             public var save: Image
             public var select: Image
         }
-        
+
         public struct RecordAudio {
             public var cancelRecord: Image
             public var deleteRecord: Image
@@ -192,15 +196,15 @@ public struct ChatTheme {
             public var sendRecord: Image
             public var stopRecord: Image
         }
-        
+
         public struct Reply {
             public var cancelReply: Image
             public var replyToMessage: Image
         }
-        
+
         public var backButton: Image
         public var scrollToBottom: Image
-        
+
         public var attachMenu: AttachMenu
         public var inputView: InputView
         public var fullscreenMedia: FullscreenMedia
@@ -209,7 +213,7 @@ public struct ChatTheme {
         public var messageMenu: MessageMenu
         public var recordAudio: RecordAudio
         public var reply: Reply
-        
+
         public init(
             camera: Image? = nil,
             contact: Image? = nil,
@@ -261,7 +265,7 @@ public struct ChatTheme {
         ) {
             self.backButton = backButton ?? Image("backArrow", bundle: .current)
             self.scrollToBottom = scrollToBottom ?? Image("scrollToBottom", bundle: .current)
-            
+
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),
                 contact: contact ?? Image("contact", bundle: .current),
@@ -272,7 +276,7 @@ public struct ChatTheme {
                 pickLocation: pickLocation ?? Image("pickLocation", bundle: .current),
                 pickPhoto: pickPhoto ?? Image("pickPhoto", bundle: .current)
             )
-            
+
             self.inputView = InputView(
                 add: add ?? Image("add", bundle: .current),
                 arrowSend: arrowSend ?? Image("arrowSend", bundle: .current),
@@ -281,20 +285,20 @@ public struct ChatTheme {
                 attachCamera: attachCamera ?? Image("attachCamera", bundle: .current),
                 microphone: microphone ?? Image("microphone", bundle: .current)
             )
-            
+
             self.fullscreenMedia = FullscreenMedia(
                 play: fullscreenPlay ?? Image(systemName: "play.fill"),
                 pause: fullscreenPause ?? Image(systemName: "pause.fill"),
                 mute: fullscreenMute ?? Image(systemName: "speaker.slash.fill"),
                 unmute: fullscreenUnmute ?? Image(systemName: "speaker.fill")
             )
-            
+
             self.mediaPicker = MediaPicker(
                 chevronDown: chevronDown ?? Image("chevronDown", bundle: .current),
                 chevronRight: chevronRight ?? Image("chevronRight", bundle: .current),
                 cross: cross ?? Image("cross", bundle: .current)
             )
-            
+
             self.message = Message(
                 attachedDocument: attachedDocument ?? Image("attachedDocument", bundle: .current),
                 checkmarks: checkmarks ?? Image("checkmarks", bundle: .current),
@@ -306,7 +310,7 @@ public struct ChatTheme {
                 playVideo: playVideo ?? Image(systemName: "play.circle.fill"),
                 sending: sending ?? Image("sending", bundle: .current)
             )
-            
+
             self.messageMenu = MessageMenu(
                 delete: delete ?? Image("delete", bundle: .current),
                 edit: edit ?? Image("edit", bundle: .current),
@@ -315,7 +319,7 @@ public struct ChatTheme {
                 save: save ?? Image("save", bundle: .current),
                 select: select ?? Image("select", bundle: .current)
             )
-            
+
             self.recordAudio = RecordAudio(
                 cancelRecord: cancelRecord ?? Image("cancelRecord", bundle: .current),
                 deleteRecord: deleteRecord ?? Image("deleteRecord", bundle: .current),
@@ -325,7 +329,7 @@ public struct ChatTheme {
                 sendRecord: sendRecord ?? Image("sendRecord", bundle: .current),
                 stopRecord: stopRecord ?? Image("stopRecord", bundle: .current)
             )
-            
+
             self.reply = Reply(
                 cancelReply: cancelReply ?? Image("cancelReply", bundle: .current),
                 replyToMessage: replyToMessage ?? Image("replyToMessage", bundle: .current)
@@ -333,4 +337,3 @@ public struct ChatTheme {
         }
     }
 }
-

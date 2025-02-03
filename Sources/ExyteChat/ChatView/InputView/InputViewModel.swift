@@ -36,24 +36,24 @@ final class InputViewModel: ObservableObject {
     func onStart() {
         subscribeValidation()
         subscribePicker()
-      subscribeGiphyPicker()
+        subscribeGiphyPicker()
     }
 
     func onStop() {
         subscriptions.removeAll()
     }
 
-  func reset() {
-    DispatchQueue.main.async { [weak self] in
-      self?.showPicker = false
-      self?.showGiphyPicker = false
-      self?.text = ""
-      self?.saveEditingClosure = nil
-      self?.attachments = InputViewAttachments()
-      self?.subscribeValidation()
-      self?.state = .empty
+    func reset() {
+        DispatchQueue.main.async { [weak self] in
+            self?.showPicker = false
+            self?.showGiphyPicker = false
+            self?.text = ""
+            self?.saveEditingClosure = nil
+            self?.attachments = InputViewAttachments()
+            self?.subscribeValidation()
+            self?.state = .empty
+        }
     }
-  }
 
     func send() {
         recorder.stopRecording()
