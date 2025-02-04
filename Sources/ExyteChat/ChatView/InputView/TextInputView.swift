@@ -5,17 +5,17 @@
 import SwiftUI
 
 struct TextInputView: View {
-
+    
     @Environment(\.chatTheme) private var theme
-
+    
     @EnvironmentObject private var globalFocusState: GlobalFocusState
-
+    
     @Binding var text: String
     var inputFieldId: UUID
     var style: InputViewStyle
-    var availableInput: AvailableInputType
+    var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
-
+    
     var body: some View {
         TextField("", text: $text, axis: .vertical)
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
@@ -25,10 +25,15 @@ struct TextInputView: View {
             }
             .foregroundColor(theme.colors.inputText)
             .padding(.vertical, 10)
-            .padding(.leading, !availableInput.isMediaAvailable ? 12 : 0)
+            .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
             .onTapGesture {
                 globalFocusState.focus = .uuid(inputFieldId)
             }
-            .tint(theme.colors.sendButtonBackground)
+    }
+    
+    private func isMediaGiphyAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.media)
+        || availableInputs.contains(AvailableInputType.giphy)
     }
 }
+
