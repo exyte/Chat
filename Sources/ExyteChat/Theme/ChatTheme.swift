@@ -227,7 +227,7 @@ public struct ChatTheme {
             scrollToBottom: Image? = nil
         ) {
             self.backButton = backButton ?? Image("backArrow", bundle: .current)
-            self.scrollToBottom = scrollToBottom ?? Image("scrollToBottom", bundle: .current)
+            self.scrollToBottom = scrollToBottom ?? Image(systemName: "chevron.down")
 
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),
@@ -258,7 +258,7 @@ public struct ChatTheme {
             self.mediaPicker = MediaPicker(
                 chevronDown: chevronDown ?? Image("chevronDown", bundle: .current),
                 chevronRight: chevronRight ?? Image("chevronRight", bundle: .current),
-                cross: cross ?? Image("cross", bundle: .current)
+                cross: cross ?? Image(systemName: "xmark")
             )
 
             self.message = Message(
@@ -277,15 +277,15 @@ public struct ChatTheme {
                 cancelRecord: cancelRecord ?? Image("cancelRecord", bundle: .current),
                 deleteRecord: deleteRecord ?? Image("deleteRecord", bundle: .current),
                 lockRecord: lockRecord ?? Image("lockRecord", bundle: .current),
-                pauseRecord: pauseRecord ?? Image("pauseRecord", bundle: .current),
-                playRecord: playRecord ?? Image("playRecord", bundle: .current),
+                pauseRecord: pauseRecord ?? Image(systemName: "pause.fill"),
+                playRecord: playRecord ?? Image(systemName: "play.fill"),
                 sendRecord: sendRecord ?? Image("sendRecord", bundle: .current),
                 stopRecord: stopRecord ?? Image("stopRecord", bundle: .current)
             )
 
             self.reply = Reply(
-                cancelReply: cancelReply ?? Image("cancelReply", bundle: .current),
-                replyToMessage: replyToMessage ?? Image("replyToMessage", bundle: .current)
+                cancelReply: cancelReply ?? Image(systemName: "x.circle"),
+                replyToMessage: replyToMessage ?? Image(systemName: "arrow.uturn.left")
             )
         }
     }
