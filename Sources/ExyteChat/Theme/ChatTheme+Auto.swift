@@ -146,9 +146,7 @@ internal struct ThemedChatView: ViewModifier {
                     main: .init(
                         text: .primary,
                         albumSelectionBackground: backgroundColor,
-                        fullscreenPhotoBackground: backgroundColor,
-                        cameraBackground: backgroundColor,
-                        cameraSelectionBackground: backgroundColor
+                        fullscreenPhotoBackground: backgroundColor
                     ),
                     selection: .init(
                         selectedTint: accentColor,
