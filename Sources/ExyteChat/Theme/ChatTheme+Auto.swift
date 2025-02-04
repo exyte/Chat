@@ -27,13 +27,6 @@ extension ChatTheme {
                 messageMyBG: accentColor,
                 messageMyTimeText: Color.white.opacity(0.5),
                 sendButtonBackground: accentColor
-            ), images: .init(
-                cross: Image(systemName: "xmark"),
-                pauseRecord: Image(systemName: "pause.fill"),
-                playRecord: Image(systemName: "play.fill"),
-                cancelReply: Image(systemName: "x.circle"),
-                replyToMessage: Image(systemName: "arrow.uturn.left"),
-                scrollToBottom: Image(systemName: "chevron.down")
             )
         )
     }
@@ -95,13 +88,6 @@ extension ChatTheme {
                 inputBG: friendMessageColor,
                 menuBG: backgroundColor,
                 sendButtonBackground: accentColor
-            ), images: .init(
-                cross: Image(systemName: "xmark"),
-                pauseRecord: Image(systemName: "pause.fill"),
-                playRecord: Image(systemName: "play.fill"),
-                cancelReply: Image(systemName: "x.circle"),
-                replyToMessage: Image(systemName: "arrow.uturn.left"),
-                scrollToBottom: Image(systemName: "chevron.down")
             )
         )
     }
