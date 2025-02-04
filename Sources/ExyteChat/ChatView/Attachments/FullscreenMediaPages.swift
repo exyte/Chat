@@ -108,7 +108,7 @@ struct FullscreenMediaPages: View {
                         .imageScale(.large)
                         .padding(5)
                 }
-                .tint(.white)
+                .tint(theme.colors.mainText)
                 .padding(.leading, 15)
                 .offset(y: safeAreaInsets.top - 5)
             }

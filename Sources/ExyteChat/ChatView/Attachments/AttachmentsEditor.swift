@@ -172,11 +172,11 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {
         HStack {
-            Button {
-                cancelClosure()
-            } label: {
+            Button(action: cancelClosure) {
                 theme.images.mediaPicker.cross
+                    .imageScale(.large)
             }
+            .tint(theme.colors.mainText)
             .padding(.trailing, 30)
 
             if let chatTitle = chatTitle {
