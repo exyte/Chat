@@ -64,6 +64,14 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
     public static var allCases: [DefaultMessageMenuAction] = [
         .copy, .reply, .edit(saveClosure: {_ in})
     ]
+    
+    static public func menuItems(for message: Message) -> [DefaultMessageMenuAction] {
+        if message.user.isCurrentUser {
+            return allCases
+        } else {
+            return [.copy, .reply]
+        }
+    }
 }
 
 struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
