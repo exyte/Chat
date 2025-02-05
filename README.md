@@ -172,6 +172,17 @@ enum Action: MessageMenuAction {
             Image(systemName: "square.and.pencil")
         }
     }
+    
+    // Optional
+    // Implement this method to conditionally include menu actions on a per message basis
+    // The default behavior is to include all menu action items
+    static func menuItems(for message: ExyteChat.Message) -> [Action] {
+        if message.user.isCurrentUser  {
+            return [.edit]
+        } else {
+            return [.reply]
+        }
+    }
 }
 
 ChatView(messages: viewModel.messages) { draft in
