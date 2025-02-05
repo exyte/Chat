@@ -72,6 +72,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
 
     @Binding var isShowingMenu: Bool
     @Binding var menuButtonsSize: CGSize
+    var message: Message
     var alignment: Alignment
     var leadingPadding: CGFloat
     var trailingPadding: CGFloat
@@ -90,7 +91,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var body: some View {
         FloatingButton(
             mainButtonView: mainButton().allowsHitTesting(false),
-            buttons: ActionEnum.allCases.map {
+            buttons: ActionEnum.menuItems(for: message).map {
                 menuButton(title: $0.title(), icon: $0.icon(), action: $0)
             },
             isOpen: $isShowingMenu
