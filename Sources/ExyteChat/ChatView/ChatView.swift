@@ -121,7 +121,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availablelInput: AvailableInputType = .full
     var recorderSettings: RecorderSettings = RecorderSettings()
-
+    var listSwipeActions: ListSwipeActions = ListSwipeActions()
+    
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
@@ -284,7 +285,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                showMessageTimeView: showMessageTimeView,
                messageFont: messageFont,
                sections: sections,
-               ids: ids
+               ids: ids,
+               listSwipeActions: listSwipeActions
         )
         .applyIf(!isScrollEnabled) {
             $0.frame(height: tableContentHeight)
