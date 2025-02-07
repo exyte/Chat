@@ -224,6 +224,7 @@ extension CommentsExampleView {
     
     func onInfo(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
         print("Swipe Action - Info: \(message)")
+        // Maybe navigate to a details page?
     }
     
     // This is an example of a standard swipe button with an image and label in a white foregroundStyle
