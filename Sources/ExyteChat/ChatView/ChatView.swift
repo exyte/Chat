@@ -7,8 +7,6 @@
 
 import SwiftUI
 import GiphyUISDK
-import FloatingButton
-import SwiftUIIntrospect
 import ExyteMediaPicker
 
 public typealias MediaPickerParameters = SelectionParamsHolder
@@ -142,6 +140,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var inputViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
 
+    @State private var giphyConfigured = false
+    @State private var selectedMedia: GPHMedia? = nil
+    
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
