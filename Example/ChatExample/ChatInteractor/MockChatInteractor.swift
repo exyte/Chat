@@ -58,6 +58,82 @@ final class MockChatInteractor: ChatInteractorProtocol {
             }
         }
     }
+    
+    func remove(messageID: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.chatState.value.removeAll(where: { $0.uid == messageID })
+        }
+    }
+    
+    /// Adds a reaction to an existing message
+    func add(draftReaction: ExyteChat.DraftReaction, to messageID: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if let matchIndex = self.chatState.value.firstIndex(where: { $0.uid == messageID }) {
+                let originalMessage = self.chatState.value[matchIndex]
+                let reaction = Reaction(user: self.chatData.tim.toChatUser(), type: draftReaction.type)
+                let newMessage = MockMessage(
+                    uid: originalMessage.uid,
+                    sender: originalMessage.sender,
+                    createdAt: originalMessage.createdAt,
+                    status: originalMessage.status,
+                    text: originalMessage.text,
+                    images: originalMessage.images,
+                    videos: originalMessage.videos,
+                    reactions: originalMessage.reactions + [reaction],
+                    recording: originalMessage.recording,
+                    replyMessage: originalMessage.replyMessage
+                )
+                print("Setting Reaction")
+                self.chatState.value[matchIndex] = newMessage
+                
+                // Update our message reaction status after a random delay...
+                delayUpdateReactionStatus(messageID: messageID, reactionID: reaction.id)
+                
+            } else {
+                print("No Match for Reaction")
+            }
+        }
+    }
+
+    /// Updates a reaction's status after a random amount of time
+    func delayUpdateReactionStatus(messageID: String, reactionID: String) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(.random(in: 500...2500))) { [weak self] in
+            guard let self else { return }
+            if let matchIndex = self.chatState.value.firstIndex(where: { $0.uid == messageID }) {
+                let originalMessage = self.chatState.value[matchIndex]
+                if let reactionIndex = originalMessage.reactions.firstIndex(where: { $0.id == reactionID }) {
+                    let originalReaction = originalMessage.reactions[reactionIndex]
+                    
+                    var reactions = originalMessage.reactions
+                    var status:Reaction.Status = .sent
+                    if Int.random(min: 0, max: 2) == 0 {
+                        status = .error(.init(id: originalReaction.id, messageID: originalMessage.uid, createdAt: originalReaction.createdAt, type: originalReaction.type))
+                    }
+                    reactions[reactionIndex] = .init(id: originalReaction.id, user: originalReaction.user, createdAt: originalReaction.createdAt, type: originalReaction.type, status: status)
+                    
+                    let newMessage = MockMessage(
+                        uid: originalMessage.uid,
+                        sender: originalMessage.sender,
+                        createdAt: originalMessage.createdAt,
+                        status: originalMessage.status,
+                        text: originalMessage.text,
+                        images: originalMessage.images,
+                        videos: originalMessage.videos,
+                        reactions: reactions,
+                        recording: originalMessage.recording,
+                        replyMessage: originalMessage.replyMessage
+                    )
+                    
+                    self.chatState.value[matchIndex] = newMessage
+                } else {
+                    print("No Match for Reaction")
+                }
+            } else {
+                print("No Match for Message")
+            }
+        }
+    }
 
     func connect() {
         Timer.publish(every: 2, on: .main, in: .default)
