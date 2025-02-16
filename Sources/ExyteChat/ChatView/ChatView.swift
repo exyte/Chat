@@ -562,5 +562,41 @@ public extension ChatView {
         view.recorderSettings = settings
         return view
     }
-
+    
+    /// Sets the general duration of various message menu animations
+    ///
+    /// This value is more akin to 'how snappy' the message menu feels
+    /// - Note: Good values are between 0.15 - 0.5 (defaults to 0.3)
+    /// - Important: This value is clamped between 0.1 and 1.0
+    func messageMenuAnimationDuration(_ duration:Double) -> ChatView {
+        var view = self
+        view.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
+        return view
+    }
+    
+    /// Sets a ReactionDelegate on the ChatView for handling and configuring message reactions
+    func messageReactionDelegate(_ configuration: ReactionDelegate) -> ChatView {
+        var view = self
+        view.reactionDelegate = configuration
+        return view
+    }
+    
+    /// Constructs, and applies, a ReactionDelegate for you based on the provided closures
+    func onMessageReaction(
+        didReactTo: @escaping (Message, DraftReaction) -> Void,
+        canReactTo: ((Message) -> Bool)? = nil,
+        availableReactionsFor: ((Message) -> [ReactionType]?)? = nil,
+        allowEmojiSearchFor: ((Message) -> Bool)? = nil,
+        shouldShowOverviewFor: ((Message) -> Bool)? = nil
+    ) -> ChatView {
+        var view = self
+        view.reactionDelegate = DefaultReactionConfiguration(
+            didReact: didReactTo,
+            canReact: canReactTo,
+            reactions: availableReactionsFor,
+            allowEmojiSearch: allowEmojiSearchFor,
+            shouldShowOverview: shouldShowOverviewFor
+        )
+        return view
+    }
 }
