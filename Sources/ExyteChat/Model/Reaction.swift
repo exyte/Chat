@@ -7,7 +7,7 @@ import Foundation
 
 public enum ReactionType: Codable, Equatable, Hashable {
     case emoji(String)
-    //case sticker
+    //case sticker(Image / Giphy / Memoji)
     //case other...
     
     var toString:String {
