@@ -38,6 +38,36 @@ public struct ChatTheme {
         self.colors = colors
         self.images = images
     }
+    
+    internal init(accentColor: Color) {
+        self.init(
+            colors: .init(
+                mainTint: accentColor,
+                messageMyBG: accentColor,
+                messageMyTimeText: Color.white.opacity(0.5),
+                sendButtonBackground: accentColor
+            )
+        )
+    }
+    
+    @available(iOS 18.0, *)
+    internal init(accentColor: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast:Bool) {
+        let backgroundColor:Color = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
+        let friendMessageColor:Color = background.getFriendMessageColor(improveContrast: improveContrast)
+        self.init(
+            colors: .init(
+                mainBG: backgroundColor,
+                mainTint: accentColor,
+                messageMyBG: accentColor,
+                messageMyText: Color.white,
+                messageMyTimeText: Color.white.opacity(0.5),
+                messageFriendBG: friendMessageColor,
+                inputBG: friendMessageColor,
+                menuBG: backgroundColor,
+                sendButtonBackground: accentColor
+            )
+        )
+    }
 
     public struct Colors {
         public var mainBG: Color

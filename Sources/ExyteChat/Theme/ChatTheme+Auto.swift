@@ -19,20 +19,6 @@ extension View {
     }
 }
 
-extension ChatTheme {
-    internal init(accentColor: Color) {
-        self.init(
-            colors: .init(
-                mainTint: accentColor,
-                messageMyBG: accentColor,
-                messageMyTimeText: Color.white.opacity(0.5),
-                sendButtonBackground: accentColor
-            )
-        )
-    }
-}
-
-
 // MARK: iOS 18+ Auto Themes Based on Accent Color
 
 extension View {
@@ -72,27 +58,6 @@ extension Color {
     }
 }
 
-extension ChatTheme {
-    @available(iOS 18.0, *)
-    internal init(accentColor: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast:Bool) {
-        let backgroundColor:Color = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
-        let friendMessageColor:Color = background.getFriendMessageColor(improveContrast: improveContrast)
-        self.init(
-            colors: .init(
-                mainBG: backgroundColor,
-                mainTint: accentColor,
-                messageMyBG: accentColor,
-                messageMyText: Color.white,
-                messageMyTimeText: Color.white.opacity(0.5),
-                messageFriendBG: friendMessageColor,
-                inputBG: friendMessageColor,
-                menuBG: backgroundColor,
-                sendButtonBackground: accentColor
-            )
-        )
-    }
-}
-
 @available(iOS 18.0, *)
 public enum ThemedBackgroundStyle {
     /// The default system background color
@@ -102,7 +67,7 @@ public enum ThemedBackgroundStyle {
     /// The default system background tinted with the accent color (defaults to a value of 0.2)
     case mixedWithAccentColor(byAmount:Double = 0.2)
     
-    fileprivate func getBackgroundColor(withAccent accentColor:Color, improveContrast:Bool) -> Color {
+    internal func getBackgroundColor(withAccent accentColor:Color, improveContrast:Bool) -> Color {
         switch self {
         case .systemDefault:
             return Color(UIColor.systemBackground)
@@ -115,7 +80,7 @@ public enum ThemedBackgroundStyle {
         }
     }
     
-    fileprivate func getFriendMessageColor(improveContrast:Bool) -> Color {
+    internal func getFriendMessageColor(improveContrast:Bool) -> Color {
         switch self {
         case .systemDefault:
             return Color(UIColor.secondarySystemBackground)
