@@ -515,6 +515,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     .onTapGesture { }
                     .applyIf(showMessageMenuOnLongPress) {
                         $0.onLongPressGesture {
+                            // Trigger haptic feedback
+                            self.viewModel.impactGenerator.impactOccurred()
+                            // Launch the message menu
                             self.viewModel.messageMenuRow = row
                         }
                     }
