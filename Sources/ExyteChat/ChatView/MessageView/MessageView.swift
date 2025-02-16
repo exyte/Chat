@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MessageView: View {
 
-    @Environment(\.chatTheme) private var theme
+    @Environment(\.chatTheme) var theme
 
     @ObservedObject var viewModel: ChatViewModel
 
@@ -21,11 +21,17 @@ struct MessageView: View {
     let messageUseMarkdown: Bool
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
+    var font: UIFont
 
     @State var avatarViewSize: CGSize = .zero
     @State var statusSize: CGSize = .zero
     @State var timeSize: CGSize = .zero
-
+    @State var messageSize: CGSize = .zero
+    
+    // The size of our reaction bubbles are based on the users font size,
+    // Therefore we need to capture it's rendered size in order to place it correctly
+    @State var bubbleSize: CGSize = .zero
+    
     static let widthWithMedia: CGFloat = 204
     static let horizontalNoAvatarPadding: CGFloat = 8
     static let horizontalAvatarPadding: CGFloat = 8
@@ -34,8 +40,6 @@ struct MessageView: View {
     static let statusViewSize: CGFloat = 14
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
-
-    var font: UIFont
 
     enum DateArrangement {
         case hstack, vstack, overlay
@@ -69,14 +73,17 @@ struct MessageView: View {
     }
 
     var showAvatar: Bool {
-        positionInUserGroup == .single
+        isDisplayingMessageMenu
+        || positionInUserGroup == .single
         || (chatType == .conversation && positionInUserGroup == .last)
         || (chatType == .comments && positionInUserGroup == .first)
     }
 
     var topPadding: CGFloat {
         if chatType == .comments { return 0 }
-        return positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        var amount:CGFloat = positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        if !message.reactions.isEmpty { amount += (bubbleSize.height / 1.5) }
+        return amount
     }
 
     var bottomPadding: CGFloat {
@@ -101,7 +108,16 @@ struct MessageView: View {
                                 .frame(width: 2)
                         }
                 }
-                bubbleView(message)
+                if isDisplayingMessageMenu || message.reactions.isEmpty {
+                    bubbleView(message)
+                } else {
+                    ZStack(alignment: .top) {
+                        bubbleView(message)
+                        reactionsView(message)
+                    }
+                    // Sometimes the ZStack renders with a height larger than what's necessary, so we constrain it here.
+                    .frame(maxHeight: messageSize.height)
+                }
             }
 
             if message.user.isCurrentUser, let status = message.status {
@@ -142,6 +158,10 @@ struct MessageView: View {
             }
         }
         .bubbleBackground(message, theme: theme)
+        .sizeGetter($messageSize)
+        .applyIf(isDisplayingMessageMenu) {
+            $0.frameGetter($viewModel.messageFrame)
+        }
     }
 
     @ViewBuilder
