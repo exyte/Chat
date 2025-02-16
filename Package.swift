@@ -33,7 +33,6 @@ let package = Package(
             name: "ExyteChat",
             dependencies: [
                 .product(name: "ExyteMediaPicker", package: "MediaPicker"),
-                .product(name: "FloatingButton", package: "FloatingButton"),
                 .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
                 .product(name: "GiphyUISDK", package: "giphy-ios-sdk")
             ],
