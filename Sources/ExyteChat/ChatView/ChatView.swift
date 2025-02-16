@@ -130,16 +130,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var shouldScrollToTop: () -> () = {}
 
     @State private var isShowingMenu = false
-    @State private var needsScrollView = false
-    @State private var readyToShowScrollView = false
-    @State private var menuButtonsSize: CGSize = .zero
+
     @State private var tableContentHeight: CGFloat = 0
     @State private var inputViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
-    @State private var menuCellPosition: CGPoint = .zero
-    @State private var menuBgOpacity: CGFloat = 0
-    @State private var menuCellOpacity: CGFloat = 0
-    @State private var menuScrollView: UIScrollView?
 
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
@@ -292,37 +286,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
             if let row = viewModel.messageMenuRow {
-                ZStack(alignment: .topLeading) {
-                    theme.colors.menuBG
-                        .opacity(menuBgOpacity)
-                        .ignoresSafeArea(.all)
-
-                    if needsScrollView {
-                        ScrollView {
-                            messageMenu(row)
-                        }
-                        .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { scrollView in
-                            DispatchQueue.main.async {
-                                self.menuScrollView = scrollView
-                            }
-                        }
-                        .opacity(readyToShowScrollView ? 1 : 0)
-                    }
-                    if !needsScrollView || !readyToShowScrollView {
-                        messageMenu(row)
-                            .position(menuCellPosition)
-                    }
-                }
-                .onAppear {
-                    DispatchQueue.main.async {
-                        if let frame = cellFrames[row.id] {
-                            showMessageMenu(frame)
-                        }
-                    }
-                }
-                .onTapGesture {
-                    hideMessageMenu()
-                }
+                messageMenu(row)
+                    .onAppear(perform: showMessageMenu)
             }
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) {
@@ -406,53 +371,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         return { _ in }
     }
 
-    func showMessageMenu(_ cellFrame: CGRect) {
-        DispatchQueue.main.async {
-            let wholeMenuHeight = menuButtonsSize.height + cellFrame.height
-            let needsScrollTemp = wholeMenuHeight > UIScreen.main.bounds.height - safeAreaInsets.top - safeAreaInsets.bottom
-
-            menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.minY + wholeMenuHeight/2 - safeAreaInsets.top)
-            menuCellOpacity = 1
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                var finalCellPosition = menuCellPosition
-                if needsScrollTemp ||
-                    cellFrame.minY + wholeMenuHeight + safeAreaInsets.bottom > UIScreen.main.bounds.height {
-
-                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight/2 - safeAreaInsets.top - safeAreaInsets.bottom
-                    )
-                }
-
-                withAnimation(.linear(duration: 0.1)) {
-                    menuBgOpacity = 0.9
-                    menuCellPosition = finalCellPosition
-                    isShowingMenu = true
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                needsScrollView = needsScrollTemp
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                readyToShowScrollView = true
-                if let menuScrollView = menuScrollView {
-                    menuScrollView.contentOffset = CGPoint(x: 0, y: menuScrollView.contentSize.height - menuScrollView.frame.height + safeAreaInsets.bottom)
-                }
-            }
-        }
+    func showMessageMenu() {
+        isShowingMenu = true
     }
 
     func hideMessageMenu() {
-        menuScrollView = nil
-        withAnimation(.linear(duration: 0.1)) {
-            menuCellOpacity = 0
-            menuBgOpacity = 0
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            viewModel.messageMenuRow = nil
-            isShowingMenu = false
-            needsScrollView = false
-            readyToShowScrollView = false
-        }
+        viewModel.messageMenuRow = nil
+        viewModel.messageFrame = .zero
+        isShowingMenu = false
     }
     
     private static func createLocalization() -> ChatLocalization {
