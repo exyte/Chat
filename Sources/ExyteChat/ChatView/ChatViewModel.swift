@@ -12,7 +12,15 @@ final class ChatViewModel: ObservableObject {
     @Published var fullscreenAttachmentPresented = false
 
     @Published var messageMenuRow: MessageRow?
-
+    
+    /// The messages frame that is currently being rendered in the Message Menu
+    /// - Note: Used to further refine a messages frame (instead of using the cell boundary), mainly used for positioning reactions
+    @Published var messageFrame: CGRect = .zero
+    
+    /// Provides a mechanism to issue haptic feedback to the user
+    /// - Note: Used when launching the MessageMenu
+    let impactGenerator = UIImpactFeedbackGenerator(style: .heavy)
+    
     let inputFieldId = UUID()
 
     var didSendMessage: (DraftMessage) -> Void = {_ in}
