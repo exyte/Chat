@@ -176,7 +176,12 @@ private extension MockChatInteractor {
         }
         return (0...10)
             .map { index in
-                chatData.randomMessage(senders: senders, date: lastDate.randomTime())
+                // Generate a random message
+                var msg = chatData.randomMessage(senders: senders, date: lastDate.randomTime())
+                // 20% of the time, generate a random reaction to the message
+                if Int.random(in: 0...4) == 0 { msg = chatData.reactToMessage(msg, senders: senders) }
+                // Return the message
+                return msg
             }
             .sorted { lhs, rhs in
                 lhs.createdAt < rhs.createdAt
@@ -184,8 +189,17 @@ private extension MockChatInteractor {
     }
 
     func generateNewMessage() {
-        let message = chatData.randomMessage(senders: otherSenders)
-        chatState.value.append(message)
+        let idx = Int.random(min: 1, max: 10)
+        // 30% of the time, lets react to a previous and recent message
+        if idx <= 3, chatState.value.count >= idx {
+            let msgIndex = chatState.value.count - idx
+            let message = chatData.reactToMessage(chatState.value[msgIndex], senders: otherSenders)
+            chatState.value[msgIndex] = message
+        } else {
+            // 70% of the time just create a new random message
+            let message = chatData.randomMessage(senders: otherSenders)
+            chatState.value.append(message)
+        }
     }
 
     func updateSendingStatuses() {
