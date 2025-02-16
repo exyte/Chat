@@ -8,7 +8,7 @@ import ExyteMediaPicker
 struct ContentView: View {
     
     @State private var isAccent: Bool = true
-    @State private var accentColor = Color("messageMyBG", bundle: .current)
+    @State private var color = Color("messageMyBG", bundle: .current)
     
     var body: some View {
         NavigationView {
@@ -20,23 +20,23 @@ struct ContentView: View {
                                 viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
                                 title: "Active chat example"
                             )
-                            .chatTheme(color: accentColor)
+                            .chatTheme(themeColor: color)
                         } else {
                             ChatExampleView(
                                 viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
                                 title: "Active chat example"
                             )
-                            .chatTheme(accentColor: accentColor)
+                            .chatTheme(accentColor: color)
                         }
                     }
                     
                     NavigationLink("Simple chat example") {
                         if !isAccent, #available(iOS 18.0, *) {
                             ChatExampleView(title: "Simple example")
-                                .chatTheme(color: accentColor)
+                                .chatTheme(themeColor: color)
                         } else {
                             ChatExampleView(title: "Simple example")
-                                .chatTheme(accentColor: accentColor)
+                                .chatTheme(accentColor: color)
                         }
                     }
 
@@ -69,9 +69,9 @@ struct ContentView: View {
                             Button(isAccent ? "Accent" : "Themed") {
                                 isAccent.toggle()
                             }
-                            ColorPicker("", selection: $accentColor)
+                            ColorPicker("", selection: $color)
                         } else {
-                            ColorPicker("Accent", selection: $accentColor)
+                            ColorPicker("Accent", selection: $color)
                         }
                     }
                     

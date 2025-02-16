@@ -31,7 +31,7 @@ extension View {
     /// - Note: If you're using a custom color and you want the exact color to come through, try disabling `improveContrast` but be sure the text is still legible.
     /// - Note: By default, this method mixes your theme `color` into the `ChatView`'s default background, if you don't want this behavior, you can set `background` to one of `.systemDefault`, or `.static(Color)`.
     @available(iOS 18.0, *)
-    public func chatTheme(color ac: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast: Bool = true) -> some View {
+    public func chatTheme(themeColor ac: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast: Bool = true) -> some View {
         let accentColor:Color
         if improveContrast {
             let luminance = ac.luminance
