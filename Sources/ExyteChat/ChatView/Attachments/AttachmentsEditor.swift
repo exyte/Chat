@@ -10,9 +10,9 @@ import ExyteMediaPicker
 import ActivityIndicatorView
 
 struct AttachmentsEditor<InputViewContent: View>: View {
-
+    
     typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderClosure
-
+    
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var pickerTheme
 
@@ -26,7 +26,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var messageUseMarkdown: Bool
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
-    var availableInput: AvailableInputType
+    var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
 
     @State private var seleсtedMedias: [Media] = []
@@ -103,10 +103,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     fullscreenPhotoBackground: theme.colors.mainBG,
                     cameraBackground: theme.colors.mainBG,
                     cameraSelectionBackground: theme.colors.mainBG),
-                selection: .init(
-                    selectedTint: theme.colors.sendButtonBackground,
-                    fullscreenTint: theme.colors.sendButtonBackground
-                )
+                selection: .init(selectedTint: theme.colors.sendButtonBackground)
             )
         }
     }
@@ -125,7 +122,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var inputView: some View {
         Group {
             if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .signature, inputViewModel.inputViewAction()) {
+                inputViewBuilder(
+                    $inputViewModel.text, inputViewModel.attachments, inputViewModel.state,
+                    .signature, inputViewModel.inputViewAction()
+                ) {
                     globalFocusState.focus = nil
                 }
             } else {
@@ -133,7 +133,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     viewModel: inputViewModel,
                     inputFieldId: UUID(),
                     style: .signature,
-                    availableInput: availableInput,
+                    availableInputs: availableInputs,
                     messageUseMarkdown: messageUseMarkdown,
                     localization: localization
                 )
@@ -170,8 +170,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         .padding(.horizontal)
         .padding(.bottom, 5)
     }
-
     func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {
+
         HStack {
             Button {
                 cancelClosure()

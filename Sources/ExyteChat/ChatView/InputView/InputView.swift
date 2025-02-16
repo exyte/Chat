@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ExyteMediaPicker
+import GiphyUISDK
 
 public enum InputViewStyle {
     case message
@@ -23,6 +24,7 @@ public enum InputViewStyle {
 }
 
 public enum InputViewAction {
+    case giphy
     case photo
     case add
     case camera
@@ -64,60 +66,53 @@ public enum InputViewState {
 }
 
 public enum AvailableInputType {
-    case full // media + text + audio
-    case textAndMedia
-    case textAndAudio
-    case textOnly
-
-    var isMediaAvailable: Bool {
-        [.full, .textAndMedia].contains(self)
-    }
-
-    var isAudioAvailable: Bool {
-        [.full, .textAndAudio].contains(self)
-    }
+  case text
+  case media
+  case audio
+  case giphy
 }
 
 public struct InputViewAttachments {
-    public var medias: [Media] = []
-    public var recording: Recording?
-    public var replyMessage: ReplyMessage?
+  public var medias: [Media] = []
+  public var recording: Recording?
+  public var giphyMedia: GPHMedia?
+  public var replyMessage: ReplyMessage?
 }
 
 struct InputView: View {
-
+    
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
-
+    
     @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
     var style: InputViewStyle
-    var availableInput: AvailableInputType
+    var availableInputs: [AvailableInputType]
     var messageUseMarkdown: Bool
     var recorderSettings: RecorderSettings = RecorderSettings()
     var localization: ChatLocalization
     
     @StateObject var recordingPlayer = RecordingPlayer()
-
+    
     private var onAction: (InputViewAction) -> Void {
         viewModel.inputViewAction()
     }
-
+    
     private var state: InputViewState {
         viewModel.state
     }
-
+    
     @State private var overlaySize: CGSize = .zero
-
+    
     @State private var recordButtonFrame: CGRect = .zero
     @State private var lockRecordFrame: CGRect = .zero
     @State private var deleteRecordFrame: CGRect = .zero
-
+    
     @State private var dragStart: Date?
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
     private let tapDelay = 0.2
-
+    
     var body: some View {
         VStack {
             viewOnTop
@@ -131,7 +126,7 @@ struct InputView: View {
                     RoundedRectangle(cornerRadius: 18)
                         .fill(theme.colors.inputBG)
                 }
-
+                
                 rightOutsideButton
             }
             .padding(.horizontal, 12)
@@ -143,7 +138,7 @@ struct InputView: View {
             viewModel.setRecorderSettings(recorderSettings: recorderSettings)
         }
     }
-
+    
     @ViewBuilder
     var leftView: some View {
         if [.isRecordingTap, .isRecordingHold, .hasRecording, .playingRecording, .pausedRecording].contains(state) {
@@ -151,7 +146,10 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                if availableInput.isMediaAvailable {
+                if isGiphyAvailable() {
+                    giphyButton
+                }
+                if isMediaAvailable() {
                     attachButton
                 }
             case .signature:
@@ -163,7 +161,9 @@ struct InputView: View {
             }
         }
     }
-
+    
+    
+    
     @ViewBuilder
     var middleView: some View {
         Group {
@@ -175,18 +175,24 @@ struct InputView: View {
             case .isRecordingTap:
                 recordingInProgress
             default:
-                TextInputView(text: $viewModel.text, inputFieldId: inputFieldId, style: style, availableInput: availableInput, localization: localization)
+                TextInputView(
+                    text: $viewModel.text,
+                    inputFieldId: inputFieldId,
+                    style: style,
+                    availableInputs: availableInputs,
+                    localization: localization
+                )
             }
         }
         .frame(minHeight: 48)
     }
-
+    
     @ViewBuilder
     var rightView: some View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                if case .message = style, availableInput.isMediaAvailable {
+                if case .message = style, isMediaAvailable() {
                     cameraButton
                 }
             case .isRecordingHold, .isRecordingTap:
@@ -201,7 +207,7 @@ struct InputView: View {
         }
         .frame(minHeight: 48)
     }
-
+    
     @ViewBuilder
     var editingButtons: some View {
         HStack {
@@ -214,7 +220,7 @@ struct InputView: View {
                     .padding(5)
                     .background(Circle().foregroundStyle(.red))
             }
-
+            
             Button {
                 onAction(.saveEdit)
             } label: {
@@ -226,7 +232,7 @@ struct InputView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     var rightOutsideButton: some View {
         if state == .editing {
@@ -241,7 +247,7 @@ struct InputView: View {
                         .foregroundColor(theme.colors.sendButtonBackground)
                 }
                 Group {
-                    if state.canSend || availableInput == .textOnly || availableInput == .textAndMedia {
+                    if state.canSend || !isAudioAvailable()   {
                         sendButton
                             .disabled(!state.canSend)
                     } else {
@@ -266,7 +272,7 @@ struct InputView: View {
             .viewSize(48)
         }
     }
-
+    
     @ViewBuilder
     var viewOnTop: some View {
         if let message = viewModel.attachments.replyMessage {
@@ -274,10 +280,9 @@ struct InputView: View {
                 Rectangle()
                     .foregroundColor(theme.colors.messageFriendBG)
                     .frame(height: 2)
-
+                
                 HStack {
                     theme.images.reply.replyToMessage
-                        .foregroundStyle(theme.colors.sendButtonBackground)
                     Capsule()
                         .foregroundColor(theme.colors.messageMyBG)
                         .frame(width: 2)
@@ -293,34 +298,33 @@ struct InputView: View {
                         }
                     }
                     .padding(.vertical, 2)
-
+                    
                     Spacer()
-
+                    
                     if let first = message.attachments.first {
                         AsyncImageView(url: first.thumbnail)
                             .viewSize(30)
                             .cornerRadius(4)
                             .padding(.trailing, 16)
                     }
-
+                    
                     if let _ = message.recording {
                         theme.images.inputView.microphone
                             .renderingMode(.template)
                             .foregroundColor(theme.colors.mainTint)
                     }
-
+                    
                     theme.images.reply.cancelReply
                         .onTapGesture {
                             viewModel.attachments.replyMessage = nil
                         }
-                        .foregroundStyle(theme.colors.sendButtonBackground)
                 }
                 .padding(.horizontal, 26)
             }
             .fixedSize(horizontal: false, vertical: true)
         }
     }
-
+    
     @ViewBuilder
     func textView(_ text: String) -> some View {
         if messageUseMarkdown,
@@ -330,7 +334,7 @@ struct InputView: View {
             Text(text)
         }
     }
-
+    
     var attachButton: some View {
         Button {
             onAction(.photo)
@@ -340,7 +344,18 @@ struct InputView: View {
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
         }
     }
-
+    
+    var giphyButton: some View {
+        Button {
+            onAction(.giphy)
+        } label: {
+            theme.images.inputView.sticker
+                .resizable()
+                .viewSize(24)
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
+        }
+    }
+    
     var addButton: some View {
         Button {
             onAction(.add)
@@ -351,7 +366,7 @@ struct InputView: View {
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
         }
     }
-
+    
     var cameraButton: some View {
         Button {
             onAction(.camera)
@@ -361,7 +376,7 @@ struct InputView: View {
                 .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 12))
         }
     }
-
+    
     var sendButton: some View {
         Button {
             onAction(.send)
@@ -371,14 +386,14 @@ struct InputView: View {
                 .circleBackground(theme.colors.sendButtonBackground)
         }
     }
-
+    
     var recordButton: some View {
         theme.images.inputView.microphone
             .viewSize(48)
             .circleBackground(theme.colors.sendButtonBackground)
             .frameGetter($recordButtonFrame)
     }
-
+    
     var deleteRecordButton: some View {
         Button {
             onAction(.deleteRecord)
@@ -389,7 +404,7 @@ struct InputView: View {
         }
         .frameGetter($deleteRecordFrame)
     }
-
+    
     var stopRecordButton: some View {
         Button {
             onAction(.stopRecordAudio)
@@ -403,7 +418,7 @@ struct InputView: View {
                 )
         }
     }
-
+    
     var lockRecordButton: some View {
         Button {
             onAction(.recordAudioLock)
@@ -422,7 +437,7 @@ struct InputView: View {
         }
         .frameGetter($lockRecordFrame)
     }
-
+    
     var swipeToCancel: some View {
         HStack {
             Spacer()
@@ -441,7 +456,7 @@ struct InputView: View {
             Spacer()
         }
     }
-
+    
     var recordingInProgress: some View {
         HStack {
             Spacer()
@@ -451,7 +466,7 @@ struct InputView: View {
             Spacer()
         }
     }
-
+    
     var recordDurationInProcess: some View {
         HStack {
             Circle()
@@ -460,7 +475,7 @@ struct InputView: View {
             recordDuration
         }
     }
-
+    
     var recordDuration: some View {
         Text(DateFormatter.timeString(Int(viewModel.attachments.recording?.duration ?? 0)))
             .foregroundColor(theme.colors.mainText)
@@ -469,7 +484,7 @@ struct InputView: View {
             .monospacedDigit()
             .padding(.trailing, 12)
     }
-
+    
     var recordDurationLeft: some View {
         Text(DateFormatter.timeString(Int(recordingPlayer.secondsLeft)))
             .foregroundColor(theme.colors.mainText)
@@ -478,25 +493,23 @@ struct InputView: View {
             .monospacedDigit()
             .padding(.trailing, 12)
     }
-
+    
     var playRecordButton: some View {
         Button {
             onAction(.playRecord)
         } label: {
             theme.images.recordAudio.playRecord
         }
-        .tint(theme.colors.mainText)
     }
-
+    
     var pauseRecordButton: some View {
         Button {
             onAction(.pauseRecord)
         } label: {
             theme.images.recordAudio.pauseRecord
         }
-        .tint(theme.colors.mainText)
     }
-
+    
     @ViewBuilder
     var recordWaveform: some View {
         if let samples = viewModel.attachments.recording?.waveformSamples {
@@ -509,7 +522,7 @@ struct InputView: View {
                     }
                 }
                 .frame(width: 20)
-
+                
                 RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.mainText, addExtraDots: true) { progress in
                     recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
                 }
@@ -517,7 +530,7 @@ struct InputView: View {
             .padding(.horizontal, 8)
         }
     }
-
+    
     var backgroundColor: Color {
         switch style {
         case .message:
@@ -526,7 +539,8 @@ struct InputView: View {
             return pickerTheme.main.albumSelectionBackground
         }
     }
-
+    
+    
     func dragGesture() -> some Gesture {
         DragGesture(minimumDistance: 0.0, coordinateSpace: .global)
             .onChanged { value in
@@ -539,13 +553,13 @@ struct InputView: View {
                         }
                     }
                 }
-
+                
                 if value.location.y < lockRecordFrame.minY,
                    value.location.x > recordButtonFrame.minX {
                     cancelGesture = true
                     onAction(.recordAudioLock)
                 }
-
+                
                 if value.location.x < UIScreen.main.bounds.width/2,
                    value.location.y > recordButtonFrame.minY {
                     cancelGesture = true
@@ -574,4 +588,17 @@ struct InputView: View {
                 dragStart = nil
             }
     }
+    
+    private func isAudioAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.audio)
+    }
+    
+    private func isGiphyAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.giphy)
+    }
+    
+    private func isMediaAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.media)
+    }
 }
+
