@@ -51,6 +51,7 @@ public struct Message: Identifiable, Hashable {
 
     public var text: String
     public var attachments: [Attachment]
+    public var reactions: [Reaction]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
 
@@ -62,6 +63,7 @@ public struct Message: Identifiable, Hashable {
                 createdAt: Date = Date(),
                 text: String = "",
                 attachments: [Attachment] = [],
+                reactions: [Reaction] = [],
                 recording: Recording? = nil,
                 replyMessage: ReplyMessage? = nil) {
 
@@ -71,6 +73,7 @@ public struct Message: Identifiable, Hashable {
         self.createdAt = createdAt
         self.text = text
         self.attachments = attachments
+        self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
     }
@@ -114,6 +117,7 @@ extension Message: Equatable {
         lhs.createdAt == rhs.createdAt &&
         lhs.text == rhs.text &&
         lhs.attachments == rhs.attachments &&
+        lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&
         lhs.replyMessage == rhs.replyMessage
     }
