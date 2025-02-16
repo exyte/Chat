@@ -77,6 +77,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     let sections: [MessagesSection]
     let ids: [String]
     let didSendMessage: (DraftMessage) -> Void
+    var reactionDelegate: ReactionDelegate?
 
     // MARK: - View builders
 
@@ -109,6 +110,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var showMessageMenuOnLongPress: Bool = true
+    var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
@@ -129,6 +131,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
 
+    /// Used to prevent the MainView from responding to keyboard changes while the Menu is active
     @State private var isShowingMenu = false
 
     @State private var tableContentHeight: CGFloat = 0
@@ -139,16 +142,20 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
                 didSendMessage: @escaping (DraftMessage) -> Void,
+                reactionDelegate: ReactionDelegate? = nil,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?) {
+                messageMenuAction: MessageMenuActionClosure?,
+                localization: ChatLocalization) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
+        self.localization = localization
     }
 
     public var body: some View {
@@ -207,6 +214,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 listWithButton
             }
         }
+        // Used to prevent ChatView movement during Emoji Keyboard invocation
+        .ignoresSafeArea(isShowingMenu ? .keyboard : [])
     }
 
     var waitingForNetwork: some View {
@@ -289,6 +298,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 messageMenu(row)
                     .onAppear(perform: showMessageMenu)
             }
+            
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) {
             self.cellFrames = $0
@@ -339,21 +349,44 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
 
     func messageMenu(_ row: MessageRow) -> some View {
-        MessageMenu(
+        let cellFrame = cellFrames[row.id] ?? .zero
+
+        return MessageMenu(
+            viewModel: viewModel,
             isShowingMenu: $isShowingMenu,
-            menuButtonsSize: $menuButtonsSize,
+            message: row.message,
+            cellFrame: cellFrame,
             alignment: row.message.user.isCurrentUser ? .right : .left,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
             font: messageFont,
-            onAction: menuActionClosure(row.message)) {
+            animationDuration: messageMenuAnimationDuration,
+            onAction: menuActionClosure(row.message),
+            reactionHandler: MessageMenu.ReactionConfig(
+                delegate: reactionDelegate,
+                didReact: reactionClosure(row.message)
+            )) {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {
                         hideMessageMenu()
                     }
             }
-            .frame(height: menuButtonsSize.height + (cellFrames[row.id]?.height ?? 0), alignment: .top)
-            .opacity(menuCellOpacity)
+    }
+    
+    /// Constructs our default reactionCallback flow if the user supports Reactions by implementing the didReactToMessage closure
+    private func reactionClosure(_ message: Message) -> (ReactionType?) -> () {
+        return { reactionType in
+            Task {
+                // Run the callback on the main thread
+                await MainActor.run {
+                    // Hide the menu
+                    hideMessageMenu()
+                    // Send the draft reaction
+                    guard let reactionDelegate, let reactionType else { return }
+                    reactionDelegate.didReact(to: message, reaction: DraftReaction(messageID: message.id, type: reactionType))
+                }
+            }
+        }
     }
 
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
@@ -392,7 +425,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             replyToText: String(localized: "Reply to")
         )
     }
-
 }
 
 public extension ChatView {
