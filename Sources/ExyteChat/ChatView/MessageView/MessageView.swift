@@ -333,6 +333,15 @@ struct MessageView_Preview: PreviewProvider {
             Attachment.randomImage(),
             Attachment.randomImage(),
             Attachment.randomImage(),
+        ],
+        reactions: [
+            Reaction(user: john, createdAt: Date.now.addingTimeInterval(-70), type: .emoji("🔥"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-60), type: .emoji("🥳"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-50), type: .emoji("🤠"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-40), type: .emoji("🧠"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-30), type: .emoji("🥳"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-20), type: .emoji("🤯"), status: .sent),
+            Reaction(user: john, createdAt: Date.now.addingTimeInterval(-10), type: .emoji("🥰"), status: .sending)
         ]
     )
 
