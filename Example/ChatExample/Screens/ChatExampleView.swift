@@ -29,6 +29,7 @@ struct ChatExampleView: View {
         }
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
+        .messageReactionDelegate(viewModel)
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
