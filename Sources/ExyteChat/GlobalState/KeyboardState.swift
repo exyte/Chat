@@ -15,7 +15,7 @@ public final class KeyboardState: ObservableObject {
     init() {
         subscribeKeyboardNotifications()
     }
-    
+
     /// Requests the dismissal of the current / active keyboard
     public func resignFirstResponder() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)

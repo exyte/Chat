@@ -8,6 +8,14 @@ import SwiftUI
 public protocol MessageMenuAction: Equatable, CaseIterable {
     func title() -> String
     func icon() -> Image
+    
+    static func menuItems(for message: Message) -> [Self]
+}
+
+extension MessageMenuAction {
+    public static func menuItems(for message: Message) -> [Self] {
+        Self.allCases.map { $0 }
+    }
 }
 
 public enum DefaultMessageMenuAction: MessageMenuAction {
@@ -52,4 +60,12 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
     public static var allCases: [DefaultMessageMenuAction] = [
         .copy, .reply, .edit(saveClosure: {_ in})
     ]
+    
+    static public func menuItems(for message: Message) -> [DefaultMessageMenuAction] {
+        if message.user.isCurrentUser {
+            return allCases
+        } else {
+            return [.copy, .reply]
+        }
+    }
 }

@@ -36,6 +36,14 @@ enum Action: MessageMenuAction {
             Image(systemName: "printer")
         }
     }
+    
+    static func menuItems(for message: ExyteChat.Message) -> [Action] {
+        if message.user.isCurrentUser  {
+            return [.edit]
+        } else {
+            return [.reply]
+        }
+    }
 }
 
 struct CommentsExampleView: View {
@@ -77,6 +85,31 @@ struct CommentsExampleView: View {
                 }
             }
             .showDateHeaders(false)
+            .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: false, items: [
+                // SwipeActions are similar to Buttons, they accept an Action and a ViewBuilder
+                SwipeAction(action: onDelete, activeFor: { $0.user.isCurrentUser }, background: .red) {
+                    swipeActionButtonStandard(title: "Delete", image: "xmark.bin")
+                },
+                SwipeAction(action: onReply, background: .blue) {
+                    swipeActionButtonStandard(title: "Reply", image: "arrowshape.turn.up.left")
+                },
+                // SwipeActions can also be selectively shown based on the message, here we only show the Edit action when the message is from the current sender
+                SwipeAction(action: onEdit, activeFor: { $0.user.isCurrentUser }, background: .gray) {
+                    swipeActionButtonStandard(title: "Edit", image: "bubble.and.pencil")
+                }
+            ])
+            // Just like with UITableView's we can enable, or disable, `performsFirstActionWithFullSwipe` triggering the first action
+            .swipeActions(edge: .trailing, performsFirstActionWithFullSwipe: true, items: [
+                SwipeAction(action: onInfo) {
+                    Image(systemName: "info.bubble")
+                        .imageScale(.large)
+                        .foregroundStyle(.blue.gradient)
+                        .frame(height: 30)
+                    Text("Info")
+                        .foregroundStyle(.blue.gradient)
+                        .font(.footnote)
+                }
+            ])
         }
         .navigationTitle("Comments example")
         .onAppear(perform: viewModel.onStart)
@@ -163,5 +196,50 @@ struct CommentsExampleView: View {
             }
         }
         .padding(.horizontal, 18)
+    }
+}
+
+// MARK: - Swipe Actions
+extension CommentsExampleView {
+    
+    /// `message` - message the swipe action was triggered on
+    /// `defaultActions` - closure to perform default ChatView actions such as .reply, .edit, or .copy
+    
+    func onDelete(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+        print("Swipe Action - Delete: \(message)")
+        // Delete the message from your message provider
+    }
+    
+    func onReply(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+        print("Swipe Action - Reply: \(message)")
+        // This places the message in the ChatView's InputView ready for the sender to reply
+        defaultActions(message, .reply)
+    }
+    
+    func onEdit(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+        print("Swipe Action - Edit: \(message)")
+        // This places the message in the ChatView's InputView ready for the sender to edit it
+        defaultActions(message, .edit(saveClosure: { msg in
+            print("Edited Message: \(msg)")
+            // Update the message in your message provider
+        }))
+    }
+    
+    func onInfo(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+        print("Swipe Action - Info: \(message)")
+        // Maybe navigate to a details page?
+    }
+    
+    // standard swipe button with an image and label in a white foregroundStyle
+    func swipeActionButtonStandard(title: String, image: String) -> some View {
+        VStack {
+            Image(systemName: image)
+                .imageScale(.large)
+                .foregroundStyle(.white)
+                .frame(height: 30)
+            Text(title)
+                .foregroundStyle(.white)
+                .font(.footnote)
+        }
     }
 }

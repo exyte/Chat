@@ -172,6 +172,17 @@ enum Action: MessageMenuAction {
             Image(systemName: "square.and.pencil")
         }
     }
+    
+    // Optional
+    // Implement this method to conditionally include menu actions on a per message basis
+    // The default behavior is to include all menu action items
+    static func menuItems(for message: ExyteChat.Message) -> [Action] {
+        if message.user.isCurrentUser  {
+            return [.edit]
+        } else {
+            return [.reply]
+        }
+    }
 }
 
 ChatView(messages: viewModel.messages) { draft in
@@ -194,6 +205,35 @@ ChatView(messages: viewModel.messages) { draft in
 - `message` - message for which the menu is displayed
     
 When implementing your own `MessageMenuActionClosure`, write a switch statement passing through all the cases of your `MessageMenuAction`, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for `.edit` you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.
+
+## Custom swipe actions
+
+```swift
+// Example: Adding Swipe Actions to your ChatView
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+} 
+.swipeActions(edge: .leading, performsFirstActionWithFullSwipe: false, items: [
+    // SwipeActions are similar to Buttons, they accept an Action and a ViewBuilder
+    SwipeAction(action: onDelete, activeFor: { $0.user.isCurrentUser }, background: .red) {
+        swipeActionButtonStandard(title: "Delete", image: "xmark.bin")
+    },
+    // Set the background color of a SwipeAction in the initializer,
+    // instead of trying to apply a background color in your ViewBuilder
+    SwipeAction(action: onReply, background: .blue) {
+        swipeActionButtonStandard(title: "Reply", image: "arrowshape.turn.up.left")
+    },
+    // SwipeActions can also be selectively shown based on the message,
+    // here we only show the Edit action when the message is from the current sender
+    SwipeAction(action: onEdit, activeFor: { $0.user.isCurrentUser }, background: .gray) {
+        swipeActionButtonStandard(title: "Edit", image: "bubble.and.pencil")
+    }
+])
+```
+`swipeActions`'s parameters:  
+- `edge` - either the leading or trailing edge of the Message
+- `performsFirstActionWithFullSwipe` - if true, a full swipe will trigger the first `SwipeAction` provided in the `items` list
+- `items` - list of `SwipeAction`s to include
 
 ## Small view builders:
 These use `AnyView`, so please try to keep them easy enough

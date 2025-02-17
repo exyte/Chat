@@ -30,6 +30,19 @@ struct ChatExampleView: View {
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
+        .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [
+            SwipeAction(action: onReply, activeFor: { !$0.user.isCurrentUser }, background: .blue) {
+                VStack {
+                    Image(systemName: "arrowshape.turn.up.left")
+                        .imageScale(.large)
+                        .foregroundStyle(.white)
+                        .frame(height: 30)
+                    Text("Reply")
+                        .foregroundStyle(.white)
+                        .font(.footnote)
+                }
+            }
+        ])
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -74,6 +87,13 @@ struct ChatExampleView: View {
         }
         .onAppear(perform: viewModel.onStart)
         .onDisappear(perform: viewModel.onStop)
+    }
+    
+    // Swipe Action
+    func onReply(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+        print("Swipe Action - Reply: \(message)")
+        // This places the message in the ChatView's InputView ready for the sender to reply
+        defaultActions(message, .reply)
     }
 }
 

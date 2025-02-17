@@ -41,6 +41,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let messageFont: UIFont
     let sections: [MessagesSection]
     let ids: [String]
+    let listSwipeActions: ListSwipeActions
 
     @State private var isScrolledToTop = false
 
@@ -363,7 +364,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder, headerBuilder: headerBuilder, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler, messageUseMarkdown: messageUseMarkdown, showMessageTimeView: showMessageTimeView, messageFont: messageFont, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBG)
+        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder, headerBuilder: headerBuilder, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler, messageUseMarkdown: messageUseMarkdown, showMessageTimeView: showMessageTimeView, messageFont: messageFont, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -396,8 +397,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
         let ids: [String]
         let mainBackgroundColor: Color
+        let listSwipeActions: ListSwipeActions
 
-        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (()->AnyView)?, headerBuilder: ((Date)->AnyView)?, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?, messageUseMarkdown: Bool, showMessageTimeView: Bool, messageFont: UIFont, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil) {
+        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (()->AnyView)?, headerBuilder: ((Date)->AnyView)?, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?, messageUseMarkdown: Bool, showMessageTimeView: Bool, messageFont: UIFont, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil, listSwipeActions: ListSwipeActions) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
             self._isScrolledToBottom = isScrolledToBottom
@@ -418,6 +420,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.ids = ids
             self.mainBackgroundColor = mainBackgroundColor
             self.paginationTargetIndexPath = paginationTargetIndexPath
+            self.listSwipeActions = listSwipeActions
         }
 
         /// call pagination handler when this row is reached
@@ -472,7 +475,38 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             header?.backgroundColor = UIColor(mainBackgroundColor)
             return header
         }
-
+        
+        func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+            guard let items = type == .conversation ? listSwipeActions.trailing : listSwipeActions.leading else { return nil }
+            guard !items.actions.isEmpty else { return nil }
+            let message = sections[indexPath.section].rows[indexPath.row].message
+            let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
+            conf.performsFirstActionWithFullSwipe = items.performsFirstActionWithFullSwipe
+            return conf
+        }
+        
+        func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+            guard let items = type == .conversation ? listSwipeActions.leading : listSwipeActions.trailing else { return nil }
+            guard !items.actions.isEmpty else { return nil }
+            let message = sections[indexPath.section].rows[indexPath.row].message
+            let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
+            conf.performsFirstActionWithFullSwipe = items.performsFirstActionWithFullSwipe
+            return conf
+        }
+        
+        private func toContextualAction(_ item: SwipeActionable, message:Message) -> UIContextualAction {
+            let ca = UIContextualAction(style: .normal, title: nil) { (action, sourceView, completionHandler) in
+                item.action(message, self.viewModel.messageMenuAction())
+                completionHandler(true)
+            }
+            ca.image = item.render(type: type)
+            
+            let bgColor = item.background ?? mainBackgroundColor
+            ca.backgroundColor = UIColor(bgColor)
+            
+            return ca
+        }
+        
         @ViewBuilder
         func sectionHeaderViewBuilder(_ section: Int) -> some View {
             if let mainHeaderBuilder, section == 0 {
