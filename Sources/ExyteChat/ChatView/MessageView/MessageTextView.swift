@@ -9,28 +9,52 @@ import SwiftUI
 
 struct MessageTextView: View {
 
+    @Environment(\.chatTheme) private var theme
+
     let text: String?
     let messageUseMarkdown: Bool
+    let isCurrentUser: Bool
 
-    var body: some View {
-        if let text = text, !text.isEmpty {
-            textView(text)
+    var styledText: AttributedString {
+        let textToStyle = text ?? ""
+
+        var result =
+            if messageUseMarkdown,
+                let attributed = try? AttributedString(
+                    markdown: textToStyle, options: String.markdownOptions)
+            {
+                attributed
+            } else {
+                AttributedString(stringLiteral: textToStyle)
+            }
+
+        let color =
+            isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText
+        result.foregroundColor = color
+
+        for (link, range) in result.runs[\.link] {
+            if link != nil {
+                result[range].underlineStyle = .single
+            }
         }
+
+        return result
     }
 
-    @ViewBuilder
-    private func textView(_ text: String) -> some View {
-        if messageUseMarkdown,
-           let attributed = try? AttributedString(markdown: text, options: String.markdownOptions) {
-            Text(attributed)
-        } else {
-            Text(text)
+    var body: some View {
+        if !styledText.characters.isEmpty {
+            Text(styledText)
         }
     }
 }
 
 struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageTextView(text: "Hello world!", messageUseMarkdown: false)
+        MessageTextView(
+            text: "Look at [this website](https://example.org)", messageUseMarkdown: true,
+            isCurrentUser: false)
+        MessageTextView(
+            text: "Look at [this website](https://example.org)", messageUseMarkdown: false,
+            isCurrentUser: false)
     }
 }
