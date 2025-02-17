@@ -36,6 +36,14 @@ enum Action: MessageMenuAction {
             Image(systemName: "printer")
         }
     }
+    
+    static func menuItems(for message: ExyteChat.Message) -> [Action] {
+        if message.user.isCurrentUser  {
+            return [.edit]
+        } else {
+            return [.reply]
+        }
+    }
 }
 
 struct CommentsExampleView: View {
