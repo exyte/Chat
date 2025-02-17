@@ -57,6 +57,36 @@ public struct ChatTheme {
         self.colors = colors
         self.images = images
     }
+    
+    internal init(accentColor: Color) {
+        self.init(
+            colors: .init(
+                mainTint: accentColor,
+                messageMyBG: accentColor,
+                messageMyTimeText: Color.white.opacity(0.5),
+                sendButtonBackground: accentColor
+            )
+        )
+    }
+    
+    @available(iOS 18.0, *)
+    internal init(accentColor: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast:Bool) {
+        let backgroundColor:Color = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
+        let friendMessageColor:Color = background.getFriendMessageColor(improveContrast: improveContrast)
+        self.init(
+            colors: .init(
+                mainBG: backgroundColor,
+                mainTint: accentColor,
+                messageMyBG: accentColor,
+                messageMyText: Color.white,
+                messageMyTimeText: Color.white.opacity(0.5),
+                messageFriendBG: friendMessageColor,
+                inputBG: friendMessageColor,
+                menuBG: backgroundColor,
+                sendButtonBackground: accentColor
+            )
+        )
+    }
 
     public struct Colors {
         public var mainBG: Color
@@ -264,7 +294,7 @@ public struct ChatTheme {
             scrollToBottom: Image? = nil
         ) {
             self.backButton = backButton ?? Image("backArrow", bundle: .current)
-            self.scrollToBottom = scrollToBottom ?? Image("scrollToBottom", bundle: .current)
+            self.scrollToBottom = scrollToBottom ?? Image(systemName: "chevron.down")
 
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),
@@ -296,7 +326,7 @@ public struct ChatTheme {
             self.mediaPicker = MediaPicker(
                 chevronDown: chevronDown ?? Image("chevronDown", bundle: .current),
                 chevronRight: chevronRight ?? Image("chevronRight", bundle: .current),
-                cross: cross ?? Image("cross", bundle: .current)
+                cross: cross ?? Image(systemName: "xmark")
             )
 
             self.message = Message(
@@ -324,15 +354,15 @@ public struct ChatTheme {
                 cancelRecord: cancelRecord ?? Image("cancelRecord", bundle: .current),
                 deleteRecord: deleteRecord ?? Image("deleteRecord", bundle: .current),
                 lockRecord: lockRecord ?? Image("lockRecord", bundle: .current),
-                pauseRecord: pauseRecord ?? Image("pauseRecord", bundle: .current),
-                playRecord: playRecord ?? Image("playRecord", bundle: .current),
+                pauseRecord: pauseRecord ?? Image(systemName: "pause.fill"),
+                playRecord: playRecord ?? Image(systemName: "play.fill"),
                 sendRecord: sendRecord ?? Image("sendRecord", bundle: .current),
                 stopRecord: stopRecord ?? Image("stopRecord", bundle: .current)
             )
 
             self.reply = Reply(
-                cancelReply: cancelReply ?? Image("cancelReply", bundle: .current),
-                replyToMessage: replyToMessage ?? Image("replyToMessage", bundle: .current)
+                cancelReply: cancelReply ?? Image(systemName: "x.circle"),
+                replyToMessage: replyToMessage ?? Image(systemName: "arrow.uturn.left")
             )
         }
     }

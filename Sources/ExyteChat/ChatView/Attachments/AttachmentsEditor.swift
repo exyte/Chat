@@ -100,10 +100,12 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 main: .init(
                     text: theme.colors.mainText,
                     albumSelectionBackground: theme.colors.mainBG,
-                    fullscreenPhotoBackground: theme.colors.mainBG,
-                    cameraBackground: theme.colors.mainBG,
-                    cameraSelectionBackground: theme.colors.mainBG),
-                selection: .init(selectedTint: theme.colors.sendButtonBackground)
+                    fullscreenPhotoBackground: theme.colors.mainBG
+                ),
+                selection: .init(
+                    selectedTint: theme.colors.sendButtonBackground,
+                    fullscreenTint: theme.colors.sendButtonBackground
+                )
             )
         }
     }
@@ -173,11 +175,11 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {
 
         HStack {
-            Button {
-                cancelClosure()
-            } label: {
+            Button(action: cancelClosure) {
                 theme.images.mediaPicker.cross
+                    .imageScale(.large)
             }
+            .tint(theme.colors.mainText)
             .padding(.trailing, 30)
 
             if let chatTitle = chatTitle {
