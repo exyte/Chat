@@ -74,28 +74,22 @@ struct CommentsExampleView: View {
                 }
             }
             .showDateHeaders(false)
-            // Example: Adding Swipe Actions to your ChatView
-            .swipeActions(edge: .leading, allowsFullSwipe: false, items: [
+            .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: false, items: [
                 // SwipeActions are similar to Buttons, they accept an Action and a ViewBuilder
                 SwipeAction(action: onDelete, activeFor: { $0.user.isCurrentUser }, background: .red) {
                     swipeActionButtonStandard(title: "Delete", image: "xmark.bin")
                 },
-                // Set the background color of a SwipeAction in the initializer, instead of trying to apply a background color in your ViewBuilder
                 SwipeAction(action: onReply, background: .blue) {
                     swipeActionButtonStandard(title: "Reply", image: "arrowshape.turn.up.left")
                 },
-                // SwipeActions can also be selectively shown based on the message, here we only show the Edit action when the message is from the current sender (cause you can't just go around editing other peoples messages...)
+                // SwipeActions can also be selectively shown based on the message, here we only show the Edit action when the message is from the current sender
                 SwipeAction(action: onEdit, activeFor: { $0.user.isCurrentUser }, background: .gray) {
                     swipeActionButtonStandard(title: "Edit", image: "bubble.and.pencil")
                 }
             ])
-            // Just like with UITableView's we can enable, or disable, `allowsFullSwipe` triggering the first action
-            // In this example a full swipe will automatically trigger the `onInfo` callback
-            .swipeActions(edge: .trailing, allowsFullSwipe: true, items: [
-                // SwipeAction's accept almost any static content (no animations), so play around and style your buttons!
-                // - Note: leaving the background parameter empty here defaults to the ChatView's mainBG color (providing a 'transparent' background look)
+            // Just like with UITableView's we can enable, or disable, `performsFirstActionWithFullSwipe` triggering the first action
+            .swipeActions(edge: .trailing, performsFirstActionWithFullSwipe: true, items: [
                 SwipeAction(action: onInfo) {
-                    // This is an example of a swipe button with a gradient foregroundStyle
                     Image(systemName: "info.bubble")
                         .imageScale(.large)
                         .foregroundStyle(.blue.gradient)
@@ -194,26 +188,24 @@ struct CommentsExampleView: View {
     }
 }
 
-// Example: Adding Swipe Actions to your ChatView
+// MARK: - Swipe Actions
 extension CommentsExampleView {
     
-    // Swipe Action Callbacks are provided with...
-    // The `message` - that the swipe action was triggered on and
-    // A `defaultActions` function, that you can call if you want to perform a default ChatView action such as .reply, .edit, or .copy
-    // Below are a few examples of various common swipe actions
+    /// `message` - message the swipe action was triggered on
+    /// `defaultActions` - closure to perform default ChatView actions such as .reply, .edit, or .copy
     
-    func onDelete(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+    func onDelete(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
         print("Swipe Action - Delete: \(message)")
         // Delete the message from your message provider
     }
     
-    func onReply(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+    func onReply(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
         print("Swipe Action - Reply: \(message)")
         // This places the message in the ChatView's InputView ready for the sender to reply
         defaultActions(message, .reply)
     }
     
-    func onEdit(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+    func onEdit(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
         print("Swipe Action - Edit: \(message)")
         // This places the message in the ChatView's InputView ready for the sender to edit it
         defaultActions(message, .edit(saveClosure: { msg in
@@ -227,8 +219,7 @@ extension CommentsExampleView {
         // Maybe navigate to a details page?
     }
     
-    // This is an example of a standard swipe button with an image and label in a white foregroundStyle
-    @ViewBuilder
+    // standard swipe button with an image and label in a white foregroundStyle
     func swipeActionButtonStandard(title: String, image: String) -> some View {
         VStack {
             Image(systemName: image)

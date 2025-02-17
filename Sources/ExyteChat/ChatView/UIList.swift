@@ -481,7 +481,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             guard !items.actions.isEmpty else { return nil }
             let message = sections[indexPath.section].rows[indexPath.row].message
             let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
-            conf.performsFirstActionWithFullSwipe = items.allowsFullSwipe
+            conf.performsFirstActionWithFullSwipe = items.performsFirstActionWithFullSwipe
             return conf
         }
         
@@ -490,7 +490,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             guard !items.actions.isEmpty else { return nil }
             let message = sections[indexPath.section].rows[indexPath.row].message
             let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
-            conf.performsFirstActionWithFullSwipe = items.allowsFullSwipe
+            conf.performsFirstActionWithFullSwipe = items.performsFirstActionWithFullSwipe
             return conf
         }
         
