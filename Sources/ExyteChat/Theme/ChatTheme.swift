@@ -7,24 +7,41 @@
 
 import SwiftUI
 
+struct GiphyConfigKey: EnvironmentKey {
+    static var defaultValue: GiphyConfiguration = GiphyConfiguration()
+}
+
 struct ChatThemeKey: EnvironmentKey {
     static var defaultValue: ChatTheme = ChatTheme()
 }
 
 extension EnvironmentValues {
+
     var chatTheme: ChatTheme {
         get { self[ChatThemeKey.self] }
         set { self[ChatThemeKey.self] = newValue }
     }
+
+    var giphyConfig: GiphyConfiguration {
+        get { self[GiphyConfigKey.self] }
+        set { self[GiphyConfigKey.self] = newValue }
+    }
 }
 
-public extension View {
-    func chatTheme(_ theme: ChatTheme) -> some View {
+extension View {
+
+    public func giphyConfig(_ config: GiphyConfiguration) -> some View {
+        self.environment(\.giphyConfig, config)
+    }
+
+    public func chatTheme(_ theme: ChatTheme) -> some View {
         self.environment(\.chatTheme, theme)
     }
 
-    func chatTheme(colors: ChatTheme.Colors = .init(),
-                   images: ChatTheme.Images = .init()) -> some View {
+    public func chatTheme(
+        colors: ChatTheme.Colors = .init(),
+        images: ChatTheme.Images = .init()
+    ) -> some View {
         self.environment(\.chatTheme, ChatTheme(colors: colors, images: images))
     }
 }
@@ -33,8 +50,10 @@ public struct ChatTheme {
     public let colors: ChatTheme.Colors
     public let images: ChatTheme.Images
 
-    public init(colors: ChatTheme.Colors = .init(),
-                images: ChatTheme.Images = .init()) {
+    public init(
+        colors: ChatTheme.Colors = .init(),
+        images: ChatTheme.Images = .init()
+    ) {
         self.colors = colors
         self.images = images
     }
@@ -158,6 +177,7 @@ public struct ChatTheme {
         public struct InputView {
             public var add: Image
             public var arrowSend: Image
+            public var sticker: Image
             public var attach: Image
             public var attachCamera: Image
             public var microphone: Image
@@ -188,6 +208,15 @@ public struct ChatTheme {
             public var sending: Image
         }
 
+        public struct MessageMenu {
+            public var delete: Image
+            public var edit: Image
+            public var forward: Image
+            public var retry: Image
+            public var save: Image
+            public var select: Image
+        }
+
         public struct RecordAudio {
             public var cancelRecord: Image
             public var deleteRecord: Image
@@ -211,6 +240,7 @@ public struct ChatTheme {
         public var fullscreenMedia: FullscreenMedia
         public var mediaPicker: MediaPicker
         public var message: Message
+        public var messageMenu: MessageMenu
         public var recordAudio: RecordAudio
         public var reply: Reply
 
@@ -225,6 +255,7 @@ public struct ChatTheme {
             pickPhoto: Image? = nil,
             add: Image? = nil,
             arrowSend: Image? = nil,
+            sticker: Image? = nil,
             attach: Image? = nil,
             attachCamera: Image? = nil,
             microphone: Image? = nil,
@@ -244,6 +275,12 @@ public struct ChatTheme {
             playAudio: Image? = nil,
             playVideo: Image? = nil,
             sending: Image? = nil,
+            delete: Image? = nil,
+            edit: Image? = nil,
+            forward: Image? = nil,
+            retry: Image? = nil,
+            save: Image? = nil,
+            select: Image? = nil,
             cancelRecord: Image? = nil,
             deleteRecord: Image? = nil,
             lockRecord: Image? = nil,
@@ -273,6 +310,7 @@ public struct ChatTheme {
             self.inputView = InputView(
                 add: add ?? Image("add", bundle: .current),
                 arrowSend: arrowSend ?? Image("arrowSend", bundle: .current),
+                sticker: sticker ?? Image("sticker", bundle: .current),
                 attach: attach ?? Image("attach", bundle: .current),
                 attachCamera: attachCamera ?? Image("attachCamera", bundle: .current),
                 microphone: microphone ?? Image("microphone", bundle: .current)
@@ -301,6 +339,15 @@ public struct ChatTheme {
                 playAudio: playAudio ?? Image("playAudio", bundle: .current),
                 playVideo: playVideo ?? Image(systemName: "play.circle.fill"),
                 sending: sending ?? Image("sending", bundle: .current)
+            )
+
+            self.messageMenu = MessageMenu(
+                delete: delete ?? Image("delete", bundle: .current),
+                edit: edit ?? Image("edit", bundle: .current),
+                forward: forward ?? Image("forward", bundle: .current),
+                retry: retry ?? Image("retry", bundle: .current),
+                save: save ?? Image("save", bundle: .current),
+                select: select ?? Image("select", bundle: .current)
             )
 
             self.recordAudio = RecordAudio(
