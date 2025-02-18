@@ -80,7 +80,7 @@ public enum ThemedBackgroundStyle {
         }
     }
     
-    internal func getFriendMessageColor(improveContrast:Bool) -> Color {
+    internal func getFriendMessageColor(improveContrast: Bool, background: Color) -> Color {
         switch self {
         case .systemDefault:
             return Color(UIColor.secondarySystemBackground)
@@ -88,9 +88,9 @@ public enum ThemedBackgroundStyle {
             return Color(UIColor.secondarySystemBackground)
         case .mixedWithAccentColor:
             if improveContrast {
-                return Color(UIColor.systemBackground).opacity(0.8)
+                return Color(UIColor.systemBackground).mix(with: background, by: 0.2)
             } else {
-                return Color(UIColor.secondarySystemBackground).opacity(0.8)
+                return Color(UIColor.secondarySystemBackground).mix(with: background, by: 0.1)
             }
         }
     }
