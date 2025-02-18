@@ -70,7 +70,7 @@ public struct ChatTheme {
     }
     
     @available(iOS 18.0, *)
-    internal init(accentColor: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast:Bool) {
+    internal init(accentColor: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast: Bool) {
         let backgroundColor:Color = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
         let friendMessageColor:Color = background.getFriendMessageColor(improveContrast: improveContrast)
         self.init(

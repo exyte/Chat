@@ -67,7 +67,7 @@ public enum ThemedBackgroundStyle {
     /// The default system background tinted with the accent color (defaults to a value of 0.2)
     case mixedWithAccentColor(byAmount:Double = 0.2)
     
-    internal func getBackgroundColor(withAccent accentColor:Color, improveContrast:Bool) -> Color {
+    internal func getBackgroundColor(withAccent accentColor: Color, improveContrast: Bool) -> Color {
         switch self {
         case .systemDefault:
             return Color(UIColor.systemBackground)
@@ -98,9 +98,9 @@ public enum ThemedBackgroundStyle {
 
 @available(iOS 18.0, *)
 internal struct ThemedChatView: ViewModifier {
-    var accentColor:Color
-    var background:ThemedBackgroundStyle
-    var improveContrast:Bool
+    var accentColor: Color
+    var background: ThemedBackgroundStyle
+    var improveContrast: Bool
     
     func body(content: Content) -> some View {
         let backgroundColor = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
