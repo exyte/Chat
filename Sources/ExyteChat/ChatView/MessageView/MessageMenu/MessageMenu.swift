@@ -257,8 +257,6 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                     horizontalOffset = safeAreaInsets.leading
                 case .right:
                     horizontalOffset = -safeAreaInsets.trailing
-                default:
-                    horizontalOffset = 0
                 }
             }
             messageFrame = .init(
@@ -660,9 +658,7 @@ struct ScrollContainerModifier: ViewModifier {
     func body(content: Content) -> some View {
         if (viewState != .initial || viewState != .prepare), case .scrollView(let height) = style {
             ScrollView {
-                Color.clear.frame(height: 16)
                 content
-                Color.clear.frame(height: 16)
             }
             .clipped()
             .frame(maxHeight: height)
