@@ -175,8 +175,11 @@ struct MessageView: View {
             }
 
             if !message.text.isEmpty {
-                MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-                    .padding(.horizontal, MessageView.horizontalTextPadding)
+                MessageTextView(
+                    text: message.text, messageUseMarkdown: messageUseMarkdown,
+                    isCurrentUser: message.user.isCurrentUser
+                )
+                .padding(.horizontal, MessageView.horizontalTextPadding)
             }
 
             if let recording = message.recording {
@@ -227,9 +230,12 @@ struct MessageView: View {
 
     @ViewBuilder
     func textWithTimeView(_ message: Message) -> some View {
-        let messageView = MessageTextView(text: message.text, messageUseMarkdown: messageUseMarkdown)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.horizontal, MessageView.horizontalTextPadding)
+        let messageView = MessageTextView(
+            text: message.text, messageUseMarkdown: messageUseMarkdown,
+            isCurrentUser: message.user.isCurrentUser
+        )
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.horizontal, MessageView.horizontalTextPadding)
 
         let timeView = messageTimeView()
             .padding(.trailing, 12)
