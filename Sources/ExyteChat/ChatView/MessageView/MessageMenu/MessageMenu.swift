@@ -341,7 +341,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             if case .keyboard = previousState {
                 if case .scrollView = messageMenuStyle {
                     /// Ensure we still need our scroll view
-                    let contentHeight = calculateMessageMenuHeight(including: [.message, .reactionSelection, .menu])
+                    let rOHeight:CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
+                    let contentHeight = calculateMessageMenuHeight(including: [.message, .reactionSelection, .menu]) + rOHeight
                     let safeArea = safeAreaInsets.top + safeAreaInsets.bottom
                     if contentHeight > maxEntireHeight - safeArea {
                         messageMenuStyle = .scrollView(height: maxEntireHeight - safeArea)
