@@ -92,6 +92,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     @State private var messageMenuFrame: CGRect = .zero
     @State private var reactionSelectionHeight: CGFloat = .zero
     @State private var reactionOverviewHeight: CGFloat = .zero
+    @State private var reactionOverviewWidth: CGFloat = .zero
     @State private var menuHeight: CGFloat = .zero
     
     /// Controls whether or not the reaction selection view is rendered
@@ -156,8 +157,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             
             // Reaction Overview Rectangle
             if reactionOverviewIsVisible, case .vStack = messageMenuStyle {
-                ReactionOverview(viewModel: viewModel, message: message, backgroundColor: theme.colors.messageFriendBG)
-                    .frame(maxWidth: chatViewFrame.width - safeAreaInsets.leading - safeAreaInsets.trailing)
+                ReactionOverview(viewModel: viewModel, message: message, width: reactionOverviewWidth, backgroundColor: theme.colors.messageFriendBG, inScrollView: false)
+                    .frame(width: reactionOverviewWidth)
                     .maxHeightGetter($reactionOverviewHeight)
                     .offset(y: safeAreaInsets.top)
                     .transition(defaultTransition)
@@ -447,9 +448,10 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     func messageMenuView() -> some View {
         VStack(spacing: verticalSpacing) {
             if reactionOverviewIsVisible, case .scrollView = messageMenuStyle {
-                ReactionOverview(viewModel: viewModel, message: message, backgroundColor: theme.colors.messageFriendBG)
-                    .frame(maxWidth: chatViewFrame.width - safeAreaInsets.leading - safeAreaInsets.trailing)
-                    .offset(x: -safeAreaInsets.leading)
+                ReactionOverview(viewModel: viewModel, message: message, width: reactionOverviewWidth, backgroundColor: theme.colors.messageFriendBG, inScrollView: true)
+                    .frame(width: reactionOverviewWidth)
+                    .maxHeightGetter($reactionOverviewHeight)
+                    //.offset(y: safeAreaInsets.top)
                     .transition(defaultTransition)
                     .opacity(messageMenuOpacity)
             }
