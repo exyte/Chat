@@ -55,7 +55,7 @@ struct ReactionOverview: View {
                 .font(.title3)
                 .background(
                     emojiBackgroundView()
-                        .opacity(0.5)
+                        .opacity(0.1)
                         .padding(-10)
                 )
                 .padding(.top, 8)
@@ -80,9 +80,9 @@ struct ReactionOverview: View {
         GeometryReader { proxy in
             ZStack(alignment: .center) {
                 Circle()
-                    .fill(Color(UIColor.systemBackground))
+                    .fill(.primary)
                 Circle()
-                    .fill(Color(UIColor.systemBackground))
+                    .fill(.primary)
                     .frame(width: proxy.size.width / 4, height: proxy.size.width / 4)
                     .offset(y: proxy.size.height / 2)
             }
