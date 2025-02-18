@@ -8,6 +8,7 @@ import SwiftUI
 struct ReactionSelectionView: View {
     
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
     
     static let MaxSelectionRowWidth:CGFloat = 400
     
@@ -293,10 +294,10 @@ struct ReactionSelectionView: View {
             return .leastNonzeroMagnitude
         case .search, .picked:
             if alignment == .left {
-                let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - leadingPadding)
+                let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - leadingPadding) - safeAreaInsets.leading
                 return -((UIScreen.main.bounds.width - (additionalPadding + trailingPadding * 3) - (bubbleDiameter * 0.8)) - viewModel.messageFrame.maxX)
             } else {
-                let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - trailingPadding)
+                let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - trailingPadding) - safeAreaInsets.leading
                 return viewModel.messageFrame.minX - ((additionalPadding + trailingPadding * 3) + (bubbleDiameter * 0.8))
             }
         }
