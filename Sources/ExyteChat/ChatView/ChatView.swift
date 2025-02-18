@@ -405,7 +405,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             isShowingMenu: $isShowingMenu,
             message: row.message,
             cellFrame: cellFrame,
-            alignment: row.message.user.isCurrentUser ? .right : .left,
+            alignment: menuAlignment(row.message, chatType: type),
             positionInUserGroup: row.positionInUserGroup,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
@@ -423,7 +423,17 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
     }
     
-    /// Constructs our default reactionCallback flow if the user supports Reactions by implementing the didReactToMessage closure
+    /// Determines the message menu alignment based on ChatType and message sender.
+    private func menuAlignment(_ message: Message, chatType: ChatType) -> MessageMenuAlignment {
+        switch chatType {
+        case .conversation:
+            return message.user.isCurrentUser ? .right : .left
+        case .comments:
+            return .left
+        }
+    }
+    
+    /// Our default reactionCallback flow if the user supports Reactions by implementing the didReactToMessage closure
     private func reactionClosure(_ message: Message) -> (ReactionType?) -> () {
         return { reactionType in
             Task {
@@ -439,6 +449,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
     }
     
+    /// Our default Menu Action closure
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
         if let messageMenuAction {
             return { action in

@@ -482,7 +482,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                 .allowsHitTesting(false)
             
             if menuIsVisible {
-                menuView(isSender: message.user.isCurrentUser)
+                menuView()
                     .transition(defaultTransition)
             }
         }
@@ -507,10 +507,10 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     }
     
     @ViewBuilder
-    func menuView(isSender: Bool) -> some View {
+    func menuView() -> some View {
         let buttons = ActionEnum.allCases.enumerated().map { MenuButton(id: $0, action: $1) }
         HStack {
-            if isSender { Spacer() }
+            if alignment == .right { Spacer() }
             
             VStack {
                 ForEach(buttons) { button in
@@ -519,9 +519,9 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
             .menuContainer(menuStyle)
             
-            if !isSender { Spacer() }
+            if alignment == .left { Spacer() }
         }
-        .padding(isSender ? .trailing : .leading, isSender ? trailingPadding : leadingPadding)
+        .padding(alignment == .right ? .trailing : .leading, alignment == .right ? trailingPadding : leadingPadding)
         .padding(.top, 8)
         .maxHeightGetter($menuHeight)
         .frame(maxWidth: .infinity)
