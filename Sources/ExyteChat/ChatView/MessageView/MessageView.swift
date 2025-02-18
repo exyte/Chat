@@ -108,16 +108,8 @@ struct MessageView: View {
                                 .frame(width: 2)
                         }
                 }
-                if isDisplayingMessageMenu || message.reactions.isEmpty {
-                    bubbleView(message)
-                } else {
-                    ZStack(alignment: .top) {
-                        bubbleView(message)
-                        reactionsView(message)
-                    }
-                    // Sometimes the ZStack renders with a height larger than what's necessary, so we constrain it here.
-                    .frame(maxHeight: messageSize.height)
-                }
+
+                bubbleView(message)
             }
 
             if message.user.isCurrentUser, let status = message.status {
@@ -138,29 +130,34 @@ struct MessageView: View {
 
     @ViewBuilder
     func bubbleView(_ message: Message) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if !message.attachments.isEmpty {
-                attachmentsView(message)
-            }
-
-            if !message.text.isEmpty {
-                textWithTimeView(message)
-                    .font(Font(font))
-            }
-
-            if let recording = message.recording {
-                VStack(alignment: .trailing, spacing: 8) {
-                    recordingView(recording)
-                    messageTimeView()
-                        .padding(.bottom, 8)
-                        .padding(.trailing, 12)
+        ZStack(alignment: message.user.isCurrentUser ? .topLeading : .topTrailing) {
+            VStack(alignment: .leading, spacing: 0) {
+                if !message.attachments.isEmpty {
+                    attachmentsView(message)
+                }
+                
+                if !message.text.isEmpty {
+                    textWithTimeView(message)
+                        .font(Font(font))
+                }
+                
+                if let recording = message.recording {
+                    VStack(alignment: .trailing, spacing: 8) {
+                        recordingView(recording)
+                        messageTimeView()
+                            .padding(.bottom, 8)
+                            .padding(.trailing, 12)
+                    }
                 }
             }
-        }
-        .bubbleBackground(message, theme: theme)
-        .sizeGetter($messageSize)
-        .applyIf(isDisplayingMessageMenu) {
-            $0.frameGetter($viewModel.messageFrame)
+            .bubbleBackground(message, theme: theme)
+            .applyIf(isDisplayingMessageMenu) {
+                $0.frameGetter($viewModel.messageFrame)
+            }
+            
+            if !isDisplayingMessageMenu && !message.reactions.isEmpty {
+                reactionsView(message)
+            }
         }
     }
 

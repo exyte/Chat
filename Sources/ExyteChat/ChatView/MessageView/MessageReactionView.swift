@@ -38,14 +38,14 @@ extension MessageView {
                 )
             }
         }
-        .padding(.horizontal, -(bubbleSize.width / 2))
-        .frame(width: messageSize.width)
-        .offset(x: 0, y: -(bubbleSize.height / 1.5))
+        .offset(
+            x: message.user.isCurrentUser ? -(bubbleSize.height / 2) : (bubbleSize.height / 2),
+            y: -(bubbleSize.height / 1.5)
+        )
     }
     
     @ViewBuilder
     func overflowBubbleView(leadingSpacer:Bool, needsOverflowBubble:Bool, text:String, containsReactionFromCurrentUser:Bool) -> some View {
-        if leadingSpacer { Spacer() }
         if needsOverflowBubble {
             ReactionBubble(
                 reaction: .init(
@@ -62,7 +62,6 @@ extension MessageView {
             )
             .padding(message.user.isCurrentUser ? .trailing : .leading, -3)
         }
-        if !leadingSpacer { Spacer() }
     }
     
     struct PreparedReactions {
@@ -150,7 +149,7 @@ struct ReactionBubble: View {
                     // Otherwise just stroke the circle normally
                     } else {
                         Circle()
-                            .stroke(style: .init(lineWidth: 1))
+                            .stroke(style: .init(lineWidth: 2))
                             .fill(theme.colors.mainBG)
                     }
                 }
