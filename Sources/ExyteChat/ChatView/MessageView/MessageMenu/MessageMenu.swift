@@ -46,6 +46,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var cellFrame: CGRect
     /// Leading / Trailing message alignment
     var alignment: MessageMenuAlignment
+    /// The position in user group of the message
+    var positionInUserGroup: PositionInUserGroup
     /// Leading padding (includes space for avatar)
     var leadingPadding: CGFloat
     /// Trailing padding
@@ -224,7 +226,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             isShowingMenu = true
             
             /// Set our view state variables
-            reactionSelectionBottomPadding = message.reactions.isEmpty ? 2 : 6
+            reactionSelectionBottomPadding = positionInUserGroup == .middle || positionInUserGroup == .last ? 4 : 0
+            reactionOverviewWidth = chatViewFrame.width - safeAreaInsets.leading - safeAreaInsets.trailing
             reactionOverviewIsVisible = shouldShowReactionOverviewView
             reactionSelectionIsVisible = shouldShowReactionSelectionView
             menuIsVisible = true
@@ -264,9 +267,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                 height: viewModel.messageFrame.height
             )
             
-            // - TODO: Reference the cells PositionInUserGroup for the exact padding amount
             messageTopPadding = cellFrame.height - messageFrame.height
-            if !message.reactions.isEmpty { messageTopPadding = 4 }
+            if !message.reactions.isEmpty { messageTopPadding = positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4 }
             
             /// Calculate our vertical safe area insets
             let safeArea = safeAreaInsets.top + safeAreaInsets.bottom

@@ -406,6 +406,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             message: row.message,
             cellFrame: cellFrame,
             alignment: row.message.user.isCurrentUser ? .right : .left,
+            positionInUserGroup: row.positionInUserGroup,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
             font: messageFont,
