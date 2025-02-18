@@ -98,7 +98,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
 
     /// Updates a reaction's status after a random amount of time
     func delayUpdateReactionStatus(messageID: String, reactionID: String) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(.random(in: 500...2500))) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(.random(in: 1000...3500))) { [weak self] in
             guard let self else { return }
             if let matchIndex = self.chatState.value.firstIndex(where: { $0.uid == messageID }) {
                 let originalMessage = self.chatState.value[matchIndex]
@@ -107,7 +107,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
                     
                     var reactions = originalMessage.reactions
                     var status:Reaction.Status = .sent
-                    if Int.random(min: 0, max: 2) == 0 {
+                    if Int.random(min: 0, max: 20) == 0 {
                         status = .error(.init(id: originalReaction.id, messageID: originalMessage.uid, createdAt: originalReaction.createdAt, type: originalReaction.type))
                     }
                     reactions[reactionIndex] = .init(id: originalReaction.id, user: originalReaction.user, createdAt: originalReaction.createdAt, type: originalReaction.type, status: status)
