@@ -361,6 +361,12 @@ extension ReactionSelectionView {
     }
 }
 
+extension AnyTransition {
+    static var scaleAndFade: AnyTransition {
+        .scale.combined(with: .opacity)
+    }
+}
+
 internal struct InteriorRadialShadow: ViewModifier {
     var color:Color
     let innerRadius: CGFloat = 14
@@ -424,10 +430,4 @@ internal struct InteriorRadialShadow: ViewModifier {
         }
     }
     .frame(width: 400, height: 100)
-}
-
-extension AnyTransition {
-    static var scaleAndFade: AnyTransition {
-        .scale.combined(with: .opacity)
-    }
 }
