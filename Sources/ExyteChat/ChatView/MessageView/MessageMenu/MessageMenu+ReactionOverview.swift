@@ -12,8 +12,10 @@ struct ReactionOverview: View {
     @StateObject var viewModel: ChatViewModel
     
     let message: Message
+    let width: CGFloat
     let backgroundColor: Color
     let padding: CGFloat = 16
+    let inScrollView: Bool
     
     struct SortedReaction:Identifiable {
         var id: String { reaction.toString }
@@ -31,7 +33,7 @@ struct ReactionOverview: View {
                 }
                 Spacer()
             }
-            .frame(minWidth: UIScreen.main.bounds.width - (padding * 2))
+            .frame(minWidth: width - (padding * 2))
         }
         .scrollIndicators(.hidden)
         .frame(maxWidth: .infinity)
@@ -43,6 +45,7 @@ struct ReactionOverview: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
         )
         .padding(padding)
+        .offset(x: horizontalOffset)
     }
     
     @ViewBuilder
@@ -87,6 +90,15 @@ struct ReactionOverview: View {
         .compositingGroup()
     }
     
+    private var horizontalOffset: CGFloat {
+        guard inScrollView else { return 0 }
+        if message.user.isCurrentUser {
+            return safeAreaInsets.leading
+        } else {
+            return -safeAreaInsets.leading
+        }
+    }
+    
     private func sortReactions() -> [SortedReaction] {
         let mostRecent = message.reactions.sorted { $0.createdAt < $1.createdAt }
         let orderedEmojis = mostRecent.map(\.emoji)
@@ -125,6 +137,8 @@ struct ReactionOverview: View {
                 Reaction(user: sally, createdAt: Date.now.addingTimeInterval(-10), type: .emoji("🧠"))
             ]
         ),
-        backgroundColor: .black //Color(UIColor.secondarySystemBackground)
+        width: UIScreen.main.bounds.width,
+        backgroundColor: Color(UIColor.secondarySystemBackground),
+        inScrollView: false
     )
 }
