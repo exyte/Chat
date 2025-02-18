@@ -363,6 +363,8 @@ extension ReactionSelectionView {
 
 internal struct InteriorRadialShadow: ViewModifier {
     var color:Color
+    let innerRadius: CGFloat = 14
+    let outerRadius: CGFloat = 5
     
     func body(content: Content) -> some View {
         content.overlay(
@@ -370,10 +372,10 @@ internal struct InteriorRadialShadow: ViewModifier {
                 GeometryReader { proxy in
                     Capsule(style: .continuous)
                         .fill(
-                            RadialGradient(gradient: Gradient(colors: [.clear, color]), center: .center, startRadius: proxy.size.width / 2 - 18, endRadius: proxy.size.width / 2 - 5)
+                            RadialGradient(gradient: Gradient(colors: [.clear, color]), center: .center, startRadius: proxy.size.width / 2 - innerRadius, endRadius: proxy.size.width / 2 - outerRadius)
                         )
                         .overlay(
-                            RadialGradient(gradient: Gradient(colors: [.clear, color]), center: .center, startRadius: proxy.size.width / 2 - 18, endRadius: proxy.size.width / 2 - 5)
+                            RadialGradient(gradient: Gradient(colors: [.clear, color]), center: .center, startRadius: proxy.size.width / 2 - innerRadius, endRadius: proxy.size.width / 2 - outerRadius)
                                 .clipShape(Capsule(style: .continuous))
                         )
                 }
