@@ -72,11 +72,14 @@ struct CommentsExampleView: View {
                     defaultActionClosure(message, .reply)
                 case .edit:
                     defaultActionClosure(message, .edit { editedText in
-                        // update this message's text on your BE
+                        // update this message's text in your datasource
                         print(editedText)
                     })
                 case .delete:
-                    print("deleted")
+                    // delete this message in your datasource
+                    viewModel.messages.removeAll { msg in
+                        msg.id == message.id
+                    }
                 case .print:
                     print(message.text)
                 }

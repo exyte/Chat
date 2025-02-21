@@ -29,6 +29,7 @@ struct ChatExampleView: View {
         }
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
+        .messageReactionDelegate(viewModel)
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [
             SwipeAction(action: onReply, activeFor: { !$0.user.isCurrentUser }, background: .blue) {
                 VStack {

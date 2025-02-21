@@ -6,7 +6,8 @@ import Foundation
 import Combine
 import ExyteChat
 
-final class ChatExampleViewModel: ObservableObject {
+final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
+
     @Published var messages: [Message] = []
     
     var chatTitle: String {
@@ -30,6 +31,14 @@ final class ChatExampleViewModel: ObservableObject {
         interactor.send(draftMessage: draft)
     }
     
+    func remove(messageID: String) {
+        interactor.remove(messageID: messageID)
+    }
+
+    func didReact(to message: Message, reaction draftReaction: DraftReaction) {
+        interactor.add(draftReaction: draftReaction, to: draftReaction.messageID)
+    }
+
     func onStart() {
         interactor.messages
             .compactMap { messages in

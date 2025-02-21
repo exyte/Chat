@@ -66,6 +66,7 @@ struct MessageRow: Equatable {
         && lhs.message.status == rhs.message.status
         && lhs.message.triggerRedraw == rhs.message.triggerRedraw
         && lhs.message.text == rhs.message.text
+        && lhs.message.reactions == rhs.message.reactions
     }
 }
 

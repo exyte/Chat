@@ -58,6 +58,82 @@ final class MockChatInteractor: ChatInteractorProtocol {
             }
         }
     }
+    
+    func remove(messageID: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.chatState.value.removeAll(where: { $0.uid == messageID })
+        }
+    }
+    
+    /// Adds a reaction to an existing message
+    func add(draftReaction: ExyteChat.DraftReaction, to messageID: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if let matchIndex = self.chatState.value.firstIndex(where: { $0.uid == messageID }) {
+                let originalMessage = self.chatState.value[matchIndex]
+                let reaction = Reaction(user: self.chatData.tim.toChatUser(), type: draftReaction.type)
+                let newMessage = MockMessage(
+                    uid: originalMessage.uid,
+                    sender: originalMessage.sender,
+                    createdAt: originalMessage.createdAt,
+                    status: originalMessage.status,
+                    text: originalMessage.text,
+                    images: originalMessage.images,
+                    videos: originalMessage.videos,
+                    reactions: originalMessage.reactions + [reaction],
+                    recording: originalMessage.recording,
+                    replyMessage: originalMessage.replyMessage
+                )
+                print("Setting Reaction")
+                self.chatState.value[matchIndex] = newMessage
+                
+                // Update our message reaction status after a random delay...
+                delayUpdateReactionStatus(messageID: messageID, reactionID: reaction.id)
+                
+            } else {
+                print("No Match for Reaction")
+            }
+        }
+    }
+
+    /// Updates a reaction's status after a random amount of time
+    func delayUpdateReactionStatus(messageID: String, reactionID: String) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(.random(in: 1000...3500))) { [weak self] in
+            guard let self else { return }
+            if let matchIndex = self.chatState.value.firstIndex(where: { $0.uid == messageID }) {
+                let originalMessage = self.chatState.value[matchIndex]
+                if let reactionIndex = originalMessage.reactions.firstIndex(where: { $0.id == reactionID }) {
+                    let originalReaction = originalMessage.reactions[reactionIndex]
+                    
+                    var reactions = originalMessage.reactions
+                    var status:Reaction.Status = .sent
+                    if Int.random(min: 0, max: 20) == 0 {
+                        status = .error(.init(id: originalReaction.id, messageID: originalMessage.uid, createdAt: originalReaction.createdAt, type: originalReaction.type))
+                    }
+                    reactions[reactionIndex] = .init(id: originalReaction.id, user: originalReaction.user, createdAt: originalReaction.createdAt, type: originalReaction.type, status: status)
+                    
+                    let newMessage = MockMessage(
+                        uid: originalMessage.uid,
+                        sender: originalMessage.sender,
+                        createdAt: originalMessage.createdAt,
+                        status: originalMessage.status,
+                        text: originalMessage.text,
+                        images: originalMessage.images,
+                        videos: originalMessage.videos,
+                        reactions: reactions,
+                        recording: originalMessage.recording,
+                        replyMessage: originalMessage.replyMessage
+                    )
+                    
+                    self.chatState.value[matchIndex] = newMessage
+                } else {
+                    print("No Match for Reaction")
+                }
+            } else {
+                print("No Match for Message")
+            }
+        }
+    }
 
     func connect() {
         Timer.publish(every: 2, on: .main, in: .default)
@@ -100,7 +176,12 @@ private extension MockChatInteractor {
         }
         return (0...10)
             .map { index in
-                chatData.randomMessage(senders: senders, date: lastDate.randomTime())
+                // Generate a random message
+                var msg = chatData.randomMessage(senders: senders, date: lastDate.randomTime())
+                // 20% of the time, generate a random reaction to the message
+                if Int.random(in: 0...4) == 0 { msg = chatData.reactToMessage(msg, senders: senders) }
+                // Return the message
+                return msg
             }
             .sorted { lhs, rhs in
                 lhs.createdAt < rhs.createdAt
@@ -108,8 +189,17 @@ private extension MockChatInteractor {
     }
 
     func generateNewMessage() {
-        let message = chatData.randomMessage(senders: otherSenders)
-        chatState.value.append(message)
+        let idx = Int.random(min: 1, max: 10)
+        // 30% of the time, lets react to a previous and recent message
+        if idx <= 3, chatState.value.count >= idx {
+            let msgIndex = chatState.value.count - idx
+            let message = chatData.reactToMessage(chatState.value[msgIndex], senders: otherSenders)
+            chatState.value[msgIndex] = message
+        } else {
+            // 70% of the time just create a new random message
+            let message = chatData.randomMessage(senders: otherSenders)
+            chatState.value.append(message)
+        }
     }
 
     func updateSendingStatuses() {

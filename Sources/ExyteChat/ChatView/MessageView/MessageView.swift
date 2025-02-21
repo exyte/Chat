@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MessageView: View {
 
-    @Environment(\.chatTheme) private var theme
+    @Environment(\.chatTheme) var theme
 
     @ObservedObject var viewModel: ChatViewModel
 
@@ -21,11 +21,17 @@ struct MessageView: View {
     let messageUseMarkdown: Bool
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
+    var font: UIFont
 
     @State var avatarViewSize: CGSize = .zero
     @State var statusSize: CGSize = .zero
     @State var timeSize: CGSize = .zero
-
+    @State var messageSize: CGSize = .zero
+    
+    // The size of our reaction bubbles are based on the users font size,
+    // Therefore we need to capture it's rendered size in order to place it correctly
+    @State var bubbleSize: CGSize = .zero
+    
     static let widthWithMedia: CGFloat = 204
     static let horizontalNoAvatarPadding: CGFloat = 8
     static let horizontalAvatarPadding: CGFloat = 8
@@ -34,8 +40,6 @@ struct MessageView: View {
     static let statusViewSize: CGFloat = 14
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
-
-    var font: UIFont
 
     enum DateArrangement {
         case hstack, vstack, overlay
@@ -69,14 +73,17 @@ struct MessageView: View {
     }
 
     var showAvatar: Bool {
-        positionInUserGroup == .single
+        isDisplayingMessageMenu
+        || positionInUserGroup == .single
         || (chatType == .conversation && positionInUserGroup == .last)
         || (chatType == .comments && positionInUserGroup == .first)
     }
 
     var topPadding: CGFloat {
         if chatType == .comments { return 0 }
-        return positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        var amount:CGFloat = positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        if !message.reactions.isEmpty { amount += (bubbleSize.height / 1.5) }
+        return amount
     }
 
     var bottomPadding: CGFloat {
@@ -101,6 +108,7 @@ struct MessageView: View {
                                 .frame(width: 2)
                         }
                 }
+
                 bubbleView(message)
             }
 
@@ -122,26 +130,35 @@ struct MessageView: View {
 
     @ViewBuilder
     func bubbleView(_ message: Message) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if !message.attachments.isEmpty {
-                attachmentsView(message)
-            }
-
-            if !message.text.isEmpty {
-                textWithTimeView(message)
-                    .font(Font(font))
-            }
-
-            if let recording = message.recording {
-                VStack(alignment: .trailing, spacing: 8) {
-                    recordingView(recording)
-                    messageTimeView()
-                        .padding(.bottom, 8)
-                        .padding(.trailing, 12)
+        ZStack(alignment: message.user.isCurrentUser ? .topLeading : .topTrailing) {
+            VStack(alignment: .leading, spacing: 0) {
+                if !message.attachments.isEmpty {
+                    attachmentsView(message)
+                }
+                
+                if !message.text.isEmpty {
+                    textWithTimeView(message)
+                        .font(Font(font))
+                }
+                
+                if let recording = message.recording {
+                    VStack(alignment: .trailing, spacing: 8) {
+                        recordingView(recording)
+                        messageTimeView()
+                            .padding(.bottom, 8)
+                            .padding(.trailing, 12)
+                    }
                 }
             }
+            .bubbleBackground(message, theme: theme)
+            .applyIf(isDisplayingMessageMenu) {
+                $0.frameGetter($viewModel.messageFrame)
+            }
+            
+            if !isDisplayingMessageMenu && !message.reactions.isEmpty {
+                reactionsView(message)
+            }
         }
-        .bubbleBackground(message, theme: theme)
     }
 
     @ViewBuilder
@@ -319,6 +336,15 @@ struct MessageView_Preview: PreviewProvider {
             Attachment.randomImage(),
             Attachment.randomImage(),
             Attachment.randomImage(),
+        ],
+        reactions: [
+            Reaction(user: john, createdAt: Date.now.addingTimeInterval(-70), type: .emoji("🔥"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-60), type: .emoji("🥳"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-50), type: .emoji("🤠"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-40), type: .emoji("🧠"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-30), type: .emoji("🥳"), status: .sent),
+            Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-20), type: .emoji("🤯"), status: .sent),
+            Reaction(user: john, createdAt: Date.now.addingTimeInterval(-10), type: .emoji("🥰"), status: .sending)
         ]
     )
 

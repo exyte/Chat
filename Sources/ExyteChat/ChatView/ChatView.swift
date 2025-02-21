@@ -7,8 +7,6 @@
 
 import SwiftUI
 import GiphyUISDK
-import FloatingButton
-import SwiftUIIntrospect
 import ExyteMediaPicker
 
 public typealias MediaPickerParameters = SelectionParamsHolder
@@ -81,7 +79,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     let sections: [MessagesSection]
     let ids: [String]
     let didSendMessage: (DraftMessage) -> Void
-    
+    var reactionDelegate: ReactionDelegate?
+
     // MARK: - View builders
     
     /// provide custom message view builder
@@ -113,6 +112,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var showMessageMenuOnLongPress: Bool = true
+    var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
     var mediaPickerSelectionParameters: MediaPickerParameters?
@@ -133,35 +133,35 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
-    
-    @State private var giphyConfigured = false
+
+    /// Used to prevent the MainView from responding to keyboard changes while the Menu is active
     @State private var isShowingMenu = false
-    @State private var needsScrollView = false
-    @State private var readyToShowScrollView = false
-    @State private var menuButtonsSize: CGSize = .zero
+
     @State private var tableContentHeight: CGFloat = 0
     @State private var inputViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
-    @State private var menuCellPosition: CGPoint = .zero
-    @State private var menuBgOpacity: CGFloat = 0
-    @State private var menuCellOpacity: CGFloat = 0
-    @State private var menuScrollView: UIScrollView?
+
+    @State private var giphyConfigured = false
     @State private var selectedMedia: GPHMedia? = nil
     
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
                 didSendMessage: @escaping (DraftMessage) -> Void,
+                reactionDelegate: ReactionDelegate? = nil,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?) {
+                messageMenuAction: MessageMenuActionClosure?,
+                localization: ChatLocalization) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
+        self.localization = localization
     }
     
     public var body: some View {
@@ -262,6 +262,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 listWithButton
             }
         }
+        // Used to prevent ChatView movement during Emoji Keyboard invocation
+        .ignoresSafeArea(isShowingMenu ? .keyboard : [])
     }
     
     var waitingForNetwork: some View {
@@ -342,38 +344,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
             if let row = viewModel.messageMenuRow {
-                ZStack(alignment: .topLeading) {
-                    theme.colors.menuBG
-                        .opacity(menuBgOpacity)
-                        .ignoresSafeArea(.all)
-                    
-                    if needsScrollView {
-                        ScrollView {
-                            messageMenu(row)
-                        }
-                        .introspect(.scrollView, on: .iOS(.v16, .v17, .v18)) { scrollView in
-                            DispatchQueue.main.async {
-                                self.menuScrollView = scrollView
-                            }
-                        }
-                        .opacity(readyToShowScrollView ? 1 : 0)
-                    }
-                    if !needsScrollView || !readyToShowScrollView {
-                        messageMenu(row)
-                            .position(menuCellPosition)
-                    }
-                }
-                .onAppear {
-                    DispatchQueue.main.async {
-                        if let frame = cellFrames[row.id] {
-                            showMessageMenu(frame)
-                        }
-                    }
-                }
-                .onTapGesture {
-                    hideMessageMenu()
-                }
+                messageMenu(row)
+                    .onAppear(perform: showMessageMenu)
             }
+            
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) {
             self.cellFrames = $0
@@ -385,7 +359,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.didSendMessage = didSendMessage
             viewModel.inputViewModel = inputViewModel
             viewModel.globalFocusState = globalFocusState
-            
+
             inputViewModel.didSendMessage = { value in
                 Task { @MainActor in
                     didSendMessage(value)
@@ -398,7 +372,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
         }
     }
-    
+
     var inputView: some View {
         Group {
             if let inputViewBuilder = inputViewBuilder {
@@ -424,24 +398,58 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     func messageMenu(_ row: MessageRow) -> some View {
-        MessageMenu(
+        let cellFrame = cellFrames[row.id] ?? .zero
+
+        return MessageMenu(
+            viewModel: viewModel,
             isShowingMenu: $isShowingMenu,
-            menuButtonsSize: $menuButtonsSize,
             message: row.message,
-            alignment: row.message.user.isCurrentUser ? .right : .left,
+            cellFrame: cellFrame,
+            alignment: menuAlignment(row.message, chatType: type),
+            positionInUserGroup: row.positionInUserGroup,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
             font: messageFont,
-            onAction: menuActionClosure(row.message)) {
+            animationDuration: messageMenuAnimationDuration,
+            onAction: menuActionClosure(row.message),
+            reactionHandler: MessageMenu.ReactionConfig(
+                delegate: reactionDelegate,
+                didReact: reactionClosure(row.message)
+            )) {
                 ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {
                         hideMessageMenu()
                     }
             }
-            .frame(height: menuButtonsSize.height + (cellFrames[row.id]?.height ?? 0), alignment: .top)
-            .opacity(menuCellOpacity)
     }
     
+    /// Determines the message menu alignment based on ChatType and message sender.
+    private func menuAlignment(_ message: Message, chatType: ChatType) -> MessageMenuAlignment {
+        switch chatType {
+        case .conversation:
+            return message.user.isCurrentUser ? .right : .left
+        case .comments:
+            return .left
+        }
+    }
+    
+    /// Our default reactionCallback flow if the user supports Reactions by implementing the didReactToMessage closure
+    private func reactionClosure(_ message: Message) -> (ReactionType?) -> () {
+        return { reactionType in
+            Task {
+                // Run the callback on the main thread
+                await MainActor.run {
+                    // Hide the menu
+                    hideMessageMenu()
+                    // Send the draft reaction
+                    guard let reactionDelegate, let reactionType else { return }
+                    reactionDelegate.didReact(to: message, reaction: DraftReaction(messageID: message.id, type: reactionType))
+                }
+            }
+        }
+    }
+    
+    /// Our default Menu Action closure
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
         if let messageMenuAction {
             return { action in
@@ -456,54 +464,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         return { _ in }
     }
-    
-    func showMessageMenu(_ cellFrame: CGRect) {
-        DispatchQueue.main.async {
-            let wholeMenuHeight = menuButtonsSize.height + cellFrame.height
-            let needsScrollTemp = wholeMenuHeight > UIScreen.main.bounds.height - safeAreaInsets.top - safeAreaInsets.bottom
-            
-            menuCellPosition = CGPoint(x: cellFrame.midX, y: cellFrame.minY + wholeMenuHeight/2 - safeAreaInsets.top)
-            menuCellOpacity = 1
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                var finalCellPosition = menuCellPosition
-                if needsScrollTemp ||
-                    cellFrame.minY + wholeMenuHeight + safeAreaInsets.bottom > UIScreen.main.bounds.height {
-                    
-                    finalCellPosition = CGPoint(x: cellFrame.midX, y: UIScreen.main.bounds.height - wholeMenuHeight/2 - safeAreaInsets.top - safeAreaInsets.bottom
-                    )
-                }
-                
-                withAnimation(.linear(duration: 0.1)) {
-                    menuBgOpacity = 0.9
-                    menuCellPosition = finalCellPosition
-                    isShowingMenu = true
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                needsScrollView = needsScrollTemp
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                readyToShowScrollView = true
-                if let menuScrollView = menuScrollView {
-                    menuScrollView.contentOffset = CGPoint(x: 0, y: menuScrollView.contentSize.height - menuScrollView.frame.height + safeAreaInsets.bottom)
-                }
-            }
-        }
+
+    func showMessageMenu() {
+        isShowingMenu = true
     }
     
     func hideMessageMenu() {
-        menuScrollView = nil
-        withAnimation(.linear(duration: 0.1)) {
-            menuCellOpacity = 0
-            menuBgOpacity = 0
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            viewModel.messageMenuRow = nil
-            isShowingMenu = false
-            needsScrollView = false
-            readyToShowScrollView = false
-        }
+        viewModel.messageMenuRow = nil
+        viewModel.messageFrame = .zero
+        isShowingMenu = false
     }
     
     private func isGiphyAvailable() -> Bool {
@@ -660,5 +629,41 @@ public extension ChatView {
         return view
     }
     
+    /// Sets the general duration of various message menu animations
+    ///
+    /// This value is more akin to 'how snappy' the message menu feels
+    /// - Note: Good values are between 0.15 - 0.5 (defaults to 0.3)
+    /// - Important: This value is clamped between 0.1 and 1.0
+    func messageMenuAnimationDuration(_ duration:Double) -> ChatView {
+        var view = self
+        view.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
+        return view
+    }
+    
+    /// Sets a ReactionDelegate on the ChatView for handling and configuring message reactions
+    func messageReactionDelegate(_ configuration: ReactionDelegate) -> ChatView {
+        var view = self
+        view.reactionDelegate = configuration
+        return view
+    }
+    
+    /// Constructs, and applies, a ReactionDelegate for you based on the provided closures
+    func onMessageReaction(
+        didReactTo: @escaping (Message, DraftReaction) -> Void,
+        canReactTo: ((Message) -> Bool)? = nil,
+        availableReactionsFor: ((Message) -> [ReactionType]?)? = nil,
+        allowEmojiSearchFor: ((Message) -> Bool)? = nil,
+        shouldShowOverviewFor: ((Message) -> Bool)? = nil
+    ) -> ChatView {
+        var view = self
+        view.reactionDelegate = DefaultReactionConfiguration(
+            didReact: didReactTo,
+            canReact: canReactTo,
+            reactions: availableReactionsFor,
+            allowEmojiSearch: allowEmojiSearchFor,
+            shouldShowOverview: shouldShowOverviewFor
+        )
+        return view
+    }
 }
 

@@ -19,24 +19,6 @@
       }
     },
     {
-      "identity" : "giphy-ios-sdk",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Giphy/giphy-ios-sdk",
-      "state" : {
-        "revision" : "5afbf8ac89273a14ead2bd494b498a3fa46c6c56",
-        "version" : "2.2.14"
-      }
-    },
-    {
-      "identity" : "libwebp-xcode",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/libwebp-Xcode",
-      "state" : {
-        "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
-        "version" : "1.5.0"
-      }
-    },
-    {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
