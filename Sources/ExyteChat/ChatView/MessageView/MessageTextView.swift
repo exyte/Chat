@@ -13,7 +13,7 @@ struct MessageTextView: View {
 
     let text: String?
     let messageUseMarkdown: Bool
-    let isCurrentUser: Bool
+    let userType: UserType
 
     var styledText: AttributedString {
         let textToStyle = text ?? ""
@@ -28,9 +28,7 @@ struct MessageTextView: View {
                 AttributedString(stringLiteral: textToStyle)
             }
 
-        let color =
-            isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText
-        result.foregroundColor = color
+        result.foregroundColor = theme.colors.messageText(userType)
 
         for (link, range) in result.runs[\.link] {
             if link != nil {
@@ -52,9 +50,9 @@ struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
         MessageTextView(
             text: "Look at [this website](https://example.org)", messageUseMarkdown: true,
-            isCurrentUser: false)
+            userType: .other)
         MessageTextView(
             text: "Look at [this website](https://example.org)", messageUseMarkdown: false,
-            isCurrentUser: false)
+            userType: .other)
     }
 }

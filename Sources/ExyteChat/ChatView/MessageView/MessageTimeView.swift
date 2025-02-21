@@ -7,13 +7,13 @@ import SwiftUI
 struct MessageTimeView: View {
 
     let text: String
-    let isCurrentUser: Bool
+    let userType: UserType
     var chatTheme: ChatTheme
 
     var body: some View {
         Text(text)
             .font(.caption)
-            .foregroundColor(isCurrentUser ? chatTheme.colors.messageMyTimeText : chatTheme.colors.messageFriendTimeText)
+            .foregroundColor(chatTheme.colors.messageTimeText(userType))
     }
 }
 
