@@ -101,6 +101,10 @@ public struct ChatTheme {
         public var messageFriendBG: Color
         public var messageFriendText: Color
         public var messageFriendTimeText: Color
+        
+        public var messageSystemBG: Color
+        public var messageSystemText: Color
+        public var messageSystemTimeText: Color
 
         public var inputBG: Color
         public var inputText: Color
@@ -127,6 +131,9 @@ public struct ChatTheme {
             messageFriendBG: Color = Color("messageFriendBG", bundle: .current),
             messageFriendText: Color = Color("mainText", bundle: .current),
             messageFriendTimeText: Color = Color("messageFriendTimeText", bundle: .current),
+            messageSystemBG: Color = Color("messageFriendBG", bundle: .current),
+            messageSystemText: Color = Color("mainText", bundle: .current),
+            messageSystemTimeText: Color = Color("messageFriendTimeText", bundle: .current),
             inputBG: Color = Color("inputBG", bundle: .current),
             inputText: Color = Color("mainText", bundle: .current),
             inputPlaceholderText: Color = Color("inputPlaceholderText", bundle: .current),
@@ -148,6 +155,9 @@ public struct ChatTheme {
             self.messageFriendBG = messageFriendBG
             self.messageFriendText = messageFriendText
             self.messageFriendTimeText = messageFriendTimeText
+            self.messageSystemBG = messageSystemBG
+            self.messageSystemText = messageSystemText
+            self.messageSystemTimeText = messageSystemTimeText
             self.inputBG = inputBG
             self.inputText = inputText
             self.inputPlaceholderText = inputPlaceholderText

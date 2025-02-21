@@ -177,7 +177,7 @@ struct MessageView: View {
             if !message.text.isEmpty {
                 MessageTextView(
                     text: message.text, messageUseMarkdown: messageUseMarkdown,
-                    isCurrentUser: message.user.isCurrentUser
+                    userType: message.user.type
                 )
                 .padding(.horizontal, MessageView.horizontalTextPadding)
             }
@@ -232,7 +232,7 @@ struct MessageView: View {
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(
             text: message.text, messageUseMarkdown: messageUseMarkdown,
-            isCurrentUser: message.user.isCurrentUser
+            userType: message.user.type
         )
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, MessageView.horizontalTextPadding)
@@ -277,7 +277,7 @@ struct MessageView: View {
             recording: recording,
             colorButton: message.user.isCurrentUser ? theme.colors.messageMyBG : theme.colors.mainBG,
             colorButtonBg: message.user.isCurrentUser ? theme.colors.mainBG : theme.colors.messageMyBG,
-            colorWaveform: message.user.isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText
+            colorWaveform: theme.colors.messageText(message.user.type)
         )
         .padding(.horizontal, MessageView.horizontalTextPadding)
         .padding(.top, 8)
@@ -289,7 +289,7 @@ struct MessageView: View {
                 if needsCapsule {
                     MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
                 } else {
-                    MessageTimeView(text: message.time, isCurrentUser: message.user.isCurrentUser, chatTheme: theme)
+                    MessageTimeView(text: message.time, userType: message.user.type, chatTheme: theme)
                 }
             }
         }
@@ -305,12 +305,12 @@ extension View {
         let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
         self
             .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
-            .foregroundColor(message.user.isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText)
+            .foregroundColor(theme.colors.messageText(message.user.type))
             .background {
                 if isReply || !message.text.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: radius)
-                        .foregroundColor(message.user.isCurrentUser ? theme.colors.messageMyBG : theme.colors.messageFriendBG)
                         .opacity(isReply ? 0.5 : 1)
+                        .foregroundColor(theme.colors.messageBG(message.user.type))
                 }
             }
             .cornerRadius(radius)

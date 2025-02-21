@@ -130,7 +130,7 @@ struct ReactionBubble: View {
         Text(reaction.emoji ?? "?")
             .font(font)
             .opacity(opacity)
-            .foregroundStyle(reaction.user.isCurrentUser ? theme.colors.messageMyText : theme.colors.messageFriendText)
+            .foregroundStyle(theme.colors.messageText(reaction.user.type))
             .padding(6)
             .background(
                 ZStack {
