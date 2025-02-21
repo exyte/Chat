@@ -100,7 +100,7 @@ struct MessageView: View {
             VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 2) {
                 if !isDisplayingMessageMenu, let reply = message.replyMessage?.toMessage() {
                     replyBubbleView(reply)
-                        .opacity(0.5)
+                        .opacity(theme.style.replyOpacity)
                         .padding(message.user.isCurrentUser ? .trailing : .leading, 10)
                         .overlay(alignment: message.user.isCurrentUser ? .trailing : .leading) {
                             Capsule()
@@ -309,8 +309,8 @@ extension View {
             .background {
                 if isReply || !message.text.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: radius)
-                        .opacity(isReply ? 0.5 : 1)
                         .foregroundColor(theme.colors.messageBG(message.user.type))
+                        .opacity(isReply ? theme.style.replyOpacity : 1)
                 }
             }
             .cornerRadius(radius)
