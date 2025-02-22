@@ -383,7 +383,7 @@ public struct ChatTheme {
     public struct Style {
         public var replyOpacity: Double
         
-        public init(replyOpacity: Double = 0.5) {
+        public init(replyOpacity: Double = 0.8) {
             self.replyOpacity = replyOpacity
         }
     }
