@@ -30,6 +30,7 @@ struct ChatMessageView<MessageContent: View>: View {
                 messageBuilder(
                     row.message,
                     row.positionInUserGroup,
+                    row.positionInMessagesSection,
                     row.commentsPosition,
                     { viewModel.messageMenuRow = row },
                     viewModel.messageMenuAction()) { attachment in

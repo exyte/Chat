@@ -95,7 +95,7 @@ You may customize message cells like this:
 ```swift
 ChatView(messages: viewModel.messages) { draft in
     viewModel.send(draft: draft)
-} messageBuilder: { message, positionInUserGroup, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
+} messageBuilder: { message, positionInUserGroup, positionInMessagesSection, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
     VStack {
         Text(message.text)
         if !message.attachments.isEmpty {
@@ -109,6 +109,7 @@ ChatView(messages: viewModel.messages) { draft in
 `messageBuilder`'s parameters:  
 - `message` - the message containing user info, attachments, etc.   
 - `positionInUserGroup` - the position of the message in its continuous collection of messages from the same user    
+- `positionInMessagesSection` position of message in the section of messages from that day
 - `positionInCommentsGroup` - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)  
 - `showContextMenuClosure` - closure to show message context menu   
 - `messageActionClosure ` - closure to pass user interaction, .reply for example   
