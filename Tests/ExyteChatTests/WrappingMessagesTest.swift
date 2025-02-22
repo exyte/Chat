@@ -23,7 +23,7 @@ extension Tag {
     @Tag static var messageOrder: Self
     @Tag static var answerMode: Self
     @Tag static var quoteMode: Self
-    @Tag static var positionInUserGroup: Self
+    @Tag static var positionInUserGroupAndMessagesSection: Self
     @Tag static var positionInCommentsGroup: Self
 }
 
@@ -221,7 +221,8 @@ struct WrappingMessagesTest {
     }
 
     @Test(
-        "Single message has single position in user group", .tags(.positionInUserGroup),
+        "Single message has single position in user group",
+        .tags(.positionInUserGroupAndMessagesSection),
         arguments: ChatType.allCases, ReplyMode.allCases)
     func singleMessageHasSinglePositionInUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
         async throws
@@ -235,11 +236,13 @@ struct WrappingMessagesTest {
         #expect(sections.first?.rows.first?.id == singleMessage.id)
 
         #expect(sections.first?.rows.first?.positionInUserGroup == .single)
+        #expect(sections.first?.rows.first?.positionInMessagesSection == .single)
     }
 
     @Test(
         "Multiple messages from single user have top, middle and bottom positions in user group",
-        .tags(.positionInUserGroup), arguments: ChatType.allCases, ReplyMode.allCases)
+        .tags(.positionInUserGroupAndMessagesSection), arguments: ChatType.allCases,
+        ReplyMode.allCases)
     func multipleMessagesFromSingleUserHaveCorrectUserGroupPositions(
         for chatType: ChatType, and replyMode: ReplyMode
     ) async throws {
@@ -262,18 +265,29 @@ struct WrappingMessagesTest {
         switch chatType {
         case .comments:
             #expect(sections.first?.rows[0].positionInUserGroup == .first)
+            #expect(sections.first?.rows[0].positionInMessagesSection == .first)
+
             #expect(sections.first?.rows[1].positionInUserGroup == .middle)
+            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[2].positionInUserGroup == .last)
+            #expect(sections.first?.rows[2].positionInMessagesSection == .last)
         case .conversation:
             #expect(sections.first?.rows[2].positionInUserGroup == .first)
+            #expect(sections.first?.rows[2].positionInMessagesSection == .first)
+
             #expect(sections.first?.rows[1].positionInUserGroup == .middle)
+            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[0].positionInUserGroup == .last)
+            #expect(sections.first?.rows[0].positionInMessagesSection == .last)
         }
     }
 
     @Test(
         "Message from another user, in between many messages by another, splits the user group",
-        .tags(.positionInUserGroup), arguments: ChatType.allCases, ReplyMode.allCases)
+        .tags(.positionInUserGroupAndMessagesSection), arguments: ChatType.allCases,
+        ReplyMode.allCases)
     func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
         async throws
     {
@@ -297,22 +311,41 @@ struct WrappingMessagesTest {
         switch chatType {
         case .comments:
             #expect(sections.first?.rows[0].positionInUserGroup == .first)
+            #expect(sections.first?.rows[0].positionInMessagesSection == .first)
+
             #expect(sections.first?.rows[1].positionInUserGroup == .last)
+            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[2].positionInUserGroup == .single)
+            #expect(sections.first?.rows[2].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[3].positionInUserGroup == .first)
+            #expect(sections.first?.rows[3].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[4].positionInUserGroup == .last)
+            #expect(sections.first?.rows[4].positionInMessagesSection == .last)
         case .conversation:
             #expect(sections.first?.rows[4].positionInUserGroup == .first)
+            #expect(sections.first?.rows[4].positionInMessagesSection == .first)
+
             #expect(sections.first?.rows[3].positionInUserGroup == .last)
+            #expect(sections.first?.rows[3].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[2].positionInUserGroup == .single)
+            #expect(sections.first?.rows[2].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[1].positionInUserGroup == .first)
+            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+
             #expect(sections.first?.rows[0].positionInUserGroup == .last)
+            #expect(sections.first?.rows[0].positionInMessagesSection == .last)
         }
     }
 
     @Test(
         "Messages from the same user on different days should not be in the same user group",
-        .tags(.positionInUserGroup), arguments: ChatType.allCases, ReplyMode.allCases)
+        .tags(.positionInUserGroupAndMessagesSection), arguments: ChatType.allCases,
+        ReplyMode.allCases)
     func messagesOnDifferentDaysShouldBeInDifferentUserGroups(
         for chatType: ChatType, and replyMode: ReplyMode
     ) async throws {
@@ -329,7 +362,10 @@ struct WrappingMessagesTest {
         #expect(sections[0].rows.first?.id == message1.id)
 
         #expect(sections[1].rows.first?.positionInUserGroup == .single)
+        #expect(sections[1].rows.first?.positionInMessagesSection == .single)
+
         #expect(sections[0].rows.first?.positionInUserGroup == .single)
+        #expect(sections[0].rows.first?.positionInMessagesSection == .single)
     }
 
     @Test(

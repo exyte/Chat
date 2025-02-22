@@ -40,6 +40,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     viewModel: viewModel,
                     message: row.message,
                     positionInUserGroup: row.positionInUserGroup,
+                    positionInMessagesSection: row.positionInMessagesSection,
                     chatType: chatType,
                     avatarSize: avatarSize,
                     tapAvatarClosure: tapAvatarClosure,

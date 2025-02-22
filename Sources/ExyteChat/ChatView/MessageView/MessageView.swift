@@ -15,6 +15,7 @@ struct MessageView: View {
 
     let message: Message
     let positionInUserGroup: PositionInUserGroup
+    let positionInMessagesSection: PositionInMessagesSection
     let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
@@ -365,6 +366,7 @@ struct MessageView_Preview: PreviewProvider {
                 viewModel: ChatViewModel(),
                 message: replyedMessage,
                 positionInUserGroup: .single,
+                positionInMessagesSection: .single,
                 chatType: .conversation,
                 avatarSize: 32,
                 tapAvatarClosure: nil,

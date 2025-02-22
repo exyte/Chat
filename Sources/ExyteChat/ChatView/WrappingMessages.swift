@@ -111,10 +111,21 @@ extension ChatView {
                     positionInUserGroup = .last
                 }
 
+                let positionInMessagesSection: PositionInMessagesSection
+                if messages.count == 1 {
+                    positionInMessagesSection = .single
+                } else if !prevMessageExists {
+                    positionInMessagesSection = .first
+                } else if !nextMessageExists {
+                    positionInMessagesSection = .last
+                } else {
+                    positionInMessagesSection = .middle
+                }
+
                 if replyMode == .quote {
                     return MessageRow(
                         message: $0.element, positionInUserGroup: positionInUserGroup,
-                        commentsPosition: nil)
+                        positionInMessagesSection: positionInMessagesSection, commentsPosition: nil)
                 }
 
                 let nextMessageIsAReply = nextMessage?.replyMessage != nil
@@ -164,6 +175,7 @@ extension ChatView {
 
                 return MessageRow(
                     message: $0.element, positionInUserGroup: positionInUserGroup,
+                    positionInMessagesSection: positionInMessagesSection,
                     commentsPosition: commentsPosition)
             }
             .reversed()
