@@ -83,7 +83,7 @@ struct MessageView: View {
     var topPadding: CGFloat {
         let bubbleOffset = bubbleSize.height / 1.5
         if chatType == .comments { return 0 }
-        var amount: CGFloat = positionInUserGroup.isTop ? 8 : 4
+        var amount: CGFloat = positionInUserGroup.isTop && !positionInMessagesSection.isTop ? 8 : 4
         if !message.reactions.isEmpty { amount += bubbleOffset }
         return amount
     }

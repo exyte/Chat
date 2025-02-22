@@ -527,7 +527,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 } else {
                     Text(sections[section].formattedDate)
                         .font(.system(size: 11))
-                        .padding(10)
+                        .padding(.top, 30)
                         .padding(.bottom, 8)
                         .foregroundColor(.gray)
                 }
