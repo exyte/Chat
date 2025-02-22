@@ -49,13 +49,16 @@ extension View {
 public struct ChatTheme {
     public let colors: ChatTheme.Colors
     public let images: ChatTheme.Images
+    public let style: ChatTheme.Style
 
     public init(
         colors: ChatTheme.Colors = .init(),
-        images: ChatTheme.Images = .init()
+        images: ChatTheme.Images = .init(),
+        style: ChatTheme.Style = .init()
     ) {
         self.colors = colors
         self.images = images
+        self.style = style
     }
     
     internal init(accentColor: Color) {
@@ -374,6 +377,14 @@ public struct ChatTheme {
                 cancelReply: cancelReply ?? Image(systemName: "x.circle"),
                 replyToMessage: replyToMessage ?? Image(systemName: "arrow.uturn.left")
             )
+        }
+    }
+    
+    public struct Style {
+        public var replyOpacity: Double
+        
+        public init(replyOpacity: Double = 0.5) {
+            self.replyOpacity = replyOpacity
         }
     }
 }
