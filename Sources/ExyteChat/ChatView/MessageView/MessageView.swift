@@ -15,6 +15,7 @@ struct MessageView: View {
 
     let message: Message
     let positionInUserGroup: PositionInUserGroup
+    let positionInMessagesSection: PositionInMessagesSection
     let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
@@ -80,15 +81,16 @@ struct MessageView: View {
     }
 
     var topPadding: CGFloat {
-        if chatType == .comments { return 0 }
-        var amount:CGFloat = positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
-        if !message.reactions.isEmpty { amount += (bubbleSize.height / 1.5) }
+        let bubbleOffset = message.reactions.isEmpty ? 0 : bubbleSize.height / 1.5
+        if chatType == .comments { return bubbleOffset }
+        var amount: CGFloat = positionInUserGroup.isTop && !positionInMessagesSection.isTop ? 8 : 4
+        if !message.reactions.isEmpty { amount += bubbleOffset }
         return amount
     }
 
     var bottomPadding: CGFloat {
         if chatType == .conversation { return 0 }
-        return positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        return positionInUserGroup.isTop ? 8 : 4
     }
 
     var body: some View {
@@ -364,6 +366,7 @@ struct MessageView_Preview: PreviewProvider {
                 viewModel: ChatViewModel(),
                 message: replyedMessage,
                 positionInUserGroup: .single,
+                positionInMessagesSection: .single,
                 chatType: .conversation,
                 avatarSize: 32,
                 tapAvatarClosure: nil,

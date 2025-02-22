@@ -9,6 +9,21 @@ public enum PositionInUserGroup { // group from the same user
     case middle
     case last
     case single // the only message in its group
+
+    var isTop: Bool {
+        self == .first || self == .single
+    }
+}
+
+public enum PositionInMessagesSection { // messages within the same day
+    case first
+    case middle
+    case last
+    case single
+
+    var isTop: Bool {
+        self == .first || self == .single
+    }
 }
 
 // for comments reply mode only
@@ -57,11 +72,13 @@ public enum PositionInChat {
 struct MessageRow: Equatable {
     let message: Message
     let positionInUserGroup: PositionInUserGroup
+    let positionInMessagesSection: PositionInMessagesSection
     let commentsPosition: CommentsPosition?
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id
         && lhs.positionInUserGroup == rhs.positionInUserGroup
+        && lhs.positionInMessagesSection == rhs.positionInMessagesSection
         && lhs.commentsPosition == rhs.commentsPosition
         && lhs.message.status == rhs.message.status
         && lhs.message.triggerRedraw == rhs.message.triggerRedraw

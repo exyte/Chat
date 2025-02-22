@@ -26,6 +26,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     /// To build a custom message view use the following parameters passed by this closure:
     /// - message containing user, attachments, etc.
     /// - position of message in its continuous group of messages from the same user
+    /// - position of message in the section of messages from that day
     /// - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)
     /// - closure to show message context menu
     /// - closure to pass user interaction, .reply for example
@@ -33,6 +34,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     public typealias MessageBuilderClosure = ((
         _ message: Message,
         _ positionInGroup: PositionInUserGroup,
+        _ positionInMessagesSection: PositionInMessagesSection,
         _ positionInCommentsGroup: CommentsPosition?,
         _ showContextMenuClosure: @escaping () -> Void,
         _ messageActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,

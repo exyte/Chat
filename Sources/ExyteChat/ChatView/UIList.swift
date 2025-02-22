@@ -527,7 +527,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 } else {
                     Text(sections[section].formattedDate)
                         .font(.system(size: 11))
-                        .padding(10)
+                        .padding(.top, 30)
                         .padding(.bottom, 8)
                         .foregroundColor(.gray)
                 }
@@ -581,7 +581,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
     func formatRow(_ row: MessageRow) -> String {
         if let status = row.message.status {
-            return String("id: \(row.id) text: \(row.message.text) status: \(status) date: \(row.message.createdAt) position: \(row.positionInUserGroup) trigger: \(row.message.triggerRedraw)")
+            return String(
+                "id: \(row.id) text: \(row.message.text) status: \(status) date: \(row.message.createdAt) position in user group: \(row.positionInUserGroup) position in messages section: \(row.positionInMessagesSection) trigger: \(row.message.triggerRedraw)"
+            )
         }
         return ""
     }

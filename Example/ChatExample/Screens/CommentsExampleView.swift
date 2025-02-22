@@ -64,7 +64,9 @@ struct CommentsExampleView: View {
 
             ChatView(messages: viewModel.messages, chatType: .comments, replyMode: .answer) { draft in
                 viewModel.send(draft: draft)
-            } messageBuilder: { message, positionInGroup, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
+            } messageBuilder: {
+                message, positionInGroup, positionInMessagesSection, positionInCommentsGroup,
+                showContextMenuClosure, messageActionClosure, showAttachmentClosure in
                 messageCell(message, positionInCommentsGroup, showMenuClosure: showContextMenuClosure, actionClosure: messageActionClosure, attachmentClosure: showAttachmentClosure)
             } messageMenuAction: { (action: Action, defaultActionClosure, message) in
                 switch action {

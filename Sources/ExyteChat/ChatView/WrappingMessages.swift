@@ -100,19 +100,32 @@ extension ChatView {
                 let nextMessageIsSameUser = nextMessage?.user.id == message.user.id
                 let prevMessageIsSameUser = prevMessage?.user.id == message.user.id
 
-                let position: PositionInUserGroup
+                let positionInUserGroup: PositionInUserGroup
                 if nextMessageExists, nextMessageIsSameUser, prevMessageIsSameUser {
-                    position = .middle
+                    positionInUserGroup = .middle
                 } else if !nextMessageExists || !nextMessageIsSameUser, !prevMessageIsSameUser {
-                    position = .single
+                    positionInUserGroup = .single
                 } else if nextMessageExists, nextMessageIsSameUser {
-                    position = .first
+                    positionInUserGroup = .first
                 } else {
-                    position = .last
+                    positionInUserGroup = .last
+                }
+
+                let positionInMessagesSection: PositionInMessagesSection
+                if messages.count == 1 {
+                    positionInMessagesSection = .single
+                } else if !prevMessageExists {
+                    positionInMessagesSection = .first
+                } else if !nextMessageExists {
+                    positionInMessagesSection = .last
+                } else {
+                    positionInMessagesSection = .middle
                 }
 
                 if replyMode == .quote {
-                    return MessageRow(message: $0.element, positionInUserGroup: position, commentsPosition: nil)
+                    return MessageRow(
+                        message: $0.element, positionInUserGroup: positionInUserGroup,
+                        positionInMessagesSection: positionInMessagesSection, commentsPosition: nil)
                 }
 
                 let nextMessageIsAReply = nextMessage?.replyMessage != nil
@@ -156,9 +169,14 @@ extension ChatView {
                     positionInChat = .middle
                 }
 
-                let commentsPosition = CommentsPosition(inCommentsGroup: positionInComments, inSection: positionInSection, inChat: positionInChat)
+                let commentsPosition = CommentsPosition(
+                    inCommentsGroup: positionInComments, inSection: positionInSection,
+                    inChat: positionInChat)
 
-                return MessageRow(message: $0.element, positionInUserGroup: position, commentsPosition: commentsPosition)
+                return MessageRow(
+                    message: $0.element, positionInUserGroup: positionInUserGroup,
+                    positionInMessagesSection: positionInMessagesSection,
+                    commentsPosition: commentsPosition)
             }
             .reversed()
     }
