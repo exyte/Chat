@@ -9,6 +9,10 @@ public enum PositionInUserGroup { // group from the same user
     case middle
     case last
     case single // the only message in its group
+
+    var isTop: Bool {
+        self == .first || self == .single
+    }
 }
 
 // for comments reply mode only

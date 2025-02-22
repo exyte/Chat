@@ -267,7 +267,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             )
             
             messageTopPadding = cellFrame.height - messageFrame.height
-            if !message.reactions.isEmpty { messageTopPadding = positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4 }
+            if !message.reactions.isEmpty { messageTopPadding = positionInUserGroup.isTop ? 8 : 4 }
             
             /// Calculate our vertical safe area insets
             let safeArea = safeAreaInsets.top + safeAreaInsets.bottom

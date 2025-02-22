@@ -81,14 +81,14 @@ struct MessageView: View {
 
     var topPadding: CGFloat {
         if chatType == .comments { return 0 }
-        var amount:CGFloat = positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        var amount: CGFloat = positionInUserGroup.isTop ? 8 : 4
         if !message.reactions.isEmpty { amount += (bubbleSize.height / 1.5) }
         return amount
     }
 
     var bottomPadding: CGFloat {
         if chatType == .conversation { return 0 }
-        return positionInUserGroup == .single || positionInUserGroup == .first ? 8 : 4
+        return positionInUserGroup.isTop ? 8 : 4
     }
 
     var body: some View {
