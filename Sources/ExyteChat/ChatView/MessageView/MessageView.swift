@@ -132,34 +132,33 @@ struct MessageView: View {
 
     @ViewBuilder
     func bubbleView(_ message: Message) -> some View {
-        ZStack(alignment: message.user.isCurrentUser ? .topLeading : .topTrailing) {
-            VStack(alignment: .leading, spacing: 0) {
-                if !message.attachments.isEmpty {
-                    attachmentsView(message)
-                }
-                
-                if !message.text.isEmpty {
-                    textWithTimeView(message)
-                        .font(Font(font))
-                }
-                
-                if let recording = message.recording {
-                    VStack(alignment: .trailing, spacing: 8) {
-                        recordingView(recording)
-                        messageTimeView()
-                            .padding(.bottom, 8)
-                            .padding(.trailing, 12)
-                    }
-                }
-            }
-            .bubbleBackground(message, theme: theme)
-            .applyIf(isDisplayingMessageMenu) {
-                $0.frameGetter($viewModel.messageFrame)
+        VStack(alignment: .leading, spacing: 0) {
+            if !message.attachments.isEmpty {
+                attachmentsView(message)
             }
             
+            if !message.text.isEmpty {
+                textWithTimeView(message)
+                    .font(Font(font))
+            }
+            
+            if let recording = message.recording {
+                VStack(alignment: .trailing, spacing: 8) {
+                    recordingView(recording)
+                    messageTimeView()
+                        .padding(.bottom, 8)
+                        .padding(.trailing, 12)
+                }
+            }
+        }
+        .bubbleBackground(message, theme: theme)
+        .overlay(alignment: message.user.isCurrentUser ? .topLeading : .topTrailing) {
             if !isDisplayingMessageMenu && !message.reactions.isEmpty {
                 reactionsView(message)
             }
+        }
+        .applyIf(isDisplayingMessageMenu) {
+            $0.frameGetter($viewModel.messageFrame)
         }
     }
 
@@ -324,7 +323,8 @@ struct MessageView_Preview: PreviewProvider {
     static let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
     static let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
 
-    static private var shortMessage = "Hi, buddy!"
+    static private var extraShortText = "Sss"
+    static private var shortText = "Hi, buddy!"
     static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
 
     static private var replyedMessage = Message(
@@ -354,10 +354,17 @@ struct MessageView_Preview: PreviewProvider {
         id: UUID().uuidString,
         user: stan,
         status: .read,
-        text: shortMessage,
+        text: shortText,
         replyMessage: replyedMessage.toReplyMessage()
     )
 
+    static private var shortMessage = Message(
+        id: UUID().uuidString,
+        user: stan,
+        status: .read,
+        text: extraShortText
+    )
+    
     static var previews: some View {
         ZStack {
             Color.yellow.ignoresSafeArea()
