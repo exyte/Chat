@@ -81,11 +81,8 @@ struct MessageView: View {
     }
 
     var topPadding: CGFloat {
-        let bubbleOffset = message.reactions.isEmpty ? 0 : bubbleSize.height / 1.5
-        if chatType == .comments { return bubbleOffset }
-        var amount: CGFloat = positionInUserGroup.isTop && !positionInMessagesSection.isTop ? 8 : 4
-        if !message.reactions.isEmpty { amount += bubbleOffset }
-        return amount
+        if chatType == .comments { return 0 }
+        return positionInUserGroup.isTop && !positionInMessagesSection.isTop ? 8 : 4
     }
 
     var bottomPadding: CGFloat {
@@ -132,7 +129,15 @@ struct MessageView: View {
 
     @ViewBuilder
     func bubbleView(_ message: Message) -> some View {
-        ZStack(alignment: message.user.isCurrentUser ? .topLeading : .topTrailing) {
+        VStack(
+            alignment: message.user.isCurrentUser ? .leading : .trailing,
+            spacing: -bubbleSize.height / 3
+        ) {
+            if !isDisplayingMessageMenu && !message.reactions.isEmpty {
+                reactionsView(message)
+                    .zIndex(1)
+            }
+            
             VStack(alignment: .leading, spacing: 0) {
                 if !message.attachments.isEmpty {
                     attachmentsView(message)
@@ -153,13 +158,10 @@ struct MessageView: View {
                 }
             }
             .bubbleBackground(message, theme: theme)
-            .applyIf(isDisplayingMessageMenu) {
-                $0.frameGetter($viewModel.messageFrame)
-            }
-            
-            if !isDisplayingMessageMenu && !message.reactions.isEmpty {
-                reactionsView(message)
-            }
+            .zIndex(0)
+        }
+        .applyIf(isDisplayingMessageMenu) {
+            $0.frameGetter($viewModel.messageFrame)
         }
     }
 
@@ -324,14 +326,15 @@ struct MessageView_Preview: PreviewProvider {
     static let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
     static let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
 
-    static private var shortMessage = "Hi, buddy!"
-    static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
+    static private var extraShortText = "Sss"
+    static private var shortText = "Hi, buddy!"
+    static private var longText = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
 
     static private var replyedMessage = Message(
         id: UUID().uuidString,
         user: stan,
         status: .read,
-        text: longMessage,
+        text: longText,
         attachments: [
             Attachment.randomImage(),
             Attachment.randomImage(),
@@ -354,10 +357,17 @@ struct MessageView_Preview: PreviewProvider {
         id: UUID().uuidString,
         user: stan,
         status: .read,
-        text: shortMessage,
+        text: shortText,
         replyMessage: replyedMessage.toReplyMessage()
     )
 
+    static private var shortMessage = Message(
+        id: UUID().uuidString,
+        user: stan,
+        status: .read,
+        text: extraShortText
+    )
+    
     static var previews: some View {
         ZStack {
             Color.yellow.ignoresSafeArea()
