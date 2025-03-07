@@ -11,21 +11,19 @@ struct MessageTextView: View {
 
     @Environment(\.chatTheme) private var theme
 
-    let text: String?
+    let text: String
     let messageUseMarkdown: Bool
     let userType: UserType
 
     var styledText: AttributedString {
-        let textToStyle = text ?? ""
-
         var result =
             if messageUseMarkdown,
                 let attributed = try? AttributedString(
-                    markdown: textToStyle, options: String.markdownOptions)
+                    markdown: text, options: String.markdownOptions)
             {
                 attributed
             } else {
-                AttributedString(stringLiteral: textToStyle)
+                AttributedString(stringLiteral: text)
             }
 
         result.foregroundColor = theme.colors.messageText(userType)
