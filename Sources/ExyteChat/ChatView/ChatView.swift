@@ -600,8 +600,12 @@ public extension ChatView {
     }
     
     func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
+        return messageUseStyler(String.markdownStyler)
+    }
+
+    func messageUseStyler(_ styler: @escaping (String) -> AttributedString) -> ChatView {
         var view = self
-        view.messageStyler = String.markdownStyler
+        view.messageStyler = styler
         return view
     }
     
