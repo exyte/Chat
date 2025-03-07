@@ -90,7 +90,7 @@ struct InputView: View {
     var inputFieldId: UUID
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]
-    var messageUseMarkdown: Bool
+    var messageStyler: (String) -> AttributedString
     var recorderSettings: RecorderSettings = RecorderSettings()
     var localization: ChatLocalization
     
@@ -332,12 +332,7 @@ struct InputView: View {
     
     @ViewBuilder
     func textView(_ text: String) -> some View {
-        if messageUseMarkdown,
-           let attributed = try? AttributedString(markdown: text) {
-            Text(attributed)
-        } else {
-            Text(text)
-        }
+        Text(text.styled(using: messageStyler))
     }
     
     var attachButton: some View {

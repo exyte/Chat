@@ -19,7 +19,7 @@ struct MessageView: View {
     let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let messageUseMarkdown: Bool
+    let messageStyler: (String) -> AttributedString
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
     var font: UIFont
@@ -60,9 +60,11 @@ struct MessageView: View {
         - textPaddings
 
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
-        let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
-        let lastLineWidth = message.text.lastLineWidth(labelWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
-        let numberOfLines = message.text.numberOfLines(labelWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
+        let styledText = message.text.styled(using: messageStyler)
+
+        let finalWidth = styledText.width(withConstrainedWidth: maxWidth, font: font)
+        let lastLineWidth = styledText.lastLineWidth(labelWidth: maxWidth, font: font)
+        let numberOfLines = styledText.numberOfLines(labelWidth: maxWidth, font: font)
 
         if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
             return .hstack
@@ -178,7 +180,7 @@ struct MessageView: View {
 
             if !message.text.isEmpty {
                 MessageTextView(
-                    text: message.text, messageUseMarkdown: messageUseMarkdown,
+                    text: message.text, messageStyler: messageStyler,
                     userType: message.user.type
                 )
                 .padding(.horizontal, MessageView.horizontalTextPadding)
@@ -233,7 +235,7 @@ struct MessageView: View {
     @ViewBuilder
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(
-            text: message.text, messageUseMarkdown: messageUseMarkdown,
+            text: message.text, messageStyler: messageStyler,
             userType: message.user.type
         )
         .fixedSize(horizontal: false, vertical: true)
@@ -370,7 +372,7 @@ struct MessageView_Preview: PreviewProvider {
                 chatType: .conversation,
                 avatarSize: 32,
                 tapAvatarClosure: nil,
-                messageUseMarkdown: false,
+                messageStyler: AttributedString.init,
                 isDisplayingMessageMenu: false,
                 showMessageTimeView: true,
                 font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))

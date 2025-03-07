@@ -112,7 +112,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = true
     var avatarSize: CGFloat = 32
-    var messageUseMarkdown: Bool = false
+    var messageStyler: (String) -> AttributedString = AttributedString.init
     var showMessageMenuOnLongPress: Bool = true
     var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
@@ -223,7 +223,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
                     chatTitle: chatTitle,
-                    messageUseMarkdown: messageUseMarkdown,
+                    messageStyler: messageStyler,
                     orientationHandler: orientationHandler,
                     mediaPickerSelectionParameters: mediaPickerSelectionParameters,
                     availableInputs: availableInputs,
@@ -331,7 +331,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                showMessageMenuOnLongPress: showMessageMenuOnLongPress,
                tapAvatarClosure: tapAvatarClosure,
                paginationHandler: paginationHandler,
-               messageUseMarkdown: messageUseMarkdown,
+               messageStyler: messageStyler,
                showMessageTimeView: showMessageTimeView,
                messageFont: messageFont,
                sections: sections,
@@ -387,7 +387,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputFieldId: viewModel.inputFieldId,
                     style: .message,
                     availableInputs: availableInputs,
-                    messageUseMarkdown: messageUseMarkdown,
+                    messageStyler: messageStyler,
                     recorderSettings: recorderSettings,
                     localization: localization
                 )
@@ -418,7 +418,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 delegate: reactionDelegate,
                 didReact: reactionClosure(row.message)
             )) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
+                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
                     .onTapGesture {
                         hideMessageMenu()
                     }
@@ -601,7 +601,7 @@ public extension ChatView {
     
     func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
         var view = self
-        view.messageUseMarkdown = messageUseMarkdown
+        view.messageStyler = String.markdownStyler
         return view
     }
     

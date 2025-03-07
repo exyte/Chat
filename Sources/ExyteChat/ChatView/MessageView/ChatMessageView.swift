@@ -19,7 +19,7 @@ struct ChatMessageView<MessageContent: View>: View {
     let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let messageUseMarkdown: Bool
+    let messageStyler: (String) -> AttributedString
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
     let messageFont: UIFont
@@ -45,7 +45,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     chatType: chatType,
                     avatarSize: avatarSize,
                     tapAvatarClosure: tapAvatarClosure,
-                    messageUseMarkdown: messageUseMarkdown,
+                    messageStyler: messageStyler,
                     isDisplayingMessageMenu: isDisplayingMessageMenu,
                     showMessageTimeView: showMessageTimeView,
                     font: messageFont)

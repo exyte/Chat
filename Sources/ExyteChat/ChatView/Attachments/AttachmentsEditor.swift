@@ -23,7 +23,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     var inputViewBuilder: InputViewBuilderClosure?
     var chatTitle: String?
-    var messageUseMarkdown: Bool
+    var messageStyler: (String) -> AttributedString
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerParameters?
     var availableInputs: [AvailableInputType]
@@ -136,7 +136,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputFieldId: UUID(),
                     style: .signature,
                     availableInputs: availableInputs,
-                    messageUseMarkdown: messageUseMarkdown,
+                    messageStyler: messageStyler,
                     localization: localization
                 )
             }
