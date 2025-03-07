@@ -37,7 +37,11 @@ struct MessageTextView: View {
 
 struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageTextView(text: "Look at [this website](https://example.org)", messageStyler: AttributedString.init, userType: .other)
-        MessageTextView(text: "Look at [this website](https://example.org)", messageStyler: String.markdownStyler, userType: .other)
+        MessageTextView(
+            text: "Look at [this website](https://example.org)",
+            messageStyler: AttributedString.init, userType: .other)
+        MessageTextView(
+            text: "Look at [this website](https://example.org)",
+            messageStyler: String.markdownStyler, userType: .other)
     }
 }

@@ -315,28 +315,29 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     @ViewBuilder
     var list: some View {
-        UIList(viewModel: viewModel,
-               inputViewModel: inputViewModel,
-               isScrolledToBottom: $isScrolledToBottom,
-               shouldScrollToTop: $shouldScrollToTop,
-               tableContentHeight: $tableContentHeight,
-               messageBuilder: messageBuilder,
-               mainHeaderBuilder: mainHeaderBuilder,
-               headerBuilder: headerBuilder,
-               inputView: inputView,
-               type: type,
-               showDateHeaders: showDateHeaders,
-               isScrollEnabled: isScrollEnabled,
-               avatarSize: avatarSize,
-               showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-               tapAvatarClosure: tapAvatarClosure,
-               paginationHandler: paginationHandler,
-               messageStyler: messageStyler,
-               showMessageTimeView: showMessageTimeView,
-               messageFont: messageFont,
-               sections: sections,
-               ids: ids,
-               listSwipeActions: listSwipeActions
+        UIList(
+            viewModel: viewModel,
+            inputViewModel: inputViewModel,
+            isScrolledToBottom: $isScrolledToBottom,
+            shouldScrollToTop: $shouldScrollToTop,
+            tableContentHeight: $tableContentHeight,
+            messageBuilder: messageBuilder,
+            mainHeaderBuilder: mainHeaderBuilder,
+            headerBuilder: headerBuilder,
+            inputView: inputView,
+            type: type,
+            showDateHeaders: showDateHeaders,
+            isScrollEnabled: isScrollEnabled,
+            avatarSize: avatarSize,
+            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
+            tapAvatarClosure: tapAvatarClosure,
+            paginationHandler: paginationHandler,
+            messageStyler: messageStyler,
+            showMessageTimeView: showMessageTimeView,
+            messageFont: messageFont,
+            sections: sections,
+            ids: ids,
+            listSwipeActions: listSwipeActions
         )
         .applyIf(!isScrollEnabled) {
             $0.frame(height: tableContentHeight)
@@ -417,12 +418,18 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             reactionHandler: MessageMenu.ReactionConfig(
                 delegate: reactionDelegate,
                 didReact: reactionClosure(row.message)
-            )) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
-                    .onTapGesture {
-                        hideMessageMenu()
-                    }
+            )
+        ) {
+            ChatMessageView(
+                viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
+                avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
+                isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
+                messageFont: messageFont
+            )
+            .onTapGesture {
+                hideMessageMenu()
             }
+        }
     }
     
     /// Determines the message menu alignment based on ChatType and message sender.

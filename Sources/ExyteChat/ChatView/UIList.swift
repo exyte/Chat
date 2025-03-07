@@ -364,7 +364,16 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(viewModel: viewModel, inputViewModel: inputViewModel, isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop, messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder, headerBuilder: headerBuilder, type: type, showDateHeaders: showDateHeaders, avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress, tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler, messageStyler: messageStyler, showMessageTimeView: showMessageTimeView, messageFont: messageFont, sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
+        Coordinator(
+            viewModel: viewModel, inputViewModel: inputViewModel,
+            isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop,
+            messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder,
+            headerBuilder: headerBuilder, type: type, showDateHeaders: showDateHeaders,
+            avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress,
+            tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
+            messageStyler: messageStyler, showMessageTimeView: showMessageTimeView,
+            messageFont: messageFont, sections: sections, ids: ids,
+            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -399,7 +408,18 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let mainBackgroundColor: Color
         let listSwipeActions: ListSwipeActions
 
-        init(viewModel: ChatViewModel, inputViewModel: InputViewModel, isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>, messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (()->AnyView)?, headerBuilder: ((Date)->AnyView)?, type: ChatType, showDateHeaders: Bool, avatarSize: CGFloat, showMessageMenuOnLongPress: Bool, tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?, messageStyler: @escaping (String) -> AttributedString, showMessageTimeView: Bool, messageFont: UIFont, sections: [MessagesSection], ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil, listSwipeActions: ListSwipeActions) {
+        init(
+            viewModel: ChatViewModel, inputViewModel: InputViewModel,
+            isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>,
+            messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (() -> AnyView)?,
+            headerBuilder: ((Date) -> AnyView)?, type: ChatType, showDateHeaders: Bool,
+            avatarSize: CGFloat, showMessageMenuOnLongPress: Bool,
+            tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?,
+            messageStyler: @escaping (String) -> AttributedString, showMessageTimeView: Bool,
+            messageFont: UIFont, sections: [MessagesSection], ids: [String],
+            mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
+            listSwipeActions: ListSwipeActions
+        ) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
             self._isScrolledToBottom = isScrolledToBottom
@@ -542,19 +562,24 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure, messageStyler: messageStyler, isDisplayingMessageMenu: false, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
-                    .transition(.scale)
-                    .background(MessageMenuPreferenceViewSetter(id: row.id))
-                    .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
-                    .onTapGesture { }
-                    .applyIf(showMessageMenuOnLongPress) {
-                        $0.onLongPressGesture {
-                            // Trigger haptic feedback
-                            self.viewModel.impactGenerator.impactOccurred()
-                            // Launch the message menu
-                            self.viewModel.messageMenuRow = row
-                        }
+                ChatMessageView(
+                    viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
+                    avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure,
+                    messageStyler: messageStyler, isDisplayingMessageMenu: false,
+                    showMessageTimeView: showMessageTimeView, messageFont: messageFont
+                )
+                .transition(.scale)
+                .background(MessageMenuPreferenceViewSetter(id: row.id))
+                .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
+                .onTapGesture {}
+                .applyIf(showMessageMenuOnLongPress) {
+                    $0.onLongPressGesture {
+                        // Trigger haptic feedback
+                        self.viewModel.impactGenerator.impactOccurred()
+                        // Launch the message menu
+                        self.viewModel.messageMenuRow = row
                     }
+                }
             }
             .minSize(width: 0, height: 0)
             .margins(.all, 0)
