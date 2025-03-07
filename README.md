@@ -48,7 +48,7 @@
 - Can display a fullscreen menu on long press a message cell (automatically shows scroll for big messages)
 - Supports "reply to message" via message menu or through a closure. Remove and edit are **coming soon**
 - This library allows to send the following content in messages in any combination:
-    - Text with/without markdown
+    - Arbitrarily styled text with `AttributedString` or markdown
     - Photo/video
     - Audio recording
     **Coming soon:**
@@ -277,6 +277,7 @@ Please use `mediaPickerTheme` in a similar fashion to customize the built-in pho
 `avatarSize` - the default avatar is a circle, you can specify its diameter here 
 `tapAvatarClosure` - closure to call on avatar tap   
 `messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not
+`messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`
 `showMessageTimeView` - show timestamp in a corner of the message   
 `setMessageFont` - pass custom font to use for messages   
 

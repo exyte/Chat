@@ -11,23 +11,12 @@ struct MessageTextView: View {
 
     @Environment(\.chatTheme) private var theme
 
-    let text: String?
-    let messageUseMarkdown: Bool
+    let text: String
+    let messageStyler: (String) -> AttributedString
     let userType: UserType
 
     var styledText: AttributedString {
-        let textToStyle = text ?? ""
-
-        var result =
-            if messageUseMarkdown,
-                let attributed = try? AttributedString(
-                    markdown: textToStyle, options: String.markdownOptions)
-            {
-                attributed
-            } else {
-                AttributedString(stringLiteral: textToStyle)
-            }
-
+        var result = text.styled(using: messageStyler)
         result.foregroundColor = theme.colors.messageText(userType)
 
         for (link, range) in result.runs[\.link] {
@@ -49,10 +38,10 @@ struct MessageTextView: View {
 struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
         MessageTextView(
-            text: "Look at [this website](https://example.org)", messageUseMarkdown: true,
-            userType: .other)
+            text: "Look at [this website](https://example.org)",
+            messageStyler: AttributedString.init, userType: .other)
         MessageTextView(
-            text: "Look at [this website](https://example.org)", messageUseMarkdown: false,
-            userType: .other)
+            text: "Look at [this website](https://example.org)",
+            messageStyler: String.markdownStyler, userType: .other)
     }
 }

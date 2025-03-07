@@ -5,38 +5,24 @@
 import SwiftUI
 import UIKit
 
-extension String {
+extension AttributedString {
 
-    static func localizedFormat(key: String, _ args: CVarArg...) -> String {
-        let localizedString = NSLocalizedString(key, comment: "")
-        return String(format: localizedString, arguments: args)
-    }
-
-    static var markdownOptions = AttributedString.MarkdownParsingOptions(
-        allowsExtendedAttributes: false,
-        interpretedSyntax: .inlineOnlyPreservingWhitespace,
-        failurePolicy: .returnPartiallyParsedIfPossible,
-        languageCode: nil
-    )
-
-    func width(withConstrainedWidth width: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
+    func width(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown).boundingRect(with: constraintRect,
-                                                      options: .usesLineFragmentOrigin,
-                                                      context: nil)
+        let boundingBox = toAttrString(font: font).boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, context: nil)
 
         return ceil(boundingBox.width)
     }
 
-    func toAttrString(font: UIFont, messageUseMarkdown: Bool) -> NSAttributedString {
-        var str = messageUseMarkdown ? (try? AttributedString(markdown: self, options: String.markdownOptions)) ?? AttributedString(self) : AttributedString(self)
+    func toAttrString(font: UIFont) -> NSAttributedString {
+        var str = self
         str.setAttributes(AttributeContainer([.font: font]))
         return NSAttributedString(str)
     }
 
-    public func lastLineWidth(labelWidth: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
+    public func lastLineWidth(labelWidth: CGFloat, font: UIFont) -> CGFloat {
         // Create instances of NSLayoutManager, NSTextContainer and NSTextStorage
-        let attrString = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown)
+        let attrString = toAttrString(font: font)
         let availableSize = CGSize(width: labelWidth, height: .infinity)
         let layoutManager = NSLayoutManager()
         let textContainer = NSTextContainer(size: availableSize)
@@ -59,11 +45,12 @@ extension String {
         return lastLineFragmentRect.maxX
     }
 
-    func numberOfLines(labelWidth: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> Int {
-        let attrString = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown)
+    func numberOfLines(labelWidth: CGFloat, font: UIFont) -> Int {
+        let attrString = toAttrString(font: font)
         let availableSize = CGSize(width: labelWidth, height: .infinity)
         let textSize = attrString.boundingRect(with: availableSize, options: .usesLineFragmentOrigin, context: nil)
         let lineHeight = font.lineHeight
         return Int(ceil(textSize.height/lineHeight))
     }
+
 }

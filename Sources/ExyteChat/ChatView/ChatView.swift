@@ -112,7 +112,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = true
     var avatarSize: CGFloat = 32
-    var messageUseMarkdown: Bool = false
+    var messageStyler: (String) -> AttributedString = AttributedString.init
     var showMessageMenuOnLongPress: Bool = true
     var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
@@ -223,7 +223,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
                     chatTitle: chatTitle,
-                    messageUseMarkdown: messageUseMarkdown,
+                    messageStyler: messageStyler,
                     orientationHandler: orientationHandler,
                     mediaPickerSelectionParameters: mediaPickerSelectionParameters,
                     availableInputs: availableInputs,
@@ -315,28 +315,29 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     @ViewBuilder
     var list: some View {
-        UIList(viewModel: viewModel,
-               inputViewModel: inputViewModel,
-               isScrolledToBottom: $isScrolledToBottom,
-               shouldScrollToTop: $shouldScrollToTop,
-               tableContentHeight: $tableContentHeight,
-               messageBuilder: messageBuilder,
-               mainHeaderBuilder: mainHeaderBuilder,
-               headerBuilder: headerBuilder,
-               inputView: inputView,
-               type: type,
-               showDateHeaders: showDateHeaders,
-               isScrollEnabled: isScrollEnabled,
-               avatarSize: avatarSize,
-               showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-               tapAvatarClosure: tapAvatarClosure,
-               paginationHandler: paginationHandler,
-               messageUseMarkdown: messageUseMarkdown,
-               showMessageTimeView: showMessageTimeView,
-               messageFont: messageFont,
-               sections: sections,
-               ids: ids,
-               listSwipeActions: listSwipeActions
+        UIList(
+            viewModel: viewModel,
+            inputViewModel: inputViewModel,
+            isScrolledToBottom: $isScrolledToBottom,
+            shouldScrollToTop: $shouldScrollToTop,
+            tableContentHeight: $tableContentHeight,
+            messageBuilder: messageBuilder,
+            mainHeaderBuilder: mainHeaderBuilder,
+            headerBuilder: headerBuilder,
+            inputView: inputView,
+            type: type,
+            showDateHeaders: showDateHeaders,
+            isScrollEnabled: isScrollEnabled,
+            avatarSize: avatarSize,
+            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
+            tapAvatarClosure: tapAvatarClosure,
+            paginationHandler: paginationHandler,
+            messageStyler: messageStyler,
+            showMessageTimeView: showMessageTimeView,
+            messageFont: messageFont,
+            sections: sections,
+            ids: ids,
+            listSwipeActions: listSwipeActions
         )
         .applyIf(!isScrollEnabled) {
             $0.frame(height: tableContentHeight)
@@ -387,7 +388,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputFieldId: viewModel.inputFieldId,
                     style: .message,
                     availableInputs: availableInputs,
-                    messageUseMarkdown: messageUseMarkdown,
+                    messageStyler: messageStyler,
                     recorderSettings: recorderSettings,
                     localization: localization
                 )
@@ -417,12 +418,18 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             reactionHandler: MessageMenu.ReactionConfig(
                 delegate: reactionDelegate,
                 didReact: reactionClosure(row.message)
-            )) {
-                ChatMessageView(viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type, avatarSize: avatarSize, tapAvatarClosure: nil, messageUseMarkdown: messageUseMarkdown, isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView, messageFont: messageFont)
-                    .onTapGesture {
-                        hideMessageMenu()
-                    }
+            )
+        ) {
+            ChatMessageView(
+                viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
+                avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
+                isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
+                messageFont: messageFont
+            )
+            .onTapGesture {
+                hideMessageMenu()
             }
+        }
     }
     
     /// Determines the message menu alignment based on ChatType and message sender.
@@ -600,8 +607,12 @@ public extension ChatView {
     }
     
     func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
+        return messageUseStyler(String.markdownStyler)
+    }
+
+    func messageUseStyler(_ styler: @escaping (String) -> AttributedString) -> ChatView {
         var view = self
-        view.messageUseMarkdown = messageUseMarkdown
+        view.messageStyler = styler
         return view
     }
     
