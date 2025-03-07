@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct GiphyConfigKey: EnvironmentKey {
-    static var defaultValue: GiphyConfiguration = GiphyConfiguration()
-}
-
 struct ChatThemeKey: EnvironmentKey {
     static var defaultValue: ChatTheme = ChatTheme()
+}
+
+struct GiphyConfigKey: EnvironmentKey {
+    static var defaultValue: GiphyConfiguration = GiphyConfiguration()
 }
 
 extension EnvironmentValues {
@@ -30,10 +30,6 @@ extension EnvironmentValues {
 
 extension View {
 
-    public func giphyConfig(_ config: GiphyConfiguration) -> some View {
-        self.environment(\.giphyConfig, config)
-    }
-
     public func chatTheme(_ theme: ChatTheme) -> some View {
         self.environment(\.chatTheme, theme)
     }
@@ -43,6 +39,10 @@ extension View {
         images: ChatTheme.Images = .init()
     ) -> some View {
         self.environment(\.chatTheme, ChatTheme(colors: colors, images: images))
+    }
+
+    public func giphyConfig(_ config: GiphyConfiguration) -> some View {
+        self.environment(\.giphyConfig, config)
     }
 }
 
@@ -74,8 +74,8 @@ public struct ChatTheme {
     
     @available(iOS 18.0, *)
     internal init(accentColor: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast: Bool) {
-        let backgroundColor:Color = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
-        let friendMessageColor:Color = background.getFriendMessageColor(improveContrast: improveContrast, background: backgroundColor)
+        let backgroundColor: Color = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
+        let friendMessageColor: Color = background.getFriendMessageColor(improveContrast: improveContrast, background: backgroundColor)
         self.init(
             colors: .init(
                 mainBG: backgroundColor,
