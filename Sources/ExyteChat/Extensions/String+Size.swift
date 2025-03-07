@@ -12,13 +12,6 @@ extension String {
         return String(format: localizedString, arguments: args)
     }
 
-    static var markdownOptions = AttributedString.MarkdownParsingOptions(
-        allowsExtendedAttributes: false,
-        interpretedSyntax: .inlineOnlyPreservingWhitespace,
-        failurePolicy: .returnPartiallyParsedIfPossible,
-        languageCode: nil
-    )
-
     func width(withConstrainedWidth width: CGFloat, font: UIFont, messageUseMarkdown: Bool) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingBox = toAttrString(font: font, messageUseMarkdown: messageUseMarkdown).boundingRect(with: constraintRect,
