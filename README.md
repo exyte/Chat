@@ -279,6 +279,7 @@ Please use `mediaPickerTheme` in a similar fashion to customize the built-in pho
 `messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not
 `messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`
 `showMessageTimeView` - show timestamp in a corner of the message   
+`messageLinkPreviewLimit` - limit the maximum number of link previews per message
 `setMessageFont` - pass custom font to use for messages   
 
 ### makes sense only for built-in input view

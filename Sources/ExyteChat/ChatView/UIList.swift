@@ -38,6 +38,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let paginationHandler: PaginationHandler?
     let messageStyler: (String) -> AttributedString
     let showMessageTimeView: Bool
+    let messageLinkPreviewLimit: Int
     let messageFont: UIFont
     let sections: [MessagesSection]
     let ids: [String]
@@ -372,8 +373,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress,
             tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
             messageStyler: messageStyler, showMessageTimeView: showMessageTimeView,
-            messageFont: messageFont, sections: sections, ids: ids,
-            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
+            messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont,
+            sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBG,
+            listSwipeActions: listSwipeActions)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -396,6 +398,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let paginationHandler: PaginationHandler?
         let messageStyler: (String) -> AttributedString
         let showMessageTimeView: Bool
+        let messageLinkPreviewLimit: Int
         let messageFont: UIFont
         var sections: [MessagesSection] {
             didSet {
@@ -416,8 +419,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             avatarSize: CGFloat, showMessageMenuOnLongPress: Bool,
             tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?,
             messageStyler: @escaping (String) -> AttributedString, showMessageTimeView: Bool,
-            messageFont: UIFont, sections: [MessagesSection], ids: [String],
-            mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
+            messageLinkPreviewLimit: Int, messageFont: UIFont, sections: [MessagesSection],
+            ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
             listSwipeActions: ListSwipeActions
         ) {
             self.viewModel = viewModel
@@ -435,6 +438,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.paginationHandler = paginationHandler
             self.messageStyler = messageStyler
             self.showMessageTimeView = showMessageTimeView
+            self.messageLinkPreviewLimit = messageLinkPreviewLimit
             self.messageFont = messageFont
             self.sections = sections
             self.ids = ids
@@ -566,7 +570,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
                     avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure,
                     messageStyler: messageStyler, isDisplayingMessageMenu: false,
-                    showMessageTimeView: showMessageTimeView, messageFont: messageFont
+                    showMessageTimeView: showMessageTimeView,
+                    messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
                 )
                 .transition(.scale)
                 .background(MessageMenuPreferenceViewSetter(id: row.id))
