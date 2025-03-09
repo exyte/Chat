@@ -40,15 +40,19 @@ struct CachedLinkPillView: View {
     }
 
     var body: some View {
-        switch metadata {
-        case .placeholder(let url):
-            LinkPillView(url: url)
-                .onAppear {
-                    fetchMetadata(for: url)
-                }
-        case .enriched(let metadata):
-            LinkPillView(metadata: metadata)
+        // Use ZStack instead of Group as animation modifier doesn't work with Group.
+        ZStack {
+            switch metadata {
+            case .placeholder(let url):
+                LinkPillView(url: url)
+                    .onAppear {
+                        fetchMetadata(for: url)
+                    }
+            case .enriched(let metadata):
+                LinkPillView(metadata: metadata)
+            }
         }
+        .animation(.default, value: metadata)
     }
 
 }
