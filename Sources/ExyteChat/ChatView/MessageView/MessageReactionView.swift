@@ -40,7 +40,7 @@ extension MessageView {
         }
         .offset(
             x: message.user.isCurrentUser ? -(bubbleSize.height / 2) : (bubbleSize.height / 2),
-            y: -(bubbleSize.height / 1.5)
+            y: 0
         )
     }
     
