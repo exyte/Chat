@@ -386,12 +386,16 @@ private extension CachedAsyncImage {
 
 // MARK: - AsyncImageURLSession
 
-private class URLSessionTaskController: NSObject, URLSessionTaskDelegate {
+@MainActor
+private class URLSessionTaskController: NSObject,  URLSessionTaskDelegate {
 
-    var metrics: URLSessionTaskMetrics?
+    private(set) var metrics: URLSessionTaskMetrics?
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        self.metrics = metrics
+    nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+
+        DispatchQueue.main.async {
+            self.metrics = metrics
+        }
     }
 }
 
@@ -399,8 +403,8 @@ private class URLSessionTaskController: NSObject, URLSessionTaskDelegate {
 private extension URLSession {
 
     func data(for request: URLRequest) async throws -> (Data, URLResponse, URLSessionTaskMetrics) {
-        let controller = URLSessionTaskController()
+        let controller = await URLSessionTaskController()
         let (data, response) = try await data(for: request, delegate: controller)
-        return (data, response, controller.metrics!)
+        return await (data, response, controller.metrics!)
     }
 }

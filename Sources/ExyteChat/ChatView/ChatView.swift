@@ -73,7 +73,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.chatTheme) private var theme
     @Environment(\.giphyConfig) private var giphyConfig
-    @Environment(\.mediaPickerTheme) private var pickerTheme
     
     // MARK: - Parameters
     
@@ -201,8 +200,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     }
                 }
             }
-            .onChange(of: selectedMedia) { newValue in
-                if let giphyMedia = newValue {
+            .onChange(of: selectedMedia) {
+                if let giphyMedia = selectedMedia {
                     inputViewModel.attachments.giphyMedia = giphyMedia
                     inputViewModel.send()
                 }
@@ -232,13 +231,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 .environmentObject(globalFocusState)
             }
         
-            .onChange(of: inputViewModel.showPicker) {
-                if $0 {
+            .onChange(of: inputViewModel.showPicker) { _ , newValue in
+                if newValue {
                     globalFocusState.focus = nil
                 }
             }
-            .onChange(of: inputViewModel.showGiphyPicker) {
-                if $0 {
+            .onChange(of: inputViewModel.showGiphyPicker) { _ , newValue in
+                if newValue {
                     globalFocusState.focus = nil
                 }
             }
@@ -352,8 +351,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
             
         }
-        .onPreferenceChange(MessageMenuPreferenceKey.self) {
-            self.cellFrames = $0
+        .onPreferenceChange(MessageMenuPreferenceKey.self) { frames in
+            DispatchQueue.main.async {
+                self.cellFrames = frames
+            }
         }
         .onTapGesture {
             globalFocusState.focus = nil
@@ -570,7 +571,7 @@ public extension ChatView {
         view.mediaPickerSelectionParameters = params
         return view
     }
-    
+
     func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
         var view = self
         view.orientationHandler = orientationHandler

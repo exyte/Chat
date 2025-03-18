@@ -26,15 +26,12 @@ struct ConversationView: View {
         }
         .mediaPickerTheme(
             main: .init(
-                text: .white,
-                albumSelectionBackground: .examplePickerBg,
+                pickerText: .white,
+                pickerBackground: .examplePickerBg,
                 fullscreenPhotoBackground: .examplePickerBg
             ),
             selection: .init(
-                emptyTint: .white,
-                emptyBackground: .black.opacity(0.25),
-                selectedTint: .exampleBlue,
-                fullscreenTint: .white
+                accent: .exampleBlue
             )
         )
         .onDisappear {

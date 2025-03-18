@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -7,7 +7,7 @@ let package = Package(
     name: "Chat",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v17)
     ],
     products: [
         .library(
@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
-            from: "2.0.0"
+            from: "3.0.0"
         ),
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",

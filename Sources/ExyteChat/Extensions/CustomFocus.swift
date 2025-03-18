@@ -20,10 +20,10 @@ struct CustomFocus<T: Hashable>: ViewModifier {
         content
             .focused($focus, equals: true)
             .onChange(of: binding) {
-                focus = ($0 == equals)
+                focus = (binding == equals)
             }
             .onChange(of: focus) {
-                if $0 {
+                if focus {
                     binding = equals
                 }
             }

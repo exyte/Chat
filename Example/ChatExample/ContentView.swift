@@ -8,8 +8,8 @@ import ExyteMediaPicker
 struct ContentView: View {
     
     @State private var isAccent: Bool = true
-    @State private var color = Color("messageMyBG", bundle: .current)
-    
+    @State private var color = Color(.exampleBlue)
+
     var body: some View {
         NavigationView {
             List {
@@ -42,17 +42,19 @@ struct ContentView: View {
 
                     NavigationLink("Simple comments example") {
                         CommentsExampleView()
+                            .chatTheme(.init(colors: .init(
+                                inputSignatureBG: .white.opacity(0.5),
+                                inputSignatureText: .black,
+                                inputSignaturePlaceholderText: .black.opacity(0.7)
+                            )))
                             .mediaPickerTheme(
                                 main: .init(
-                                    text: .white,
-                                    albumSelectionBackground: .examplePickerBg,
-                                    fullscreenPhotoBackground: .examplePickerBg
+                                    pickerText: .white,
+                                    pickerBackground: Color(.examplePickerBg),
+                                    fullscreenPhotoBackground: Color(.examplePickerBg)
                                 ),
                                 selection: .init(
-                                    emptyTint: .white,
-                                    emptyBackground: .black.opacity(0.25),
-                                    selectedTint: .exampleBlue,
-                                    fullscreenTint: .white
+                                    accent: Color(.exampleBlue)
                                 )
                             )
                     }

@@ -4,18 +4,14 @@
 
 import Foundation
 
-public typealias ChatPaginationClosure = (Message) async -> Void
+public typealias ChatPaginationClosure = @Sendable (Message) async -> Void
 
-final class PaginationHandler: ObservableObject {
-    var handleClosure: ChatPaginationClosure
-    var pageSize: Int
+final actor PaginationHandler: ObservableObject {
+    let handleClosure: ChatPaginationClosure
+    let pageSize: Int
 
     init(handleClosure: @escaping ChatPaginationClosure, pageSize: Int) {
         self.handleClosure = handleClosure
         self.pageSize = pageSize
-    }
-
-    func handle(_ message: Message) async {
-        await handleClosure(message)
     }
 }

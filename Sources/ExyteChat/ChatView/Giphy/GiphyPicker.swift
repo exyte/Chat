@@ -5,11 +5,11 @@ import UIKit
 
 // https://github.com/Giphy/giphy-ios-sdk/blob/main/Docs.md
 public struct GiphyPicker: UIViewControllerRepresentable {
-    
-    @Binding private var selectedMedia: GPHMedia?
+
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
-    
+
+    @Binding private var selectedMedia: GPHMedia?
     private let giphyConfig: GiphyConfiguration
     
     init(
@@ -50,8 +50,8 @@ public struct GiphyPicker: UIViewControllerRepresentable {
         return GiphyPicker.Coordinator(parent: self, selectedMedia: $selectedMedia)
     }
     
-    public class Coordinator: NSObject, GiphyDelegate {
-        
+    public class Coordinator: NSObject, GiphyDelegate, @unchecked Sendable {
+
         @Binding var selectedMedia: GPHMedia?
         
         var parent: GiphyPicker
@@ -62,23 +62,22 @@ public struct GiphyPicker: UIViewControllerRepresentable {
         }
         
         public func didDismiss(controller: GiphyViewController?) {
-            self.parent.dismiss()
+            DispatchQueue.main.async {
+                self.parent.dismiss()
+            }
         }
         
         public func didSelectMedia(giphyViewController: GiphyViewController, media: GPHMedia) {
             
-            DispatchQueue.main.async {
-                let _ = Empty<Void, Never>()
-                    .sink(
-                        receiveCompletion: { _ in
-                            self.selectedMedia = media
-                        },
-                        receiveValue: { _ in }
-                    )
-                
+            DispatchQueue.main.async { [media] in
+                self.selectedMedia = media
                 self.parent.dismiss()
             }
         }
         
     }
+}
+
+extension GPHMedia: @retroactive @unchecked Sendable {
+
 }

@@ -9,21 +9,12 @@ import SwiftUI
 import ExyteMediaPicker
 import GiphyUISDK
 
-public enum InputViewStyle {
+public enum InputViewStyle: Sendable {
     case message
     case signature
-
-    var placeholder: String {
-        switch self {
-        case .message:
-            return "Type a message..."
-        case .signature:
-            return "Add signature..."
-        }
-    }
 }
 
-public enum InputViewAction {
+public enum InputViewAction: Sendable {
     case giphy
     case photo
     case add
@@ -44,7 +35,7 @@ public enum InputViewAction {
     case cancelEdit
 }
 
-public enum InputViewState {
+public enum InputViewState: Sendable {
     case empty
     case hasTextOrMedia
 
@@ -65,25 +56,25 @@ public enum InputViewState {
     }
 }
 
-public enum AvailableInputType {
-  case text
-  case media
-  case audio
-  case giphy
+public enum AvailableInputType: Sendable {
+    case text
+    case media
+    case audio
+    case giphy
 }
 
 public struct InputViewAttachments {
-  public var medias: [Media] = []
-  public var recording: Recording?
-  public var giphyMedia: GPHMedia?
-  public var replyMessage: ReplyMessage?
+    var medias: [Media] = []
+    var recording: Recording?
+    var giphyMedia: GPHMedia?
+    var replyMessage: ReplyMessage?
 }
 
 struct InputView: View {
     
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
-    
+
     @EnvironmentObject private var keyboardState: KeyboardState
     
     @ObservedObject var viewModel: InputViewModel
@@ -126,7 +117,7 @@ struct InputView: View {
                 }
                 .background {
                     RoundedRectangle(cornerRadius: 18)
-                        .fill(theme.colors.inputBG)
+                        .fill(style == .message ? theme.colors.inputBG : theme.colors.inputSignatureBG)
                 }
                 
                 rightOutsideButton
@@ -151,11 +142,11 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                if isGiphyAvailable() {
-                    giphyButton
-                }
                 if isMediaAvailable() {
                     attachButton
+                }
+                if isGiphyAvailable() {
+                    giphyButton
                 }
             case .signature:
                 if viewModel.mediaPickerMode == .cameraSelection {
@@ -341,7 +332,7 @@ struct InputView: View {
         } label: {
             theme.images.inputView.attach
                 .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
         }
     }
     
@@ -352,7 +343,7 @@ struct InputView: View {
             theme.images.inputView.sticker
                 .resizable()
                 .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
+                .padding(EdgeInsets(top: 12, leading: 6, bottom: 12, trailing: 12))
         }
     }
     
@@ -524,7 +515,9 @@ struct InputView: View {
                 .frame(width: 20)
                 
                 RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.mainText, addExtraDots: true) { progress in
-                    recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
+                    Task {
+                        await recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
+                    }
                 }
             }
             .padding(.horizontal, 8)
@@ -536,20 +529,21 @@ struct InputView: View {
         case .message:
             return theme.colors.mainBG
         case .signature:
-            return pickerTheme.main.albumSelectionBackground
+            return pickerTheme.main.pickerBackground
         }
     }
-    
-    
+
     func dragGesture() -> some Gesture {
         DragGesture(minimumDistance: 0.0, coordinateSpace: .global)
-            .onChanged { value in
+            .onChanged { [state] value in
                 if dragStart == nil {
                     dragStart = Date()
                     cancelGesture = false
                     tapDelayTimer = Timer.scheduledTimer(withTimeInterval: tapDelay, repeats: false) { _ in
                         if state != .isRecordingTap, state != .waitingForRecordingPermission {
-                            self.onAction(.recordAudioHold)
+                            DispatchQueue.main.async {
+                                self.onAction(.recordAudioHold)
+                            }
                         }
                     }
                 }
@@ -602,3 +596,13 @@ struct InputView: View {
     }
 }
 
+@MainActor
+func performBatchTableUpdates(_ tableView: UITableView, closure: ()->()) async {
+    await withCheckedContinuation { continuation in
+        tableView.performBatchUpdates {
+            closure()
+        } completion: { _ in
+            continuation.resume()
+        }
+    }
+}

@@ -96,8 +96,3 @@ struct ChatExampleView: View {
         defaultActions(message, .reply)
     }
 }
-
-extension Color {
-    static var exampleBlue = Color(hex: "#4962FF")
-    static var examplePickerBg = Color(hex: "1F1F1F")
-}

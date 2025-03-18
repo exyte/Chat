@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import UIKit
 
+@MainActor
 public final class KeyboardState: ObservableObject {
     @Published private(set) public var isShown: Bool = false
     @Published private(set) public var keyboardFrame: CGRect = .zero

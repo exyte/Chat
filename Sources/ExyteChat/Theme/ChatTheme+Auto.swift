@@ -14,8 +14,7 @@ extension View {
     /// - Parameters:
     ///   - color: The main accent color of your `ChatView`
     public func chatTheme(accentColor: Color) -> some View {
-        return self
-            .chatTheme(ChatTheme(accentColor: accentColor))
+        self.chatTheme(ChatTheme(accentColor: accentColor))
     }
 }
 
@@ -32,7 +31,7 @@ extension View {
     /// - Note: By default, this method mixes your theme `color` into the `ChatView`'s default background, if you don't want this behavior, you can set `background` to one of `.systemDefault`, or `.static(Color)`.
     @available(iOS 18.0, *)
     public func chatTheme(themeColor ac: Color, background: ThemedBackgroundStyle = .mixedWithAccentColor(), improveContrast: Bool = true) -> some View {
-        let accentColor:Color
+        let accentColor: Color
         if improveContrast {
             let luminance = ac.luminance
             let mixinColor = luminance > 0.7 ? Color.black : Color.white
@@ -46,11 +45,11 @@ extension View {
 }
 
 extension Color {
-    var luminance:Double {
-        var r:CGFloat = 0
-        var g:CGFloat = 0
-        var b:CGFloat = 0
-        var a:CGFloat = 0
+    var luminance: Double {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
         UIColor(self).getRed(&r, green: &g, blue: &b, alpha: &a)
         /// https://en.wikipedia.org/wiki/Relative_luminance
         let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
@@ -65,8 +64,8 @@ public enum ThemedBackgroundStyle {
     /// A static background color across both light and dark mode
     case `static`(Color)
     /// The default system background tinted with the accent color (defaults to a value of 0.2)
-    case mixedWithAccentColor(byAmount:Double = 0.2)
-    
+    case mixedWithAccentColor(byAmount: Double = 0.2)
+
     internal func getBackgroundColor(withAccent accentColor: Color, improveContrast: Bool) -> Color {
         switch self {
         case .systemDefault:
@@ -109,13 +108,12 @@ internal struct ThemedChatView: ViewModifier {
             .mediaPickerTheme(
                 .init(
                     main: .init(
-                        text: .primary,
-                        albumSelectionBackground: backgroundColor,
+                        pickerText: .primary,
+                        pickerBackground: backgroundColor,
                         fullscreenPhotoBackground: backgroundColor
                     ),
                     selection: .init(
-                        selectedTint: accentColor,
-                        fullscreenTint: accentColor
+                        accent: accentColor
                     )
                 )
             )

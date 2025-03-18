@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import ExyteMediaPicker
 
+@MainActor
 final class InputViewModel: ObservableObject {
 
     @Published var text = ""
@@ -30,7 +31,9 @@ final class InputViewModel: ObservableObject {
     private var subscriptions = Set<AnyCancellable>()
     
     func setRecorderSettings(recorderSettings: RecorderSettings = RecorderSettings()) {
-        self.recorder.recorderSettings = recorderSettings
+        Task {
+            await self.recorder.setRecorderSettings(recorderSettings)
+        }
     }
 
     func onStart() {
@@ -56,10 +59,11 @@ final class InputViewModel: ObservableObject {
     }
 
     func send() {
-        recorder.stopRecording()
-        recordingPlayer?.reset()
-        sendMessage()
-            .store(in: &subscriptions)
+        Task {
+            await recorder.stopRecording()
+            await recordingPlayer?.reset()
+            sendMessage()
+        }
     }
 
     func edit(_ closure: @escaping (String) -> Void) {
@@ -76,7 +80,7 @@ final class InputViewModel: ObservableObject {
     private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
         case .giphy:
-          showGiphyPicker = true
+            showGiphyPicker = true
         case .photo:
             mediaPickerMode = .photos
             showPicker = true
@@ -88,32 +92,44 @@ final class InputViewModel: ObservableObject {
         case .send:
             send()
         case .recordAudioTap:
-            state = recorder.isAllowedToRecordAudio ? .isRecordingTap : .waitingForRecordingPermission
-            recordAudio()
+            Task {
+                state = await recorder.isAllowedToRecordAudio ? .isRecordingTap : .waitingForRecordingPermission
+                recordAudio()
+            }
         case .recordAudioHold:
-            state = recorder.isAllowedToRecordAudio ? .isRecordingHold : .waitingForRecordingPermission
-            recordAudio()
+            Task {
+                state = await recorder.isAllowedToRecordAudio ? .isRecordingHold : .waitingForRecordingPermission
+                recordAudio()
+            }
         case .recordAudioLock:
             state = .isRecordingTap
         case .stopRecordAudio:
-            recorder.stopRecording()
-            if let _ = attachments.recording {
-                state = .hasRecording
+            Task {
+                await recorder.stopRecording()
+                if let _ = attachments.recording {
+                    state = .hasRecording
+                }
+                await recordingPlayer?.reset()
             }
-            recordingPlayer?.reset()
         case .deleteRecord:
-            unsubscribeRecordPlayer()
-            recorder.stopRecording()
-            attachments.recording = nil
+            Task {
+                unsubscribeRecordPlayer()
+                await recorder.stopRecording()
+                attachments.recording = nil
+            }
         case .playRecord:
             state = .playingRecording
             if let recording = attachments.recording {
-                subscribeRecordPlayer()
-                recordingPlayer?.play(recording)
+                Task {
+                    subscribeRecordPlayer()
+                    await recordingPlayer?.play(recording)
+                }
             }
         case .pauseRecord:
             state = .pausedRecording
-            recordingPlayer?.pause()
+            Task {
+                await recordingPlayer?.pause()
+            }
         case .saveEdit:
             saveEditingClosure?(text)
             reset()
@@ -123,10 +139,10 @@ final class InputViewModel: ObservableObject {
     }
 
     private func recordAudio() {
-        if recorder.isRecording {
-            return
+        Task {
+            if await recorder.isRecording { return }
         }
-        Task { @MainActor in
+        Task { @MainActor [recorder] in
             attachments.recording = Recording()
             let url = await recorder.startRecording { duration, samples in
                 DispatchQueue.main.async { [weak self] in
@@ -191,10 +207,14 @@ private extension InputViewModel {
     }
 
     func subscribeRecordPlayer() {
-        recordPlayerSubscription = recordingPlayer?.didPlayTillEnd
-            .sink { [weak self] in
-                self?.state = .hasRecording
+        Task { @MainActor in
+            if let recordingPlayer {
+                recordPlayerSubscription = recordingPlayer.didPlayTillEnd
+                    .sink { [weak self] in
+                        self?.state = .hasRecording
+                    }
             }
+        }
     }
 
     func unsubscribeRecordPlayer() {
@@ -203,67 +223,49 @@ private extension InputViewModel {
 }
 
 private extension InputViewModel {
-    
-    func mapAttachmentsForSend() -> AnyPublisher<[Attachment], Never> {
-        attachments.medias.publisher
-            .receive(on: DispatchQueue.global())
-            .asyncMap { media in
-                guard let thumbnailURL = await media.getThumbnailURL() else {
-                    return nil
-                }
 
-                switch media.type {
-                case .image:
-                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
-                case .video:
-                    guard let fullURL = await media.getURL() else {
-                        return nil
+    //alisa where to use?
+    func mapAttachmentsForSend() async -> [Attachment] {
+        await withTaskGroup(of: Attachment?.self) { group in
+            for media in attachments.medias {
+                group.addTask {
+                    guard let thumbnailURL = await media.getThumbnailURL() else { return nil }
+
+                    switch media.type {
+                    case .image:
+                        return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
+                    case .video:
+                        guard let fullURL = await media.getURL() else { return nil }
+                        return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
                     }
-                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
                 }
             }
-            .compactMap {
-                $0
+
+            // Collect results and filter out nil values
+            var results = [Attachment]()
+            for await attachment in group {
+                if let attachment = attachment {
+                    results.append(attachment)
+                }
             }
-            .collect()
-            .eraseToAnyPublisher()
+            return results
+        }
     }
 
-    func sendMessage() -> AnyCancellable {
+    func sendMessage() {
         showActivityIndicator = true
-        return mapAttachmentsForSend()
-            .compactMap { [attachments] _ in
-                DraftMessage(
-                    text: self.text,
-                    medias: attachments.medias,
-                    giphyMedia: attachments.giphyMedia,
-                    recording: attachments.recording,
-                    replyMessage: attachments.replyMessage,
-                    createdAt: Date()
-                )
-            }
-            .sink { [weak self] draft in
-                self?.didSendMessage?(draft)
-                DispatchQueue.main.async { [weak self] in
-                    self?.showActivityIndicator = false
-                    self?.reset()
-                }
-            }
-    }
-}
-
-extension Publisher {
-    func asyncMap<T>(
-        _ transform: @escaping (Output) async -> T
-    ) -> Publishers.FlatMap<Future<T, Never>, Self> {
-        flatMap { value in
-            Future { promise in
-                Task {
-                    let output = await transform(value)
-                    promise(.success(output))
-                }
-            }
+        let draft = DraftMessage(
+            text: self.text,
+            medias: attachments.medias,
+            giphyMedia: attachments.giphyMedia,
+            recording: attachments.recording,
+            replyMessage: attachments.replyMessage,
+            createdAt: Date()
+        )
+        didSendMessage?(draft)
+        DispatchQueue.main.async { [weak self] in
+            self?.showActivityIndicator = false
+            self?.reset()
         }
     }
 }
-

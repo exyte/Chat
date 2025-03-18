@@ -43,12 +43,16 @@ struct RecordWaveformWithButtons: View {
             .viewSize(40)
             .circleBackground(colorButtonBg)
             .onTapGesture {
-                recordPlayer.togglePlay(recording)
+                Task {
+                    await recordPlayer.togglePlay(recording)
+                }
             }
             
             VStack(alignment: .leading, spacing: 5) {
                 RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false) { progress in
-                    recordPlayer.seek(with: recording, to: progress)
+                    Task {
+                        await recordPlayer.seek(with: recording, to: progress)
+                    }
                 }
                 Text(DateFormatter.timeString(duration))
                     .font(.caption2)
@@ -57,7 +61,9 @@ struct RecordWaveformWithButtons: View {
             }
         }
         .onDisappear {
-            recordPlayer.pause()
+            Task {
+                await recordPlayer.pause()
+            }
         }
     }
 }

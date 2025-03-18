@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 extension String {
 
     private static var markdownOptions = AttributedString.MarkdownParsingOptions(

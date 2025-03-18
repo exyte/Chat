@@ -7,25 +7,13 @@
 
 import SwiftUI
 
-struct ChatThemeKey: EnvironmentKey {
-    static var defaultValue: ChatTheme = ChatTheme()
-}
-
-struct GiphyConfigKey: EnvironmentKey {
-    static var defaultValue: GiphyConfiguration = GiphyConfiguration()
+@MainActor
+extension EnvironmentValues {
+    @Entry var chatTheme = ChatTheme()
 }
 
 extension EnvironmentValues {
-
-    var chatTheme: ChatTheme {
-        get { self[ChatThemeKey.self] }
-        set { self[ChatThemeKey.self] = newValue }
-    }
-
-    var giphyConfig: GiphyConfiguration {
-        get { self[GiphyConfigKey.self] }
-        set { self[GiphyConfigKey.self] = newValue }
-    }
+    @Entry var giphyConfig = GiphyConfiguration()
 }
 
 extension View {
@@ -113,6 +101,10 @@ public struct ChatTheme {
         public var inputText: Color
         public var inputPlaceholderText: Color
 
+        public var inputSignatureBG: Color
+        public var inputSignatureText: Color
+        public var inputSignaturePlaceholderText: Color
+
         public var menuBG: Color
         public var menuText: Color
         public var menuTextDelete: Color
@@ -140,6 +132,9 @@ public struct ChatTheme {
             inputBG: Color = Color("inputBG", bundle: .current),
             inputText: Color = Color("mainText", bundle: .current),
             inputPlaceholderText: Color = Color("inputPlaceholderText", bundle: .current),
+            inputSignatureBG: Color = Color("inputBG", bundle: .current),
+            inputSignatureText: Color = Color("mainText", bundle: .current),
+            inputSignaturePlaceholderText: Color = Color("inputPlaceholderText", bundle: .current),
             menuBG: Color = Color("menuBG", bundle: .current),
             menuText: Color = Color("menuText", bundle: .current),
             menuTextDelete: Color = Color("menuTextDelete", bundle: .current),
@@ -164,6 +159,9 @@ public struct ChatTheme {
             self.inputBG = inputBG
             self.inputText = inputText
             self.inputPlaceholderText = inputPlaceholderText
+            self.inputSignatureBG = inputSignatureBG
+            self.inputSignatureText = inputSignatureText
+            self.inputSignaturePlaceholderText = inputSignaturePlaceholderText
             self.menuBG = menuBG
             self.menuText = menuText
             self.menuTextDelete = menuTextDelete

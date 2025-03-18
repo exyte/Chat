@@ -123,7 +123,7 @@ extension Message: Equatable {
     }
 }
 
-public struct Recording: Codable, Hashable {
+public struct Recording: Codable, Hashable, Sendable {
     public var duration: Double
     public var waveformSamples: [CGFloat]
     public var url: URL?

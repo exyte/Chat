@@ -14,7 +14,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderClosure
     
     @Environment(\.chatTheme) var theme
-    @Environment(\.mediaPickerTheme) var pickerTheme
+    @Environment(\.mediaPickerTheme) var mediaPickerTheme
+    @Environment(\.mediaPickerThemeIsOverridden) var mediaPickerThemeIsOverridden
 
     @EnvironmentObject private var keyboardState: KeyboardState
     @EnvironmentObject private var globalFocusState: GlobalFocusState
@@ -60,8 +61,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputView
                         .padding(.bottom, g.safeAreaInsets.bottom)
                 }
-                .background(theme.colors.mainBG)
-                .ignoresSafeArea()
+                .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
             } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
                 VStack {
                     cameraSelectionHeaderView(cancelClosure: cancelClosure)
@@ -71,7 +71,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputView
                         .padding(.bottom, g.safeAreaInsets.bottom)
                 }
-                .ignoresSafeArea()
+                .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
             }
             .didPressCancelCamera {
                 inputViewModel.showPicker = false
@@ -84,10 +84,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             .padding(.top)
             .background(theme.colors.mainBG)
             .ignoresSafeArea(.all)
-            .onChange(of: currentFullscreenMedia) { newValue in
+            .onChange(of: currentFullscreenMedia) {
                 assembleSelectedMedia()
             }
-            .onChange(of: inputViewModel.showPicker) { _ in
+            .onChange(of: inputViewModel.showPicker) {
                 let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
                 let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
 
@@ -96,17 +96,18 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                     inputViewModel.send()
                 }
             }
-            .mediaPickerTheme(
-                main: .init(
-                    text: theme.colors.mainText,
-                    albumSelectionBackground: theme.colors.mainBG,
-                    fullscreenPhotoBackground: theme.colors.mainBG
-                ),
-                selection: .init(
-                    selectedTint: theme.colors.sendButtonBackground,
-                    fullscreenTint: theme.colors.sendButtonBackground
+            .applyIf(!mediaPickerThemeIsOverridden) {
+                $0.mediaPickerTheme(
+                    main: .init(
+                        pickerText: theme.colors.mainText,
+                        pickerBackground: theme.colors.mainBG,
+                        fullscreenPhotoBackground: theme.colors.mainBG
+                    ),
+                    selection: .init(
+                        accent: theme.colors.sendButtonBackground
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -168,25 +169,25 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .foregroundColor(theme.colors.mainText)
+        .foregroundColor(mediaPickerTheme.main.pickerText)
         .padding(.horizontal)
         .padding(.bottom, 5)
     }
-    func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {
 
+    func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {
         HStack {
             Button(action: cancelClosure) {
                 theme.images.mediaPicker.cross
                     .imageScale(.large)
             }
-            .tint(theme.colors.mainText)
+            .tint(mediaPickerTheme.main.pickerText)
             .padding(.trailing, 30)
 
             if let chatTitle = chatTitle {
                 theme.images.mediaPicker.chevronRight
                 Text(chatTitle)
                     .font(.title3)
-                    .foregroundColor(theme.colors.mainText)
+                    .foregroundColor(mediaPickerTheme.main.pickerText)
             }
 
             Spacer()

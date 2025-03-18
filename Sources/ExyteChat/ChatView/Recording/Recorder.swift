@@ -8,17 +8,17 @@
 import Foundation
 import AVFoundation
 
-final class Recorder {
+final actor Recorder {
 
     // duration and waveform samples
-    typealias ProgressHandler = (Double, [CGFloat]) -> Void
+    typealias ProgressHandler = @Sendable (Double, [CGFloat]) -> Void
 
     private let audioSession = AVAudioSession()
     private var audioRecorder: AVAudioRecorder?
     private var audioTimer: Timer?
 
     private var soundSamples: [CGFloat] = []
-    internal var recorderSettings = RecorderSettings()
+    private var recorderSettings = RecorderSettings()
 
     var isAllowedToRecordAudio: Bool {
         audioSession.recordPermission == .granted
@@ -26,6 +26,10 @@ final class Recorder {
 
     var isRecording: Bool {
         audioRecorder?.isRecording ?? false
+    }
+
+    func setRecorderSettings(_ recorderSettings: RecorderSettings) {
+        self.recorderSettings = recorderSettings
     }
 
     func startRecording(durationProgressHandler: @escaping ProgressHandler) async -> URL? {
@@ -67,9 +71,9 @@ final class Recorder {
             audioRecorder?.record()
             durationProgressHandler(0.0, [])
 
-            DispatchQueue.main.async { [weak self] in
-                self?.audioTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                    self?.onTimer(durationProgressHandler)
+            audioTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                Task {
+                    await self?.onTimer(durationProgressHandler)
                 }
             }
 
@@ -133,7 +137,6 @@ final class Recorder {
             return nil
         }
     }
-
 }
 
 public struct RecorderSettings : Codable,Hashable {

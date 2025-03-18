@@ -1,4 +1,5 @@
 {
+  "originHash" : "cdd795c7b32fe3dbe7246ecedc221b20951fa134faf40007892799a60449e851",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -10,12 +11,21 @@
       }
     },
     {
+      "identity" : "anchoredpopup",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/AnchoredPopup.git",
+      "state" : {
+        "revision" : "dc2192cf7238793ccc52ff937c94e93da61c57cf",
+        "version" : "1.0.2"
+      }
+    },
+    {
       "identity" : "giphy-ios-sdk",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Giphy/giphy-ios-sdk",
       "state" : {
-        "revision" : "5afbf8ac89273a14ead2bd494b498a3fa46c6c56",
-        "version" : "2.2.14"
+        "revision" : "9a3970c258ef5cc005f9359ba4c6a344fe062abe",
+        "version" : "2.2.15"
       }
     },
     {
@@ -26,16 +36,7 @@
         "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
         "version" : "1.5.0"
       }
-    },
-    {
-      "identity" : "mediapicker",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
-      "state" : {
-        "revision" : "88769b1b69c2b5e5fa5b65522c08bc7b667a6cb8",
-        "version" : "2.2.3"
-      }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -18,11 +18,11 @@ extension MessageMenuAction {
     }
 }
 
-public enum DefaultMessageMenuAction: MessageMenuAction {
+public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
 
     case copy
     case reply
-    case edit(saveClosure: (String) -> Void)
+    case edit(saveClosure: @Sendable (String) -> Void)
 
     public func title() -> String {
         switch self {
@@ -46,7 +46,7 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         }
     }
 
-    public static func == (lhs: DefaultMessageMenuAction, rhs: DefaultMessageMenuAction) -> Bool {
+    nonisolated public static func == (lhs: DefaultMessageMenuAction, rhs: DefaultMessageMenuAction) -> Bool {
         switch (lhs, rhs) {
         case (.copy, .copy),
              (.reply, .reply),
@@ -57,7 +57,7 @@ public enum DefaultMessageMenuAction: MessageMenuAction {
         }
     }
 
-    public static var allCases: [DefaultMessageMenuAction] = [
+    public static let allCases: [DefaultMessageMenuAction] = [
         .copy, .reply, .edit(saveClosure: {_ in})
     ]
     

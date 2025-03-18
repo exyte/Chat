@@ -77,7 +77,7 @@ extension View {
     }
 }
 
-struct MessageMenuPreferenceKey: PreferenceKey {
+actor MessageMenuPreferenceKey: PreferenceKey {
     typealias Value = [String: CGRect]
 
     static var defaultValue: Value = [:]

@@ -15,7 +15,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
     typealias MessageBuilderClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderClosure
 
-    @Environment(\.chatTheme) private var theme
+    @Environment(\.chatTheme) var theme
 
     @ObservedObject var viewModel: ChatViewModel
     @ObservedObject var inputViewModel: InputViewModel
@@ -43,11 +43,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let ids: [String]
     let listSwipeActions: ListSwipeActions
 
-    @State private var isScrolledToTop = false
-
-    private let updatesQueue = DispatchQueue(label: "updatesQueue", qos: .utility)
-    @State private var updateSemaphore = DispatchSemaphore(value: 1)
-    @State private var tableSemaphore = DispatchSemaphore(value: 0)
+    @State var isScrolledToTop = false
+    @State var updateQueue = UpdateQueue()
 
     func makeUIView(context: Context) -> UITableView {
         let tableView = UITableView(frame: .zero, style: .grouped)
@@ -92,122 +89,128 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         if context.coordinator.sections == sections {
             return
         }
-        updatesQueue.async {
-            updateSemaphore.wait()
 
-            if context.coordinator.sections == sections {
-                updateSemaphore.signal()
-                return
+        let runID = UUID().uuidString
+
+        Task {
+            await updateQueue.enqueue(id: runID) {
+                await a(coordinator: context.coordinator, tableView: tableView, runID: runID)
             }
+        }
+    }
 
-            if context.coordinator.sections.isEmpty {
+    @MainActor
+    private func a(coordinator: Coordinator, tableView: UITableView, runID: String) async {
+        if coordinator.sections == sections {
+            coordinator.updateSemaphore.signal()
+            print("no need for work", runID)
+            return
+        }
+
+        if coordinator.sections.isEmpty {
+            coordinator.sections = sections
+            tableView.reloadData()
+            if !isScrollEnabled {
                 DispatchQueue.main.async {
-                    context.coordinator.sections = sections
-                    tableView.reloadData()
-                    if !isScrollEnabled {
-                        DispatchQueue.main.async {
-                            tableContentHeight = tableView.contentSize.height
-                        }
-                    }
-                    updateSemaphore.signal()
-                }
-                return
-            }
-
-            if let lastSection = sections.last {
-                context.coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
-            }
-
-            let prevSections = context.coordinator.sections
-            let (appliedDeletes, appliedDeletesSwapsAndEdits, deleteOperations, swapOperations, editOperations, insertOperations) = operationsSplit(oldSections: prevSections, newSections: sections)
-
-            // step 1
-            // preapare intermediate sections and operations
-            //print("1 updateUIView sections:", "\n")
-            //print("whole previous:\n", formatSections(prevSections), "\n")
-            //print("whole appliedDeletes:\n", formatSections(appliedDeletes), "\n")
-            //print("whole appliedDeletesSwapsAndEdits:\n", formatSections(appliedDeletesSwapsAndEdits), "\n")
-            //print("whole final sections:\n", formatSections(sections), "\n")
-
-            //print("operations delete:\n", deleteOperations.map { $0.description })
-            //print("operations swap:\n", swapOperations.map { $0.description })
-            //print("operations edit:\n", editOperations.map { $0.description })
-            //print("operations insert:\n", insertOperations.map { $0.description })
-
-            DispatchQueue.main.async {
-                tableView.performBatchUpdates {
-                    // step 2
-                    // delete sections and rows if necessary
-                    //print("2 apply delete")
-                    context.coordinator.sections = appliedDeletes
-                    for operation in deleteOperations {
-                        applyOperation(operation, tableView: tableView)
-                    }
-                } completion: { _ in
-                    tableSemaphore.signal()
-                    //print("2 finished delete")
+                    tableContentHeight = tableView.contentSize.height
                 }
             }
-            tableSemaphore.wait()
+            coordinator.updateSemaphore.signal()
+            print("no need for work", runID)
+            return
+        }
 
-            DispatchQueue.main.async {
-                tableView.performBatchUpdates {
-                    // step 3
-                    // swap places for rows that moved inside the table
-                    // (example of how this happens. send two messages: first m1, then m2. if m2 is delivered to server faster, then it should jump above m1 even though it was sent later)
-                    //print("3 apply swaps")
-                    context.coordinator.sections = appliedDeletesSwapsAndEdits // NOTE: this array already contains necessary edits, but won't be a problem for appplying swaps
-                    for operation in swapOperations {
-                        applyOperation(operation, tableView: tableView)
-                    }
-                } completion: { _ in
-                    tableSemaphore.signal()
-                    //print("3 finished swaps")
-                }
+        if let lastSection = sections.last {
+            coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+        }
+
+        let prevSections = coordinator.sections
+        //print("0 updateUIView sections:", runID, "\n")
+        //print("whole previous:\n", formatSections(prevSections), "\n")
+        print("start work", runID)
+        let splitInfo = await performSplitInBackground(prevSections, sections)
+        await applyUpdatesToTable(tableView, splitInfo: splitInfo, runID: runID) {
+            coordinator.sections = $0
+        }
+        print("finish work", runID)
+        //context.coordinator.updateSemaphore.signal()
+    }
+
+    nonisolated private func performSplitInBackground(_  prevSections:  [MessagesSection], _ sections: [MessagesSection]) async -> SplitInfo {
+        await withCheckedContinuation { continuation in
+            Task.detached {
+                let result = operationsSplit(oldSections: prevSections, newSections: sections)
+                continuation.resume(returning: result)
             }
-            tableSemaphore.wait()
+        }
+    }
 
-            DispatchQueue.main.async {
-                UIView.setAnimationsEnabled(false)
-                tableView.performBatchUpdates {
-                    // step 4
-                    // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
-                    //print("4 apply edits")
-                    context.coordinator.sections = appliedDeletesSwapsAndEdits
+    @MainActor
+    private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, runID: String, updateContextClosure: ([MessagesSection])->()) async {
+        // step 0: preparation
+        // prepare intermediate sections and operations
+//        print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
+//        print("whole appliedDeletesSwapsAndEdits:\n", formatSections(splitInfo.appliedDeletesSwapsAndEdits), "\n")
+//        print("whole final sections:\n", formatSections(sections), "\n")
+//
+//        print("operations delete:\n", splitInfo.deleteOperations.map { $0.description })
+//        print("operations swap:\n", splitInfo.swapOperations.map { $0.description })
+//        print("operations edit:\n", splitInfo.editOperations.map { $0.description })
+//        print("operations insert:\n", splitInfo.insertOperations.map { $0.description })
 
-                    for operation in editOperations {
-                        applyOperation(operation, tableView: tableView)
-                    }
-
-                } completion: { _ in
-                    tableSemaphore.signal()
-                    UIView.setAnimationsEnabled(true)
-                    //print("4 finished edits")
-                }
+        await performBatchTableUpdates(tableView) {
+            // step 1: deletes
+            // delete sections and rows if necessary
+            //print("1 apply deletes", runID)
+            updateContextClosure(splitInfo.appliedDeletes)
+            //context.coordinator.sections = appliedDeletes
+            for operation in splitInfo.deleteOperations {
+                applyOperation(operation, tableView: tableView)
             }
-            tableSemaphore.wait()
+        }
+        //print("1 finished deletes", runID)
 
-            if isScrolledToBottom || isScrolledToTop {
-                DispatchQueue.main.sync {
-                    // step 5
-                    // apply the rest of the changes to table's dataSource, i.e. inserts
-                    //print("5 apply inserts")
-                    context.coordinator.sections = sections
+        await performBatchTableUpdates(tableView) {
+            // step 2: swaps
+            // swap places for rows that moved inside the table
+            // (example of how this happens. send two messages: first m1, then m2. if m2 is delivered to server faster, then it should jump above m1 even though it was sent later)
+            //print("2 apply swaps", runID)
+            updateContextClosure(splitInfo.appliedDeletesSwapsAndEdits) // NOTE: this array already contains necessary edits, but won't be a problem for appplying swaps
+            for operation in splitInfo.swapOperations {
+                applyOperation(operation, tableView: tableView)
+            }
+        }
+        //print("2 finished swaps", runID)
 
-                    tableView.beginUpdates()
-                    for operation in insertOperations {
-                        applyOperation(operation, tableView: tableView)
-                    }
-                    tableView.endUpdates()
+        UIView.setAnimationsEnabled(false)
+        await performBatchTableUpdates(tableView) {
+            // step 3: edits
+            // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
+            //print("3 apply edits", runID)
+            updateContextClosure(splitInfo.appliedDeletesSwapsAndEdits)
 
-                    if !isScrollEnabled {
-                        tableContentHeight = tableView.contentSize.height
-                    }
+            for operation in splitInfo.editOperations {
+                applyOperation(operation, tableView: tableView)
+            }
+        }
+        UIView.setAnimationsEnabled(true)
+        //print("3 finished edits", runID)
 
-                    updateSemaphore.signal()
-                }
-            } else {
-                updateSemaphore.signal()
+        if isScrolledToBottom || isScrolledToTop {
+            // step 4: inserts
+            // apply the rest of the changes to table's dataSource, i.e. inserts
+            //print("4 apply inserts", runID)
+            updateContextClosure(sections)
+
+            tableView.beginUpdates()
+            for operation in splitInfo.insertOperations {
+                applyOperation(operation, tableView: tableView)
+            }
+            tableView.endUpdates()
+            //print("4 finished inserts", runID)
+
+            if !isScrollEnabled {
+                tableContentHeight = tableView.contentSize.height
             }
         }
     }
@@ -261,7 +264,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
     }
 
-    func operationsSplit(oldSections: [MessagesSection], newSections: [MessagesSection]) -> ([MessagesSection], [MessagesSection], [Operation], [Operation], [Operation], [Operation]) {
+    private nonisolated func operationsSplit(oldSections: [MessagesSection], newSections: [MessagesSection]) -> SplitInfo {
         var appliedDeletes = oldSections // start with old sections, remove rows that need to be deleted
         var appliedDeletesSwapsAndEdits = newSections // take new sections and remove rows that need to be inserted for now, then we'll get array with all the changes except for inserts
         // appliedDeletesSwapsEditsAndInserts == newSection
@@ -349,10 +352,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             appliedDeletesSwapsAndEdits[newIndex].rows = newRows
         }
 
-        return (appliedDeletes, appliedDeletesSwapsAndEdits, deleteOperations, swapOperations, editOperations, insertOperations)
+        return SplitInfo(appliedDeletes: appliedDeletes, appliedDeletesSwapsAndEdits: appliedDeletesSwapsAndEdits, deleteOperations: deleteOperations, swapOperations: swapOperations, editOperations: editOperations, insertOperations: insertOperations)
     }
 
-    func swapsContain(swaps: [Operation], section: Int, index: Int) -> Bool {
+    private nonisolated func swapsContain(swaps: [Operation], section: Int, index: Int) -> Bool {
         swaps.filter {
             if case let .swap(section, rowFrom, rowTo) = $0 {
                 return section == section && (rowFrom == index || rowTo == index)
@@ -384,6 +387,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         @Binding var isScrolledToBottom: Bool
         @Binding var isScrolledToTop: Bool
 
+        let updateSemaphore = DispatchSemaphore(value: 1)
+
         let messageBuilder: MessageBuilderClosure?
         let mainHeaderBuilder: (()->AnyView)?
         let headerBuilder: ((Date)->AnyView)?
@@ -407,6 +412,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let ids: [String]
         let mainBackgroundColor: Color
         let listSwipeActions: ListSwipeActions
+
+        private let impactGenerator = UIImpactFeedbackGenerator(style: .heavy)
 
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
@@ -575,7 +582,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 .applyIf(showMessageMenuOnLongPress) {
                     $0.onLongPressGesture {
                         // Trigger haptic feedback
-                        self.viewModel.impactGenerator.impactOccurred()
+                        self.impactGenerator.impactOccurred()
                         // Launch the message menu
                         self.viewModel.messageMenuRow = row
                     }
@@ -605,12 +612,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     }
 
     func formatRow(_ row: MessageRow) -> String {
-        if let status = row.message.status {
-            return String(
-                "id: \(row.id) text: \(row.message.text) status: \(status) date: \(row.message.createdAt) position in user group: \(row.positionInUserGroup) position in messages section: \(row.positionInMessagesSection) trigger: \(row.message.triggerRedraw)"
-            )
-        }
-        return ""
+        String(
+            "id: \(row.id) text: \(row.message.text) status: \(row.message.status ?? .none) date: \(row.message.createdAt) position in user group: \(row.positionInUserGroup) position in messages section: \(row.positionInMessagesSection) trigger: \(row.message.triggerRedraw)"
+        )
     }
 
     func formatSections(_ sections: [MessagesSection]) -> String {
@@ -624,5 +628,30 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
         res += String("}")
         return res
+    }
+}
+
+extension UIList {
+    struct SplitInfo: @unchecked Sendable {
+        let appliedDeletes: [MessagesSection]
+        let appliedDeletesSwapsAndEdits: [MessagesSection]
+        let deleteOperations: [Operation]
+        let swapOperations: [Operation]
+        let editOperations: [Operation]
+        let insertOperations: [Operation]
+    }
+}
+
+actor UpdateQueue {
+    private var isProcessing = false
+
+    func enqueue(id: String, _ work: @escaping @Sendable () async -> Void) async {
+        while isProcessing {
+            await Task.yield() // Wait for previous task to finish
+        }
+
+        isProcessing = true
+        await work()
+        isProcessing = false
     }
 }
