@@ -224,34 +224,6 @@ private extension InputViewModel {
 
 private extension InputViewModel {
 
-    //alisa where to use?
-    func mapAttachmentsForSend() async -> [Attachment] {
-        await withTaskGroup(of: Attachment?.self) { group in
-            for media in attachments.medias {
-                group.addTask {
-                    guard let thumbnailURL = await media.getThumbnailURL() else { return nil }
-
-                    switch media.type {
-                    case .image:
-                        return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
-                    case .video:
-                        guard let fullURL = await media.getURL() else { return nil }
-                        return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
-                    }
-                }
-            }
-
-            // Collect results and filter out nil values
-            var results = [Attachment]()
-            for await attachment in group {
-                if let attachment = attachment {
-                    results.append(attachment)
-                }
-            }
-            return results
-        }
-    }
-
     func sendMessage() {
         showActivityIndicator = true
         let draft = DraftMessage(
