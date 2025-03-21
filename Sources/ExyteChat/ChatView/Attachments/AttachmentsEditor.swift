@@ -64,9 +64,12 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
             } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
                 VStack {
-                    cameraSelectionHeaderView(cancelClosure: cancelClosure)
-                        .padding(.top, g.safeAreaInsets.top)
                     cameraSelectionView
+                        .overlay(alignment: .top) {
+                            cameraSelectionHeaderView(cancelClosure: cancelClosure)
+                                .padding(.top, 12)
+                        }
+                        .padding(.top, g.safeAreaInsets.top)
                     Spacer()
                     inputView
                         .padding(.bottom, g.safeAreaInsets.bottom)
@@ -193,6 +196,5 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             Spacer()
         }
         .padding(.horizontal)
-        .padding(.bottom, 10)
     }
 }

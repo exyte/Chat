@@ -150,21 +150,15 @@ struct CommentsExampleView: View {
                     if !message.attachments.isEmpty {
                         LazyVGrid(columns: Array(repeating: GridItem(), count: 2), spacing: 8) {
                             ForEach(message.attachments) { attachment in
-                                CachedAsyncImage(url: attachment.thumbnail) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(1, contentMode: .fill)
-                                        .cornerRadius(12)
-                                } placeholder: {
-                                    Rectangle().fill(Color.gray)
-                                        .aspectRatio(1, contentMode: .fill)
-                                        .cornerRadius(12)
-                                }
-                                .onTapGesture {
+                                AttachmentCell(attachment: attachment) { _ in
                                     attachmentClosure(attachment)
                                 }
+                                .frame(width: 150, height: 150)
+                                .cornerRadius(12)
+                                .clipped()
                             }
                         }
+                        .frame(width: 308)
                     }
 
                     HStack {

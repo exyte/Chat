@@ -90,20 +90,16 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             return
         }
 
-        let runID = UUID().uuidString
-
         Task {
-            await updateQueue.enqueue(id: runID) {
-                await a(coordinator: context.coordinator, tableView: tableView, runID: runID)
+            await updateQueue.enqueue() {
+                await updateIfNeeded(coordinator: context.coordinator, tableView: tableView)
             }
         }
     }
 
     @MainActor
-    private func a(coordinator: Coordinator, tableView: UITableView, runID: String) async {
+    private func updateIfNeeded(coordinator: Coordinator, tableView: UITableView) async {
         if coordinator.sections == sections {
-            coordinator.updateSemaphore.signal()
-            print("no need for work", runID)
             return
         }
 
@@ -115,8 +111,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     tableContentHeight = tableView.contentSize.height
                 }
             }
-            coordinator.updateSemaphore.signal()
-            print("no need for work", runID)
             return
         }
 
@@ -125,15 +119,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         let prevSections = coordinator.sections
-        //print("0 updateUIView sections:", runID, "\n")
+        //print("0 whole sections:", runID, "\n")
         //print("whole previous:\n", formatSections(prevSections), "\n")
-        print("start work", runID)
         let splitInfo = await performSplitInBackground(prevSections, sections)
-        await applyUpdatesToTable(tableView, splitInfo: splitInfo, runID: runID) {
+        await applyUpdatesToTable(tableView, splitInfo: splitInfo) {
             coordinator.sections = $0
         }
-        print("finish work", runID)
-        //context.coordinator.updateSemaphore.signal()
     }
 
     nonisolated private func performSplitInBackground(_  prevSections:  [MessagesSection], _ sections: [MessagesSection]) async -> SplitInfo {
@@ -146,17 +137,17 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     }
 
     @MainActor
-    private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, runID: String, updateContextClosure: ([MessagesSection])->()) async {
+    private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, updateContextClosure: ([MessagesSection])->()) async {
         // step 0: preparation
         // prepare intermediate sections and operations
-//        print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
-//        print("whole appliedDeletesSwapsAndEdits:\n", formatSections(splitInfo.appliedDeletesSwapsAndEdits), "\n")
-//        print("whole final sections:\n", formatSections(sections), "\n")
-//
-//        print("operations delete:\n", splitInfo.deleteOperations.map { $0.description })
-//        print("operations swap:\n", splitInfo.swapOperations.map { $0.description })
-//        print("operations edit:\n", splitInfo.editOperations.map { $0.description })
-//        print("operations insert:\n", splitInfo.insertOperations.map { $0.description })
+        //print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
+        //print("whole appliedDeletesSwapsAndEdits:\n", formatSections(splitInfo.appliedDeletesSwapsAndEdits), "\n")
+        //print("whole final sections:\n", formatSections(sections), "\n")
+
+        //print("operations delete:\n", splitInfo.deleteOperations.map { $0.description })
+        //print("operations swap:\n", splitInfo.swapOperations.map { $0.description })
+        //print("operations edit:\n", splitInfo.editOperations.map { $0.description })
+        //print("operations insert:\n", splitInfo.insertOperations.map { $0.description })
 
         await performBatchTableUpdates(tableView) {
             // step 1: deletes
@@ -386,8 +377,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
         @Binding var isScrolledToBottom: Bool
         @Binding var isScrolledToTop: Bool
-
-        let updateSemaphore = DispatchSemaphore(value: 1)
 
         let messageBuilder: MessageBuilderClosure?
         let mainHeaderBuilder: (()->AnyView)?
@@ -645,7 +634,7 @@ extension UIList {
 actor UpdateQueue {
     private var isProcessing = false
 
-    func enqueue(id: String, _ work: @escaping @Sendable () async -> Void) async {
+    func enqueue(_ work: @escaping @Sendable () async -> Void) async {
         while isProcessing {
             await Task.yield() // Wait for previous task to finish
         }

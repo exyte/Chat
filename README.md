@@ -270,7 +270,7 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
     )
 )
 ```
-Please use `mediaPickerTheme` in a similar fashion to customize the built-in photo picker.      
+By default the built-in MediaPicker will be auto-customized using the mosyt logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
 
 ### makes sense only for built-in message view
 `avatarSize` - the default avatar is a circle, you can specify its diameter here 

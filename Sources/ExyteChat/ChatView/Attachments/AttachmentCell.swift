@@ -4,14 +4,19 @@
 
 import SwiftUI
 
-struct AttachmentCell: View {
+public struct AttachmentCell: View {
 
     @Environment(\.chatTheme) private var theme
 
     let attachment: Attachment
     let onTap: (Attachment) -> Void
 
-    var body: some View {
+    public init(attachment: Attachment, onTap: @escaping (Attachment) -> Void) {
+        self.attachment = attachment
+        self.onTap = onTap
+    }
+
+    public var body: some View {
         Group {
             if attachment.type == .image {
                 content
@@ -31,9 +36,11 @@ struct AttachmentCell: View {
             }
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            onTap(attachment)
-        }
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                onTap(attachment)
+            }
+        )
     }
 
     var content: some View {

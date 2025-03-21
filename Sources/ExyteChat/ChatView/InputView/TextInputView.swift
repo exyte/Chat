@@ -11,7 +11,7 @@ struct TextInputView: View {
     @EnvironmentObject private var globalFocusState: GlobalFocusState
     
     @Binding var text: String
-    var inputFieldId: UUID
+    @State var inputFieldId: UUID
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
@@ -26,9 +26,12 @@ struct TextInputView: View {
             .foregroundColor(style == .message ? theme.colors.inputText : theme.colors.inputSignatureText)
             .padding(.vertical, 10)
             .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
-            .onTapGesture {
-                globalFocusState.focus = .uuid(inputFieldId)
-            }
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    globalFocusState.focus = .uuid(inputFieldId)
+                }
+            )
+
     }
     
     private func isMediaGiphyAvailable() -> Bool {

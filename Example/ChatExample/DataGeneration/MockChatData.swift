@@ -61,22 +61,18 @@ final class MockChatData {
     }
 
     func randomMockImage() -> MockImage {
-        let color = randomColorHex()
+        let w = Int.random(in: 200...500)
+        let h = Int.random(in: 200...500)
+        let url = "https://fakeimg.pl/\(w)x\(h)/"
         return MockImage(
             id: UUID().uuidString,
-            thumbnail: URL(string: "https://via.placeholder.com/150/\(color)")!,
-            full: URL(string: "https://via.placeholder.com/600/\(color)")!
+            thumbnail: URL(string: url)!,
+            full: URL(string: url)!
         )
-    }
-
-    func randomColorHex() -> String {
-        (0...6)
-            .map { _ in randomHexChar() }
-            .joined()
     }
     
     func randomReaction(senders: [MockUser]) -> Reaction {
-        let sampleEmojis:[String] = ["👍", "👎", "❤️", "🤣", "‼️", "❓", "🥳", "💪", "🔥", "💔", "😭"]
+        let sampleEmojis: [String] = ["👍", "👎", "❤️", "🤣", "‼️", "❓", "🥳", "💪", "🔥", "💔", "😭"]
         return Reaction(
             user: senders.random()!.toChatUser(),
             createdAt: Date.now,
@@ -98,13 +94,6 @@ final class MockChatData {
             recording: msg.recording,
             replyMessage: msg.replyMessage
         )
-    }
-}
-
-private extension MockChatData {
-    func randomHexChar() -> String {
-        let letters = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]
-        return letters.random()!
     }
 }
 
