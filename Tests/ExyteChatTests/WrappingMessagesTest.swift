@@ -41,8 +41,8 @@ struct WrappingMessagesTest {
     let tuesday = Date.from(string: "2025-01-28 09:00:00Z")
 
     @Test("No messages implies no sections", arguments: ChatType.allCases, ReplyMode.allCases)
-    func noMessageImpliesNoSection(for chatType: ChatType, and replyMode: ReplyMode) async throws {
-        let sections = await ConcreteChatView.mapMessages(
+    func noMessageImpliesNoSection(for chatType: ChatType, and replyMode: ReplyMode) {
+        let sections = ConcreteChatView.mapMessages(
             [], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.isEmpty)
@@ -51,11 +51,11 @@ struct WrappingMessagesTest {
     @Test(
         "Message rows are ordered starting with the latest message", .tags(.messageOrder),
         arguments: ChatType.allCases, ReplyMode.allCases)
-    func messageOrderIsReversed(for chatType: ChatType, and replyMode: ReplyMode) async throws {
+    func messageOrderIsReversed(for chatType: ChatType, and replyMode: ReplyMode) {
         let earlierMessage = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let laterMessage = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [earlierMessage, laterMessage], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -68,13 +68,11 @@ struct WrappingMessagesTest {
     @Test(
         "Message order is determined by the order in which messages are passed, not the date they were created",
         .tags(.messageOrder), arguments: ChatType.allCases, ReplyMode.allCases)
-    func messageOrderIsBasedOnOrderTheyArePassed(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func messageOrderIsBasedOnOrderTheyArePassed(for chatType: ChatType, and replyMode: ReplyMode) {
         let laterMessage = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
         let earlierMessage = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [laterMessage, earlierMessage], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -87,14 +85,12 @@ struct WrappingMessagesTest {
     @Test(
         "Messages on different days are always grouped by day, but out-of-order messages remain out of order within the day",
         .tags(.messageOrder), arguments: ChatType.allCases, ReplyMode.allCases)
-    func messagesAreAlwaysGroupedByDays(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func messagesAreAlwaysGroupedByDays(for chatType: ChatType, and replyMode: ReplyMode) {
         let mondayLaterMessage = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
         let tuesdayMessage = Message(id: UUID().uuidString, user: romeo, createdAt: tuesday)
         let mondayEarlierMessage = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [mondayLaterMessage, tuesdayMessage, mondayEarlierMessage], chatType: chatType,
             replyMode: replyMode)
 
@@ -118,13 +114,12 @@ struct WrappingMessagesTest {
         "When using answer mode, replies on a different day are included in the parent's day",
         .tags(.messageOrder, .answerMode), arguments: ChatType.allCases, [ReplyMode.answer])
     func repliesAreShownOnDateOfParentInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
     {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: tuesday,
             replyMessage: parent.toReplyMessage())
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [parent, reply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -135,14 +130,12 @@ struct WrappingMessagesTest {
     @Test(
         "When using quote mode, replies on a different day are included in their own day",
         .tags(.messageOrder, .quoteMode), arguments: ChatType.allCases, [ReplyMode.quote])
-    func repliesAreShownOnDateOfReplyInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func repliesAreShownOnDateOfReplyInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode) {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: tuesday,
             replyMessage: parent.toReplyMessage())
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [parent, reply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 2)
@@ -163,9 +156,7 @@ struct WrappingMessagesTest {
     @Test(
         "When using answer mode, nested replies are not shown", .tags(.messageOrder, .answerMode),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func nestedRepliesAreHiddenInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func nestedRepliesAreHiddenInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode) {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday),
@@ -173,7 +164,7 @@ struct WrappingMessagesTest {
         let nestedReply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 2, since: monday),
             replyMessage: reply.toReplyMessage())
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [parent, reply, nestedReply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -192,9 +183,7 @@ struct WrappingMessagesTest {
     @Test(
         "When using quote mode, nested replies are shown", .tags(.messageOrder, .quoteMode),
         arguments: ChatType.allCases, [ReplyMode.quote])
-    func nestedRepliesAreShownInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func nestedRepliesAreShownInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode) {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday),
@@ -202,7 +191,7 @@ struct WrappingMessagesTest {
         let nestedReply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 2, since: monday),
             replyMessage: reply.toReplyMessage())
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [parent, reply, nestedReply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -225,10 +214,9 @@ struct WrappingMessagesTest {
         .tags(.positionInUserGroupAndMessagesSection),
         arguments: ChatType.allCases, ReplyMode.allCases)
     func singleMessageHasSinglePositionInUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
     {
         let singleMessage = Message(id: UUID().uuidString, user: romeo)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [singleMessage], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -245,14 +233,14 @@ struct WrappingMessagesTest {
         ReplyMode.allCases)
     func multipleMessagesFromSingleUserHaveCorrectUserGroupPositions(
         for chatType: ChatType, and replyMode: ReplyMode
-    ) async throws {
+    ) {
         let message0 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let message1 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
         let message2 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 2, since: monday))
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [message0, message1, message2], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -288,9 +276,7 @@ struct WrappingMessagesTest {
         "Message from another user, in between many messages by another, splits the user group",
         .tags(.positionInUserGroupAndMessagesSection), arguments: ChatType.allCases,
         ReplyMode.allCases)
-    func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode) {
         let message0 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let message1 = Message(
@@ -301,7 +287,7 @@ struct WrappingMessagesTest {
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 3, since: monday))
         let message4 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 4, since: monday))
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [message0, message1, message2, message3, message4], chatType: chatType,
             replyMode: replyMode)
 
@@ -348,10 +334,10 @@ struct WrappingMessagesTest {
         ReplyMode.allCases)
     func messagesOnDifferentDaysShouldBeInDifferentUserGroups(
         for chatType: ChatType, and replyMode: ReplyMode
-    ) async throws {
+    ) {
         let message0 = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let message1 = Message(id: UUID().uuidString, user: romeo, createdAt: tuesday)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [message0, message1], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 2)
@@ -371,11 +357,9 @@ struct WrappingMessagesTest {
     @Test(
         "Comments position should be set for answer reply mode", .tags(.answerMode),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func commentsPositionShouldBeSetInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
-    {
+    func commentsPositionShouldBeSetInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode) {
         let message = Message(id: UUID().uuidString, user: romeo)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [message], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -387,10 +371,9 @@ struct WrappingMessagesTest {
         "Comments position should not be set for quote reply mode", .tags(.quoteMode),
         arguments: ChatType.allCases, [ReplyMode.quote])
     func commentsPositionShouldNotBeSetInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode)
-        async throws
     {
         let message = Message(id: UUID().uuidString, user: romeo)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [message], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -401,10 +384,9 @@ struct WrappingMessagesTest {
     @Test(
         "Single post should be at top level", .tags(.positionInCommentsGroup),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func singlePostShouldBeAtTopLevel(for chatType: ChatType, and replyMode: ReplyMode) async throws
-    {
+    func singlePostShouldBeAtTopLevel(for chatType: ChatType, and replyMode: ReplyMode) {
         let message = Message(id: UUID().uuidString, user: romeo)
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [message], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
@@ -419,14 +401,13 @@ struct WrappingMessagesTest {
     @Test(
         "Reply should be in comments level", .tags(.positionInCommentsGroup),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func replyShouldBeInCommentsLevel(for chatType: ChatType, and replyMode: ReplyMode) async throws
-    {
+    func replyShouldBeInCommentsLevel(for chatType: ChatType, and replyMode: ReplyMode) {
         let topLevel = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let reply = Message(
             id: UUID().uuidString, user: juliet, createdAt: Date(timeInterval: 1, since: monday),
             replyMessage: topLevel.toReplyMessage())
-        let sections = await ConcreteChatView.mapMessages(
+        let sections = ConcreteChatView.mapMessages(
             [topLevel, reply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)

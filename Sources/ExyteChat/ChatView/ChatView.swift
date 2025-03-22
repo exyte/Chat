@@ -11,12 +11,12 @@ import ExyteMediaPicker
 
 public typealias MediaPickerParameters = SelectionParamsHolder
 
-public enum ChatType: CaseIterable {
+public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
     case comments // the latest message is at the top, new messages appear from the top
 }
 
-public enum ReplyMode: CaseIterable {
+public enum ReplyMode: CaseIterable, Sendable {
     case quote // when replying to message A, new message will appear as the newest message, quoting message A in its body
     case answer // when replying to message A, new message with appear direclty below message A as a separate cell without duplicating message A in its body
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 extension ChatView {
 
-    static func mapMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+    nonisolated static func mapMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
         guard messages.hasUniqueIDs() else {
             fatalError("Messages can not have duplicate ids, please make sure every message gets a unique id")
         }
@@ -25,7 +25,7 @@ extension ChatView {
         return result
     }
 
-    static func mapMessagesQuoteModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+    nonisolated static func mapMessagesQuoteModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
         let dates = Set(messages.map({ $0.createdAt.startOfDay() }))
             .sorted()
             .reversed()
@@ -43,7 +43,7 @@ extension ChatView {
         return result
     }
 
-    static func mapMessagesCommentModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
+    nonisolated static func mapMessagesCommentModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
         let firstLevelMessages = messages.filter { m in
             m.replyMessage == nil
         }
@@ -77,7 +77,7 @@ extension ChatView {
         return result
     }
 
-    static private func getRepliesFor(id: String, messages: [Message]) -> [Message] {
+    nonisolated static private func getRepliesFor(id: String, messages: [Message]) -> [Message] {
         messages.compactMap { m in
             if m.replyMessage?.id == id {
                 return m
@@ -86,7 +86,7 @@ extension ChatView {
         }
     }
 
-    static private func wrapSectionMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode, isFirstSection: Bool, isLastSection: Bool) -> [MessageRow] {
+    nonisolated static private func wrapSectionMessages(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode, isFirstSection: Bool, isLastSection: Bool) -> [MessageRow] {
         messages
             .enumerated()
             .map {
