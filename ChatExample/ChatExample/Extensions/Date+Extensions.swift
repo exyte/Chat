@@ -31,8 +31,8 @@ extension Date {
     }
 }
 
-class DateFormatting {
-    static var agoFormatter = RelativeDateTimeFormatter()
+actor DateFormatting {
+    static let agoFormatter = RelativeDateTimeFormatter()
 }
 
 extension Date {
