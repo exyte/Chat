@@ -14,6 +14,7 @@
 /// func reactions(for message: Message) -> [ReactionType]?
 /// func allowEmojiSearch(for message: Message) -> Bool
 /// ```
+@MainActor
 public protocol ReactionDelegate {
     
     /// Called when the sender reacts to a message
