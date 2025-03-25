@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-public struct Message: Identifiable, Hashable {
+public struct Message: Identifiable, Hashable, Sendable {
 
-    public enum Status: Equatable, Hashable {
+    public enum Status: Equatable, Hashable, Sendable {
         case sending
         case sent
         case read
@@ -135,7 +135,7 @@ public struct Recording: Codable, Hashable, Sendable {
     }
 }
 
-public struct ReplyMessage: Codable, Identifiable, Hashable {
+public struct ReplyMessage: Codable, Identifiable, Hashable, Sendable {
     public static func == (lhs: ReplyMessage, rhs: ReplyMessage) -> Bool {
         lhs.id == rhs.id &&
         lhs.user == rhs.user &&

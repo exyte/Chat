@@ -6,7 +6,7 @@ import Foundation
 import GiphyUISDK
 import ExyteMediaPicker
 
-public struct DraftMessage {
+public struct DraftMessage: Sendable {
     public var id: String?
     public let text: String
     public let medias: [Media]

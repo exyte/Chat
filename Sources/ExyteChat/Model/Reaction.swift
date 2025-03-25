@@ -5,7 +5,7 @@
 
 import Foundation
 
-public enum ReactionType: Codable, Equatable, Hashable {
+public enum ReactionType: Codable, Equatable, Hashable, Sendable {
     case emoji(String)
     //case sticker(Image / Giphy / Memoji)
     //case other...
@@ -18,7 +18,7 @@ public enum ReactionType: Codable, Equatable, Hashable {
     }
 }
 
-public struct Reaction: Codable, Identifiable, Hashable {
+public struct Reaction: Codable, Identifiable, Hashable, Sendable {
     public let id: String
     public let user: User
     public let createdAt: Date
@@ -41,7 +41,7 @@ public struct Reaction: Codable, Identifiable, Hashable {
 }
 
 extension Reaction {
-    public enum Status: Codable, Equatable, Hashable {
+    public enum Status: Codable, Equatable, Hashable, Sendable {
         case sending
         case sent
         case read
@@ -49,7 +49,7 @@ extension Reaction {
     }
 }
 
-public struct DraftReaction: Codable, Identifiable, Hashable {
+public struct DraftReaction: Codable, Identifiable, Hashable, Sendable {
     public let id: String
     public let messageID: String
     public let createdAt: Date
