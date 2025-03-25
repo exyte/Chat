@@ -24,7 +24,7 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
-        .enableLoadMore(pageSize: 3) { message in
+        .enableLoadMore(pageSize: 3) { @MainActor message in
             viewModel.loadMoreMessage(before: message)
         }
         .messageUseMarkdown(true)
