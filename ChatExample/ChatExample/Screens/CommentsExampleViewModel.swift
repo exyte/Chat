@@ -22,10 +22,10 @@ class CommentsExampleViewModel: ObservableObject {
         interactor.otherSenders.count == 1 ? interactor.otherSenders.first!.avatar : nil
     }
 
-    private let interactor: ChatInteractorProtocol
+    private let interactor: any ChatInteractorProtocol
     private var subscriptions = Set<AnyCancellable>()
 
-    init(interactor: ChatInteractorProtocol = MockChatInteractor()) {
+    init(interactor: any ChatInteractorProtocol = MockChatInteractor()) {
         self.interactor = interactor
     }
 
