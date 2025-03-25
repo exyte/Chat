@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import ExyteChat
 
+@MainActor
 class CommentsExampleViewModel: ObservableObject {
     @Published var messages: [Message] = []
 

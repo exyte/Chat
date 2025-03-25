@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import ExyteChat
 
+@MainActor
 final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     @Published var messages: [Message] = []

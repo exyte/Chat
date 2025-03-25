@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import ExyteChat
 
+@MainActor
 protocol ChatInteractorProtocol {
     var messages: AnyPublisher<[MockMessage], Never> { get }
     var senders: [MockUser] { get }
