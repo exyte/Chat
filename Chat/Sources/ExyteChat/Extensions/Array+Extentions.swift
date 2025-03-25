@@ -20,4 +20,3 @@ extension Array where Element: Identifiable {
         return true
     }
 }
-extension KeyPath: @unchecked @retroactive Sendable { }

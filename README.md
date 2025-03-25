@@ -36,8 +36,8 @@
 ![](https://img.shields.io/github/v/tag/exyte/Chat?label=Version)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fexyte%2FChat%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/exyte/Chat)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fexyte%2FChat%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/exyte/Chat)
-[![SPM Compatible](https://img.shields.io/badge/SwiftPM-Compatible-brightgreen.svg)](https://swiftpackageindex.com/exyte/Chat)
-[![Cocoapods Compatible](https://img.shields.io/badge/cocoapods-Deprecated%20after%202.4.2-yellow.svg)](https://cocoapods.org/pods/ExyteChat)
+[![SPM](https://img.shields.io/badge/SPM-Compatible-brightgreen.svg)](https://swiftpackageindex.com/exyte/Chat)
+[![Cocoapods](https://img.shields.io/badge/Cocoapods-Deprecated%20after%202.4.2-yellow.svg)](https://cocoapods.org/pods/ExyteChat)
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](https://opensource.org/licenses/MIT)
 
 # Features
