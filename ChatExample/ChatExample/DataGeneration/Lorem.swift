@@ -65,7 +65,7 @@ public class Lorem {
         "maiores", "doloribus", "asperiores", "repellat"
     ]
 
-    private static var markdownSymbols = ["*", "_", "**", "**"]
+    private static let markdownSymbols = ["*", "_", "**", "**"]
     
     /**
      Return a random word.
