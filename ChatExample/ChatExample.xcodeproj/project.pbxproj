@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -25,6 +25,7 @@
 		5B0636D72C2E9F6100E54AEE /* CommentsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */; };
 		5B0636D82C2E9F6100E54AEE /* CommentsExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636D62C2E9F6100E54AEE /* CommentsExampleViewModel.swift */; };
 		5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */; };
+		5B4D04FE2D92FA36005262A1 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4D04FD2D92FA36005262A1 /* ExyteChat */; };
 		5B4DBAA52D92E2560067A006 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B4DBAA42D92E2560067A006 /* ExyteChat */; };
 		5B6D3A732987D85A00765148 /* Color+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+hex.swift */; };
 /* End PBXBuildFile section */
@@ -63,7 +64,6 @@
 		5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleView.swift; sourceTree = "<group>"; };
 		5B0636D62C2E9F6100E54AEE /* CommentsExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleViewModel.swift; sourceTree = "<group>"; };
 		5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+asyncMap.swift"; sourceTree = "<group>"; };
-		5B4DBAA22D92E1F00067A006 /* Chat */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Chat; path = ../Chat; sourceTree = SOURCE_ROOT; };
 		5B6D3A722987D85A00765148 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B4D04FE2D92FA36005262A1 /* ExyteChat in Frameworks */,
 				5B4DBAA52D92E2560067A006 /* ExyteChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,7 +83,6 @@
 		135549272864620900C9459A = {
 			isa = PBXGroup;
 			children = (
-				5B4DBAA22D92E1F00067A006 /* Chat */,
 				135549322864620900C9459A /* ChatExample */,
 				5B4DBAA32D92E2560067A006 /* Frameworks */,
 				135549312864620900C9459A /* Products */,
@@ -206,6 +206,7 @@
 			name = ChatExample;
 			packageProductDependencies = (
 				5B4DBAA42D92E2560067A006 /* ExyteChat */,
+				5B4D04FD2D92FA36005262A1 /* ExyteChat */,
 			);
 			productName = ChatExample;
 			productReference = 135549302864620900C9459A /* ChatExample.app */;
@@ -236,6 +237,7 @@
 			);
 			mainGroup = 135549272864620900C9459A;
 			packageReferences = (
+				5B4D04FC2D92FA36005262A1 /* XCLocalSwiftPackageReference "../../Chat" */,
 			);
 			productRefGroup = 135549312864620900C9459A /* Products */;
 			projectDirPath = "";
@@ -504,7 +506,18 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5B4D04FC2D92FA36005262A1 /* XCLocalSwiftPackageReference "../../Chat" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../Chat;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		5B4D04FD2D92FA36005262A1 /* ExyteChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ExyteChat;
+		};
 		5B4DBAA42D92E2560067A006 /* ExyteChat */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ExyteChat;
