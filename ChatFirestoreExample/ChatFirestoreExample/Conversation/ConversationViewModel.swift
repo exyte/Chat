@@ -193,10 +193,11 @@ class ConversationViewModel: ObservableObject {
 
             /// update latest message in current conversation to be this one
             if let id = conversation?.id {
+                let sendableDict = dict.compactMapValues { $0 as? Codable }
                 try await Firestore.firestore()
                     .collection(Collection.conversations)
                     .document(id)
-                    .updateData(["latestMessage" : dict])
+                    .updateData(sendableDict)
             }
 
             /// update unread message counters for other participants

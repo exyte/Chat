@@ -18,7 +18,7 @@ struct MessageStatusView: View {
                 theme.images.message.sending
                     .resizable()
                     .rotationEffect(.degrees(90))
-                    .foregroundColor(theme.colors.statusGray)
+                    .foregroundColor(getTheme().colors.statusGray)
             case .sent:
                 theme.images.message.checkmarks
                     .resizable()
@@ -40,6 +40,11 @@ struct MessageStatusView: View {
         .viewSize(MessageView.statusViewSize)
         .padding(.trailing, MessageView.horizontalStatusPadding)
     }
+
+    @MainActor
+        private func getTheme() -> ChatTheme {
+            return theme
+        }
 }
 
 struct SwiftUIView_Previews: PreviewProvider {

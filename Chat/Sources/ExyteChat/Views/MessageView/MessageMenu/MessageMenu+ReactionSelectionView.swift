@@ -10,20 +10,20 @@ struct ReactionSelectionView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     
-    static let MaxSelectionRowWidth:CGFloat = 400
-    
+    static let maxSelectionRowWidth: CGFloat = 400
+
     @StateObject private var keyboardState = KeyboardState()
-    
+
     @StateObject var viewModel: ChatViewModel
     
     @State private var selectedEmoji: String = ""
     @FocusState private var emojiEntryIsFocused: Bool
     
-    @State private var emojis:[String] = []
-   
+    @State private var emojis: [String] = []
+
     @State private var placeholder: String = ""
-    @State private var maxWidth: CGFloat = ReactionSelectionView.MaxSelectionRowWidth
-    @State private var maxSelectionRowWidth: CGFloat = ReactionSelectionView.MaxSelectionRowWidth
+    @State private var maxWidth: CGFloat = ReactionSelectionView.maxSelectionRowWidth
+    @State private var maxSelectionRowWidth: CGFloat = ReactionSelectionView.maxSelectionRowWidth
     @State private var maxHeight: CGFloat? = nil
     @State private var opacity: CGFloat = 1.0
     @State private var xOffset: CGFloat = 0.0
@@ -199,7 +199,7 @@ struct ReactionSelectionView: View {
         if allowEmojiSearch { emojiCount += 1 }
         let maxWidth = min(
             CGFloat(emojiCount) * (bubbleDiameter + horizontalPadding) + horizontalPadding * 3,
-            ReactionSelectionView.MaxSelectionRowWidth
+            ReactionSelectionView.maxSelectionRowWidth
         )
         return maxWidth
     }
@@ -426,7 +426,9 @@ internal struct InteriorRadialShadow: ViewModifier {
             leadingPadding: 20,
             trailingPadding: 20
         ) { selectedEmoji in
-            print("\(selectedEmoji)")
+            if let selectedEmoji = selectedEmoji {
+                print("\(selectedEmoji)")
+            }
         }
     }
     .frame(width: 400, height: 100)

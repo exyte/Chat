@@ -53,9 +53,7 @@ final class MockChatInteractor: ChatInteractorProtocol {
                 status = .error(draftMessage)
             }
             let message = await draftMessage.toMockMessage(user: chatData.tim, status: status)
-            DispatchQueue.main.async { [weak self] in
-                self?.chatState.value.append(message)
-            }
+            chatState.value.append(message)
         }
     }
     
