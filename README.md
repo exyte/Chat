@@ -272,16 +272,16 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
 ```
 By default the built-in MediaPicker will be auto-customized using the mosyt logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
 
-### makes sense only for built-in message view
-`avatarSize` - the default avatar is a circle, you can specify its diameter here 
-`tapAvatarClosure` - closure to call on avatar tap   
-`messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not
-`messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`
-`showMessageTimeView` - show timestamp in a corner of the message   
+### makes sense only for built-in message view    
+`avatarSize` - the default avatar is a circle, you can specify its diameter here   
+`tapAvatarClosure` - closure to call on avatar tap    
+`messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not    
+`messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`    
+`showMessageTimeView` - show timestamp in a corner of the message    
 `setMessageFont` - pass custom font to use for messages   
 
 ### makes sense only for built-in input view
-`setAvailableInput` - hide some buttons in default InputView. Available options are:
+`setAvailableInput` - hide some buttons in default InputView. Available options are:    
     - `.full` - media + text + audio   
     - `.textAndMedia`   
     - `.textAndAudio`   
@@ -314,17 +314,16 @@ https://firebase.google.com/docs/firestore/manage-data/add-data
 Create cloud firestore database (for images and voice recordings)
 https://firebase.google.com/docs/storage/web/start
 
-## Example
+## Examples
 
-To try out the Chat examples:
-- Clone the repo `git clone git@github.com:exyte/Chat.git`
-- Open terminal and run `cd <ChatRepo>/Example`
-- Wait for SPM to finish downloading packages
-- Run it!
+To try the Chat examples:
+- Clone the repo `https://github.com/exyte/Chat.git`
+- Open `ChatExample.xcodeproj` or `ChatFirestoreExample.xcodeproj` in the Xcode
+- Try it!
 
 ## Installation
 
-### Swift Package Manager
+### [Swift Package Manager](https://swift.org/package-manager/)
 
 ```swift
 dependencies: [
