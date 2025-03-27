@@ -50,10 +50,10 @@
     - Arbitrarily styled text with `AttributedString` or markdown
     - Photo/video
     - Audio recording
+    - Link with preview
     **Coming soon:**
     - User's location
     - Documents
-    - Link with preview
 
 # Usage
 

@@ -66,6 +66,9 @@ struct MessageView: View {
         let lastLineWidth = styledText.lastLineWidth(labelWidth: maxWidth, font: font)
         let numberOfLines = styledText.numberOfLines(labelWidth: maxWidth, font: font)
 
+        if !styledText.urls.isEmpty {
+            return .vstack
+        }
         if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
             return .hstack
         }
