@@ -63,3 +63,50 @@ private struct PlaceholderOrEnrichedLinkPillView: View {
     }
 
 }
+
+/// PlaceholderOrEnrichedLinkPillView has two mutually exclusive cases - either displaying a placeholder, or enriched content.
+/// To switch from one case to the other, you need to create a new view.
+/// This is inconvenient for consumers since you have to keep track of whether the enriched metadata has loaded or not.
+///
+/// Therefore, this view manages this complexity, hiding the state of whether the enriched metadata is loaded or not.
+/// Since this view is the only view generating link preview metadata, it also manages the cache.
+struct LinkPillView: View {
+
+    @State var metadata: LinkPreviewMetadata
+    private static let cache = LinkMetadataCache()
+
+    init(url: URL) {
+        guard let cached = Self.cache.get(forURL: url) else {
+            metadata = .placeholder(for: url)
+            return
+        }
+        metadata = .enriched(with: cached)
+    }
+
+    private func fetchMetadata(for url: URL) async {
+        let provider = LPMetadataProvider()
+        let metadata = try? await provider.startFetchingMetadata(for: url)
+        guard let metadata = metadata else {
+            return
+        }
+        self.metadata = .enriched(with: metadata)
+        Self.cache.insert(metadata, forURL: url)
+    }
+
+    var body: some View {
+        switch metadata {
+        case .placeholder(let url):
+            PlaceholderOrEnrichedLinkPillView(url: url)
+                .task {
+                    await fetchMetadata(for: url)
+                }
+        case .enriched(let metadata):
+            PlaceholderOrEnrichedLinkPillView(metadata: metadata)
+        }
+    }
+
+}
+
+#Preview {
+    LinkPillView(url: URL(string: "https://example.org")!)
+}
