@@ -258,12 +258,9 @@ struct MessageView: View {
                 }
                 .padding(.vertical, 8)
             case .vstack:
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .trailing, spacing: 4) {
                     messageView
-                    HStack(spacing: 0) {
-                        Spacer()
-                        timeView
-                    }
+                    timeView
                 }
                 .padding(.vertical, 8)
             case .overlay:
