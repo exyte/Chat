@@ -631,6 +631,10 @@ public extension ChatView {
         return view
     }
     
+    func linkPreviewsDisabled() -> ChatView {
+        return messageLinkPreviewLimit(0)
+    }
+
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageFont = font
