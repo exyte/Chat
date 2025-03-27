@@ -22,6 +22,7 @@ struct ChatMessageView<MessageContent: View>: View {
     let messageStyler: (String) -> AttributedString
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
+    let messageLinkPreviewLimit: Int
     let messageFont: UIFont
 
     var body: some View {
@@ -48,6 +49,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     messageStyler: messageStyler,
                     isDisplayingMessageMenu: isDisplayingMessageMenu,
                     showMessageTimeView: showMessageTimeView,
+                    messageLinkPreviewLimit: messageLinkPreviewLimit,
                     font: messageFont)
             }
         }

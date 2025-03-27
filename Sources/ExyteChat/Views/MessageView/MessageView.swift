@@ -22,6 +22,7 @@ struct MessageView: View {
     let messageStyler: (String) -> AttributedString
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
+    let messageLinkPreviewLimit: Int
     var font: UIFont
 
     @State var avatarViewSize: CGSize = .zero
@@ -66,7 +67,7 @@ struct MessageView: View {
         let lastLineWidth = styledText.lastLineWidth(labelWidth: maxWidth, font: font)
         let numberOfLines = styledText.numberOfLines(labelWidth: maxWidth, font: font)
 
-        if !styledText.urls.isEmpty {
+        if !styledText.urls.isEmpty && messageLinkPreviewLimit > 0 {
             return .vstack
         }
         if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
@@ -186,7 +187,7 @@ struct MessageView: View {
             if !message.text.isEmpty {
                 MessageTextView(
                     text: message.text, messageStyler: messageStyler,
-                    userType: message.user.type
+                    userType: message.user.type, messageLinkPreviewLimit: messageLinkPreviewLimit
                 )
                 .padding(.horizontal, MessageView.horizontalTextPadding)
             }
@@ -241,7 +242,7 @@ struct MessageView: View {
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(
             text: message.text, messageStyler: messageStyler,
-            userType: message.user.type
+            userType: message.user.type, messageLinkPreviewLimit: messageLinkPreviewLimit
         )
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, MessageView.horizontalTextPadding)
@@ -385,6 +386,7 @@ struct MessageView_Preview: PreviewProvider {
                 messageStyler: AttributedString.init,
                 isDisplayingMessageMenu: false,
                 showMessageTimeView: true,
+                messageLinkPreviewLimit: 8,
                 font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
             )
         }

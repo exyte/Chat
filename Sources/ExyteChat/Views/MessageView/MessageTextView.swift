@@ -20,6 +20,7 @@ struct MessageTextView: View {
     let text: String
     let messageStyler: (String) -> AttributedString
     let userType: UserType
+    let messageLinkPreviewLimit: Int
 
     var styledText: AttributedString {
         var result = text.styled(using: messageStyler)
@@ -34,6 +35,10 @@ struct MessageTextView: View {
         return result
     }
 
+    var urlsToPreview: [URL] {
+        Array(styledText.urls.prefix(messageLinkPreviewLimit))
+    }
+
     var body: some View {
         if !styledText.characters.isEmpty {
             VStack(alignment: .leading) {
@@ -41,9 +46,9 @@ struct MessageTextView: View {
                     .sizeGetter($textSize)
 
                 // We use .enumerated(), and \.offset as the id, so that a message with duplicate links will show a preview for each.
-                if !styledText.urls.isEmpty {
+                if !urlsToPreview.isEmpty {
                     VStack {
-                        ForEach(Array(styledText.urls.enumerated()), id: \.offset) { _, url in
+                        ForEach(Array(urlsToPreview.enumerated()), id: \.offset) { _, url in
                             LinkPillView(url: url)
                         }
                     }
@@ -58,9 +63,11 @@ struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
         MessageTextView(
             text: "Look at [this website](https://example.org)",
-            messageStyler: AttributedString.init, userType: .other)
+            messageStyler: AttributedString.init, userType: .other,
+            messageLinkPreviewLimit: 8)
         MessageTextView(
             text: "Look at [this website](https://example.org)",
-            messageStyler: String.markdownStyler, userType: .other)
+            messageStyler: String.markdownStyler, userType: .other,
+            messageLinkPreviewLimit: 8)
     }
 }
