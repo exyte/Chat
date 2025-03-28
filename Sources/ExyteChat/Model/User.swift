@@ -4,11 +4,11 @@
 
 import Foundation
 
-public enum UserType: Int, Codable {
+public enum UserType: Int, Codable, Sendable {
     case current = 0, other, system
 }
 
-public struct User: Codable, Identifiable, Hashable {
+public struct User: Codable, Identifiable, Hashable, Sendable {
     public let id: String
     public let name: String
     public let avatarURL: URL?

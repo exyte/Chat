@@ -3,59 +3,81 @@
 //
 
 import Foundation
-import Combine
 import ExyteChat
 
+@MainActor
 final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     @Published var messages: [Message] = []
-    
-    var chatTitle: String {
-        interactor.otherSenders.count == 1 ? interactor.otherSenders.first!.name : "Group chat"
-    }
-    var chatStatus: String {
-        interactor.otherSenders.count == 1 ? "online" : "\(interactor.senders.count) members"
-    }
-    var chatCover: URL? {
-        interactor.otherSenders.count == 1 ? interactor.otherSenders.first!.avatar : nil
-    }
 
-    private let interactor: ChatInteractorProtocol
-    private var subscriptions = Set<AnyCancellable>()
+    @Published var chatTitle: String = ""
+    @Published var chatStatus: String = ""
+    @Published var chatCover: URL?
 
-    init(interactor: ChatInteractorProtocol = MockChatInteractor()) {
+    private let interactor: MockChatInteractor
+    private var timer: Timer?
+
+    init(interactor: MockChatInteractor = MockChatInteractor()) {
         self.interactor = interactor
+
+        Task {
+            let senders = await interactor.otherSenders
+            self.chatTitle = senders.count == 1 ? senders.first!.name : "Group chat"
+            self.chatStatus = senders.count == 1 ? "online" : "\(senders.count + 1) members"
+            self.chatCover = senders.count == 1 ? senders.first!.avatar : nil
+        }
     }
 
     func send(draft: DraftMessage) {
-        interactor.send(draftMessage: draft)
+        Task {
+            await interactor.send(draftMessage: draft)
+            self.updateMessages()
+        }
     }
     
     func remove(messageID: String) {
-        interactor.remove(messageID: messageID)
+        Task {
+            await interactor.remove(messageID: messageID)
+            self.updateMessages()
+        }
     }
 
-    func didReact(to message: Message, reaction draftReaction: DraftReaction) {
-        interactor.add(draftReaction: draftReaction, to: draftReaction.messageID)
+    nonisolated func didReact(to message: Message, reaction draftReaction: DraftReaction) {
+        Task {
+            await interactor.add(draftReaction: draftReaction, to: draftReaction.messageID)
+        }
     }
 
     func onStart() {
-        interactor.messages
-            .compactMap { messages in
-                messages.map { $0.toChatMessage() }
-            }
-            .assign(to: &$messages)
+        Task {
+            self.updateMessages()
+            connect()
+        }
+    }
 
-        interactor.connect()
+    func connect() {
+        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
+            Task {
+                await self.interactor.timerTick()
+                await self.updateMessages()
+            }
+        }
     }
 
     func onStop() {
-        interactor.disconnect()
+        timer?.invalidate()
     }
 
     func loadMoreMessage(before message: Message) {
-        interactor.loadNextPage()
-            .sink { _ in }
-            .store(in: &subscriptions)
+        Task {
+            await interactor.loadNextPage()
+            updateMessages()
+        }
+    }
+
+    func updateMessages() {
+        Task {
+            self.messages = await interactor.messages.compactMap { $0.toChatMessage() }
+        }
     }
 }
