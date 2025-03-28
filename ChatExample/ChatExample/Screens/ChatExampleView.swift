@@ -24,13 +24,6 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
-        .chatTheme(
-            colors: .init()
-            images: .init(
-                backgroundLight: Image("chatBackgroundLight"),
-                backgroundDark: Image("chatBackgroundDark")
-            )
-        )
         .enableLoadMore(pageSize: 3) { message in
             await MainActor.run {
                 viewModel.loadMoreMessage(before: message)
@@ -52,6 +45,13 @@ struct ChatExampleView: View {
                 }
             }
         ])
+        .chatTheme(
+            colors: .init(),
+            images: .init(
+                backgroundLight: Image("chatBackgroundLight"),
+                backgroundDark: Image("chatBackgroundDark")
+            )
+        )
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
