@@ -269,6 +269,21 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
         )
     )
 )
+
+// chat view with a full background image  
+.chatTheme(
+    ChatTheme(
+        colors: .init(
+            buttonBackground: .yellow,
+            addButtonBackground: .purple
+        ),
+        images: .init(
+          backgroundLight: Image("chatBackgroundLight"),
+          backgroundDark: Image("chatBackgroundDark")
+        )
+    )
+)
+
 ```
 By default the built-in MediaPicker will be auto-customized using the mosyt logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
 
