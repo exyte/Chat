@@ -44,12 +44,14 @@
 - Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure since user will be the one providing actual API calls)
 - Allows you to pass a custom view builder for messages and input views
 - Has a built-in photo and video library/camera picker for multiple media asset selection
+- Sticker keyboard that integrates with Giphy
 - Can display a fullscreen menu on long press a message cell (automatically shows scroll for big messages)
 - Supports "reply to message" via message menu or through a closure. Remove and edit are **coming soon**
 - This library allows to send the following content in messages in any combination:
     - Arbitrarily styled text with `AttributedString` or markdown
     - Photo/video
     - Audio recording
+    - Gif/Sticker
     **Coming soon:**
     - User's location
     - Documents
@@ -288,6 +290,26 @@ By default the built-in MediaPicker will be auto-customized using the mosyt logi
     - `.textOnly`    
   
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
+
+## Sticker Keyboard
+
+You can pick and send animated gifs via the integrated sticker keyboard. In order to use this functionality a client id must be granted via the [Giphy Developers](https://developers.giphy.com/) site.
+
+To include the sticker keyboard:
+
+```swift
+.setAvailableInputs([.text, .giphy])
+.giphyConfig(
+    GiphyConfiguration(
+        giphyKey: "client id",
+        mediaTypeConfig: [.recents, .gifs, .stickers, .clips],
+        showAttributionMark: true
+    )
+)
+```
+
+To approve a production client Id for your app, Giphy requires that you include a "Powered By GIPHY" attibution mark, see [attribution mark requirement](https://support.giphy.com/hc/en-us/articles/360035158592-What-conditions-does-my-app-project-need-to-meet-in-order-to-get-a-production-API-Key). Setting the showAttributionMark in the GiphyConfiguration struct will include a small overlay image on the giphy picker which meets the requirement needed for a production client id.
+
 
 ## Localization
 
