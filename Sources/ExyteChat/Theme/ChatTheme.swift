@@ -44,9 +44,15 @@ public struct ChatTheme {
         images: ChatTheme.Images = .init(),
         style: ChatTheme.Style = .init()
     ) {
-        self.colors = colors
-        self.images = images
         self.style = style
+        self.images = images
+        
+        // if background images have been set then override the mainBG color to be clear
+        self.colors = if images.backgroundDark != nil && images.backgroundLight != nil {
+            ChatTheme.Colors(copy: colors, mainBG: .clear)
+        } else {
+            colors
+        }
     }
     
     internal init(accentColor: Color) {
@@ -170,6 +176,35 @@ public struct ChatTheme {
             self.sendButtonBackground = sendButtonBackground
             self.recordDot = recordDot
         }
+        
+        public init(copy: Colors, mainBG: Color) {
+            self.mainBG = mainBG
+            self.mainTint = copy.mainTint
+            self.mainText = copy.mainText
+            self.mainCaptionText = copy.mainCaptionText
+            self.messageMyBG = copy.messageMyBG
+            self.messageMyText = copy.messageMyText
+            self.messageMyTimeText = copy.messageMyTimeText
+            self.messageFriendBG = copy.messageFriendBG
+            self.messageFriendText = copy.messageFriendText
+            self.messageFriendTimeText = copy.messageFriendTimeText
+            self.messageSystemBG = copy.messageSystemBG
+            self.messageSystemText = copy.messageSystemText
+            self.messageSystemTimeText = copy.messageSystemTimeText
+            self.inputBG = copy.inputBG
+            self.inputText = copy.inputText
+            self.inputPlaceholderText = copy.inputPlaceholderText
+            self.inputSignatureBG = copy.inputSignatureBG
+            self.inputSignatureText = copy.inputSignatureText
+            self.inputSignaturePlaceholderText = copy.inputSignaturePlaceholderText
+            self.menuBG = copy.menuBG
+            self.menuText = copy.menuText
+            self.menuTextDelete = copy.menuTextDelete
+            self.statusError = copy.statusError
+            self.statusGray = copy.statusGray
+            self.sendButtonBackground = copy.sendButtonBackground
+            self.recordDot = copy.recordDot
+        }
     }
 
     public struct Images {
@@ -242,6 +277,9 @@ public struct ChatTheme {
             public var cancelReply: Image
             public var replyToMessage: Image
         }
+        
+        public var backgroundLight: Image? = nil
+        public var backgroundDark: Image? = nil
 
         public var backButton: Image
         public var scrollToBottom: Image
@@ -302,10 +340,15 @@ public struct ChatTheme {
             cancelReply: Image? = nil,
             replyToMessage: Image? = nil,
             backButton: Image? = nil,
-            scrollToBottom: Image? = nil
+            scrollToBottom: Image? = nil,
+            backgroundLight: Image? = nil,
+            backgroundDark: Image? = nil
         ) {
             self.backButton = backButton ?? Image("backArrow", bundle: .current)
             self.scrollToBottom = scrollToBottom ?? Image(systemName: "chevron.down")
+            
+            self.backgroundLight = backgroundLight
+            self.backgroundDark = backgroundDark
 
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),
