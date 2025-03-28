@@ -122,6 +122,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var chatTitle: String?
     var paginationHandler: PaginationHandler?
     var showMessageTimeView = true
+    var messageLinkPreviewLimit = 8
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
     var recorderSettings: RecorderSettings = RecorderSettings()
@@ -334,6 +335,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             paginationHandler: paginationHandler,
             messageStyler: messageStyler,
             showMessageTimeView: showMessageTimeView,
+            messageLinkPreviewLimit: messageLinkPreviewLimit,
             messageFont: messageFont,
             sections: sections,
             ids: ids,
@@ -426,7 +428,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
                 avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
                 isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
-                messageFont: messageFont
+                messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
             )
             .onTapGesture {
                 hideMessageMenu()
@@ -646,7 +648,17 @@ public extension ChatView {
         view.showMessageTimeView = isShow
         return view
     }
+
+    func messageLinkPreviewLimit(_ limit: Int) -> ChatView {
+        var view = self
+        view.messageLinkPreviewLimit = limit
+        return view
+    }
     
+    func linkPreviewsDisabled() -> ChatView {
+        return messageLinkPreviewLimit(0)
+    }
+
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageFont = font

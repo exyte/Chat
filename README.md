@@ -51,11 +51,11 @@
     - Arbitrarily styled text with `AttributedString` or markdown
     - Photo/video
     - Audio recording
+    - Link with preview
     - Gif/Sticker
     **Coming soon:**
     - User's location
     - Documents
-    - Link with preview
 
 # Usage
 
@@ -295,6 +295,8 @@ By default the built-in MediaPicker will be auto-customized using the mosyt logi
 `messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not    
 `messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`    
 `showMessageTimeView` - show timestamp in a corner of the message    
+`messageLinkPreviewLimit` - limit the maximum number of link previews per message
+`linkPreviewsDisabled` - completely disable message link previews
 `setMessageFont` - pass custom font to use for messages   
 
 ### makes sense only for built-in input view
