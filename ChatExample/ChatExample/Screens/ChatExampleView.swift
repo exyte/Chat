@@ -11,7 +11,7 @@ struct ChatExampleView: View {
     @Environment(\.presentationMode) private var presentationMode
 
     @StateObject private var viewModel: ChatExampleViewModel
-    
+
     private let title: String
     private let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
@@ -24,8 +24,17 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
+        .chatTheme(
+            colors: .init()
+            images: .init(
+                backgroundLight: Image("chatBackgroundLight"),
+                backgroundDark: Image("chatBackgroundDark")
+            )
+        )
         .enableLoadMore(pageSize: 3) { message in
-            viewModel.loadMoreMessage(before: message)
+            await MainActor.run {
+                viewModel.loadMoreMessage(before: message)
+            }
         }
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)

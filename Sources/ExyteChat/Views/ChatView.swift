@@ -71,6 +71,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     public typealias TapAvatarClosure = (User, String) -> ()
     
     @Environment(\.safeAreaInsets) private var safeAreaInsets
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.chatTheme) private var theme
     @Environment(\.giphyConfig) private var giphyConfig
     
@@ -168,7 +169,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     public var body: some View {
         mainView
-            .background(theme.colors.mainBG)
+            .background(chatBackground())
             .environmentObject(keyboardState)
         
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
@@ -485,6 +486,29 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         viewModel.messageMenuRow = nil
         viewModel.messageFrame = .zero
         isShowingMenu = false
+    }
+    
+    private func chatBackground() -> some View {
+        Group {
+            // to use a background image both the light and dark background images should be set
+            //  these can be set to the same image
+            if let backgroundLight = theme.images.backgroundLight,
+               let backgroundDark = theme.images.backgroundDark {
+                
+                if colorScheme == .dark {
+                    backgroundDark
+                        .resizable()
+                        .ignoresSafeArea(.keyboard)
+                } else {
+                    backgroundLight
+                        .resizable()
+                        .ignoresSafeArea(.keyboard)
+                }
+                
+            } else {
+                theme.colors.mainBG
+            }
+        }
     }
     
     private func isGiphyAvailable() -> Bool {

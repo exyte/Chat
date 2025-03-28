@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Color {
-    static var exampleGrey = Color(hex: "1F1F1F")
+    static let exampleGrey = Color(hex: "1F1F1F")
 }
 
 extension Color {

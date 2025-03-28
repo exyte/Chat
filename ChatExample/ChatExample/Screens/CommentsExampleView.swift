@@ -48,7 +48,7 @@ enum Action: MessageMenuAction {
 
 struct CommentsExampleView: View {
 
-    @StateObject var viewModel = CommentsExampleViewModel()
+    @StateObject var viewModel = ChatExampleViewModel()
 
     var body: some View {
         VStack {

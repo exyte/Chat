@@ -5,7 +5,7 @@
 import Foundation
 import ExyteChat
 
-struct MockMessage {
+struct MockMessage: Sendable {
     let uid: String
     let sender: MockUser
     let createdAt: Date
