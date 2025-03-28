@@ -24,7 +24,6 @@
 		5B5748372A3707860033C808 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B5748362A3707860033C808 /* Preview Assets.xcassets */; };
 		5B5748452A3714AE0033C808 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5748442A3714AE0033C808 /* AuthViewModel.swift */; };
 		5B5748472A3714BA0033C808 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5748462A3714BA0033C808 /* AuthView.swift */; };
-		5B6C8D7F2D92B6A500E8714B /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B6C8D7E2D92B6A500E8714B /* ExyteChat */; };
 		5B73CB432A5D465C007D80B0 /* SearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B73CB422A5D465C007D80B0 /* SearchField.swift */; };
 		5B73CB452A5D4A77007D80B0 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B73CB442A5D4A77007D80B0 /* CustomTextField.swift */; };
 		5B897B3C2A42C347005274DE /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 5B897B3B2A42C347005274DE /* CachedAsyncImage */; };
@@ -99,7 +98,6 @@
 				5B897B3C2A42C347005274DE /* CachedAsyncImage in Frameworks */,
 				5B9920EE2A4050A300995901 /* FirebaseStorage in Frameworks */,
 				5B4D05012D92FA73005262A1 /* ExyteChat in Frameworks */,
-				5B6C8D7F2D92B6A500E8714B /* ExyteChat in Frameworks */,
 				5B9920EA2A4050A300995901 /* FirebaseFirestore in Frameworks */,
 				5B9920EC2A4050A300995901 /* FirebaseFirestoreSwift in Frameworks */,
 			);
@@ -263,7 +261,6 @@
 				5B9920EB2A4050A300995901 /* FirebaseFirestoreSwift */,
 				5B9920ED2A4050A300995901 /* FirebaseStorage */,
 				5B897B3B2A42C347005274DE /* CachedAsyncImage */,
-				5B6C8D7E2D92B6A500E8714B /* ExyteChat */,
 				5B4D05002D92FA73005262A1 /* ExyteChat */,
 			);
 			productName = ChatFirestoreExample;
@@ -297,7 +294,7 @@
 			packageReferences = (
 				5B9920E82A4050A200995901 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				5B897B3A2A42C347005274DE /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
-				5B4D04FF2D92FA73005262A1 /* XCLocalSwiftPackageReference "../../Chat" */,
+				5B4D04FF2D92FA73005262A1 /* XCLocalSwiftPackageReference "../../ExyteChat" */,
 			);
 			productRefGroup = 5B57482D2A3707850033C808 /* Products */;
 			projectDirPath = "";
@@ -585,9 +582,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		5B4D04FF2D92FA73005262A1 /* XCLocalSwiftPackageReference "../../Chat" */ = {
+		5B4D04FF2D92FA73005262A1 /* XCLocalSwiftPackageReference "../../ExyteChat" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../Chat;
+			relativePath = ../../ExyteChat;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -612,10 +609,6 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		5B4D05002D92FA73005262A1 /* ExyteChat */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ExyteChat;
-		};
-		5B6C8D7E2D92B6A500E8714B /* ExyteChat */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ExyteChat;
 		};
