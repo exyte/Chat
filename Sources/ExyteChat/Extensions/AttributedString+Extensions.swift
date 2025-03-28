@@ -54,3 +54,12 @@ extension AttributedString {
     }
 
 }
+
+public extension AttributedString {
+    public var urls: [URL] {
+        runs[\.link].map { (link, range) in
+            link?.absoluteURL
+        }
+        .compactMap { $0 }
+    }
+}
