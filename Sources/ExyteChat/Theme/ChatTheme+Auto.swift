@@ -13,8 +13,8 @@ extension View {
     /// Creates and applies a `ChatTheme` to your `ChatView` based around the provided `accentColor`
     /// - Parameters:
     ///   - color: The main accent color of your `ChatView`
-    public func chatTheme(accentColor: Color) -> some View {
-        self.chatTheme(ChatTheme(accentColor: accentColor))
+    public func chatTheme(accentColor: Color, images: ChatTheme.Images = .init()) -> some View {
+        self.chatTheme(ChatTheme(accentColor: accentColor, images: images))
     }
 }
 
