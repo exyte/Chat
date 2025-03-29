@@ -39,6 +39,17 @@ struct ContentView: View {
                                 .chatTheme(accentColor: color)
                         }
                     }
+                    
+                    NavigationLink("Chat with Image Background") {
+                        ChatExampleView(title: "Background Image")
+                            .chatTheme(
+                                accentColor: color,
+                                images: .init(
+                                    backgroundLight: Image("chatBackgroundLight"),
+                                    backgroundDark: Image("chatBackgroundDark")
+                                )
+                            )
+                    }
 
                     NavigationLink("Simple comments example") {
                         CommentsExampleView()
