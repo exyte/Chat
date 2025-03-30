@@ -94,3 +94,49 @@ struct ContentView: View {
         .navigationViewStyle(.stack)
     }
 }
+
+/// An enum that lets us iterate through the different ChatTheme styles
+enum ExampleThemeState: String {
+    case accent
+    case image
+    
+    @available(iOS 18, *)
+    case themed
+    
+    var title:String {
+        self.rawValue.capitalized
+    }
+    
+    func next() -> ExampleThemeState {
+        switch self {
+        case .accent:
+            if #available(iOS 18.0, *) {
+                return .themed
+            } else {
+                return .image
+            }
+        case .themed:
+            return .image
+        case .image:
+            return .accent
+        }
+    }
+    
+    var images: ChatTheme.Images {
+        switch self {
+        case .accent, .themed: return .init()
+        case .image:
+            return .init(
+                backgroundLight: Image("chatBackgroundLight"),
+                backgroundDark: Image("chatBackgroundDark")
+            )
+        }
+    }
+    
+    var isAccent: Bool {
+        if #available(iOS 18.0, *) {
+            return self != .themed
+        }
+        return true
+    }
+}
