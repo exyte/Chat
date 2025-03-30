@@ -3,19 +3,20 @@
 //
 
 import SwiftUI
+import ExyteChat
 import ExyteMediaPicker
 
 struct ContentView: View {
     
-    @State private var isAccent: Bool = true
+    @State private var theme: ExampleThemeState = .accent
     @State private var color = Color(.exampleBlue)
-
+    
     var body: some View {
         NavigationView {
             List {
                 Section {
                     NavigationLink("Active chat example") {
-                        if !isAccent, #available(iOS 18.0, *) {
+                        if !theme.isAccent, #available(iOS 18.0, *) {
                             ChatExampleView(
                                 viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
                                 title: "Active chat example"
@@ -26,29 +27,24 @@ struct ContentView: View {
                                 viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
                                 title: "Active chat example"
                             )
-                            .chatTheme(accentColor: color)
+                            .chatTheme(
+                                accentColor: color,
+                                images: theme.images
+                            )
                         }
                     }
                     
                     NavigationLink("Simple chat example") {
-                        if !isAccent, #available(iOS 18.0, *) {
-                            ChatExampleView(title: "Simple example")
+                        if !theme.isAccent, #available(iOS 18.0, *) {
+                            ChatExampleView(title: "Simple chat example")
                                 .chatTheme(themeColor: color)
                         } else {
-                            ChatExampleView(title: "Simple example")
-                                .chatTheme(accentColor: color)
-                        }
-                    }
-                    
-                    NavigationLink("Chat with Image Background") {
-                        ChatExampleView(title: "Background Image")
-                            .chatTheme(
-                                accentColor: color,
-                                images: .init(
-                                    backgroundLight: Image("chatBackgroundLight"),
-                                    backgroundDark: Image("chatBackgroundDark")
+                            ChatExampleView(title: "Simple chat example")
+                                .chatTheme(
+                                    accentColor: color,
+                                    images: theme.images
                                 )
-                            )
+                        }
                     }
 
                     NavigationLink("Simple comments example") {
@@ -78,16 +74,11 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
-                        if #available(iOS 18.0, *) {
-                            Button(isAccent ? "Accent" : "Themed") {
-                                isAccent.toggle()
-                            }
-                            ColorPicker("", selection: $color)
-                        } else {
-                            ColorPicker("Accent", selection: $color)
+                        Button(theme.title) {
+                            theme = theme.next()
                         }
+                        ColorPicker("", selection: $color)
                     }
-                    
                 }
             }
         }
