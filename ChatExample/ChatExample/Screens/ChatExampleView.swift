@@ -45,13 +45,6 @@ struct ChatExampleView: View {
                 }
             }
         ])
-        .chatTheme(
-            colors: .init(),
-            images: .init(
-                backgroundLight: Image("chatBackgroundLight"),
-                backgroundDark: Image("chatBackgroundDark")
-            )
-        )
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

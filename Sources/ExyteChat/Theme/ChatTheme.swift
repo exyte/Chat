@@ -55,14 +55,15 @@ public struct ChatTheme {
         }
     }
     
-    internal init(accentColor: Color) {
+    internal init(accentColor: Color, images: ChatTheme.Images) {
         self.init(
             colors: .init(
                 mainTint: accentColor,
                 messageMyBG: accentColor,
                 messageMyTimeText: Color.white.opacity(0.5),
                 sendButtonBackground: accentColor
-            )
+            ),
+            images: images
         )
     }
     
