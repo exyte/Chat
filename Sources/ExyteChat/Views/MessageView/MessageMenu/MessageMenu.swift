@@ -507,7 +507,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     
     @ViewBuilder
     func menuView() -> some View {
-        let buttons = ActionEnum.allCases.enumerated().map { MenuButton(id: $0, action: $1) }
+        let buttons = ActionEnum.menuItems(for: message).enumerated().map { MenuButton(id: $0, action: $1) }
         HStack {
             if alignment == .right { Spacer() }
             
