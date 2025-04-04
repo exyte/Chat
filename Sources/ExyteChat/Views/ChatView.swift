@@ -358,9 +358,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 self.cellFrames = frames
             }
         }
-        .onTapGesture {
-            globalFocusState.focus = nil
-        }
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                globalFocusState.focus = nil
+            }
+        )
         .onAppear {
             viewModel.didSendMessage = didSendMessage
             viewModel.inputViewModel = inputViewModel

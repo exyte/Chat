@@ -57,12 +57,11 @@ struct FullscreenMediaPages: View {
                         ScrollView(.horizontal) {
                             HStack(spacing: 2) {
                                 ForEach(viewModel.attachments.enumerated().map({ $0 }), id: \.offset) { (index, attachment) in
-                                    AttachmentCell(attachment: attachment) { _ in
+                                    AttachmentCell(attachment: attachment, size: CGSize(width: 100, height: 100)) { _ in
                                         withAnimation {
                                             viewModel.index = index
                                         }
                                     }
-                                    .frame(width: 100, height: 100)
                                     .cornerRadius(4)
                                     .clipped()
                                     .id(index)

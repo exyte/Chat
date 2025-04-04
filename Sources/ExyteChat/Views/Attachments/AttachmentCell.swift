@@ -6,13 +6,15 @@ import SwiftUI
 
 public struct AttachmentCell: View {
 
-    @Environment(\.chatTheme) private var theme
+    @Environment(\.chatTheme) var theme
 
     let attachment: Attachment
+    let size: CGSize
     let onTap: (Attachment) -> Void
 
-    public init(attachment: Attachment, onTap: @escaping (Attachment) -> Void) {
+    public init(attachment: Attachment, size: CGSize, onTap: @escaping (Attachment) -> Void) {
         self.attachment = attachment
+        self.size = size
         self.onTap = onTap
     }
 
@@ -35,6 +37,7 @@ public struct AttachmentCell: View {
                     }
             }
         }
+        .frame(width: size.width, height: size.height)
         .contentShape(Rectangle())
         .simultaneousGesture(
             TapGesture().onEnded {
@@ -44,25 +47,29 @@ public struct AttachmentCell: View {
     }
 
     var content: some View {
-        AsyncImageView(url: attachment.thumbnail)
+        AsyncImageView(url: attachment.thumbnail, size: size)
     }
 }
 
 struct AsyncImageView: View {
 
     @Environment(\.chatTheme) var theme
+
     let url: URL
+    let size: CGSize
 
     var body: some View {
         CachedAsyncImage(url: url, urlCache: .imageCache) { imageView in
             imageView
                 .resizable()
                 .scaledToFill()
+                .frame(width: size.width, height: size.height)
+                .clipped()
         } placeholder: {
             ZStack {
                 Rectangle()
                     .foregroundColor(theme.colors.inputBG)
-                    .frame(minWidth: 100, minHeight: 100)
+                    .frame(width: size.width, height: size.height)
                 ActivityIndicator(size: 30, showBackground: false)
             }
         }

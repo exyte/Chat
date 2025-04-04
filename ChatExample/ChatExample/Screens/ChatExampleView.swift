@@ -93,7 +93,7 @@ struct ChatExampleView: View {
     }
     
     // Swipe Action
-    func onReply(message:Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
+    func onReply(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
         print("Swipe Action - Reply: \(message)")
         // This places the message in the ChatView's InputView ready for the sender to reply
         defaultActions(message, .reply)

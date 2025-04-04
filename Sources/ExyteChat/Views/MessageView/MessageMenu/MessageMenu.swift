@@ -109,9 +109,9 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     @State private var backgroundOpacity: CGFloat = 0.0
     
     /// This flag is used to adjust the dismiss animation
-    @State private var didReact:Bool = false
+    @State private var didReact: Bool = false
     /// We use this `onReaction` handler in order to set our `didReact` flag and kick off the dismissal sequence
-    private func handleOnReaction(_ rt:ReactionType?) {
+    private func handleOnReaction(_ rt: ReactionType?) {
         guard let rt else { transitionViewState(to: .ready); return }
         didReact = true
         dismissSelf(rt)
@@ -131,22 +131,22 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         }
     }
     
-    var shouldShowReactionSelectionView:Bool {
+    var shouldShowReactionSelectionView: Bool {
         guard let delegate = reactionHandler.delegate else { return false }
         return delegate.canReact(to: message)
     }
     
-    var shouldShowReactionOverviewView:Bool {
+    var shouldShowReactionOverviewView: Bool {
         guard let delegate = reactionHandler.delegate else { return false }
         return delegate.shouldShowOverview(for: message)
     }
     
-    var shouldAllowEmojiSearch:Bool {
+    var shouldAllowEmojiSearch: Bool {
         guard let delegate = reactionHandler.delegate else { return false }
         return delegate.allowEmojiSearch(for: message)
     }
     
-    var reactions:[ReactionType]? {
+    var reactions: [ReactionType]? {
         guard let delegate = reactionHandler.delegate else { return nil }
         return delegate.reactions(for: message)
     }
@@ -337,7 +337,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             if case .keyboard = previousState {
                 if case .scrollView = messageMenuStyle {
                     /// Ensure we still need our scroll view
-                    let rOHeight:CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
+                    let rOHeight: CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
                     let contentHeight = calculateMessageMenuHeight(including: [.message, .reactionSelection, .menu]) + rOHeight
                     let safeArea = UIApplication.safeArea.top + UIApplication.safeArea.bottom
                     if contentHeight > maxEntireHeight - safeArea {
@@ -352,12 +352,12 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             if case .scrollView(let height) = messageMenuStyle { return (height / 2) + UIApplication.safeArea.top }
 
             /// Otherwise, calculate our offsets and move to our target
-            let rHeight:CGFloat = reactionSelectionIsVisible ? calculateMessageMenuHeight(including: [.reactionSelection]) : 0
-            let mHeight:CGFloat = menuIsVisible ? calculateMessageMenuHeight(including: [.menu]) : 0
-            let rOHeight:CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
-            
-            var ty:CGFloat = messageFrame.midY - (messageTopPadding / 2)
-            
+            let rHeight: CGFloat = reactionSelectionIsVisible ? calculateMessageMenuHeight(including: [.reactionSelection]) : 0
+            let mHeight: CGFloat = menuIsVisible ? calculateMessageMenuHeight(including: [.menu]) : 0
+            let rOHeight: CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
+
+            var ty: CGFloat = messageFrame.midY - (messageTopPadding / 2)
+
             if (messageFrame.minY - rHeight) < UIApplication.safeArea.top + rOHeight {
                 let off = (UIApplication.safeArea.top + rOHeight) - (messageFrame.minY - rHeight)
                 /// We need to move the message down to make room for the views above it
@@ -394,10 +394,10 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
             
             /// At this point our messageMenuFrame height includes the menu view so we need to subtract that
-            let mHeight:CGFloat = calculateMessageMenuHeight(including: [.menu])
-            
+            let mHeight: CGFloat = calculateMessageMenuHeight(including: [.menu])
+
             /// Grab our current verticalOffset
-            var ty:CGFloat = verticalOffset
+            var ty: CGFloat = verticalOffset
             /// Keep the message stationary while we hide / remove the menu
             ty -= mHeight / 2
             /// Provide a bit of padding to lift the view off of the keyboard
@@ -426,7 +426,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     
     /// Attempts to provide a single call site for gathering the height of our various views
     private func calculateMessageMenuHeight(including views: [MMViews]) -> CGFloat {
-        var height:CGFloat = 0
+        var height: CGFloat = 0
         for view in Set(views) {
             switch view {
             case .message:
@@ -494,11 +494,11 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         })
     }
     
-    private struct MenuButton:Identifiable {
-        let id:Int
-        let action:ActionEnum
-        
-        init(id:Int, action:ActionEnum) {
+    private struct MenuButton: Identifiable {
+        let id: Int
+        let action: ActionEnum
+
+        init(id: Int, action: ActionEnum) {
             self.id = id
             self.action = action
         }
