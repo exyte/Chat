@@ -6,7 +6,7 @@
 //
 
 @preconcurrency import Combine
-import AVFoundation
+@preconcurrency import AVFoundation
 
 final actor RecordingPlayer: ObservableObject {
 

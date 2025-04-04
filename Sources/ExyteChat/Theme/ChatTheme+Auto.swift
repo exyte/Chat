@@ -100,7 +100,7 @@ internal struct ThemedChatView: ViewModifier {
     var accentColor: Color
     var background: ThemedBackgroundStyle
     var improveContrast: Bool
-    
+
     func body(content: Content) -> some View {
         let backgroundColor = background.getBackgroundColor(withAccent: accentColor, improveContrast: improveContrast)
         return content
@@ -119,3 +119,12 @@ internal struct ThemedChatView: ViewModifier {
             )
     }
 }
+
+// stub for earlier versions
+#if swift(<6.0)
+extension Color {
+    func mix(with color: Color, by: CGFloat) -> Color {
+        return color
+    }
+}
+#endif

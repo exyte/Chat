@@ -70,7 +70,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     /// User and MessageId
     public typealias TapAvatarClosure = (User, String) -> ()
     
-    @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.chatTheme) private var theme
     @Environment(\.giphyConfig) private var giphyConfig
@@ -526,7 +525,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             replyToText: String(localized: "Reply to")
         )
     }
-    
 }
 
 public extension ChatView {

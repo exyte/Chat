@@ -48,7 +48,7 @@ struct ListSwipeAction {
     let actions: [SwipeActionable]
 }
 
-public struct SwipeAction<V: View>: @preconcurrency SwipeActionable {
+public struct SwipeAction<V: View>: SwipeActionable {
     let action: (Message, @escaping (Message, DefaultMessageMenuAction) -> Void) -> Void
     let activeFor: (Message) -> Bool
     let content: () -> V

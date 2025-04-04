@@ -78,6 +78,8 @@ public struct GiphyPicker: UIViewControllerRepresentable {
     }
 }
 
-extension GPHMedia: @retroactive @unchecked Sendable {
-
-}
+#if compiler(>=6.0)
+extension GPHMedia: @retroactive @unchecked Sendable { }
+#else
+extension GPHMedia: @unchecked Sendable { }
+#endif

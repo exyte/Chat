@@ -36,10 +36,10 @@ struct ContentView: View {
                     
                     NavigationLink("Simple chat example") {
                         if !theme.isAccent, #available(iOS 18.0, *) {
-                            ChatExampleView(title: "Simple chat example")
+                            ChatExampleView(viewModel: ChatExampleViewModel(), title: "Simple chat example")
                                 .chatTheme(themeColor: color)
                         } else {
-                            ChatExampleView(title: "Simple chat example")
+                            ChatExampleView(viewModel: ChatExampleViewModel(), title: "Simple chat example")
                                 .chatTheme(
                                     accentColor: color,
                                     images: theme.images

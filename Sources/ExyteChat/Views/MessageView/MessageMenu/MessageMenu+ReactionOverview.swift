@@ -7,8 +7,6 @@ import SwiftUI
 
 struct ReactionOverview: View {
     
-    @Environment(\.safeAreaInsets) private var safeAreaInsets
-    
     @StateObject var viewModel: ChatViewModel
     
     let message: Message
@@ -93,9 +91,9 @@ struct ReactionOverview: View {
     private var horizontalOffset: CGFloat {
         guard inScrollView else { return 0 }
         if message.user.isCurrentUser {
-            return safeAreaInsets.leading
+            return UIApplication.safeArea.leading
         } else {
-            return -safeAreaInsets.leading
+            return -UIApplication.safeArea.leading
         }
     }
     
@@ -114,6 +112,7 @@ struct ReactionOverview: View {
     }
 }
 
+#if swift(>=6.0)
 #Preview {
     let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
     let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
@@ -142,3 +141,4 @@ struct ReactionOverview: View {
         inScrollView: false
     )
 }
+#endif

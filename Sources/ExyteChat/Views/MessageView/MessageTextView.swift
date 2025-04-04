@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct MessageTextView: View {
 
     @Environment(\.chatTheme) private var theme

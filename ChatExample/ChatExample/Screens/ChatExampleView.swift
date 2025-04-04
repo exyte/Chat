@@ -6,6 +6,7 @@ import Foundation
 import SwiftUI
 import ExyteChat
 
+@MainActor
 struct ChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) private var presentationMode
@@ -15,7 +16,7 @@ struct ChatExampleView: View {
     private let title: String
     private let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
-    init(viewModel: ChatExampleViewModel = ChatExampleViewModel(), title: String) {
+    init(viewModel: ChatExampleViewModel, title: String) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.title = title
     }
