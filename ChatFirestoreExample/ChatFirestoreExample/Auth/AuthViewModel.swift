@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseFirestore
-import FirebaseFirestoreSwift
 import ExyteMediaPicker
 
 class AuthViewModel: ObservableObject {

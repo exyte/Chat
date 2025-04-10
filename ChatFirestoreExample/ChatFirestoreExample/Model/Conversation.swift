@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseFirestore
-import FirebaseFirestoreSwift
 
 public struct Conversation: Identifiable, Hashable {
     public let id: String
