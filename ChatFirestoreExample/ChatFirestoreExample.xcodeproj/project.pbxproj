@@ -33,7 +33,6 @@
 		5B8D76282A5C162D00EDE1B7 /* GroupSelectUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8D76272A5C162D00EDE1B7 /* GroupSelectUsersView.swift */; };
 		5B8D762F2A5C18EA00EDE1B7 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8D762E2A5C18EA00EDE1B7 /* ButtonStyle.swift */; };
 		5B9920EA2A4050A300995901 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9920E92A4050A300995901 /* FirebaseFirestore */; };
-		5B9920EC2A4050A300995901 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9920EB2A4050A300995901 /* FirebaseFirestoreSwift */; };
 		5B9920EE2A4050A300995901 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9920ED2A4050A300995901 /* FirebaseStorage */; };
 		5B9920F02A405B5500995901 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9920EF2A405B5500995901 /* Utils.swift */; };
 		5B9920F32A405BB800995901 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9920F22A405BB800995901 /* AvatarView.swift */; };
@@ -101,7 +100,6 @@
 				5B580A3E2D9FF6E400F537F1 /* ExyteChat in Frameworks */,
 				5B4D05012D92FA73005262A1 /* ExyteChat in Frameworks */,
 				5B9920EA2A4050A300995901 /* FirebaseFirestore in Frameworks */,
-				5B9920EC2A4050A300995901 /* FirebaseFirestoreSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,7 +258,6 @@
 			name = ChatFirestoreExample;
 			packageProductDependencies = (
 				5B9920E92A4050A300995901 /* FirebaseFirestore */,
-				5B9920EB2A4050A300995901 /* FirebaseFirestoreSwift */,
 				5B9920ED2A4050A300995901 /* FirebaseStorage */,
 				5B897B3B2A42C347005274DE /* CachedAsyncImage */,
 				5B4D05002D92FA73005262A1 /* ExyteChat */,
@@ -605,7 +602,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 10.11.0;
+				minimumVersion = 11.11.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -628,11 +625,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5B9920E82A4050A200995901 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
-		};
-		5B9920EB2A4050A300995901 /* FirebaseFirestoreSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 5B9920E82A4050A200995901 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestoreSwift;
 		};
 		5B9920ED2A4050A300995901 /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
