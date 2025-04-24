@@ -116,8 +116,7 @@ public struct Message: Identifiable, Hashable, Sendable {
                 attachments: attachments,
                 giphyMediaId: giphyMediaId,
                 recording: draft.recording,
-                replyMessage: draft.replyMessage,
-                type: draft.type
+                replyMessage: draft.replyMessage
             )
         }
 }
