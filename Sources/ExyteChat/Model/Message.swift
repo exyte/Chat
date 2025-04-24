@@ -201,7 +201,7 @@ public extension Message {
     }
 }
 
-enum MessageType: String, Codable, Sendable {
+public enum MessageType: String, Codable, Sendable {
     case message
     case capture
 }
