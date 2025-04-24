@@ -178,6 +178,7 @@ extension ChatView {
                     positionInMessagesSection: positionInMessagesSection,
                     commentsPosition: commentsPosition)
             }
+            .reversed()
     }
 }
 
