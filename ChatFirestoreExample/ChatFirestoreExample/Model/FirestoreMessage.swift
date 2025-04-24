@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseFirestore
-import FirebaseFirestoreSwift
 import ExyteChat
 
 public struct FirestoreMessage: Codable, Hashable {
