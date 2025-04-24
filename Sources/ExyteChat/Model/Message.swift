@@ -55,6 +55,7 @@ public struct Message: Identifiable, Hashable, Sendable {
     public var giphyMediaId: String?
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
+    public var type: MessageType
 
     public var triggerRedraw: UUID?
 
@@ -67,7 +68,8 @@ public struct Message: Identifiable, Hashable, Sendable {
                 giphyMediaId: String? = nil,
                 reactions: [Reaction] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
+                replyMessage: ReplyMessage? = nil,
+                type: MessageType = .message) {
 
         self.id = id
         self.user = user
@@ -79,6 +81,7 @@ public struct Message: Identifiable, Hashable, Sendable {
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
+        self.type = type
     }
 
     public static func makeMessage(
@@ -113,7 +116,8 @@ public struct Message: Identifiable, Hashable, Sendable {
                 attachments: attachments,
                 giphyMediaId: giphyMediaId,
                 recording: draft.recording,
-                replyMessage: draft.replyMessage
+                replyMessage: draft.replyMessage,
+                type: draft.type
             )
         }
 }
@@ -135,7 +139,8 @@ extension Message: Equatable {
         lhs.attachments == rhs.attachments &&
         lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&
-        lhs.replyMessage == rhs.replyMessage
+        lhs.replyMessage == rhs.replyMessage &&
+        lhs.type == rhs.type
     }
 }
 
@@ -194,4 +199,9 @@ public extension Message {
     func toReplyMessage() -> ReplyMessage {
         ReplyMessage(id: id, user: user, createdAt: createdAt, text: text, attachments: attachments, recording: recording)
     }
+}
+
+enum MessageType: String, Codable, Sendable {
+    case message
+    case capture
 }
