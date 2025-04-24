@@ -10,7 +10,6 @@ extension DateFormatter {
 
         formatter.dateStyle = .none
         formatter.timeStyle = .short
-        formatter.timeZone = .current
 
         return formatter
     }()
