@@ -28,7 +28,7 @@ extension ChatView {
     nonisolated static func mapMessagesQuoteModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
         let dates = Set(messages.map({ $0.createdAt.startOfDay() }))
             .sorted()
-
+            .reversed()
         var result: [MessagesSection] = []
 
         for date in dates {
@@ -178,7 +178,6 @@ extension ChatView {
                     positionInMessagesSection: positionInMessagesSection,
                     commentsPosition: commentsPosition)
             }
-            .reversed()
     }
 }
 
