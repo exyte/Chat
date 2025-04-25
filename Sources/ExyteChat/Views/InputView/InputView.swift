@@ -123,7 +123,7 @@ struct InputView: View {
                 rightOutsideButton
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+//            .padding(.vertical, 8)
         }
         .background(backgroundColor)
         .onAppear {

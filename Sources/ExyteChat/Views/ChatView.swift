@@ -279,12 +279,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 Text(localization.waitingForNetwork)
                 Spacer()
             }
-//            .padding(.top, 6)
+            .padding(.top, 6)
             Rectangle()
                 .foregroundColor(theme.colors.mainText.opacity(0.12))
                 .frame(height: 1)
         }
-        // .padding(.top, 8)
+        .padding(.top, 8)
     }
     
     @ViewBuilder
