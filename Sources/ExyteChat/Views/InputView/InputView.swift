@@ -125,7 +125,7 @@ struct InputView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
-        // .background(backgroundColor)
+        .background(backgroundColor)
         .onAppear {
             viewModel.recordingPlayer = recordingPlayer
             viewModel.setRecorderSettings(recorderSettings: recorderSettings)
