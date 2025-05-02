@@ -319,7 +319,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .transition(.opacity)
                 }
             }
-            .animation(.easeInOut(duration: 0.25), value: isScrolledToBottom)
+            .animation(.easeInOut(duration: 0.44), value: isScrolledToBottom)
 
         case .comments:
             list

@@ -1,19 +1,20 @@
 //
 //  UIList.swift
-//  
+//
 //
 //  Created by Alisa Mylnikova on 24.02.2023.
 //
 
 import SwiftUI
 
-public extension Notification.Name {
-    static let onScrollToBottom = Notification.Name("onScrollToBottom")
+extension Notification.Name {
+    public static let onScrollToBottom = Notification.Name("onScrollToBottom")
 }
 
 struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
-    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderClosure
+    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>
+        .MessageBuilderClosure
 
     @Environment(\.chatTheme) var theme
 
@@ -21,12 +22,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     @ObservedObject var inputViewModel: InputViewModel
 
     @Binding var isScrolledToBottom: Bool
-    @Binding var shouldScrollToTop: () -> ()
+    @Binding var shouldScrollToTop: () -> Void
     @Binding var tableContentHeight: CGFloat
 
     var messageBuilder: MessageBuilderClosure?
-    var mainHeaderBuilder: (()->AnyView)?
-    var headerBuilder: ((Date)->AnyView)?
+    var mainHeaderBuilder: (() -> AnyView)?
+    var headerBuilder: ((Date) -> AnyView)?
     var inputView: InputView
 
     let type: ChatType
@@ -63,17 +64,20 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = isScrollEnabled
 
-        NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
+        NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil)
+        { _ in
             DispatchQueue.main.async {
                 if !context.coordinator.sections.isEmpty {
-                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
+                    tableView.scrollToRow(
+                        at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
                 }
             }
         }
 
         DispatchQueue.main.async {
             shouldScrollToTop = {
-                tableView.contentOffset = CGPoint(x: 0, y: tableView.contentSize.height - tableView.frame.height)
+                tableView.contentOffset = CGPoint(
+                    x: 0, y: tableView.contentSize.height - tableView.frame.height)
             }
         }
 
@@ -92,7 +96,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         Task {
-            await updateQueue.enqueue() {
+            await updateQueue.enqueue {
                 await updateIfNeeded(coordinator: context.coordinator, tableView: tableView)
             }
         }
@@ -116,7 +120,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         if let lastSection = sections.last {
-            coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+            coordinator.paginationTargetIndexPath = IndexPath(
+                row: lastSection.rows.count - 1, section: sections.count - 1)
         }
 
         let prevSections = coordinator.sections
@@ -128,7 +133,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
     }
 
-    nonisolated private func performSplitInBackground(_  prevSections:  [MessagesSection], _ sections: [MessagesSection]) async -> SplitInfo {
+    nonisolated private func performSplitInBackground(
+        _ prevSections: [MessagesSection], _ sections: [MessagesSection]
+    ) async -> SplitInfo {
         await withCheckedContinuation { continuation in
             Task.detached {
                 let result = operationsSplit(oldSections: prevSections, newSections: sections)
@@ -138,7 +145,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     }
 
     @MainActor
-    private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, updateContextClosure: ([MessagesSection])->()) async {
+    private func applyUpdatesToTable(
+        _ tableView: UITableView, splitInfo: SplitInfo,
+        updateContextClosure: ([MessagesSection]) -> Void
+    ) async {
         // step 0: preparation
         // prepare intermediate sections and operations
         //print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
@@ -167,7 +177,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             // swap places for rows that moved inside the table
             // (example of how this happens. send two messages: first m1, then m2. if m2 is delivered to server faster, then it should jump above m1 even though it was sent later)
             //print("2 apply swaps", runID)
-            updateContextClosure(splitInfo.appliedDeletesSwapsAndEdits) // NOTE: this array already contains necessary edits, but won't be a problem for appplying swaps
+            updateContextClosure(splitInfo.appliedDeletesSwapsAndEdits)  // NOTE: this array already contains necessary edits, but won't be a problem for appplying swaps
             for operation in splitInfo.swapOperations {
                 applyOperation(operation, tableView: tableView)
             }
@@ -213,10 +223,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         case deleteSection(Int)
         case insertSection(Int)
 
-        case delete(Int, Int) // delete with animation
-        case insert(Int, Int) // insert with animation
-        case swap(Int, Int, Int) // delete first with animation, then insert it into new position with animation. do not do anything with the second for now
-        case edit(Int, Int) // reload the element without animation
+        case delete(Int, Int)  // delete with animation
+        case insert(Int, Int)  // insert with animation
+        case swap(Int, Int, Int)  // delete first with animation, then insert it into new position with animation. do not do anything with the second for now
+        case edit(Int, Int)  // reload the element without animation
 
         var description: String {
             switch self {
@@ -256,9 +266,11 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
     }
 
-    private nonisolated func operationsSplit(oldSections: [MessagesSection], newSections: [MessagesSection]) -> SplitInfo {
-        var appliedDeletes = oldSections // start with old sections, remove rows that need to be deleted
-        var appliedDeletesSwapsAndEdits = newSections // take new sections and remove rows that need to be inserted for now, then we'll get array with all the changes except for inserts
+    private nonisolated func operationsSplit(
+        oldSections: [MessagesSection], newSections: [MessagesSection]
+    ) -> SplitInfo {
+        var appliedDeletes = oldSections  // start with old sections, remove rows that need to be deleted
+        var appliedDeletesSwapsAndEdits = newSections  // take new sections and remove rows that need to be inserted for now, then we'll get array with all the changes except for inserts
         // appliedDeletesSwapsEditsAndInserts == newSection
 
         var deleteOperations = [Operation]()
@@ -272,18 +284,18 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let newDates = newSections.map { $0.date }
         let commonDates = Array(Set(oldDates + newDates)).sorted(by: >)
         for date in commonDates {
-            let oldIndex = appliedDeletes.firstIndex(where: { $0.date == date } )
-            let newIndex = appliedDeletesSwapsAndEdits.firstIndex(where: { $0.date == date } )
+            let oldIndex = appliedDeletes.firstIndex(where: { $0.date == date })
+            let newIndex = appliedDeletesSwapsAndEdits.firstIndex(where: { $0.date == date })
             if oldIndex == nil, let newIndex {
                 // operationIndex is not the same as newIndex because appliedDeletesSwapsAndEdits is being changed as we go, but to apply changes to UITableView we should have initial index
-                if let operationIndex = newSections.firstIndex(where: { $0.date == date } ) {
+                if let operationIndex = newSections.firstIndex(where: { $0.date == date }) {
                     appliedDeletesSwapsAndEdits.remove(at: newIndex)
                     insertOperations.append(.insertSection(operationIndex))
                 }
                 continue
             }
             if newIndex == nil, let oldIndex {
-                if let operationIndex = oldSections.firstIndex(where: { $0.date == date } ) {
+                if let operationIndex = oldSections.firstIndex(where: { $0.date == date }) {
                     appliedDeletes.remove(at: oldIndex)
                     deleteOperations.append(.deleteSection(operationIndex))
                 }
@@ -304,7 +316,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             for rowId in rowIDsToDelete {
                 if let index = oldRows.firstIndex(where: { $0.id == rowId }) {
                     oldRows.remove(at: index)
-                    deleteOperations.append(.delete(oldIndex, index)) // this row was in old section, should not be in final result
+                    deleteOperations.append(.delete(oldIndex, index))  // this row was in old section, should not be in final result
                 }
             }
             for rowId in rowIDsToInsert {
@@ -326,14 +338,15 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             for i in 0..<oldRows.count {
                 let oldRow = oldRows[i]
                 let newRow = newRows[i]
-                if oldRow.id != newRow.id { // a swap: rows in same position are not actually the same rows
+                if oldRow.id != newRow.id {  // a swap: rows in same position are not actually the same rows
                     if let index = newRows.firstIndex(where: { $0.id == oldRow.id }) {
-                        if !swapsContain(swaps: swapOperations, section: oldIndex, index: i) ||
-                            !swapsContain(swaps: swapOperations, section: oldIndex, index: index) {
+                        if !swapsContain(swaps: swapOperations, section: oldIndex, index: i)
+                            || !swapsContain(swaps: swapOperations, section: oldIndex, index: index)
+                        {
                             swapOperations.append(.swap(oldIndex, i, index))
                         }
                     }
-                } else if oldRow != newRow { // same ids om same positions but something changed - reload rows without animation
+                } else if oldRow != newRow {  // same ids om same positions but something changed - reload rows without animation
                     editOperations.append(.edit(oldIndex, i))
                 }
             }
@@ -344,7 +357,11 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             appliedDeletesSwapsAndEdits[newIndex].rows = newRows
         }
 
-        return SplitInfo(appliedDeletes: appliedDeletes, appliedDeletesSwapsAndEdits: appliedDeletesSwapsAndEdits, deleteOperations: deleteOperations, swapOperations: swapOperations, editOperations: editOperations, insertOperations: insertOperations)
+        return SplitInfo(
+            appliedDeletes: appliedDeletes,
+            appliedDeletesSwapsAndEdits: appliedDeletesSwapsAndEdits,
+            deleteOperations: deleteOperations, swapOperations: swapOperations,
+            editOperations: editOperations, insertOperations: insertOperations)
     }
 
     private nonisolated func swapsContain(swaps: [Operation], section: Int, index: Int) -> Bool {
@@ -381,8 +398,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         @Binding var isScrolledToTop: Bool
 
         let messageBuilder: MessageBuilderClosure?
-        let mainHeaderBuilder: (()->AnyView)?
-        let headerBuilder: ((Date)->AnyView)?
+        let mainHeaderBuilder: (() -> AnyView)?
+        let headerBuilder: ((Date) -> AnyView)?
 
         let type: ChatType
         let showDateHeaders: Bool
@@ -397,7 +414,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         var sections: [MessagesSection] {
             didSet {
                 if let lastSection = sections.last {
-                    paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+                    paginationTargetIndexPath = IndexPath(
+                        row: lastSection.rows.count - 1, section: sections.count - 1)
                 }
             }
         }
@@ -488,45 +506,65 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 return nil
             }
 
-            let header = UIHostingController(rootView:
-                sectionHeaderViewBuilder(section)
+            let header = UIHostingController(
+                rootView:
+                    sectionHeaderViewBuilder(section)
                     .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
             ).view
             header?.backgroundColor = UIColor(mainBackgroundColor)
             return header
         }
-        
-        func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-            guard let items = type == .conversation ? listSwipeActions.trailing : listSwipeActions.leading else { return nil }
+
+        func tableView(
+            _ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+        ) -> UISwipeActionsConfiguration? {
+            guard
+                let items = type == .conversation
+                    ? listSwipeActions.trailing : listSwipeActions.leading
+            else { return nil }
             guard !items.actions.isEmpty else { return nil }
             let message = sections[indexPath.section].rows[indexPath.row].message
-            let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
+            let conf = UISwipeActionsConfiguration(
+                actions: items.actions.filter({ $0.activeFor(message) }).map {
+                    toContextualAction($0, message: message)
+                })
             conf.performsFirstActionWithFullSwipe = items.performsFirstActionWithFullSwipe
             return conf
         }
-        
-        func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-            guard let items = type == .conversation ? listSwipeActions.leading : listSwipeActions.trailing else { return nil }
+
+        func tableView(
+            _ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+        ) -> UISwipeActionsConfiguration? {
+            guard
+                let items = type == .conversation
+                    ? listSwipeActions.leading : listSwipeActions.trailing
+            else { return nil }
             guard !items.actions.isEmpty else { return nil }
             let message = sections[indexPath.section].rows[indexPath.row].message
-            let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
+            let conf = UISwipeActionsConfiguration(
+                actions: items.actions.filter({ $0.activeFor(message) }).map {
+                    toContextualAction($0, message: message)
+                })
             conf.performsFirstActionWithFullSwipe = items.performsFirstActionWithFullSwipe
             return conf
         }
-        
-        private func toContextualAction(_ item: SwipeActionable, message:Message) -> UIContextualAction {
-            let ca = UIContextualAction(style: .normal, title: nil) { (action, sourceView, completionHandler) in
+
+        private func toContextualAction(_ item: SwipeActionable, message: Message)
+            -> UIContextualAction
+        {
+            let ca = UIContextualAction(style: .normal, title: nil) {
+                (action, sourceView, completionHandler) in
                 item.action(message, self.viewModel.messageMenuAction())
                 completionHandler(true)
             }
             ca.image = item.render(type: type)
-            
+
             let bgColor = item.background ?? mainBackgroundColor
             ca.backgroundColor = UIColor(bgColor)
-            
+
             return ca
         }
-        
+
         @ViewBuilder
         func sectionHeaderViewBuilder(_ section: Int) -> some View {
             if let mainHeaderBuilder, section == 0 {
@@ -554,9 +592,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             }
         }
 
-        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)
+            -> UITableViewCell
+        {
 
-            let tableViewCell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+            let tableViewCell = tableView.dequeueReusableCell(
+                withIdentifier: "Cell", for: indexPath)
             tableViewCell.selectionStyle = .none
             tableViewCell.backgroundColor = UIColor(mainBackgroundColor)
 
@@ -587,8 +628,13 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             return tableViewCell
         }
 
-        func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            guard let paginationHandler = self.paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
+        func tableView(
+            _ tableView: UITableView, willDisplay cell: UITableViewCell,
+            forRowAt indexPath: IndexPath
+        ) {
+            guard let paginationHandler = self.paginationHandler, let paginationTargetIndexPath,
+                indexPath == paginationTargetIndexPath
+            else {
                 return
             }
 
@@ -599,8 +645,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            isScrolledToBottom = scrollView.contentOffset.y <= 0
-            isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
+            withAnimation(.easeInOut(duration: 0.44)) {
+                isScrolledToBottom = scrollView.contentOffset.y <= 0
+            }
+            isScrolledToTop =
+                scrollView.contentOffset.y >= scrollView.contentSize.height
+                - scrollView.frame.height - 1
         }
     }
 
@@ -640,7 +690,7 @@ actor UpdateQueue {
 
     func enqueue(_ work: @escaping @Sendable () async -> Void) async {
         while isProcessing {
-            await Task.yield() // Wait for previous task to finish
+            await Task.yield()  // Wait for previous task to finish
         }
 
         isProcessing = true
