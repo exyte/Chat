@@ -317,7 +317,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 }
                 .padding(8)
                 .opacity(isScrolledToBottom ? 0 : 1)
-                .animation(.easeInOut(duration: 0.33), value: isScrolledToBottom)  // Animation ONLY on the button
+                .animation(.easeInOut(duration: 0.22), value: isScrolledToBottom)  // Animation ONLY on the button
                 .allowsHitTesting(!isScrolledToBottom)
             }
 
