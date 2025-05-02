@@ -315,11 +315,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         // .foregroundStyle(theme.colors.sendButtonBackground)
                         .circleBackground(Color.white)
                         .foregroundStyle(Color.primary)
-                        .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+                        // .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+                        .shadow(color: .black.opacity(0.06), radius: 6, x: 1, y: 5)
                 }
                 .padding(8)
                 .opacity(isScrolledToBottom ? 0 : 1)
-                .animation(.easeInOut(duration: 0.22), value: isScrolledToBottom)  // Animation ONLY on the button
+                .animation(.spring(response: 0.3), value: isScrolledToBottom)  // Animation ONLY on the button
+                .transition(.scale(scale: 0.5, anchor: .center).combined(with: .opacity))
                 .allowsHitTesting(!isScrolledToBottom)
             }
 
