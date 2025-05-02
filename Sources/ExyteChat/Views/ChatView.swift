@@ -316,10 +316,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                             .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
                     }
                     .padding(8)
-                    .transition(.opacity)
+                    .opacity(isScrolledToBottom ? 0 : 1)
+                    .animation(.easeInOut(duration: 0.33), value: isScrolledToBottom)
+                    .allowsHitTesting(!isScrolledToBottom)
                 }
             }
-            .animation(.easeInOut(duration: 0.44), value: isScrolledToBottom)
+            .animation(.easeInOut(duration: 0.33), value: isScrolledToBottom)
 
         case .comments:
             list
