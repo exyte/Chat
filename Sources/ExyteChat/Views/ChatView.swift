@@ -319,9 +319,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         .shadow(color: .black.opacity(0.06), radius: 6, x: 1, y: 5)
                 }
                 .padding(8)
-                .opacity(isScrolledToBottom ? 0 : 1)
-                .animation(.spring(response: 0.3), value: isScrolledToBottom)  // Animation ONLY on the button
-                .transition(.scale(scale: 0.5, anchor: .center).combined(with: .opacity))
+                .opacity(isScrolledToBottom ? 0 : 1)  // Animate opacity
+                .scaleEffect(isScrolledToBottom ? 0.5 : 1.0)  // Animate scale
+                .animation(.spring(response: 0.3), value: isScrolledToBottom)  // Animates both opacity and scale
                 .allowsHitTesting(!isScrolledToBottom)
             }
 
