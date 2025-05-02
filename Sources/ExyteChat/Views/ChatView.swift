@@ -310,7 +310,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                 } label: {
                     theme.images.scrollToBottom
-                        .frame(width: 48, height: 48)
+                        .frame(width: 44, height: 44)
                         // .circleBackground(theme.colors.messageFriendBG)
                         // .foregroundStyle(theme.colors.sendButtonBackground)
                         .circleBackground(Color.white)
