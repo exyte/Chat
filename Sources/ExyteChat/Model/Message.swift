@@ -203,4 +203,8 @@ public extension Message {
 public enum MessageType: String, Codable, Sendable {
     case message
     case capture
+    case joined
+    case left
+    case created
+    case renamed
 }
