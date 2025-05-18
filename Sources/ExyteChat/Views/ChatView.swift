@@ -490,25 +490,35 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     private func chatBackground() -> some View {
         Group {
-            // to use a background image both the light and dark background images should be set
-            //  these can be set to the same image
-            if let backgroundLight = theme.images.backgroundLight,
-               let backgroundDark = theme.images.backgroundDark {
+            
+            if let background = theme.images.background {
                 
-                if colorScheme == .dark {
-                    backgroundDark
+                switch (isLandscape(), colorScheme) {
+                case (true, .dark):
+                    background.landscapeBackgroundDark
                         .resizable()
                         .ignoresSafeArea(.keyboard)
-                } else {
-                    backgroundLight
+                case (true, .light):
+                    background.landscapeBackgroundLight
+                        .resizable()
+                        .ignoresSafeArea(.keyboard)
+                case (false, .dark):
+                    background.portraitBackgroundDark
+                        .resizable()
+                        .ignoresSafeArea(.keyboard)
+                case (false, .light):
+                    background.portraitBackgroundLight
                         .resizable()
                         .ignoresSafeArea(.keyboard)
                 }
-                
             } else {
                 theme.colors.mainBG
             }
         }
+    }
+    
+    private func isLandscape() -> Bool {
+        return UIDevice.current.orientation.isLandscape
     }
     
     private func isGiphyAvailable() -> Bool {

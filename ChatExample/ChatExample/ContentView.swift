@@ -118,8 +118,12 @@ enum ExampleThemeState: String {
         case .accent, .themed: return .init()
         case .image:
             return .init(
-                backgroundLight: Image("chatBackgroundLight"),
-                backgroundDark: Image("chatBackgroundDark")
+                background: ChatTheme.Images.Background(
+                    portraitBackgroundLight: Image("chatBackgroundLight"),
+                    portraitBackgroundDark: Image("chatBackgroundDark"),
+                    landscapeBackgroundLight: Image("chatBackgroundLandscapeLight"),
+                    landscapeBackgroundDark: Image("chatBackgroundLandscapeDark")
+                )
             )
         }
     }
@@ -131,3 +135,5 @@ enum ExampleThemeState: String {
         return true
     }
 }
+
+

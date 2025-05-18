@@ -48,7 +48,7 @@ public struct ChatTheme {
         self.images = images
         
         // if background images have been set then override the mainBG color to be clear
-        self.colors = if images.backgroundDark != nil && images.backgroundLight != nil {
+        self.colors = if images.background != nil {
             ChatTheme.Colors(copy: colors, mainBG: .clear)
         } else {
             colors
@@ -209,6 +209,25 @@ public struct ChatTheme {
     }
 
     public struct Images {
+      
+        public struct Background {
+            let portraitBackgroundLight: Image
+            let portraitBackgroundDark: Image
+            let landscapeBackgroundLight: Image
+            let landscapeBackgroundDark: Image
+
+            public init(
+                portraitBackgroundLight: Image,
+                portraitBackgroundDark: Image,
+                landscapeBackgroundLight: Image,
+                landscapeBackgroundDark: Image
+            ) {
+                self.portraitBackgroundLight = portraitBackgroundLight
+                self.portraitBackgroundDark = portraitBackgroundDark
+                self.landscapeBackgroundLight = landscapeBackgroundLight
+                self.landscapeBackgroundDark = landscapeBackgroundDark
+            }
+        }
 
         public struct AttachMenu {
             public var camera: Image
@@ -278,10 +297,9 @@ public struct ChatTheme {
             public var cancelReply: Image
             public var replyToMessage: Image
         }
-        
-        public var backgroundLight: Image? = nil
-        public var backgroundDark: Image? = nil
-
+      
+        public var background: Background? = nil
+  
         public var backButton: Image
         public var scrollToBottom: Image
 
@@ -342,14 +360,12 @@ public struct ChatTheme {
             replyToMessage: Image? = nil,
             backButton: Image? = nil,
             scrollToBottom: Image? = nil,
-            backgroundLight: Image? = nil,
-            backgroundDark: Image? = nil
+            background: Background? = nil
         ) {
             self.backButton = backButton ?? Image("backArrow", bundle: .current)
             self.scrollToBottom = scrollToBottom ?? Image(systemName: "chevron.down")
             
-            self.backgroundLight = backgroundLight
-            self.backgroundDark = backgroundDark
+            self.background = background
 
             self.attachMenu = AttachMenu(
                 camera: camera ?? Image("camera", bundle: .current),
