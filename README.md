@@ -280,9 +280,12 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
             addButtonBackground: .purple
         ),
         images: .init(
-          backgroundLight: Image("chatBackgroundLight"),
-          backgroundDark: Image("chatBackgroundDark")
-        )
+            background: ChatTheme.Images.Background(
+                portraitBackgroundLight: Image("chatBackgroundLight"),
+                portraitBackgroundDark: Image("chatBackgroundDark"),
+                landscapeBackgroundLight: Image("chatBackgroundLandscapeLight"),
+                landscapeBackgroundDark: Image("chatBackgroundLandscapeDark")
+            )
     )
 )
 
