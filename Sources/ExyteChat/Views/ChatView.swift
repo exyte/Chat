@@ -497,19 +497,19 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 case (true, .dark):
                     background.landscapeBackgroundDark
                         .resizable()
-                        .ignoresSafeArea(.keyboard)
+                        .ignoresSafeArea()
                 case (true, .light):
                     background.landscapeBackgroundLight
                         .resizable()
-                        .ignoresSafeArea(.keyboard)
+                        .ignoresSafeArea()
                 case (false, .dark):
                     background.portraitBackgroundDark
                         .resizable()
-                        .ignoresSafeArea(.keyboard)
+                        .ignoresSafeArea()
                 case (false, .light):
                     background.portraitBackgroundLight
                         .resizable()
-                        .ignoresSafeArea(.keyboard)
+                        .ignoresSafeArea()
                 }
             } else {
                 theme.colors.mainBG
