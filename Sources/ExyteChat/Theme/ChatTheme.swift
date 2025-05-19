@@ -211,17 +211,24 @@ public struct ChatTheme {
     public struct Images {
       
         public struct Background {
+            
+            let safeAreaRegions: SafeAreaRegions
+            let safeAreaEdges: Edge.Set
             let portraitBackgroundLight: Image
             let portraitBackgroundDark: Image
             let landscapeBackgroundLight: Image
             let landscapeBackgroundDark: Image
 
             public init(
+                safeAreaRegions: SafeAreaRegions = .all,
+                safeAreaEdges: Edge.Set = .all,
                 portraitBackgroundLight: Image,
                 portraitBackgroundDark: Image,
                 landscapeBackgroundLight: Image,
                 landscapeBackgroundDark: Image
             ) {
+                self.safeAreaRegions = safeAreaRegions
+                self.safeAreaEdges = safeAreaEdges
                 self.portraitBackgroundLight = portraitBackgroundLight
                 self.portraitBackgroundDark = portraitBackgroundDark
                 self.landscapeBackgroundLight = landscapeBackgroundLight
