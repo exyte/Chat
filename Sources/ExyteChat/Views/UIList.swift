@@ -63,7 +63,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.backgroundColor = UIColor(theme.colors.mainBG)
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = isScrollEnabled
-
+        
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil)
         { _ in
             DispatchQueue.main.async {
@@ -376,7 +376,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     // MARK: - Coordinator
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(
+        return Coordinator(
             viewModel: viewModel, inputViewModel: inputViewModel,
             isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop,
             messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder,
@@ -414,9 +414,11 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         var sections: [MessagesSection] {
             didSet {
                 if let lastSection = sections.last {
-                    paginationTargetIndexPath = IndexPath(
+                    let newTarget = IndexPath(
                         row: lastSection.rows.count - 1, section: sections.count - 1)
-                }
+
+                    self.paginationTargetIndexPath = newTarget
+                } 
             }
         }
         let ids: [String]
@@ -632,8 +634,14 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             _ tableView: UITableView, willDisplay cell: UITableViewCell,
             forRowAt indexPath: IndexPath
         ) {
-            guard let paginationHandler = self.paginationHandler, let paginationTargetIndexPath,
-                indexPath == paginationTargetIndexPath
+            
+            // check if this is the last row in the last section
+            let isLastRow = indexPath.section == sections.count - 1 && 
+                           indexPath.row == sections[indexPath.section].rows.count - 1
+
+            // TODO: Figure out why paginationTargetIndexPath is not being set correctly, isLastRow is a bit of a hack
+            guard let paginationHandler = self.paginationHandler,
+                  (paginationTargetIndexPath == indexPath || isLastRow)
             else {
                 return
             }
