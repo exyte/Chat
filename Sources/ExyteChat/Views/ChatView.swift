@@ -498,19 +498,19 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 case (true, .dark):
                     background.landscapeBackgroundDark
                         .resizable()
-                        .ignoresSafeArea()
+                        .ignoresSafeArea(background.safeAreaRegions, edges: background.safeAreaEdges)
                 case (true, .light):
                     background.landscapeBackgroundLight
                         .resizable()
-                        .ignoresSafeArea()
+                        .ignoresSafeArea(background.safeAreaRegions, edges: background.safeAreaEdges)
                 case (false, .dark):
                     background.portraitBackgroundDark
                         .resizable()
-                        .ignoresSafeArea()
+                        .ignoresSafeArea(background.safeAreaRegions, edges: background.safeAreaEdges)
                 case (false, .light):
                     background.portraitBackgroundLight
                         .resizable()
-                        .ignoresSafeArea()
+                        .ignoresSafeArea(background.safeAreaRegions, edges: background.safeAreaEdges)
                 }
             } else {
                 theme.colors.mainBG
