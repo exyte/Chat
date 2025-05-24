@@ -112,6 +112,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var isScrollEnabled: Bool = true
     var avatarSize: CGFloat = 32
     var messageStyler: (String) -> AttributedString = AttributedString.init
+    var shouldShowLinkPreview: (URL) -> Bool = { _ in true }
     var showMessageMenuOnLongPress: Bool = true
     var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
@@ -333,6 +334,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             tapAvatarClosure: tapAvatarClosure,
             paginationHandler: paginationHandler,
             messageStyler: messageStyler,
+            shouldShowLinkPreview: shouldShowLinkPreview,
             showMessageTimeView: showMessageTimeView,
             messageLinkPreviewLimit: messageLinkPreviewLimit,
             messageFont: messageFont,
@@ -428,6 +430,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ChatMessageView(
                 viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
                 avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
+                shouldShowLinkPreview: shouldShowLinkPreview,
                 isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
                 messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
             )
@@ -653,6 +656,12 @@ public extension ChatView {
         return view
     }
     
+    func shouldShowLinkPreview(_ shouldShowLinkPreview: @escaping (URL) -> Bool) -> ChatView {
+        var view = self
+        view.shouldShowLinkPreview = shouldShowLinkPreview
+        return view
+    }
+
     func showMessageTimeView(_ isShow: Bool) -> ChatView {
         var view = self
         view.showMessageTimeView = isShow
