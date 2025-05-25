@@ -10,15 +10,6 @@ import Testing
 
 @testable import ExyteChat
 
-extension Date {
-    fileprivate static func from(string: String) -> Date {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withFullDate, .withFullTime, .withSpaceBetweenDateAndTime]
-        let date = formatter.date(from: string)!
-        return date
-    }
-}
-
 extension Tag {
     @Tag static var messageOrder: Self
     @Tag static var answerMode: Self
@@ -37,8 +28,8 @@ struct WrappingMessagesTest {
     let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
     let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
 
-    let monday = Date.from(string: "2025-01-27 09:00:00Z")
-    let tuesday = Date.from(string: "2025-01-28 09:00:00Z")
+    let monday = try! Date.iso8601Date.parse("2025-01-27")
+    let tuesday = try! Date.iso8601Date.parse("2025-01-28")
 
     @Test("No messages implies no sections", arguments: ChatType.allCases, ReplyMode.allCases)
     func noMessageImpliesNoSection(for chatType: ChatType, and replyMode: ReplyMode) {
