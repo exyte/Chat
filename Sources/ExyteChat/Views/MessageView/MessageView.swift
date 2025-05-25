@@ -20,6 +20,7 @@ struct MessageView: View {
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let messageStyler: (String) -> AttributedString
+    let shouldShowLinkPreview: (URL) -> Bool
     let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
     let messageLinkPreviewLimit: Int
@@ -193,7 +194,8 @@ struct MessageView: View {
             if !message.text.isEmpty {
                 MessageTextView(
                     text: message.text, messageStyler: messageStyler,
-                    userType: message.user.type, messageLinkPreviewLimit: messageLinkPreviewLimit
+                    userType: message.user.type, shouldShowLinkPreview: shouldShowLinkPreview,
+                    messageLinkPreviewLimit: messageLinkPreviewLimit
                 )
                 .padding(.horizontal, MessageView.horizontalTextPadding)
             }
@@ -254,7 +256,8 @@ struct MessageView: View {
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(
             text: message.text, messageStyler: messageStyler,
-            userType: message.user.type, messageLinkPreviewLimit: messageLinkPreviewLimit
+            userType: message.user.type, shouldShowLinkPreview: shouldShowLinkPreview,
+            messageLinkPreviewLimit: messageLinkPreviewLimit
         )
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, MessageView.horizontalTextPadding)
@@ -396,6 +399,7 @@ struct MessageView_Preview: PreviewProvider {
                 avatarSize: 32,
                 tapAvatarClosure: nil,
                 messageStyler: AttributedString.init,
+                shouldShowLinkPreview: { _ in true },
                 isDisplayingMessageMenu: false,
                 showMessageTimeView: true,
                 messageLinkPreviewLimit: 8,
