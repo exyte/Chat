@@ -42,7 +42,7 @@ struct MessageView: View {
     static let horizontalAvatarPadding: CGFloat = 8
     static let horizontalTextPadding: CGFloat = 12
     static let attachmentPadding: CGFloat = 1 // for multiple attachments
-    static let statusViewSize: CGFloat = 14
+    static let statusViewSize: CGFloat = 10
     static let horizontalStatusPadding: CGFloat = horizontalScreenEdgePadding / 2
     static let horizontalBubblePadding: CGFloat = 70
 

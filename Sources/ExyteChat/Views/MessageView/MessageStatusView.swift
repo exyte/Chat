@@ -17,12 +17,11 @@ struct MessageStatusView: View {
             case .sending:
                 theme.images.message.sending
                     .resizable()
-                    .rotationEffect(.degrees(90))
                     .foregroundColor(getTheme().colors.statusGray)
             case .sent:
                 theme.images.message.sent
                     .resizable()
-                    .foregroundColor(theme.colors.statusGray)
+                    .foregroundColor(theme.colors.messageMyBG)
             case .read:
                 theme.images.message.read
                     .resizable()

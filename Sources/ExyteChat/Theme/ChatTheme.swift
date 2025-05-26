@@ -430,15 +430,15 @@ public struct ChatTheme {
 
             self.message = Message(
                 attachedDocument: attachedDocument ?? Image("attachedDocument", bundle: .current),
-                error: error ?? Image("error", bundle: .current),
+                error: error ?? Image(systemName: "exclamationmark.circle.fill"),
                 muteVideo: muteVideo ?? Image("muteVideo", bundle: .current),
                 pauseAudio: pauseAudio ?? Image("pauseAudio", bundle: .current),
                 pauseVideo: pauseVideo ?? Image(systemName: "pause.circle.fill"),
                 playAudio: playAudio ?? Image("playAudio", bundle: .current),
                 playVideo: playVideo ?? Image(systemName: "play.circle.fill"),
-                read: read ?? Image("checkmarks", bundle: .current),
-                sending: sending ?? Image("sending", bundle: .current),
-                sent: sent ?? Image("checkmarks", bundle: .current)
+                read: read ?? Image(systemName: "checkmark.circle.fill"),
+                sending: sending ?? Image(systemName: "clock"),
+                sent: sent ?? Image(systemName: "checkmark.circle")
             )
 
             self.messageMenu = MessageMenu(
