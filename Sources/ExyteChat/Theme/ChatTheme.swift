@@ -290,14 +290,15 @@ public struct ChatTheme {
 
         public struct Message {
             public var attachedDocument: Image
-            public var checkmarks: Image
             public var error: Image
             public var muteVideo: Image
             public var pauseAudio: Image
             public var pauseVideo: Image
             public var playAudio: Image
             public var playVideo: Image
+            public var read: Image
             public var sending: Image
+            public var sent: Image
         }
 
         public struct MessageMenu {
@@ -361,14 +362,15 @@ public struct ChatTheme {
             chevronRight: Image? = nil,
             cross: Image? = nil,
             attachedDocument: Image? = nil,
-            checkmarks: Image? = nil,
             error: Image? = nil,
             muteVideo: Image? = nil,
             pauseAudio: Image? = nil,
             pauseVideo: Image? = nil,
             playAudio: Image? = nil,
             playVideo: Image? = nil,
+            read: Image? = nil,
             sending: Image? = nil,
+            sent: Image? = nil,
             delete: Image? = nil,
             edit: Image? = nil,
             forward: Image? = nil,
@@ -428,14 +430,15 @@ public struct ChatTheme {
 
             self.message = Message(
                 attachedDocument: attachedDocument ?? Image("attachedDocument", bundle: .current),
-                checkmarks: checkmarks ?? Image("checkmarks", bundle: .current),
                 error: error ?? Image("error", bundle: .current),
                 muteVideo: muteVideo ?? Image("muteVideo", bundle: .current),
                 pauseAudio: pauseAudio ?? Image("pauseAudio", bundle: .current),
                 pauseVideo: pauseVideo ?? Image(systemName: "pause.circle.fill"),
                 playAudio: playAudio ?? Image("playAudio", bundle: .current),
                 playVideo: playVideo ?? Image(systemName: "play.circle.fill"),
-                sending: sending ?? Image("sending", bundle: .current)
+                read: read ?? Image("checkmarks", bundle: .current),
+                sending: sending ?? Image("sending", bundle: .current),
+                sent: sent ?? Image("checkmarks", bundle: .current)
             )
 
             self.messageMenu = MessageMenu(
