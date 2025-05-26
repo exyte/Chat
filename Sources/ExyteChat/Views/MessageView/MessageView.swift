@@ -37,12 +37,13 @@ struct MessageView: View {
     @State var bubbleSize: CGSize = .zero
     
     static let widthWithMedia: CGFloat = 204
-    static let horizontalNoAvatarPadding: CGFloat = 6
+    static let horizontalScreenEdgePadding: CGFloat = 12
+    static let horizontalNoAvatarPadding: CGFloat = horizontalScreenEdgePadding / 2
     static let horizontalAvatarPadding: CGFloat = 8
     static let horizontalTextPadding: CGFloat = 12
     static let attachmentPadding: CGFloat = 1 // for multiple attachments
     static let statusViewSize: CGFloat = 14
-    static let horizontalStatusPadding: CGFloat = 6
+    static let horizontalStatusPadding: CGFloat = horizontalScreenEdgePadding / 2
     static let horizontalBubblePadding: CGFloat = 70
 
     enum DateArrangement {
@@ -223,7 +224,7 @@ struct MessageView: View {
                 Color.clear.viewSize(avatarSize)
             }
         }
-        .padding(.leading, 12)
+        .padding(.leading, MessageView.horizontalScreenEdgePadding)
         .padding(.trailing, MessageView.horizontalAvatarPadding)
         .sizeGetter($avatarViewSize)
     }
