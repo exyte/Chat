@@ -736,3 +736,54 @@ public extension ChatView {
     }
 }
 
+#Preview {
+    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
+    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
+
+    let monday = try! Date.iso8601Date.parse("2025-05-12")
+    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
+
+    ChatView(messages: [
+        Message(
+            id: "26tb", user: romeo, status: .read, createdAt: monday,
+            text: "And I’ll still stay, to have thee still forget"),
+        Message(
+            id: "zee6", user: romeo, status: .read, createdAt: monday,
+            text: "Forgetting any other home but this"),
+
+        Message(
+            id: "oWUN", user: juliet, status: .read, createdAt: monday,
+            text: "’Tis almost morning. I would have thee gone"),
+        Message(
+            id: "P261", user: juliet, status: .read, createdAt: monday,
+            text: "And yet no farther than a wanton’s bird"),
+        Message(
+            id: "46hu", user: juliet, status: .read, createdAt: monday,
+            text: "That lets it hop a little from his hand"),
+        Message(
+            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
+            text: "Like a poor prisoner in his twisted gyves"),
+        Message(
+            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
+            text: "And with a silken thread plucks it back again"),
+        Message(
+            id: "kwWd", user: juliet, status: .read, createdAt: monday,
+            text: "So loving-jealous of his liberty"),
+
+        Message(
+            id: "9481", user: romeo, status: .read, createdAt: tuesday,
+            text: "I would I were thy bird"),
+
+        Message(
+            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
+        Message(
+            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
+            text: "Yet I should kill thee with much cherishing"),
+        Message(
+            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
+            text: "Good night, good night. Parting is such sweet sorrow"),
+        Message(
+            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
+            text: "That I shall say 'Good night' till it be morrow"),
+    ]) { draft in }
+}
