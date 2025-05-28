@@ -82,7 +82,7 @@ Chat type - determines the order of messages and direction of new message animat
 
 Reply mode - determines how replying to message looks. Available options:
 - `quote` - when replying to message A, new message will appear as the newest message, quoting message A in its body  
-- `answer` - when replying to message A, new message with appear direclty below message A as a separate cell without duplicating message A in its body  
+- `answer` - when replying to message A, new message with appear directly below message A as a separate cell without duplicating message A in its body  
 
 To specify any of these pass them through `init`:
 ```swift
@@ -152,7 +152,7 @@ ChatView(messages: viewModel.messages) { draft in
 - `dismissKeyboardClosure` - call this to dismiss keyboard    
 
 ## Custom message menu
-Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callbcak will be called. Here is a simple example:
+Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callback will be called. Here is a simple example:
 ```swift
 enum Action: MessageMenuAction {
     case reply, edit
@@ -246,7 +246,7 @@ These use `AnyView`, so please try to keep them easy enough
 ## Modifiers 
 `isListAboveInputView` - messages table above the input field view or not   
 `showDateHeaders` - show section headers with dates between days, default is `true`    
-`isScrollEnabled` - forbid scrolling for messages' `UITabelView`   
+`isScrollEnabled` - forbid scrolling for messages' `UITableView`   
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
 `showNetworkConnectionProblem` - display network error on/off    
 `assetsPickerLimit` - set a limit for MediaPicker built into the library   
@@ -290,7 +290,7 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
 )
 
 ```
-By default the built-in MediaPicker will be auto-customized using the mosyt logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
+By default the built-in MediaPicker will be auto-customized using the most logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
 
 ### makes sense only for built-in message view    
 `avatarSize` - the default avatar is a circle, you can specify its diameter here   
@@ -328,7 +328,7 @@ To include the sticker keyboard:
 )
 ```
 
-To approve a production client Id for your app, Giphy requires that you include a "Powered By GIPHY" attibution mark, see [attribution mark requirement](https://support.giphy.com/hc/en-us/articles/360035158592-What-conditions-does-my-app-project-need-to-meet-in-order-to-get-a-production-API-Key). Setting the showAttributionMark in the GiphyConfiguration struct will include a small overlay image on the giphy picker which meets the requirement needed for a production client key.
+To approve a production client Id for your app, Giphy requires that you include a "Powered By GIPHY" attribution mark, see [attribution mark requirement](https://support.giphy.com/hc/en-us/articles/360035158592-What-conditions-does-my-app-project-need-to-meet-in-order-to-get-a-production-API-Key). Setting the showAttributionMark in the GiphyConfiguration struct will include a small overlay image on the giphy picker which meets the requirement needed for a production client key.
 
 
 ## Localization
@@ -351,7 +351,7 @@ There are 2 example projects:
 
 Create your firestore app
 https://console.firebase.google.com/
-Create firesote database (for light weight text data)
+Create firestore database (for light weight text data)
 https://firebase.google.com/docs/firestore/manage-data/add-data
 Create cloud firestore database (for images and voice recordings)
 https://firebase.google.com/docs/storage/web/start
@@ -393,6 +393,5 @@ dependencies: [
 [ProgressIndicatorView](https://github.com/exyte/ProgressIndicatorView) - A number of animated progress indicators    
 [FlagAndCountryCode](https://github.com/exyte/FlagAndCountryCode) - Phone codes and flags for every country    
 [SVGView](https://github.com/exyte/SVGView) - SVG parser    
-[LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation    
-
+[LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation
 
