@@ -394,3 +394,4 @@ dependencies: [
 [FlagAndCountryCode](https://github.com/exyte/FlagAndCountryCode) - Phone codes and flags for every country    
 [SVGView](https://github.com/exyte/SVGView) - SVG parser    
 [LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation
+
