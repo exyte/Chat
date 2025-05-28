@@ -37,12 +37,13 @@ struct MessageView: View {
     @State var bubbleSize: CGSize = .zero
     
     static let widthWithMedia: CGFloat = 204
-    static let horizontalNoAvatarPadding: CGFloat = 8
+    static let horizontalScreenEdgePadding: CGFloat = 12
+    static let horizontalNoAvatarPadding: CGFloat = horizontalScreenEdgePadding / 2
     static let horizontalAvatarPadding: CGFloat = 8
     static let horizontalTextPadding: CGFloat = 12
-    static let horizontalAttachmentPadding: CGFloat = 1 // for multiple attachments
-    static let statusViewSize: CGFloat = 14
-    static let horizontalStatusPadding: CGFloat = 8
+    static let attachmentPadding: CGFloat = 1 // for multiple attachments
+    static let statusViewSize: CGFloat = 10
+    static let horizontalStatusPadding: CGFloat = horizontalScreenEdgePadding / 2
     static let horizontalBubblePadding: CGFloat = 70
 
     enum DateArrangement {
@@ -50,7 +51,7 @@ struct MessageView: View {
     }
 
     var additionalMediaInset: CGFloat {
-        message.attachments.count > 1 ? MessageView.horizontalAttachmentPadding * 2 : 0
+        message.attachments.count > 1 ? MessageView.attachmentPadding * 2 : 0
     }
 
     var dateArrangement: DateArrangement {
@@ -223,7 +224,8 @@ struct MessageView: View {
                 Color.clear.viewSize(avatarSize)
             }
         }
-        .padding(.horizontal, MessageView.horizontalAvatarPadding)
+        .padding(.leading, MessageView.horizontalScreenEdgePadding)
+        .padding(.trailing, MessageView.horizontalAvatarPadding)
         .sizeGetter($avatarViewSize)
     }
 
@@ -234,8 +236,8 @@ struct MessageView: View {
         }
         .applyIf(message.attachments.count > 1) {
             $0
-                .padding(.top, MessageView.horizontalAttachmentPadding)
-                .padding(.horizontal, MessageView.horizontalAttachmentPadding)
+                .padding(.top, MessageView.attachmentPadding)
+                .padding(.horizontal, MessageView.attachmentPadding)
         }
         .overlay(alignment: .bottomTrailing) {
             if message.text.isEmpty {

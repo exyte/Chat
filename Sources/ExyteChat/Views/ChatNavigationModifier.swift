@@ -59,7 +59,7 @@ struct ChatNavigationModifier: ViewModifier {
                     if let status = status {
                         Text(status)
                             .font(.footnote)
-                            .foregroundColor(theme.colors.statusGray)
+                            .foregroundColor(theme.colors.mainCaptionText)
                     }
                 }
                 Spacer()
