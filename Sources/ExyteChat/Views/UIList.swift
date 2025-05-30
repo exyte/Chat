@@ -659,6 +659,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             isScrolledToTop =
                 scrollView.contentOffset.y >= scrollView.contentSize.height
                 - scrollView.frame.height - 1
+                
+            // dismiss keyboard only when scrolling down with significant motion
+            let translation = scrollView.panGestureRecognizer.translation(in: scrollView.superview).y
+            if translation > 100 { 
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
         }
     }
 
