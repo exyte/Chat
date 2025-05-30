@@ -199,19 +199,19 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .ignoresSafeArea()
                 }
             }
-            .onAppear {
-                if isGiphyAvailable() {
-                    if let giphyKey = giphyConfig.giphyKey {
-                        if !giphyConfigured {
-                            giphyConfigured = true
-                            Giphy.configure(apiKey: giphyKey)
-                        }
-                    } else {
-                        print(
-                            "WARNING: giphy key not provided, please pass a key using giphyConfig")
-                    }
-                }
-            }
+            // .onAppear {
+            //     if isGiphyAvailable() {
+            //         if let giphyKey = giphyConfig.giphyKey {
+            //             if !giphyConfigured {
+            //                 giphyConfigured = true
+            //                 Giphy.configure(apiKey: giphyKey)
+            //             }
+            //         } else {
+            //             print(
+            //                 "WARNING: giphy key not provided, please pass a key using giphyConfig")
+            //         }
+            //     }
+            // }
             .onChange(of: selectedMedia) {
                 if let giphyMedia = selectedMedia {
                     inputViewModel.attachments.giphyMedia = giphyMedia
