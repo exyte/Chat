@@ -17,21 +17,20 @@ struct MessageStatusView: View {
             case .sending:
                 theme.images.message.sending
                     .resizable()
-                    .rotationEffect(.degrees(90))
                     .foregroundColor(getTheme().colors.statusGray)
             case .sent:
-                theme.images.message.checkmarks
+                theme.images.message.sent
                     .resizable()
-                    .foregroundColor(theme.colors.statusGray)
+                    .foregroundColor(getTheme().colors.messageMyBG)
             case .read:
-                theme.images.message.checkmarks
+                theme.images.message.read
                     .resizable()
-                    .foregroundColor(theme.colors.messageMyBG)
+                    .foregroundColor(getTheme().colors.messageMyBG)
             case .error:
                 Button {
                     onRetry()
                 } label: {
-                    theme.images.message.error
+                    getTheme().images.message.error
                         .resizable()
                 }
                 .foregroundColor(theme.colors.statusError)
