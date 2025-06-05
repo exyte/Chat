@@ -13,3 +13,7 @@ extension Date {
         Calendar.current.isDate(self, inSameDayAs: date)
     }
 }
+
+extension Date {
+    static let iso8601Date = Date.ISO8601FormatStyle.iso8601.year().month().day()
+}
