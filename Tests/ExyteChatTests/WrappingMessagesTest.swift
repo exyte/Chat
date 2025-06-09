@@ -42,7 +42,7 @@ struct WrappingMessagesTest {
     @Test(
         "Message rows are ordered starting with the latest message", .tags(.messageOrder),
         arguments: ChatType.allCases, ReplyMode.allCases)
-    func messageOrderIsReversed(for chatType: ChatType, and replyMode: ReplyMode) {
+    func messageOrderIsReversed(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let earlierMessage = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let laterMessage = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
@@ -50,16 +50,17 @@ struct WrappingMessagesTest {
             [earlierMessage, laterMessage], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 2)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 2)
 
-        #expect(sections.first?.rows[1].id == earlierMessage.id)
-        #expect(sections.first?.rows[0].id == laterMessage.id)
+        #expect(section.rows[1].id == earlierMessage.id)
+        #expect(section.rows[0].id == laterMessage.id)
     }
 
     @Test(
         "Message order is determined by the order in which messages are passed, not the date they were created",
         .tags(.messageOrder), arguments: ChatType.allCases, ReplyMode.allCases)
-    func messageOrderIsBasedOnOrderTheyArePassed(for chatType: ChatType, and replyMode: ReplyMode) {
+    func messageOrderIsBasedOnOrderTheyArePassed(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let laterMessage = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
         let earlierMessage = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
@@ -67,10 +68,11 @@ struct WrappingMessagesTest {
             [laterMessage, earlierMessage], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 2)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 2)
 
-        #expect(sections.first?.rows[1].id == laterMessage.id)
-        #expect(sections.first?.rows[0].id == earlierMessage.id)
+        #expect(section.rows[1].id == laterMessage.id)
+        #expect(section.rows[0].id == earlierMessage.id)
     }
 
     @Test(
@@ -147,7 +149,7 @@ struct WrappingMessagesTest {
     @Test(
         "When using answer mode, nested replies are not shown", .tags(.messageOrder, .answerMode),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func nestedRepliesAreHiddenInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode) {
+    func nestedRepliesAreHiddenInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday),
@@ -159,22 +161,23 @@ struct WrappingMessagesTest {
             [parent, reply, nestedReply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 2)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 2)
 
         switch chatType {
         case .comments:
-            #expect(sections.first?.rows[0].id == parent.id)
-            #expect(sections.first?.rows[1].id == reply.id)
+            #expect(section.rows[0].id == parent.id)
+            #expect(section.rows[1].id == reply.id)
         case .conversation:
-            #expect(sections.first?.rows[1].id == parent.id)
-            #expect(sections.first?.rows[0].id == reply.id)
+            #expect(section.rows[1].id == parent.id)
+            #expect(section.rows[0].id == reply.id)
         }
     }
 
     @Test(
         "When using quote mode, nested replies are shown", .tags(.messageOrder, .quoteMode),
         arguments: ChatType.allCases, [ReplyMode.quote])
-    func nestedRepliesAreShownInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode) {
+    func nestedRepliesAreShownInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday),
@@ -186,17 +189,18 @@ struct WrappingMessagesTest {
             [parent, reply, nestedReply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 3)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 3)
 
         switch chatType {
         case .comments:
-            #expect(sections.first?.rows[0].id == nestedReply.id)
-            #expect(sections.first?.rows[1].id == reply.id)
-            #expect(sections.first?.rows[2].id == parent.id)
+            #expect(section.rows[0].id == nestedReply.id)
+            #expect(section.rows[1].id == reply.id)
+            #expect(section.rows[2].id == parent.id)
         case .conversation:
-            #expect(sections.first?.rows[2].id == parent.id)
-            #expect(sections.first?.rows[1].id == reply.id)
-            #expect(sections.first?.rows[0].id == nestedReply.id)
+            #expect(section.rows[2].id == parent.id)
+            #expect(section.rows[1].id == reply.id)
+            #expect(section.rows[0].id == nestedReply.id)
         }
     }
 
@@ -204,18 +208,19 @@ struct WrappingMessagesTest {
         "Single message has single position in user group",
         .tags(.positionInUserGroupAndMessagesSection),
         arguments: ChatType.allCases, ReplyMode.allCases)
-    func singleMessageHasSinglePositionInUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
+    func singleMessageHasSinglePositionInUserGroup(for chatType: ChatType, and replyMode: ReplyMode) throws
     {
         let singleMessage = Message(id: UUID().uuidString, user: romeo)
         let sections = ConcreteChatView.mapMessages(
             [singleMessage], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 1)
-        #expect(sections.first?.rows.first?.id == singleMessage.id)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 1)
+        #expect(section.rows.first?.id == singleMessage.id)
 
-        #expect(sections.first?.rows.first?.positionInUserGroup == .single)
-        #expect(sections.first?.rows.first?.positionInMessagesSection == .single)
+        #expect(section.rows.first?.positionInUserGroup == .single)
+        #expect(section.rows.first?.positionInMessagesSection == .single)
     }
 
     @Test(
@@ -224,7 +229,7 @@ struct WrappingMessagesTest {
         ReplyMode.allCases)
     func multipleMessagesFromSingleUserHaveCorrectUserGroupPositions(
         for chatType: ChatType, and replyMode: ReplyMode
-    ) {
+    ) throws {
         let message0 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let message1 = Message(
@@ -235,31 +240,32 @@ struct WrappingMessagesTest {
             [message0, message1, message2], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 3)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 3)
 
-        #expect(sections.first?.rows[0].id == message2.id)
-        #expect(sections.first?.rows[1].id == message1.id)
-        #expect(sections.first?.rows[2].id == message0.id)
+        #expect(section.rows[0].id == message2.id)
+        #expect(section.rows[1].id == message1.id)
+        #expect(section.rows[2].id == message0.id)
 
         switch chatType {
         case .comments:
-            #expect(sections.first?.rows[0].positionInUserGroup == .first)
-            #expect(sections.first?.rows[0].positionInMessagesSection == .first)
+            #expect(section.rows[0].positionInUserGroup == .first)
+            #expect(section.rows[0].positionInMessagesSection == .first)
 
-            #expect(sections.first?.rows[1].positionInUserGroup == .middle)
-            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+            #expect(section.rows[1].positionInUserGroup == .middle)
+            #expect(section.rows[1].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[2].positionInUserGroup == .last)
-            #expect(sections.first?.rows[2].positionInMessagesSection == .last)
+            #expect(section.rows[2].positionInUserGroup == .last)
+            #expect(section.rows[2].positionInMessagesSection == .last)
         case .conversation:
-            #expect(sections.first?.rows[2].positionInUserGroup == .first)
-            #expect(sections.first?.rows[2].positionInMessagesSection == .first)
+            #expect(section.rows[2].positionInUserGroup == .first)
+            #expect(section.rows[2].positionInMessagesSection == .first)
 
-            #expect(sections.first?.rows[1].positionInUserGroup == .middle)
-            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+            #expect(section.rows[1].positionInUserGroup == .middle)
+            #expect(section.rows[1].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[0].positionInUserGroup == .last)
-            #expect(sections.first?.rows[0].positionInMessagesSection == .last)
+            #expect(section.rows[0].positionInUserGroup == .last)
+            #expect(section.rows[0].positionInMessagesSection == .last)
         }
     }
 
@@ -267,7 +273,7 @@ struct WrappingMessagesTest {
         "Message from another user, in between many messages by another, splits the user group",
         .tags(.positionInUserGroupAndMessagesSection), arguments: ChatType.allCases,
         ReplyMode.allCases)
-    func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode) {
+    func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let message0 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let message1 = Message(
@@ -283,39 +289,40 @@ struct WrappingMessagesTest {
             replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 5)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 5)
 
         switch chatType {
         case .comments:
-            #expect(sections.first?.rows[0].positionInUserGroup == .first)
-            #expect(sections.first?.rows[0].positionInMessagesSection == .first)
+            #expect(section.rows[0].positionInUserGroup == .first)
+            #expect(section.rows[0].positionInMessagesSection == .first)
 
-            #expect(sections.first?.rows[1].positionInUserGroup == .last)
-            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+            #expect(section.rows[1].positionInUserGroup == .last)
+            #expect(section.rows[1].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[2].positionInUserGroup == .single)
-            #expect(sections.first?.rows[2].positionInMessagesSection == .middle)
+            #expect(section.rows[2].positionInUserGroup == .single)
+            #expect(section.rows[2].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[3].positionInUserGroup == .first)
-            #expect(sections.first?.rows[3].positionInMessagesSection == .middle)
+            #expect(section.rows[3].positionInUserGroup == .first)
+            #expect(section.rows[3].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[4].positionInUserGroup == .last)
-            #expect(sections.first?.rows[4].positionInMessagesSection == .last)
+            #expect(section.rows[4].positionInUserGroup == .last)
+            #expect(section.rows[4].positionInMessagesSection == .last)
         case .conversation:
-            #expect(sections.first?.rows[4].positionInUserGroup == .first)
-            #expect(sections.first?.rows[4].positionInMessagesSection == .first)
+            #expect(section.rows[4].positionInUserGroup == .first)
+            #expect(section.rows[4].positionInMessagesSection == .first)
 
-            #expect(sections.first?.rows[3].positionInUserGroup == .last)
-            #expect(sections.first?.rows[3].positionInMessagesSection == .middle)
+            #expect(section.rows[3].positionInUserGroup == .last)
+            #expect(section.rows[3].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[2].positionInUserGroup == .single)
-            #expect(sections.first?.rows[2].positionInMessagesSection == .middle)
+            #expect(section.rows[2].positionInUserGroup == .single)
+            #expect(section.rows[2].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[1].positionInUserGroup == .first)
-            #expect(sections.first?.rows[1].positionInMessagesSection == .middle)
+            #expect(section.rows[1].positionInUserGroup == .first)
+            #expect(section.rows[1].positionInMessagesSection == .middle)
 
-            #expect(sections.first?.rows[0].positionInUserGroup == .last)
-            #expect(sections.first?.rows[0].positionInMessagesSection == .last)
+            #expect(section.rows[0].positionInUserGroup == .last)
+            #expect(section.rows[0].positionInMessagesSection == .last)
         }
     }
 
@@ -361,38 +368,40 @@ struct WrappingMessagesTest {
     @Test(
         "Comments position should not be set for quote reply mode", .tags(.quoteMode),
         arguments: ChatType.allCases, [ReplyMode.quote])
-    func commentsPositionShouldNotBeSetInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode)
+    func commentsPositionShouldNotBeSetInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode) throws
     {
         let message = Message(id: UUID().uuidString, user: romeo)
         let sections = ConcreteChatView.mapMessages(
             [message], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 1)
-        #expect(sections.first?.rows.first?.commentsPosition == nil)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 1)
+        #expect(section.rows.first?.commentsPosition == nil)
     }
 
     @Test(
         "Single post should be at top level", .tags(.positionInCommentsGroup),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func singlePostShouldBeAtTopLevel(for chatType: ChatType, and replyMode: ReplyMode) {
+    func singlePostShouldBeAtTopLevel(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let message = Message(id: UUID().uuidString, user: romeo)
         let sections = ConcreteChatView.mapMessages(
             [message], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 1)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 1)
 
-        #expect(sections.first?.rows.first?.commentsPosition?.inChat == .single)
-        #expect(sections.first?.rows.first?.commentsPosition?.inSection == .single)
+        #expect(section.rows.first?.commentsPosition?.inChat == .single)
+        #expect(section.rows.first?.commentsPosition?.inSection == .single)
         #expect(
-            sections.first?.rows.first?.commentsPosition?.inCommentsGroup == .singleFirstLevelPost)
+            section.rows.first?.commentsPosition?.inCommentsGroup == .singleFirstLevelPost)
     }
 
     @Test(
         "Reply should be in comments level", .tags(.positionInCommentsGroup),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func replyShouldBeInCommentsLevel(for chatType: ChatType, and replyMode: ReplyMode) {
+    func replyShouldBeInCommentsLevel(for chatType: ChatType, and replyMode: ReplyMode) throws {
         let topLevel = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let reply = Message(
@@ -402,28 +411,29 @@ struct WrappingMessagesTest {
             [topLevel, reply], chatType: chatType, replyMode: replyMode)
 
         #expect(sections.count == 1)
-        #expect(sections.first?.rows.count == 2)
+        let section = try #require(sections.first)
+        #expect(section.rows.count == 2)
 
         switch chatType {
         case .comments:
-            #expect(sections.first?.rows[0].id == topLevel.id)
-            #expect(sections.first?.rows[1].id == reply.id)
+            #expect(section.rows[0].id == topLevel.id)
+            #expect(section.rows[1].id == reply.id)
         case .conversation:
-            #expect(sections.first?.rows[1].id == topLevel.id)
-            #expect(sections.first?.rows[0].id == reply.id)
+            #expect(section.rows[1].id == topLevel.id)
+            #expect(section.rows[0].id == reply.id)
         }
 
         let topLevelIndex = chatType == .conversation ? 1 : 0
         let replyIndex = chatType == .conversation ? 0 : 1
 
-        #expect(sections.first?.rows[topLevelIndex].commentsPosition?.inChat == .first)
-        #expect(sections.first?.rows[topLevelIndex].commentsPosition?.inSection == .first)
+        #expect(section.rows[topLevelIndex].commentsPosition?.inChat == .first)
+        #expect(section.rows[topLevelIndex].commentsPosition?.inSection == .first)
         #expect(
-            sections.first?.rows[topLevelIndex].commentsPosition?.inCommentsGroup
+            section.rows[topLevelIndex].commentsPosition?.inCommentsGroup
                 == .firstLevelPostWithComments)
 
-        #expect(sections.first?.rows[replyIndex].commentsPosition?.inChat == .last)
-        #expect(sections.first?.rows[replyIndex].commentsPosition?.inSection == .last)
-        #expect(sections.first?.rows[replyIndex].commentsPosition?.inCommentsGroup == .lastComment)
+        #expect(section.rows[replyIndex].commentsPosition?.inChat == .last)
+        #expect(section.rows[replyIndex].commentsPosition?.inSection == .last)
+        #expect(section.rows[replyIndex].commentsPosition?.inCommentsGroup == .lastComment)
     }
 }
