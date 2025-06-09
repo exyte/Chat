@@ -60,7 +60,9 @@ struct WrappingMessagesTest {
     @Test(
         "Message order is determined by the order in which messages are passed, not the date they were created",
         .tags(.messageOrder), arguments: ChatType.allCases, ReplyMode.allCases)
-    func messageOrderIsBasedOnOrderTheyArePassed(for chatType: ChatType, and replyMode: ReplyMode) throws {
+    func messageOrderIsBasedOnOrderTheyArePassed(for chatType: ChatType, and replyMode: ReplyMode)
+        throws
+    {
         let laterMessage = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday))
         let earlierMessage = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
@@ -149,7 +151,8 @@ struct WrappingMessagesTest {
     @Test(
         "When using answer mode, nested replies are not shown", .tags(.messageOrder, .answerMode),
         arguments: ChatType.allCases, [ReplyMode.answer])
-    func nestedRepliesAreHiddenInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode) throws {
+    func nestedRepliesAreHiddenInAnswerMode(for chatType: ChatType, and replyMode: ReplyMode) throws
+    {
         let parent = Message(id: UUID().uuidString, user: romeo, createdAt: monday)
         let reply = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 1, since: monday),
@@ -208,7 +211,8 @@ struct WrappingMessagesTest {
         "Single message has single position in user group",
         .tags(.positionInUserGroupAndMessagesSection),
         arguments: ChatType.allCases, ReplyMode.allCases)
-    func singleMessageHasSinglePositionInUserGroup(for chatType: ChatType, and replyMode: ReplyMode) throws
+    func singleMessageHasSinglePositionInUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
+        throws
     {
         let singleMessage = Message(id: UUID().uuidString, user: romeo)
         let sections = ConcreteChatView.mapMessages(
@@ -273,7 +277,9 @@ struct WrappingMessagesTest {
         "Message from another user, in between many messages by another, splits the user group",
         .tags(.positionInUserGroupAndMessagesSection), arguments: ChatType.allCases,
         ReplyMode.allCases)
-    func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode) throws {
+    func messageFromAnotherUserSplitsUserGroup(for chatType: ChatType, and replyMode: ReplyMode)
+        throws
+    {
         let message0 = Message(
             id: UUID().uuidString, user: romeo, createdAt: Date(timeInterval: 0, since: monday))
         let message1 = Message(
@@ -368,7 +374,8 @@ struct WrappingMessagesTest {
     @Test(
         "Comments position should not be set for quote reply mode", .tags(.quoteMode),
         arguments: ChatType.allCases, [ReplyMode.quote])
-    func commentsPositionShouldNotBeSetInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode) throws
+    func commentsPositionShouldNotBeSetInQuoteMode(for chatType: ChatType, and replyMode: ReplyMode)
+        throws
     {
         let message = Message(id: UUID().uuidString, user: romeo)
         let sections = ConcreteChatView.mapMessages(
