@@ -56,7 +56,7 @@ extension AttributedString {
 }
 
 public extension AttributedString {
-    public var urls: [URL] {
+    var urls: [URL] {
         runs[\.link].map { (link, range) in
             link?.absoluteURL
         }
