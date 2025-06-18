@@ -24,7 +24,7 @@ let package = Package(
         ),
         .package(
            url: "https://github.com/Giphy/giphy-ios-sdk",
-           exact: "2.2.12"
+           from: "2.2.16"
         ),
     ],
     targets: [
