@@ -313,10 +313,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         .frame(width: 44, height: 44)
                         // .circleBackground(theme.colors.messageFriendBG)
                         // .foregroundStyle(theme.colors.sendButtonBackground)
-                        .circleBackground(Color.white)
-                        .foregroundStyle(Color.primary)
+                        .circleBackground(Color(UIColor.systemBackground))
+                        .foregroundStyle(Color(UIColor.label))
                         // .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
-                        .shadow(color: .black.opacity(0.06), radius: 6, x: 1, y: 5)
+                        .shadow(color: colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.06), radius: 6, x: 1, y: 5)
                 }
                 .padding(8)
                 .opacity(isScrolledToBottom ? 0 : 1)  // Animate opacity
