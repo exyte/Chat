@@ -311,11 +311,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 } label: {
                     theme.images.scrollToBottom
                         .frame(width: 44, height: 44)
-                        // .circleBackground(theme.colors.messageFriendBG)
-                        // .foregroundStyle(theme.colors.sendButtonBackground)
-                        .circleBackground(Color(UIColor.systemBackground))
                         .foregroundStyle(Color(UIColor.label))
-                        // .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+                        .background(.thinMaterial)
+                        .clipShape(Circle())
                         .shadow(color: colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.06), radius: 6, x: 1, y: 5)
                 }
                 .padding(8)
