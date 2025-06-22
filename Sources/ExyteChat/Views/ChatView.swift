@@ -314,6 +314,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         .foregroundStyle(Color(UIColor.label))
                         .background(.thinMaterial)
                         .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+                        )
                         .shadow(color: colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.06), radius: 6, x: 1, y: 5)
                 }
                 .padding(8)
