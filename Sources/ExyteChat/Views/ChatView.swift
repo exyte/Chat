@@ -308,6 +308,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 // Button is always present, opacity controlled by state
                 Button {
                     NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 } label: {
                     theme.images.scrollToBottom
                         .frame(width: 44, height: 44)
