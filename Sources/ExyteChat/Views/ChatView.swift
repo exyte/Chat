@@ -317,7 +317,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         .clipShape(Circle())
                         .overlay(
                             Circle()
-                                .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
+                                .stroke(Color.primary.opacity(0.12), lineWidth: 0.6)
                         )
                         .shadow(color: colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.06), radius: 6, x: 1, y: 5)
                 }
