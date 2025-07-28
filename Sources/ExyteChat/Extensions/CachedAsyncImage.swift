@@ -304,8 +304,15 @@ public struct CachedAsyncImage<Content>: View where Content: View {
 
         self._phase = State(wrappedValue: .empty)
         do {
-            if let urlRequest = urlRequest, let image = try cachedImage(from: urlRequest, cache: urlCache) {
-                self._phase = State(wrappedValue: .success(image))
+            if let urlRequest = urlRequest {
+                // For file:// URLs, try to load immediately since they're local
+                if urlRequest.url?.scheme == "file" {
+                    let image = try Self.loadLocalFileImageSync(from: urlRequest)
+                    self._phase = State(wrappedValue: .success(image))
+                } else if let image = try cachedImage(from: urlRequest, cache: urlCache) {
+                    // For web URLs, check cache first
+                    self._phase = State(wrappedValue: .success(image))
+                }
             }
         } catch {
             self._phase = State(wrappedValue: .failure(error))
@@ -316,13 +323,21 @@ public struct CachedAsyncImage<Content>: View where Content: View {
     private func load() async {
         do {
             if let urlRequest = urlRequest {
-                let (image, metrics) = try await remoteImage(from: urlRequest, session: urlSession)
-                if metrics.transactionMetrics.last?.resourceFetchType == .localCache {
-                    // WARNING: This does not behave well when the url is changed with another
+                // Check if this is a local file URL
+                if urlRequest.url?.scheme == "file" {
+                    let image = try await localFileImage(from: urlRequest)
+                    // Local files don't need animation since they load instantly
                     phase = .success(image)
                 } else {
-                    withAnimation(transaction.animation) {
+                    // Handle web URLs with existing network logic
+                    let (image, metrics) = try await remoteImage(from: urlRequest, session: urlSession)
+                    if metrics.transactionMetrics.last?.resourceFetchType == .localCache {
+                        // WARNING: This does not behave well when the url is changed with another
                         phase = .success(image)
+                    } else {
+                        withAnimation(transaction.animation) {
+                            phase = .success(image)
+                        }
                     }
                 }
             } else {
@@ -351,6 +366,18 @@ private extension AsyncImage {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 private extension CachedAsyncImage {
+    /// Load image from local file URL (file://)
+    private func localFileImage(from request: URLRequest) async throws -> Image {
+        guard let url = request.url, url.scheme == "file" else {
+            throw AsyncImage<Content>.LoadingError()
+        }
+
+        // Load data directly from file system
+        let data = try Data(contentsOf: url)
+        return try image(from: data)
+    }
+
+    /// Load image from remote URL (https://) with caching
     private func remoteImage(from request: URLRequest, session: URLSession) async throws -> (Image, URLSessionTaskMetrics) {
         let (data, _, metrics) = try await session.data(for: request)
         if metrics.redirectCount > 0, let lastResponse = metrics.transactionMetrics.last?.response {
@@ -365,6 +392,29 @@ private extension CachedAsyncImage {
     private func cachedImage(from request: URLRequest, cache: URLCache) throws -> Image? {
         guard let cachedResponse = cache.cachedResponse(for: request) else { return nil }
         return try image(from: cachedResponse.data)
+    }
+
+    /// Static helper for synchronous local file loading during initialization
+    private static func loadLocalFileImageSync(from request: URLRequest) throws -> Image {
+        guard let url = request.url, url.scheme == "file" else {
+            throw AsyncImage<Content>.LoadingError()
+        }
+
+        let data = try Data(contentsOf: url)
+
+#if os(macOS)
+        if let nsImage = NSImage(data: data) {
+            return Image(nsImage: nsImage)
+        } else {
+            throw AsyncImage<Content>.LoadingError()
+        }
+#else
+        if let uiImage = UIImage(data: data) {
+            return Image(uiImage: uiImage)
+        } else {
+            throw AsyncImage<Content>.LoadingError()
+        }
+#endif
     }
 
     private func image(from data: Data) throws -> Image {
