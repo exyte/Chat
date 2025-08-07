@@ -6,26 +6,26 @@
 import SwiftUI
 
 struct ReactionOverview: View {
-    
+
     @StateObject var viewModel: ChatViewModel
-    
+
     let message: Message
     let width: CGFloat
     let backgroundColor: Color
     let padding: CGFloat = 16
     let inScrollView: Bool
-    
-    struct SortedReaction:Identifiable {
+
+    struct SortedReaction: Identifiable {
         var id: String { reaction.toString }
         let reaction: ReactionType
         let users: [User]
     }
-    
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: padding) {
                 Spacer()
-                ForEach( sortReactions() ) { reaction in
+                ForEach(sortReactions()) { reaction in
                     reactionUserView(reaction: reaction)
                         .padding(padding / 2)
                 }
@@ -45,9 +45,9 @@ struct ReactionOverview: View {
         .padding(padding)
         .offset(x: horizontalOffset)
     }
-    
+
     @ViewBuilder
-    func reactionUserView(reaction:SortedReaction) -> some View {
+    func reactionUserView(reaction: SortedReaction) -> some View {
         VStack {
             Text(reaction.reaction.toString)
                 .font(.title3)
@@ -58,21 +58,15 @@ struct ReactionOverview: View {
                 )
                 .padding(.top, 8)
                 .padding(.bottom)
-                                         
+
             HStack(spacing: -14) {
                 ForEach(reaction.users) { user in
-                    AvatarView(url: user.avatarURL, avatarSize: 32)
-                        .contentShape(Circle())
-                        .overlay(
-                            Circle()
-                                .stroke(style: .init(lineWidth: 1))
-                                .foregroundStyle(backgroundColor)
-                        )
+                    avatarView(user)
                 }
             }
         }
     }
-    
+
     @ViewBuilder
     func emojiBackgroundView() -> some View {
         GeometryReader { proxy in
@@ -88,6 +82,27 @@ struct ReactionOverview: View {
         .compositingGroup()
     }
     
+    @ViewBuilder
+     func avatarView(_ user: User) -> some View {
+         if let url = user.avatarURL {
+             AvatarImageView(url: user.avatarURL, avatarSize: 32)
+                 .contentShape(Circle())
+                 .overlay(
+                     Circle()
+                         .stroke(style: .init(lineWidth: 1))
+                         .foregroundStyle(backgroundColor)
+                 )
+         } else {
+             AvatarNameView(name: user.name, avatarSize: 32)
+                 .contentShape(Circle())
+                 .overlay(
+                     Circle()
+                         .stroke(style: .init(lineWidth: 1))
+                         .foregroundStyle(backgroundColor)
+                 )
+         }
+     }
+
     private var horizontalOffset: CGFloat {
         guard inScrollView else { return 0 }
         if message.user.isCurrentUser {
@@ -96,7 +111,7 @@ struct ReactionOverview: View {
             return -UIApplication.safeArea.leading
         }
     }
-    
+
     private func sortReactions() -> [SortedReaction] {
         let mostRecent = message.reactions.sorted { $0.createdAt < $1.createdAt }
         let orderedEmojis = mostRecent.map(\.emoji)
@@ -113,32 +128,40 @@ struct ReactionOverview: View {
 }
 
 #if swift(>=6.0)
-#Preview {
-    let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
-    let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
-    let sally = User(id: "sally", name: "Sally", avatarURL: nil, isCurrentUser: false)
-    
-    ReactionOverview(
-        viewModel: ChatViewModel(),
-        message: .init(
-            id: UUID().uuidString,
-            user: stan,
-            status: .read,
-            text: "An example message of great importance",
-            reactions: [
-                Reaction(user: john, createdAt: Date.now.addingTimeInterval(-80), type: .emoji("🔥")),
-                Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-70), type: .emoji("🥳")),
-                Reaction(user: john, createdAt: Date.now.addingTimeInterval(-60), type: .emoji("🔌")),
-                Reaction(user: john, createdAt: Date.now.addingTimeInterval(-50), type: .emoji("🧠")),
-                Reaction(user: john, createdAt: Date.now.addingTimeInterval(-40), type: .emoji("🥳")),
-                Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-30), type: .emoji("🔌")),
-                Reaction(user: stan, createdAt: Date.now.addingTimeInterval(-20), type: .emoji("🧠")),
-                Reaction(user: sally, createdAt: Date.now.addingTimeInterval(-10), type: .emoji("🧠"))
-            ]
-        ),
-        width: UIScreen.main.bounds.width,
-        backgroundColor: Color(UIColor.secondarySystemBackground),
-        inScrollView: false
-    )
-}
+    #Preview {
+        let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
+        let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
+        let sally = User(id: "sally", name: "Sally", avatarURL: nil, isCurrentUser: false)
+
+        ReactionOverview(
+            viewModel: ChatViewModel(),
+            message: .init(
+                id: UUID().uuidString,
+                user: stan,
+                status: .read,
+                text: "An example message of great importance",
+                reactions: [
+                    Reaction(
+                        user: john, createdAt: Date.now.addingTimeInterval(-80), type: .emoji("🔥")),
+                    Reaction(
+                        user: stan, createdAt: Date.now.addingTimeInterval(-70), type: .emoji("🥳")),
+                    Reaction(
+                        user: john, createdAt: Date.now.addingTimeInterval(-60), type: .emoji("🔌")),
+                    Reaction(
+                        user: john, createdAt: Date.now.addingTimeInterval(-50), type: .emoji("🧠")),
+                    Reaction(
+                        user: john, createdAt: Date.now.addingTimeInterval(-40), type: .emoji("🥳")),
+                    Reaction(
+                        user: stan, createdAt: Date.now.addingTimeInterval(-30), type: .emoji("🔌")),
+                    Reaction(
+                        user: stan, createdAt: Date.now.addingTimeInterval(-20), type: .emoji("🧠")),
+                    Reaction(
+                        user: sally, createdAt: Date.now.addingTimeInterval(-10), type: .emoji("🧠")),
+                ]
+            ),
+            width: UIScreen.main.bounds.width,
+            backgroundColor: Color(UIColor.secondarySystemBackground),
+            inScrollView: false
+        )
+    }
 #endif
