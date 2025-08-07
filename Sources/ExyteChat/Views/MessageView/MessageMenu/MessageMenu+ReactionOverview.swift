@@ -61,13 +61,7 @@ struct ReactionOverview: View {
 
             HStack(spacing: -14) {
                 ForEach(reaction.users) { user in
-                    AvatarView(url: user.avatarURL, avatarSize: 32)
-                        .contentShape(Circle())
-                        .overlay(
-                            Circle()
-                                .stroke(style: .init(lineWidth: 1))
-                                .foregroundStyle(backgroundColor)
-                        )
+                    avatarView(user)
                 }
             }
         }
@@ -87,6 +81,27 @@ struct ReactionOverview: View {
         }
         .compositingGroup()
     }
+    
+    @ViewBuilder
+     func avatarView(_ user: User) -> some View {
+         if let url = user.avatarURL {
+             AvatarImageView(url: user.avatarURL, avatarSize: 32)
+                 .contentShape(Circle())
+                 .overlay(
+                     Circle()
+                         .stroke(style: .init(lineWidth: 1))
+                         .foregroundStyle(backgroundColor)
+                 )
+         } else {
+             AvatarNameView(name: user.name, avatarSize: 32)
+                 .contentShape(Circle())
+                 .overlay(
+                     Circle()
+                         .stroke(style: .init(lineWidth: 1))
+                         .foregroundStyle(backgroundColor)
+                 )
+         }
+     }
 
     private var horizontalOffset: CGFloat {
         guard inScrollView else { return 0 }

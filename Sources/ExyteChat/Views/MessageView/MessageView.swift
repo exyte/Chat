@@ -226,11 +226,20 @@ struct MessageView: View {
     var avatarView: some View {
         Group {
             if showAvatar {
-                AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
-                    .contentShape(Circle())
-                    .onTapGesture {
-                        tapAvatarClosure?(message.user, message.id)
-                    }
+                if let url = message.user.avatarURL {
+                    AvatarImageView(url: url, avatarSize: avatarSize)
+                        .contentShape(Circle())
+                        .onTapGesture {
+                            tapAvatarClosure?(message.user, message.id)
+                        }
+                } else {
+                    AvatarNameView(name: message.user.name, avatarSize: avatarSize)
+                        .contentShape(Circle())
+                        .onTapGesture {
+                            tapAvatarClosure?(message.user, message.id)
+                        }
+                }
+
             } else {
                 Color.clear.viewSize(avatarSize)
             }
