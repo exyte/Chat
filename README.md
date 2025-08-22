@@ -249,6 +249,7 @@ These use `AnyView`, so please try to keep them easy enough
 `isScrollEnabled` - forbid scrolling for messages' `UITableView`   
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
 `showNetworkConnectionProblem` - display network error on/off    
+`keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
 `assetsPickerLimit` - set a limit for MediaPicker built into the library   
 `setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (assetsPickerLimit and others like mediaType, selectionStyle, etc.).   
 `orientationHandler` - handle screen rotation
