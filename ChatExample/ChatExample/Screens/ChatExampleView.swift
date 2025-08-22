@@ -30,6 +30,7 @@ struct ChatExampleView: View {
                 viewModel.loadMoreMessage(before: message)
             }
         }
+        .keyboardDismissMode(.interactive)
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
