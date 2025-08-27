@@ -6,15 +6,16 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
+import ExyteChat
 
 struct AvatarView: View {
     let url: URL?
     let size: CGFloat
+    var avatarCacheKey: String? = nil
 
     var body: some View {
         if let url {
-            CachedAsyncImage(url: url, urlCache: .imageCache) { image in
+            CachedAsyncImage(url: url, cacheKey: avatarCacheKey) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -29,26 +30,5 @@ struct AvatarView: View {
                 .resizable()
                 .frame(width: size, height: size)
         }
-    }
-}
-
-extension URLCache {
-    static let imageCache = URLCache(
-        memoryCapacity: 512.megabytes(),
-        diskCapacity: 2.gigabytes()
-    )
-}
-
-private extension Int {
-    func kilobytes() -> Int {
-        self * 1024 * 1024
-    }
-
-    func megabytes() -> Int {
-        self.kilobytes() * 1024
-    }
-
-    func gigabytes() -> Int {
-        self.megabytes() * 1024
     }
 }

@@ -37,7 +37,7 @@ struct ChatNavigationModifier: ViewModifier {
         ToolbarItem(placement: .principal) {
             HStack {
                 if let url = cover {
-                    CachedAsyncImage(url: url, urlCache: .imageCache) { phase in
+                    CachedAsyncImage(url: url) { phase in
                         switch phase {
                         case .success(let image):
                             image

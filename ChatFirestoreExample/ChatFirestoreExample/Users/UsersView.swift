@@ -61,7 +61,7 @@ struct UsersView: View {
 
                 ForEach(viewModel.filteredUsers) { user in
                     HStack {
-                        AvatarView(url: user.avatarURL, size: 48)
+                        AvatarView(url: user.avatarURL, size: 48, avatarCacheKey: user.avatarCacheKey)
                         Text(user.name)
                             .font(17, .black, .medium)
                     }

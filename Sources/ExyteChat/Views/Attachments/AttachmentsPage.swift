@@ -13,7 +13,10 @@ struct AttachmentsPage: View {
 
     var body: some View {
         if attachment.type == .image {
-            CachedAsyncImage(url: attachment.full, urlCache: .imageCache) { phase in
+            CachedAsyncImage(
+                url: attachment.full,
+                cacheKey: attachment.fullCacheKey
+            ) { phase in
                 switch phase {
                 case let .success(image):
                     image

@@ -45,7 +45,7 @@ struct ConversationsView: View {
                     } else {
                         HStack(spacing: -30) {
                             ForEach(conversation.notMeUsers) { user in
-                                AvatarView(url: user.avatarURL, size: 56)
+                                AvatarView(url: user.avatarURL, size: 56, avatarCacheKey: user.avatarCacheKey)
                             }
                         }
                     }

@@ -345,6 +345,39 @@ The library uses the following text that can be localized:
 - Recording...
 - Reply to
 
+## Image Caching with Cache Keys
+
+The Chat framework uses Kingfisher for efficient image caching. You can provide custom cache keys. By default, the cache key is the URL of the image.
+
+### User Avatar Cache Keys
+
+When creating a `User`, you can specify a custom cache key for the avatar image:
+
+```swift
+let user = User(
+    id: "user123",
+    name: "John Doe",
+    avatarURL: URL(string: "https://example.com/avatar.jpg"),
+    avatarCacheKey: "user_avatar_123", // Custom cache key
+    isCurrentUser: false
+)
+```
+
+### Attachment Cache Keys
+
+For `Attachment` objects, you can specify separate cache keys for thumbnail and full-size images:
+
+```swift
+let attachment = Attachment(
+    id: "attachment456",
+    thumbnail: URL(string: "https://example.com/thumb.jpg"),
+    full: URL(string: "https://example.com/full.jpg"),
+    type: .image,
+    thumbnailCacheKey: "thumb_456", // Cache key for thumbnail
+    fullCacheKey: "full_456"        // Cache key for full image
+)
+```
+
 ## Examples
 There are 2 example projects:    
 - One has a simple bot posting random text/media messages every 2 seconds. It has no back end and no local storage. Every new start is clean and fresh.     

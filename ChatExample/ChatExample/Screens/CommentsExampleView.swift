@@ -122,7 +122,10 @@ struct CommentsExampleView: View {
     func messageCell(_ message: Message, _ commentsPosition: CommentsPosition?, showMenuClosure: @escaping ()->(), actionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void, attachmentClosure: @escaping (Attachment) -> Void) -> some View {
         VStack {
             HStack(alignment: .top, spacing: 12) {
-                CachedAsyncImage(url: message.user.avatarURL) { image in
+                CachedAsyncImage(
+                    url: message.user.avatarURL,
+                    cacheKey: message.user.avatarCacheKey
+                ) { image in
                     image
                         .resizable()
                         .scaledToFill()
