@@ -13,7 +13,7 @@ struct GiphyMediaView: UIViewRepresentable {
             if let media = response?.data {
                 DispatchQueue.main.sync {
                     view.setMedia(media)
-                    self.aspectRatio = aspectRatio
+                    self.aspectRatio = media.aspectRatio
                 }
             }
         }
