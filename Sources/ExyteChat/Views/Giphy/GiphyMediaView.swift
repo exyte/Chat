@@ -11,7 +11,7 @@ struct GiphyMediaView: UIViewRepresentable {
         let view = GPHMediaView()
         GiphyCore.shared.gifByID(id) { (response, error) in
             if let media = response?.data {
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     view.setMedia(media)
                     self.aspectRatio = media.aspectRatio
                 }
