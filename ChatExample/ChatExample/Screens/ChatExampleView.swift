@@ -61,7 +61,7 @@ struct ChatExampleView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
                     if let url = viewModel.chatCover {
-                        CachedAsyncImage(url: url, urlCache: .shared) { phase in
+                        CachedAsyncImage(url: url) { phase in
                             switch phase {
                             case .success(let image):
                                 image

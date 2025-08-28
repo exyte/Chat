@@ -52,7 +52,7 @@ struct ConversationView: View {
                         AvatarView(url: conversation.pictureURL, size: 44)
                         Text(conversation.title)
                     } else if let user = viewModel.users.first {
-                        AvatarView(url: user.avatarURL, size: 44)
+                        AvatarView(url: user.avatarURL, size: 44, avatarCacheKey: user.avatarCacheKey)
                         Text(user.name)
                     }
                 }

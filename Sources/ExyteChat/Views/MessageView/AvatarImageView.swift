@@ -8,9 +8,10 @@ struct AvatarImageView: View {
 
     let url: URL?
     let avatarSize: CGFloat
+    var avatarCacheKey: String? = nil
 
     var body: some View {
-        CachedAsyncImage(url: url, urlCache: .imageCache) { image in
+        CachedAsyncImage(url: url, cacheKey: avatarCacheKey) { image in
             image
                 .resizable()
                 .scaledToFill()
