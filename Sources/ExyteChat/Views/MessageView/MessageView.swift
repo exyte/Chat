@@ -285,7 +285,7 @@ struct MessageView: View {
         .padding(.horizontal, MessageView.horizontalTextPadding)
 
         let timeView = messageTimeView()
-            .padding(.trailing, 12)
+            .padding(.horizontal, 12)
 
         Group {
             switch dateArrangement {
@@ -376,6 +376,7 @@ extension View {
         static let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
 
         static private var extraShortText = "Sss"
+        static private var extraShortTextWithNewline = "H\nJ"
         static private var shortText = "Hi, buddy!"
         static private var longText =
             "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
@@ -432,25 +433,51 @@ extension View {
             text: extraShortText
         )
 
+        static private var extrShortMessage = Message(
+            id: UUID().uuidString,
+            user: stan,
+            status: .read,
+            text: extraShortTextWithNewline
+        )
+        
         static var previews: some View {
             ZStack {
                 Color.yellow.ignoresSafeArea()
-
-                MessageView(
-                    viewModel: ChatViewModel(),
-                    message: replyedMessage,
-                    positionInUserGroup: .single,
-                    positionInMessagesSection: .single,
-                    chatType: .conversation,
-                    avatarSize: 32,
-                    tapAvatarClosure: nil,
-                    messageStyler: AttributedString.init,
-                    shouldShowLinkPreview: { _ in true },
-                    isDisplayingMessageMenu: false,
-                    showMessageTimeView: true,
-                    messageLinkPreviewLimit: 8,
-                    font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
-                )
+                
+                VStack {
+                    MessageView(
+                        viewModel: ChatViewModel(),
+                        message: extrShortMessage,
+                        positionInUserGroup: .single,
+                        positionInMessagesSection: .single,
+                        chatType: .conversation,
+                        avatarSize: 32,
+                        tapAvatarClosure: nil,
+                        messageStyler: AttributedString.init,
+                        shouldShowLinkPreview: { _ in true },
+                        isDisplayingMessageMenu: false,
+                        showMessageTimeView: true,
+                        messageLinkPreviewLimit: 8,
+                        font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+                    )
+                    
+                    MessageView(
+                        viewModel: ChatViewModel(),
+                        message: replyedMessage,
+                        positionInUserGroup: .single,
+                        positionInMessagesSection: .single,
+                        chatType: .conversation,
+                        avatarSize: 32,
+                        tapAvatarClosure: nil,
+                        messageStyler: AttributedString.init,
+                        shouldShowLinkPreview: { _ in true },
+                        isDisplayingMessageMenu: false,
+                        showMessageTimeView: true,
+                        messageLinkPreviewLimit: 8,
+                        font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+                    )
+                }
+                
             }
         }
     }
