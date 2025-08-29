@@ -282,8 +282,10 @@ struct MessageView: View {
             messageLinkPreviewLimit: messageLinkPreviewLimit
         )
         .fixedSize(horizontal: false, vertical: true)
+        .padding(.horizontal, MessageView.horizontalTextPadding)
 
         let timeView = messageTimeView()
+            .padding(.horizontal, 12)
 
         Group {
             switch dateArrangement {
@@ -311,7 +313,6 @@ struct MessageView: View {
                     }
             }
         }
-        .padding(.horizontal, MessageView.horizontalTextPadding)
     }
 
     @ViewBuilder
