@@ -232,6 +232,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     localization: localization
                 )
                 .environmentObject(globalFocusState)
+                .environmentObject(keyboardState)
             }
         
             .onChange(of: inputViewModel.showPicker) { _ , newValue in
