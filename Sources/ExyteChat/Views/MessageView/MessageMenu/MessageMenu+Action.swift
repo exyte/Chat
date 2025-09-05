@@ -42,7 +42,11 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
         case .reply:
             Image(systemName: "arrowshape.turn.up.left")
         case .edit:
-            Image(systemName: "bubble.and.pencil")
+            if #available(iOS 18.0, macCatalyst 18.0, *) {
+                Image(systemName: "bubble.and.pencil")
+            } else {
+                Image(systemName: "square.and.pencil")
+            }
         }
     }
 
