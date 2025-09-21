@@ -20,7 +20,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @EnvironmentObject private var keyboardState: KeyboardState
     @EnvironmentObject private var globalFocusState: GlobalFocusState
 
-    @ObservedObject var inputViewModel: InputViewModel
+    @Bindable var inputViewModel: InputViewModel
 
     var inputViewBuilder: InputViewBuilderClosure?
     var chatTitle: String?

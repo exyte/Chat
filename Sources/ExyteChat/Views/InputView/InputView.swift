@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ExyteMediaPicker
+import Observation
 import GiphyUISDK
 
 public enum InputViewStyle: Sendable {
@@ -77,7 +78,7 @@ struct InputView: View {
 
     @EnvironmentObject private var keyboardState: KeyboardState
     
-    @ObservedObject var viewModel: InputViewModel
+    @Bindable var viewModel: InputViewModel
     var inputFieldId: UUID
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]
@@ -162,15 +163,15 @@ struct InputView: View {
     
     @ViewBuilder
     var middleView: some View {
-        Group {
-            switch state {
-            case .hasRecording, .playingRecording, .pausedRecording:
-                recordWaveform
-            case .isRecordingHold:
-                swipeToCancel
-            case .isRecordingTap:
-                recordingInProgress
-            default:
+//        Group {
+//            switch state {
+//            case .hasRecording, .playingRecording, .pausedRecording:
+//                recordWaveform
+//            case .isRecordingHold:
+//                swipeToCancel
+//            case .isRecordingTap:
+//                recordingInProgress
+//            default:
                 TextInputView(
                     text: $viewModel.text,
                     inputFieldId: inputFieldId,
@@ -178,9 +179,9 @@ struct InputView: View {
                     availableInputs: availableInputs,
                     localization: localization
                 )
-            }
-        }
-        .frame(minHeight: 48)
+//            }
+//        }
+//                .frame(minHeight: 48)
     }
     
     @ViewBuilder

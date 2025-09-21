@@ -77,8 +77,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     // MARK: - Parameters
     
     let type: ChatType
-    let sections: [MessagesSection]
-    let ids: [String]
+    @State var sections: [MessagesSection] = []
+    @State var ids: [String] = []
     let didSendMessage: (DraftMessage) -> Void
     var reactionDelegate: ReactionDelegate?
 
@@ -130,7 +130,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     
     @StateObject private var viewModel = ChatViewModel()
-    @StateObject private var inputViewModel = InputViewModel()
+    @Bindable var inputViewModel: InputViewModel
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
@@ -147,26 +147,33 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var giphyConfigured = false
     @State private var selectedMedia: GPHMedia? = nil
+    @Binding var messages: [Message]
     
-    public init(messages: [Message],
-                chatType: ChatType = .conversation,
-                replyMode: ReplyMode = .quote,
-                didSendMessage: @escaping (DraftMessage) -> Void,
-                reactionDelegate: ReactionDelegate? = nil,
-                messageBuilder: @escaping MessageBuilderClosure,
-                inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?,
-                localization: ChatLocalization) {
-        self.type = chatType
-        self.didSendMessage = didSendMessage
-        self.reactionDelegate = reactionDelegate
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-        self.ids = messages.map { $0.id }
-        self.messageBuilder = messageBuilder
-        self.inputViewBuilder = inputViewBuilder
-        self.messageMenuAction = messageMenuAction
-        self.localization = localization
-    }
+    private let chatType: ChatType
+    private let replyMode: ReplyMode
+    
+//    public init(messages: Binding<[Message]>,
+//                chatType: ChatType = .conversation,
+//                replyMode: ReplyMode = .quote,
+//                didSendMessage: @escaping (DraftMessage) -> Void,
+//                reactionDelegate: ReactionDelegate? = nil,
+//                messageBuilder: @escaping MessageBuilderClosure,
+//                inputViewBuilder: @escaping InputViewBuilderClosure,
+//                messageMenuAction: MessageMenuActionClosure?,
+//                localization: ChatLocalization) {
+//        self._messages = messages
+//        self.type = chatType
+//        self.didSendMessage = didSendMessage
+//        self.reactionDelegate = reactionDelegate
+//        self.chatType = chatType
+//        self.replyMode = replyMode
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.map { $0.wrappedValue.id }
+//        self.messageBuilder = messageBuilder
+//        self.inputViewBuilder = inputViewBuilder
+//        self.messageMenuAction = messageMenuAction
+//        self.localization = localization
+//    }
     
     public var body: some View {
         mainView
@@ -208,6 +215,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputViewModel.attachments.giphyMedia = giphyMedia
                     inputViewModel.send()
                 }
+            }
+            .onChange(of: self.messages) { _, messages in
+                self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+                self.ids = messages.map { $0.id }
             }
             .sheet(isPresented: $inputViewModel.showGiphyPicker) {
                 if giphyConfig.giphyKey != nil {
@@ -374,16 +385,16 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.inputViewModel = inputViewModel
             viewModel.globalFocusState = globalFocusState
 
-            inputViewModel.didSendMessage = { value in
-                Task { @MainActor in
-                    didSendMessage(value)
-                }
-                if type == .conversation {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
-                    }
-                }
-            }
+//            inputViewModel.didSendMessage = { value in
+//                Task { @MainActor in
+//                    didSendMessage(value)
+//                }
+//                if type == .conversation {
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+//                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+//                    }
+//                }
+//            }
         }
     }
 
@@ -749,54 +760,206 @@ public extension ChatView {
     }
 }
 
-#Preview {
-    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
-    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
+//#Preview {
+//    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
+//    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
+//
+//    let monday = try! Date.iso8601Date.parse("2025-05-12")
+//    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
+//
+//    ChatView(messages: [
+//        Message(
+//            id: "26tb", user: romeo, status: .read, createdAt: monday,
+//            text: "And I’ll still stay, to have thee still forget"),
+//        Message(
+//            id: "zee6", user: romeo, status: .read, createdAt: monday,
+//            text: "Forgetting any other home but this"),
+//
+//        Message(
+//            id: "oWUN", user: juliet, status: .read, createdAt: monday,
+//            text: "’Tis almost morning. I would have thee gone"),
+//        Message(
+//            id: "P261", user: juliet, status: .read, createdAt: monday,
+//            text: "And yet no farther than a wanton’s bird"),
+//        Message(
+//            id: "46hu", user: juliet, status: .read, createdAt: monday,
+//            text: "That lets it hop a little from his hand"),
+//        Message(
+//            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
+//            text: "Like a poor prisoner in his twisted gyves"),
+//        Message(
+//            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
+//            text: "And with a silken thread plucks it back again"),
+//        Message(
+//            id: "kwWd", user: juliet, status: .read, createdAt: monday,
+//            text: "So loving-jealous of his liberty"),
+//
+//        Message(
+//            id: "9481", user: romeo, status: .read, createdAt: tuesday,
+//            text: "I would I were thy bird"),
+//
+//        Message(
+//            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
+//        Message(
+//            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "Yet I should kill thee with much cherishing"),
+//        Message(
+//            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "Good night, good night. Parting is such sweet sorrow"),
+//        Message(
+//            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "That I shall say 'Good night' till it be morrow"),
+//    ]) { draft in }
+//}
 
-    let monday = try! Date.iso8601Date.parse("2025-05-12")
-    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
+//public extension ChatView where MessageContent == EmptyView {
+//
+//    init(messages: Binding<[Message]>,
+//         chatType: ChatType = .conversation,
+//         replyMode: ReplyMode = .quote,
+//         didSendMessage: @escaping (DraftMessage) -> Void,
+//         reactionDelegate: ReactionDelegate? = nil,
+//         inputViewBuilder: @escaping InputViewBuilderClosure,
+//         messageMenuAction: MessageMenuActionClosure?) {
+//        print(">>>> ChatView inited")
+//        self.type = chatType
+//        self.didSendMessage = didSendMessage
+//        self.reactionDelegate = reactionDelegate
+//        self._messages = messages
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.wrappedValue.map { $0.id }
+//        self.inputViewBuilder = inputViewBuilder
+//        self.messageMenuAction = messageMenuAction
+//        self.chatType = chatType
+//        self.replyMode = replyMode
+//    }
+//}
 
-    ChatView(messages: [
-        Message(
-            id: "26tb", user: romeo, status: .read, createdAt: monday,
-            text: "And I’ll still stay, to have thee still forget"),
-        Message(
-            id: "zee6", user: romeo, status: .read, createdAt: monday,
-            text: "Forgetting any other home but this"),
+//public extension ChatView where InputViewContent == EmptyView {
+//
+//    init(messages: Binding<[Message]>,
+//         chatType: ChatType = .conversation,
+//         replyMode: ReplyMode = .quote,
+//         didSendMessage: @escaping (DraftMessage) -> Void,
+//         reactionDelegate: ReactionDelegate? = nil,
+//         messageBuilder: @escaping MessageBuilderClosure,
+//         messageMenuAction: MessageMenuActionClosure?) {
+//        print(">>>> ChatView inited")
+//        self.type = chatType
+//        self.didSendMessage = didSendMessage
+//        self._messages = messages
+//        self.reactionDelegate = reactionDelegate
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.wrappedValue.map { $0.id }
+//        self.messageBuilder = messageBuilder
+//        self.messageMenuAction = messageMenuAction
+//        self.chatType = chatType
+//        self.replyMode = replyMode
+//    }
+//}
 
-        Message(
-            id: "oWUN", user: juliet, status: .read, createdAt: monday,
-            text: "’Tis almost morning. I would have thee gone"),
-        Message(
-            id: "P261", user: juliet, status: .read, createdAt: monday,
-            text: "And yet no farther than a wanton’s bird"),
-        Message(
-            id: "46hu", user: juliet, status: .read, createdAt: monday,
-            text: "That lets it hop a little from his hand"),
-        Message(
-            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
-            text: "Like a poor prisoner in his twisted gyves"),
-        Message(
-            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
-            text: "And with a silken thread plucks it back again"),
-        Message(
-            id: "kwWd", user: juliet, status: .read, createdAt: monday,
-            text: "So loving-jealous of his liberty"),
+//public extension ChatView where MenuAction == DefaultMessageMenuAction {
+//
+//    init(messages: Binding<[Message]>,
+//         chatType: ChatType = .conversation,
+//         replyMode: ReplyMode = .quote,
+//         didSendMessage: @escaping (DraftMessage) -> Void,
+//         reactionDelegate: ReactionDelegate? = nil,
+//         messageBuilder: @escaping MessageBuilderClosure,
+//         inputViewBuilder: @escaping InputViewBuilderClosure) {
+//        print(">>>> ChatView inited")
+//        self.type = chatType
+//        self.didSendMessage = didSendMessage
+//        self.reactionDelegate = reactionDelegate
+//        self._messages = messages
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.wrappedValue.map { $0.id }
+//        self.messageBuilder = messageBuilder
+//        self.inputViewBuilder = inputViewBuilder
+//        self.chatType = chatType
+//        self.replyMode = replyMode
+//    }
+//}
 
-        Message(
-            id: "9481", user: romeo, status: .read, createdAt: tuesday,
-            text: "I would I were thy bird"),
+public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView {
 
-        Message(
-            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
-        Message(
-            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
-            text: "Yet I should kill thee with much cherishing"),
-        Message(
-            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
-            text: "Good night, good night. Parting is such sweet sorrow"),
-        Message(
-            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
-            text: "That I shall say 'Good night' till it be morrow"),
-    ]) { draft in }
+    init(messages: Binding<[Message]>,
+         inputViewModel: InputViewModel,
+         chatType: ChatType = .conversation,
+         replyMode: ReplyMode = .quote,
+         didSendMessage: @escaping (DraftMessage) -> Void,
+         reactionDelegate: ReactionDelegate? = nil,
+         messageMenuAction: MessageMenuActionClosure?) {
+        self.inputViewModel = inputViewModel
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.reactionDelegate = reactionDelegate
+        self._messages = messages
+        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.wrappedValue.map { $0.id }
+        self.messageMenuAction = messageMenuAction
+        self.chatType = chatType
+        self.replyMode = replyMode
+    }
 }
+
+//public extension ChatView where InputViewContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+//
+//    init(messages: Binding<[Message]>,
+//         chatType: ChatType = .conversation,
+//         replyMode: ReplyMode = .quote,
+//         didSendMessage: @escaping (DraftMessage) -> Void,
+//         reactionDelegate: ReactionDelegate? = nil,
+//         messageBuilder: @escaping MessageBuilderClosure) {
+//        print(">>>> ChatView inited")
+//        self.type = chatType
+//        self.didSendMessage = didSendMessage
+//        self.reactionDelegate = reactionDelegate
+//        self._messages = messages
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.wrappedValue.map { $0.id }
+//        self.messageBuilder = messageBuilder
+//        self.chatType = chatType
+//        self.replyMode = replyMode
+//    }
+//}
+//
+//public extension ChatView where MessageContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+//
+//    init(messages: Binding<[Message]>,
+//         chatType: ChatType = .conversation,
+//         replyMode: ReplyMode = .quote,
+//         didSendMessage: @escaping (DraftMessage) -> Void,
+//         reactionDelegate: ReactionDelegate? = nil,
+//         inputViewBuilder: @escaping InputViewBuilderClosure) {
+//        print(">>>> ChatView inited")
+//        self.type = chatType
+//        self.didSendMessage = didSendMessage
+//        self.reactionDelegate = reactionDelegate
+//        self._messages = messages
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.wrappedValue.map { $0.id }
+//        self.inputViewBuilder = inputViewBuilder
+//        self.chatType = chatType
+//        self.replyMode = replyMode
+//    }
+//}
+//
+//public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MenuAction == DefaultMessageMenuAction {
+//
+//    init(messages: Binding<[Message]>,
+//         chatType: ChatType = .conversation,
+//         replyMode: ReplyMode = .quote,
+//         didSendMessage: @escaping (DraftMessage) -> Void,
+//         reactionDelegate: ReactionDelegate? = nil) {
+//        print(">>>> ChatView inited")
+//        self.type = chatType
+//        self.replyMode = replyMode
+//        self.chatType = chatType
+//        self.didSendMessage = didSendMessage
+//        self.reactionDelegate = reactionDelegate
+//        self._messages = messages
+//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
+//        self.ids = messages.wrappedValue.map { $0.id }
+//    }
+//}
