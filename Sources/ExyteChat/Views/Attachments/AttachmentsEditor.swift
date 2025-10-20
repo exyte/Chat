@@ -20,7 +20,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @EnvironmentObject private var keyboardState: KeyboardState
     @EnvironmentObject private var globalFocusState: GlobalFocusState
 
-    @Bindable var inputViewModel: InputViewModel
+    @ObservedObject var inputViewModel: InputViewModel
 
     var inputViewBuilder: InputViewBuilderClosure?
     var chatTitle: String?
@@ -48,70 +48,71 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     }
 
     var mediaPicker: some View {
-        GeometryReader { g in
-            MediaPicker(isPresented: $inputViewModel.showPicker) {
-                seleсtedMedias = $0
-                assembleSelectedMedia()
-            } albumSelectionBuilder: { _, albumSelectionView, _ in
-                VStack {
-                    albumSelectionHeaderView
-                        .padding(.top, g.safeAreaInsets.top)
-                    albumSelectionView
-                    Spacer()
-                    inputView
-                        .padding(.bottom, g.safeAreaInsets.bottom)
-                }
-                .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
-            } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
-                VStack {
-                    cameraSelectionView
-                        .overlay(alignment: .top) {
-                            cameraSelectionHeaderView(cancelClosure: cancelClosure)
-                                .padding(.top, 12)
-                        }
-                        .padding(.top, g.safeAreaInsets.top)
-                    Spacer()
-                    inputView
-                        .padding(.bottom, g.safeAreaInsets.bottom)
-                }
-                .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
-            }
-            .didPressCancelCamera {
-                inputViewModel.showPicker = false
-            }
-            .currentFullscreenMedia($currentFullscreenMedia)
-            .liveCameraCell(.small)
-            .setSelectionParameters(mediaPickerSelectionParameters)
-            .pickerMode($inputViewModel.mediaPickerMode)
-            .orientationHandler(orientationHandler)
-            .padding(.top)
-            .background(theme.colors.mainBG)
-            .ignoresSafeArea(.all)
-            .onChange(of: currentFullscreenMedia) {
-                assembleSelectedMedia()
-            }
-            .onChange(of: inputViewModel.showPicker) {
-                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
-                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
-
-                if selectionLimit == 1 && !showFullscreenPreview {
-                    assembleSelectedMedia()
-                    inputViewModel.send()
-                }
-            }
-            .applyIf(!mediaPickerThemeIsOverridden) {
-                $0.mediaPickerTheme(
-                    main: .init(
-                        pickerText: theme.colors.mainText,
-                        pickerBackground: theme.colors.mainBG,
-                        fullscreenPhotoBackground: theme.colors.mainBG
-                    ),
-                    selection: .init(
-                        accent: theme.colors.sendButtonBackground
-                    )
-                )
-            }
-        }
+        Text("under construction")
+//        GeometryReader { g in
+//            MediaPicker(isPresented: $inputViewModel.showPicker) {
+//                seleсtedMedias = $0
+//                assembleSelectedMedia()
+//            } albumSelectionBuilder: { _, albumSelectionView, _ in
+//                VStack {
+//                    albumSelectionHeaderView
+//                        .padding(.top, g.safeAreaInsets.top)
+//                    albumSelectionView
+//                    Spacer()
+//                    inputView
+//                        .padding(.bottom, g.safeAreaInsets.bottom)
+//                }
+//                .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
+//            } cameraSelectionBuilder: { _, cancelClosure, cameraSelectionView in
+//                VStack {
+//                    cameraSelectionView
+//                        .overlay(alignment: .top) {
+//                            cameraSelectionHeaderView(cancelClosure: cancelClosure)
+//                                .padding(.top, 12)
+//                        }
+//                        .padding(.top, g.safeAreaInsets.top)
+//                    Spacer()
+//                    inputView
+//                        .padding(.bottom, g.safeAreaInsets.bottom)
+//                }
+//                .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
+//            }
+//            .didPressCancelCamera {
+//                inputViewModel.showPicker = false
+//            }
+//            .currentFullscreenMedia($currentFullscreenMedia)
+//            .liveCameraCell(.small)
+//            .setSelectionParameters(mediaPickerSelectionParameters)
+//            .pickerMode($inputViewModel.mediaPickerMode)
+//            .orientationHandler(orientationHandler)
+//            .padding(.top)
+//            .background(theme.colors.mainBG)
+//            .ignoresSafeArea(.all)
+//            .onChange(of: currentFullscreenMedia) {
+//                assembleSelectedMedia()
+//            }
+//            .onChange(of: inputViewModel.showPicker) {
+//                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
+//                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
+//
+//                if selectionLimit == 1 && !showFullscreenPreview {
+//                    assembleSelectedMedia()
+//                    inputViewModel.send()
+//                }
+//            }
+//            .applyIf(!mediaPickerThemeIsOverridden) {
+//                $0.mediaPickerTheme(
+//                    main: .init(
+//                        pickerText: theme.colors.mainText,
+//                        pickerBackground: theme.colors.mainBG,
+//                        fullscreenPhotoBackground: theme.colors.mainBG
+//                    ),
+//                    selection: .init(
+//                        accent: theme.colors.sendButtonBackground
+//                    )
+//                )
+//            }
+//        }
     }
 
     func assembleSelectedMedia() {

@@ -7,7 +7,6 @@
 
 import SwiftUI
 import ExyteMediaPicker
-import Observation
 import GiphyUISDK
 
 public enum InputViewStyle: Sendable {
@@ -78,7 +77,7 @@ struct InputView: View {
 
     @EnvironmentObject private var keyboardState: KeyboardState
     
-    @Bindable var viewModel: InputViewModel
+    @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]

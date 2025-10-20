@@ -77,8 +77,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     // MARK: - Parameters
     
     let type: ChatType
-    @State var sections: [MessagesSection] = []
-    @State var ids: [String] = []
+    let sections: [MessagesSection]
+    let ids: [String]
     let didSendMessage: (DraftMessage) -> Void
     var reactionDelegate: ReactionDelegate?
 
@@ -130,7 +130,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     
     @StateObject private var viewModel = ChatViewModel()
-    @Bindable var inputViewModel: InputViewModel
+    @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
@@ -147,33 +147,26 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var giphyConfigured = false
     @State private var selectedMedia: GPHMedia? = nil
-    @Binding var messages: [Message]
     
-    private let chatType: ChatType
-    private let replyMode: ReplyMode
-    
-//    public init(messages: Binding<[Message]>,
-//                chatType: ChatType = .conversation,
-//                replyMode: ReplyMode = .quote,
-//                didSendMessage: @escaping (DraftMessage) -> Void,
-//                reactionDelegate: ReactionDelegate? = nil,
-//                messageBuilder: @escaping MessageBuilderClosure,
-//                inputViewBuilder: @escaping InputViewBuilderClosure,
-//                messageMenuAction: MessageMenuActionClosure?,
-//                localization: ChatLocalization) {
-//        self._messages = messages
-//        self.type = chatType
-//        self.didSendMessage = didSendMessage
-//        self.reactionDelegate = reactionDelegate
-//        self.chatType = chatType
-//        self.replyMode = replyMode
-//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
-//        self.ids = messages.map { $0.wrappedValue.id }
-//        self.messageBuilder = messageBuilder
-//        self.inputViewBuilder = inputViewBuilder
-//        self.messageMenuAction = messageMenuAction
-//        self.localization = localization
-//    }
+    public init(messages: [Message],
+                chatType: ChatType = .conversation,
+                replyMode: ReplyMode = .quote,
+                didSendMessage: @escaping (DraftMessage) -> Void,
+                reactionDelegate: ReactionDelegate? = nil,
+                messageBuilder: @escaping MessageBuilderClosure,
+                inputViewBuilder: @escaping InputViewBuilderClosure,
+                messageMenuAction: MessageMenuActionClosure?,
+                localization: ChatLocalization) {
+        self.type = chatType
+        self.didSendMessage = didSendMessage
+        self.reactionDelegate = reactionDelegate
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+        self.messageBuilder = messageBuilder
+        self.inputViewBuilder = inputViewBuilder
+        self.messageMenuAction = messageMenuAction
+        self.localization = localization
+    }
     
     public var body: some View {
         mainView
@@ -215,10 +208,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputViewModel.attachments.giphyMedia = giphyMedia
                     inputViewModel.send()
                 }
-            }
-            .onChange(of: self.messages) { _, messages in
-                self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-                self.ids = messages.map { $0.id }
             }
             .sheet(isPresented: $inputViewModel.showGiphyPicker) {
                 if giphyConfig.giphyKey != nil {
@@ -385,16 +374,16 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.inputViewModel = inputViewModel
             viewModel.globalFocusState = globalFocusState
 
-//            inputViewModel.didSendMessage = { value in
-//                Task { @MainActor in
-//                    didSendMessage(value)
-//                }
-//                if type == .conversation {
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-//                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
-//                    }
-//                }
-//            }
+            inputViewModel.didSendMessage = { value in
+                Task { @MainActor in
+                    didSendMessage(value)
+                }
+                if type == .conversation {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                    }
+                }
+            }
         }
     }
 
@@ -884,82 +873,16 @@ public extension ChatView {
 public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView {
 
     init(messages: Binding<[Message]>,
-         inputViewModel: InputViewModel,
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          messageMenuAction: MessageMenuActionClosure?) {
-        self.inputViewModel = inputViewModel
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.reactionDelegate = reactionDelegate
-        self._messages = messages
         self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
         self.ids = messages.wrappedValue.map { $0.id }
         self.messageMenuAction = messageMenuAction
-        self.chatType = chatType
-        self.replyMode = replyMode
     }
 }
-
-//public extension ChatView where InputViewContent == EmptyView, MenuAction == DefaultMessageMenuAction {
-//
-//    init(messages: Binding<[Message]>,
-//         chatType: ChatType = .conversation,
-//         replyMode: ReplyMode = .quote,
-//         didSendMessage: @escaping (DraftMessage) -> Void,
-//         reactionDelegate: ReactionDelegate? = nil,
-//         messageBuilder: @escaping MessageBuilderClosure) {
-//        print(">>>> ChatView inited")
-//        self.type = chatType
-//        self.didSendMessage = didSendMessage
-//        self.reactionDelegate = reactionDelegate
-//        self._messages = messages
-//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
-//        self.ids = messages.wrappedValue.map { $0.id }
-//        self.messageBuilder = messageBuilder
-//        self.chatType = chatType
-//        self.replyMode = replyMode
-//    }
-//}
-//
-//public extension ChatView where MessageContent == EmptyView, MenuAction == DefaultMessageMenuAction {
-//
-//    init(messages: Binding<[Message]>,
-//         chatType: ChatType = .conversation,
-//         replyMode: ReplyMode = .quote,
-//         didSendMessage: @escaping (DraftMessage) -> Void,
-//         reactionDelegate: ReactionDelegate? = nil,
-//         inputViewBuilder: @escaping InputViewBuilderClosure) {
-//        print(">>>> ChatView inited")
-//        self.type = chatType
-//        self.didSendMessage = didSendMessage
-//        self.reactionDelegate = reactionDelegate
-//        self._messages = messages
-//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
-//        self.ids = messages.wrappedValue.map { $0.id }
-//        self.inputViewBuilder = inputViewBuilder
-//        self.chatType = chatType
-//        self.replyMode = replyMode
-//    }
-//}
-//
-//public extension ChatView where MessageContent == EmptyView, InputViewContent == EmptyView, MenuAction == DefaultMessageMenuAction {
-//
-//    init(messages: Binding<[Message]>,
-//         chatType: ChatType = .conversation,
-//         replyMode: ReplyMode = .quote,
-//         didSendMessage: @escaping (DraftMessage) -> Void,
-//         reactionDelegate: ReactionDelegate? = nil) {
-//        print(">>>> ChatView inited")
-//        self.type = chatType
-//        self.replyMode = replyMode
-//        self.chatType = chatType
-//        self.didSendMessage = didSendMessage
-//        self.reactionDelegate = reactionDelegate
-//        self._messages = messages
-//        self.sections = ChatView.mapMessages(messages.wrappedValue, chatType: chatType, replyMode: replyMode)
-//        self.ids = messages.wrappedValue.map { $0.id }
-//    }
-//}

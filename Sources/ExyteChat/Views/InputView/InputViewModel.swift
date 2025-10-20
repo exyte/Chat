@@ -4,49 +4,33 @@
 
 import Foundation
 import Combine
-import Observation
 import ExyteMediaPicker
 
 @MainActor
-@Observable
-public final class InputViewModel {
+public final class InputViewModel: ObservableObject {
 
-    var text = "" {
-        didSet {
-            validateDraft()
-        }
-    }
-    var attachments = InputViewAttachments()
-    var state: InputViewState = .empty
+    @Published var text = ""
+    @Published var attachments = InputViewAttachments()
+    @Published var state: InputViewState = .empty
 
-    var showGiphyPicker = false
-    var showPicker = false
+    @Published var showGiphyPicker = false
+    @Published var showPicker = false
   
-    var mediaPickerMode = MediaPickerMode.photos
+    @Published var mediaPickerMode = MediaPickerMode.photos
 
-    var showActivityIndicator = false
+    @Published var showActivityIndicator = false
     
     var inputFieldId = UUID()
     
-    @ObservationIgnored
     var recordingPlayer: RecordingPlayer?
-    @ObservationIgnored
     var didSendMessage: ((DraftMessage) -> Void)?
 
-    @ObservationIgnored
     private var recorder = Recorder()
 
-    @ObservationIgnored
     private var saveEditingClosure: ((String) -> Void)?
 
-    @ObservationIgnored
     private var recordPlayerSubscription: AnyCancellable?
-    @ObservationIgnored
     private var subscriptions = Set<AnyCancellable>()
-    
-    public init(didSendMessage: ((DraftMessage) -> Void)? = nil) {
-        self.didSendMessage = didSendMessage
-    }
     
     func setRecorderSettings(recorderSettings: RecorderSettings = RecorderSettings()) {
         Task {
@@ -65,14 +49,15 @@ public final class InputViewModel {
     }
 
     func reset() {
-        showPicker = false
-        showGiphyPicker = false
-        text = ""
-        saveEditingClosure = nil
-        attachments = InputViewAttachments()
-        subscribeValidation()
-        state = .empty
-        inputFieldId = UUID()
+        DispatchQueue.main.async { [weak self] in
+            self?.showPicker = false
+            self?.showGiphyPicker = false
+            self?.text = ""
+            self?.saveEditingClosure = nil
+            self?.attachments = InputViewAttachments()
+            self?.subscribeValidation()
+            self?.state = .empty
+        }
     }
 
     func send() {
@@ -178,8 +163,8 @@ public final class InputViewModel {
 private extension InputViewModel {
 
     func validateDraft() {
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self = self else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             guard state != .editing else { return } // special case
             if !self.text.isEmpty || !self.attachments.medias.isEmpty {
                 self.state = .hasTextOrMedia
@@ -188,39 +173,39 @@ private extension InputViewModel {
                       self.attachments.recording == nil {
                 self.state = .empty
             }
-//        }
+        }
     }
 
     func subscribeValidation() {
-//        $attachments.sink { [weak self] _ in
-//            self?.validateDraft()
-//        }
-//        .store(in: &subscriptions)
-//
-//        $text.sink { [weak self] _ in
-//            self?.validateDraft()
-//        }
-//        .store(in: &subscriptions)
+        $attachments.sink { [weak self] _ in
+            self?.validateDraft()
+        }
+        .store(in: &subscriptions)
+
+        $text.sink { [weak self] _ in
+            self?.validateDraft()
+        }
+        .store(in: &subscriptions)
     }
 
     func subscribeGiphyPicker() {
-//        $showGiphyPicker
-//            .sink { [weak self] value in
-//                if !value {
-//                  self?.attachments.giphyMedia = nil
-//                }
-//            }
-//            .store(in: &subscriptions)
+        $showGiphyPicker
+            .sink { [weak self] value in
+                if !value {
+                  self?.attachments.giphyMedia = nil
+                }
+            }
+            .store(in: &subscriptions)
     }
   
     func subscribePicker() {
-//        $showPicker
-//            .sink { [weak self] value in
-//                if !value {
-//                    self?.attachments.medias = []
-//                }
-//            }
-//            .store(in: &subscriptions)
+        $showPicker
+            .sink { [weak self] value in
+                if !value {
+                    self?.attachments.medias = []
+                }
+            }
+            .store(in: &subscriptions)
     }
 
     func subscribeRecordPlayer() {
@@ -252,8 +237,8 @@ private extension InputViewModel {
             createdAt: Date()
         )
         didSendMessage?(draft)
-        showActivityIndicator = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.async {
+            self.showActivityIndicator = false
             self.reset()
         }
     }
