@@ -9,7 +9,9 @@ import SwiftUI
 import GiphyUISDK
 import ExyteMediaPicker
 
-public typealias MediaPickerParameters = SelectionParamsHolder
+public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
+public typealias MediaPickerSelectionParameters = SelectionParamsHolder
+public typealias MediaPickerParameters = MediaPickerParamsHolder
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -117,7 +119,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
-    var mediaPickerSelectionParameters: MediaPickerParameters?
+    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
+    var mediaPickerParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
     var paginationHandler: PaginationHandler?
@@ -228,6 +231,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     messageStyler: messageStyler,
                     orientationHandler: orientationHandler,
                     mediaPickerSelectionParameters: mediaPickerSelectionParameters,
+                    mediaPickerParameters: mediaPickerParameters,
                     availableInputs: availableInputs,
                     localization: localization
                 )
@@ -613,17 +617,23 @@ public extension ChatView {
     
     func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
         var view = self
-        view.mediaPickerSelectionParameters = MediaPickerParameters()
+        view.mediaPickerSelectionParameters = MediaPickerSelectionParameters()
         view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
         return view
     }
     
-    func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
+    func setMediaPickerSelectionParameters(_ params: MediaPickerSelectionParameters) -> ChatView {
         var view = self
         view.mediaPickerSelectionParameters = params
         return view
     }
-
+    
+    func setMediaPickerParameters(_ params: MediaPickerParameters) -> ChatView {
+        var view = self
+        view.mediaPickerParameters = params
+        return view
+    }
+    
     func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
         var view = self
         view.orientationHandler = orientationHandler

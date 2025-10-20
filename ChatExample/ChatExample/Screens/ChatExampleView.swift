@@ -32,6 +32,7 @@ struct ChatExampleView: View {
         }
         .keyboardDismissMode(.interactive)
         .messageUseMarkdown(true)
+        .setMediaPickerParameters(MediaPickerParameters(liveCameraCell: MediaPickerLiveCameraStyle.prominant))
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [
