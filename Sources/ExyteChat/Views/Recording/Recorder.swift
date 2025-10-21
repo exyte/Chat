@@ -71,10 +71,14 @@ final actor Recorder {
             audioRecorder?.record()
             durationProgressHandler(0.0, [])
 
-            audioTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
                 Task {
                     await self?.onTimer(durationProgressHandler)
                 }
+            }
+            audioTimer = timer
+            Task { @MainActor in
+                RunLoop.main.add(timer, forMode: .common)
             }
 
             return recordingUrl
