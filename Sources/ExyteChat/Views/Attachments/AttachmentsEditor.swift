@@ -26,7 +26,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var chatTitle: String?
     var messageStyler: (String) -> AttributedString
     var orientationHandler: MediaPickerOrientationHandler
-    var mediaPickerSelectionParameters: MediaPickerParameters?
+    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
+    var mediaPickerParameters: MediaPickerParameters?
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
 
@@ -80,8 +81,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.showPicker = false
             }
             .currentFullscreenMedia($currentFullscreenMedia)
-            .liveCameraCell(.small)
             .setSelectionParameters(mediaPickerSelectionParameters)
+            .setMediaPickerParameters(mediaPickerParameters)
             .pickerMode($inputViewModel.mediaPickerMode)
             .orientationHandler(orientationHandler)
             .padding(.top)
