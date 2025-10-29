@@ -361,7 +361,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 messageMenu(row)
                     .onAppear(perform: showMessageMenu)
             }
-            
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) { frames in
             DispatchQueue.main.async {
@@ -397,6 +396,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
                     globalFocusState.focus = nil
                 }
+                .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
             } else {
                 InputView(
                     viewModel: inputViewModel,
@@ -502,9 +502,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     private func chatBackground() -> some View {
         Group {
-            
             if let background = theme.images.background {
-                
                 switch (isLandscape(), colorScheme) {
                 case (true, .dark):
                     background.landscapeBackgroundDark
@@ -522,6 +520,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     background.portraitBackgroundLight
                         .resizable()
                         .ignoresSafeArea(background.safeAreaRegions, edges: background.safeAreaEdges)
+                default:
+                    theme.colors.mainBG
                 }
             } else {
                 theme.colors.mainBG
@@ -530,15 +530,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     private func isLandscape() -> Bool {
-        return UIDevice.current.orientation.isLandscape
+        UIDevice.current.orientation.isLandscape
     }
     
     private func isGiphyAvailable() -> Bool {
-        return availableInputs.contains(AvailableInputType.giphy)
+        availableInputs.contains(AvailableInputType.giphy)
     }
     
     private static func createLocalization() -> ChatLocalization {
-        return ChatLocalization(
+        ChatLocalization(
             inputPlaceholder: String(localized: "Type a message..."),
             signatureText: String(localized: "Add signature..."),
             cancelButtonText: String(localized: "Cancel"),
