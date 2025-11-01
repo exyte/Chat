@@ -312,6 +312,56 @@ By default the built-in MediaPicker will be auto-customized using the most logic
   
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 
+## Large Attachment Support
+
+The library provides full support for uploading multiple attachments larger than 100 MB and for reporting upload status on both the sender’s and receiver’s message views. It offers flexibility in how much progress tracking functionality the client implements, allowing developers to omit percentage-based updates if desired. Sending percentage updates to the receiver requires careful handling, as it involves multiple WebSocket calls to synchronize status between sender and receiver.
+
+*Option 1*
+
+No status is passed to an Attachment. This is the default behavior and shows no progress indicators. If the full attachment is uploaded to a resource server before the message is sent to the receiver, use this method, as it is the simplest and requires no progress tracking.
+
+```swift
+Attachment(
+  fullUploadStatus: Attachment.UploadStatus? = nil
+)
+```
+
+*Option 2*
+
+A progress indicator is displayed without a percentage. Most chat applications handle multiple large (100 MB+) files, which may take several minutes to upload. In these cases, Option 1 results in a poor user experience because the receiver has no indication that the files are being uploaded. Option 2 allows both the sender and receiver to see a generic progress indicator during the upload.
+
+```swift
+Attachment(
+  fullUploadStatus: Attachment.UploadStatus? = Attachment.UploadStatus.inProgress(nil)
+)
+```
+
+*Option 3*: 
+
+A progress indicator is displayed with a percentage. This option provides the best user experience, as it shows the progress of the upload. However, it adds implementation complexity: both the sender and receiver must remain synchronized through multiple WebSocket updates (e.g., 10%, 20%, …). For production-quality chat applications, implementing this option is recommended.
+
+```swift
+Attachment(
+  fullUploadStatus: Attachment.UploadStatus? = Attachment.UploadStatus.inProgress(0)
+)
+```
+
+When implementing status updates via Option 2/3 the following status updates need to be handled by the client:
+
+```swift
+// When the upload completes, send a final message to stop displaying the progress indicator.
+let completeUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.complete)
+sendToServer(initialProgress)
+
+// If the user cancels an attachment upload, report this to the receiver.
+let cancelUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.cancelled)
+sendToServer(cancelUpload)
+
+// If the upload to the resource server fails, send an error status to the receiver.
+let errorUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.error)
+sendToServer(errorUpload)
+```
+
 ## Sticker Keyboard
 
 You can pick and send animated gifs via the integrated sticker keyboard. In order to use this functionality a client id must be granted via the [Giphy Developers](https://developers.giphy.com/) site.

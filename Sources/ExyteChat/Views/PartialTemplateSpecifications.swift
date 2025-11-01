@@ -13,11 +13,13 @@ public extension ChatView where MessageContent == EmptyView {
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil,
          inputViewBuilder: @escaping InputViewBuilderClosure,
          messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -32,11 +34,13 @@ public extension ChatView where InputViewContent == EmptyView {
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil,
          messageBuilder: @escaping MessageBuilderClosure,
          messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -51,11 +55,13 @@ public extension ChatView where MenuAction == DefaultMessageMenuAction {
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil,
          messageBuilder: @escaping MessageBuilderClosure,
          inputViewBuilder: @escaping InputViewBuilderClosure) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -70,10 +76,12 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil,
          messageMenuAction: MessageMenuActionClosure?) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -87,10 +95,12 @@ public extension ChatView where InputViewContent == EmptyView, MenuAction == Def
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil,
          messageBuilder: @escaping MessageBuilderClosure) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -104,10 +114,12 @@ public extension ChatView where MessageContent == EmptyView, MenuAction == Defau
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil,
          inputViewBuilder: @escaping InputViewBuilderClosure) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -121,9 +133,11 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
          didSendMessage: @escaping (DraftMessage) -> Void,
+         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
          reactionDelegate: ReactionDelegate? = nil) {
         self.type = chatType
         self.didSendMessage = didSendMessage
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }

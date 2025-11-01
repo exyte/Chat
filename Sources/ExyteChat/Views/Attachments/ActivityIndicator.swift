@@ -13,6 +13,7 @@ struct ActivityIndicator: View {
     @Environment(\.chatTheme) var theme
     var size: CGFloat = 50
     var showBackground = true
+    var color: Color? = nil
 
     var body: some View {
         ZStack {
@@ -23,7 +24,7 @@ struct ActivityIndicator: View {
             }
 
             ActivityIndicatorView(isVisible: .constant(true), type: .flickeringDots())
-                .foregroundColor(theme.colors.sendButtonBackground)
+                .foregroundColor(color != nil ? color! : theme.colors.sendButtonBackground)
                 .frame(width: size, height: size)
         }
     }

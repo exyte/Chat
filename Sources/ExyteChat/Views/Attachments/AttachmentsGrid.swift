@@ -5,7 +5,7 @@
 import SwiftUI
 
 struct AttachmentsGrid: View {
-    let onTap: (Attachment) -> Void
+    let onTap: (_ attachment: Attachment, _ isCancel: Bool) -> Void
     let maxImages: Int = 4 // TODO: Make injectable
 
     private let single: (Attachment)?
@@ -15,7 +15,7 @@ struct AttachmentsGrid: View {
     private let hidden: String?
     private let showMoreAttachmentId: String?
 
-    init(attachments: [Attachment], onTap: @escaping (Attachment) -> Void) {
+    init(attachments: [Attachment], onTap: @escaping (_ attachment: Attachment, _ isCancel: Bool) -> Void) {
         var toShow = attachments
 
         if toShow.count > maxImages {
@@ -108,7 +108,7 @@ struct AttachmentsGrid_Preview: PreviewProvider {
         Group {
             ForEach(examples, id: \.self) { count in
                 ScrollView {
-                    AttachmentsGrid(attachments: .random(count: count), onTap: { _ in })
+                    AttachmentsGrid(attachments: .random(count: count),  onTap: { _,_ in } )
                         .padding()
                         .background(Color.white)
                 }
