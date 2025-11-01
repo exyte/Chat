@@ -153,7 +153,7 @@ struct CommentsExampleView: View {
                     if !message.attachments.isEmpty {
                         LazyVGrid(columns: Array(repeating: GridItem(), count: 2), spacing: 8) {
                             ForEach(message.attachments) { attachment in
-                                AttachmentCell(attachment: attachment, size: CGSize(width: 150, height: 150)) { _,_ in
+                                AttachmentCell(attachment: attachment, size: CGSize(width: 150, height: 150), showCancel: message.user.isCurrentUser) { _,_ in
                                     attachmentClosure(attachment)
                                 }
                                 .cornerRadius(12)

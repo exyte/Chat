@@ -10,14 +10,16 @@ public struct AttachmentCell: View {
 
     let attachment: Attachment
     let size: CGSize
+    let showCancel: Bool
     let onTap: (_ attachment: Attachment, _ isCancel: Bool) -> Void
 
     public init(
-        attachment: Attachment, size: CGSize,
+        attachment: Attachment, size: CGSize, showCancel: Bool = false,
         onTap: @escaping (_ attachment: Attachment, _ isCancel: Bool) -> Void
     ) {
         self.attachment = attachment
         self.size = size
+        self.showCancel = showCancel
         self.onTap = onTap
     }
 
@@ -92,11 +94,13 @@ public struct AttachmentCell: View {
     @ViewBuilder
     private func uploadingOverlay(percent: Int?) -> some View {
         Color.white.opacity(0.8)
-        theme.images.message.cancel
-            .resizable()
-            .symbolRenderingMode(.palette)
-            .foregroundStyle(.white, .black.opacity(0.4))
-            .frame(width: 36, height: 36)
+        if showCancel {
+            theme.images.message.cancel
+                .resizable()
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(.white, .black.opacity(0.4))
+                .frame(width: 36, height: 36)
+        }
         VStack {
             HStack {
                 Spacer()
@@ -151,7 +155,14 @@ public struct AttachmentCell: View {
             switch status {
             case .cancelled: return nil
             case .error: return nil
-            case .inProgress(_): return AnyGesture(TapGesture().onEnded { onTap(attachment, true) })
+            case .inProgress(_):
+                if showCancel {
+                    return AnyGesture(TapGesture().onEnded { onTap(attachment, true) })
+                }
+                else {
+                    // only the sender can cancel an upload attachment
+                    return nil
+                }
             case .complete: return AnyGesture(TapGesture().onEnded { onTap(attachment, false) })
             }
         }

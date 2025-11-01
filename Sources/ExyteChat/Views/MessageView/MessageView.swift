@@ -251,7 +251,7 @@ struct MessageView: View {
 
     @ViewBuilder
     func attachmentsView(_ message: Message) -> some View {
-        AttachmentsGrid(attachments: message.attachments) { attachment, isCancel in
+        AttachmentsGrid(attachments: message.attachments, isCurrentUser: message.user.isCurrentUser) { attachment, isCancel in
           if isCancel {
             let update = AttachmentUploadUpdate(
               messageId: message.id,
