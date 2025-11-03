@@ -26,6 +26,19 @@
 		5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */; };
 		5B6467A02D96F4FC00FFD920 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B64679F2D96F4FC00FFD920 /* ExyteChat */; };
 		5B6D3A732987D85A00765148 /* Color+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+hex.swift */; };
+		845EB3722EB8BA00005347E5 /* Utendo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3642EB8BA00005347E5 /* Utendo-Bold.ttf */; };
+		845EB3732EB8BA00005347E5 /* PlusJakartaSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36F2EB8BA00005347E5 /* PlusJakartaSans-SemiBold.ttf */; };
+		845EB3742EB8BA00005347E5 /* Utendo-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3632EB8BA00005347E5 /* Utendo-Black.ttf */; };
+		845EB3752EB8BA00005347E5 /* Utendo-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3672EB8BA00005347E5 /* Utendo-Regular.ttf */; };
+		845EB3762EB8BA00005347E5 /* QurovaDEMO-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36A2EB8BA00005347E5 /* QurovaDEMO-Medium.otf */; };
+		845EB3772EB8BA00005347E5 /* Utendo-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3682EB8BA00005347E5 /* Utendo-Semibold.ttf */; };
+		845EB3782EB8BA00005347E5 /* ClashDisplay-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3612EB8BA00005347E5 /* ClashDisplay-Bold.otf */; };
+		845EB3792EB8BA00005347E5 /* Utendo-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3662EB8BA00005347E5 /* Utendo-Medium.ttf */; };
+		845EB37A2EB8BA00005347E5 /* ClashDisplay-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3602EB8BA00005347E5 /* ClashDisplay-Semibold.otf */; };
+		845EB37B2EB8BA00005347E5 /* Utendo-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB3652EB8BA00005347E5 /* Utendo-Light.ttf */; };
+		845EB37C2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36D2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf */; };
+		845EB37D2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36E2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf */; };
+		845EB37E2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36C2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf */; };
 		FF220E5D2DD9F0B700BE315E /* .editorconfig in Resources */ = {isa = PBXBuildFile; fileRef = FF220E5C2DD9F0AF00BE315E /* .editorconfig */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +76,19 @@
 		5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleView.swift; sourceTree = "<group>"; };
 		5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+asyncMap.swift"; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
+		845EB3602EB8BA00005347E5 /* ClashDisplay-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ClashDisplay-Semibold.otf"; sourceTree = "<group>"; };
+		845EB3612EB8BA00005347E5 /* ClashDisplay-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ClashDisplay-Bold.otf"; sourceTree = "<group>"; };
+		845EB3632EB8BA00005347E5 /* Utendo-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Utendo-Black.ttf"; sourceTree = "<group>"; };
+		845EB3642EB8BA00005347E5 /* Utendo-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Utendo-Bold.ttf"; sourceTree = "<group>"; };
+		845EB3652EB8BA00005347E5 /* Utendo-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Utendo-Light.ttf"; sourceTree = "<group>"; };
+		845EB3662EB8BA00005347E5 /* Utendo-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Utendo-Medium.ttf"; sourceTree = "<group>"; };
+		845EB3672EB8BA00005347E5 /* Utendo-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Utendo-Regular.ttf"; sourceTree = "<group>"; };
+		845EB3682EB8BA00005347E5 /* Utendo-Semibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Utendo-Semibold.ttf"; sourceTree = "<group>"; };
+		845EB36A2EB8BA00005347E5 /* QurovaDEMO-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "QurovaDEMO-Medium.otf"; sourceTree = "<group>"; };
+		845EB36C2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-Bold.ttf"; sourceTree = "<group>"; };
+		845EB36D2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
+		845EB36E2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-Regular.ttf"; sourceTree = "<group>"; };
+		845EB36F2EB8BA00005347E5 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		FF220E5C2DD9F0AF00BE315E /* .editorconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = .editorconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -142,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				1376F7A3286466460016CD1B /* Info.plist */,
+				845EB3712EB8BA00005347E5 /* Fonts */,
 				135549372864620B00C9459A /* Assets.xcassets */,
 				135549392864620B00C9459A /* Preview Content */,
 			);
@@ -183,6 +210,58 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		845EB3622EB8BA00005347E5 /* ClashDisplay */ = {
+			isa = PBXGroup;
+			children = (
+				845EB3602EB8BA00005347E5 /* ClashDisplay-Semibold.otf */,
+				845EB3612EB8BA00005347E5 /* ClashDisplay-Bold.otf */,
+			);
+			path = ClashDisplay;
+			sourceTree = "<group>";
+		};
+		845EB3692EB8BA00005347E5 /* utendo */ = {
+			isa = PBXGroup;
+			children = (
+				845EB3632EB8BA00005347E5 /* Utendo-Black.ttf */,
+				845EB3642EB8BA00005347E5 /* Utendo-Bold.ttf */,
+				845EB3652EB8BA00005347E5 /* Utendo-Light.ttf */,
+				845EB3662EB8BA00005347E5 /* Utendo-Medium.ttf */,
+				845EB3672EB8BA00005347E5 /* Utendo-Regular.ttf */,
+				845EB3682EB8BA00005347E5 /* Utendo-Semibold.ttf */,
+			);
+			path = utendo;
+			sourceTree = "<group>";
+		};
+		845EB36B2EB8BA00005347E5 /* QurovaDEMO */ = {
+			isa = PBXGroup;
+			children = (
+				845EB36A2EB8BA00005347E5 /* QurovaDEMO-Medium.otf */,
+			);
+			path = QurovaDEMO;
+			sourceTree = "<group>";
+		};
+		845EB3702EB8BA00005347E5 /* PlusJakartaSans */ = {
+			isa = PBXGroup;
+			children = (
+				845EB36C2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf */,
+				845EB36D2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf */,
+				845EB36E2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf */,
+				845EB36F2EB8BA00005347E5 /* PlusJakartaSans-SemiBold.ttf */,
+			);
+			path = PlusJakartaSans;
+			sourceTree = "<group>";
+		};
+		845EB3712EB8BA00005347E5 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				845EB3622EB8BA00005347E5 /* ClashDisplay */,
+				845EB3692EB8BA00005347E5 /* utendo */,
+				845EB36B2EB8BA00005347E5 /* QurovaDEMO */,
+				845EB3702EB8BA00005347E5 /* PlusJakartaSans */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -252,6 +331,19 @@
 			files = (
 				1355493B2864620B00C9459A /* Preview Assets.xcassets in Resources */,
 				135549382864620B00C9459A /* Assets.xcassets in Resources */,
+				845EB3722EB8BA00005347E5 /* Utendo-Bold.ttf in Resources */,
+				845EB3732EB8BA00005347E5 /* PlusJakartaSans-SemiBold.ttf in Resources */,
+				845EB3742EB8BA00005347E5 /* Utendo-Black.ttf in Resources */,
+				845EB3752EB8BA00005347E5 /* Utendo-Regular.ttf in Resources */,
+				845EB3762EB8BA00005347E5 /* QurovaDEMO-Medium.otf in Resources */,
+				845EB3772EB8BA00005347E5 /* Utendo-Semibold.ttf in Resources */,
+				845EB3782EB8BA00005347E5 /* ClashDisplay-Bold.otf in Resources */,
+				845EB3792EB8BA00005347E5 /* Utendo-Medium.ttf in Resources */,
+				845EB37A2EB8BA00005347E5 /* ClashDisplay-Semibold.otf in Resources */,
+				845EB37B2EB8BA00005347E5 /* Utendo-Light.ttf in Resources */,
+				845EB37C2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf in Resources */,
+				845EB37D2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf in Resources */,
+				845EB37E2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf in Resources */,
 				FF220E5D2DD9F0B700BE315E /* .editorconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -413,7 +505,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
-				DEVELOPMENT_TEAM = FZXCM5CJ7P;
+				DEVELOPMENT_TEAM = YSQM5QWSN3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChatExample/Info.plist;
@@ -430,7 +522,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.exyte.ChatExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thanduc.chat.AI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -454,7 +546,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"ChatExample/Preview Content\"";
-				DEVELOPMENT_TEAM = FZXCM5CJ7P;
+				DEVELOPMENT_TEAM = YSQM5QWSN3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChatExample/Info.plist;
@@ -471,7 +563,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.exyte.ChatExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thanduc.chat.AI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

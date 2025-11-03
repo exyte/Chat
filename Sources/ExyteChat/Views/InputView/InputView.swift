@@ -109,21 +109,23 @@ struct InputView: View {
     var body: some View {
         VStack {
             viewOnTop
-            HStack(alignment: .bottom, spacing: 10) {
-                HStack(alignment: .bottom, spacing: 0) {
-                    leftView
-                    middleView
-                    rightView
-                }
-                .background {
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(style == .message ? theme.colors.inputBG : theme.colors.inputSignatureBG)
-                }
+            
+            HStack(spacing: 16) {
+                middleView
                 
                 rightOutsideButton
             }
-            .padding(.horizontal, MessageView.horizontalScreenEdgePadding)
+            .padding(.horizontal, Constants.marginSpacingInterface)
+            .cornerRadius(24)
+            .overlay {
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color(hex: "#EEEEEE"), lineWidth: 1.5)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, Constants.marginSpacingInterface)
             .padding(.vertical, 8)
+            .padding(.bottom, 4)
+            .background(.white)
         }
         .background(backgroundColor)
         .onAppear {
@@ -180,7 +182,6 @@ struct InputView: View {
                 )
             }
         }
-        .frame(minHeight: 48)
     }
     
     @ViewBuilder
@@ -231,41 +232,31 @@ struct InputView: View {
     
     @ViewBuilder
     var rightOutsideButton: some View {
-        if state == .editing {
-            editingButtons
-                .frame(height: 48)
-        }
-        else {
-            ZStack {
-                if [.isRecordingTap, .isRecordingHold].contains(state) {
-                    RecordIndicator()
-                        .viewSize(80)
-                        .foregroundColor(theme.colors.sendButtonBackground)
+        Group {
+            if viewModel.text.isEmpty {
+                Button {
+//                    chatViewmodel.showSuggestionBottomSheet = true
+                } label: {
+                    Image(viewModel.isGenerating ? "ic_spakle_2_disable" : "ic_spakle_2")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+//                        .opacity(listSuggestion.isEmpty ? 0 : 1)
                 }
-                Group {
-                    if state.canSend || !isAudioAvailable()   {
-                        sendButton
-                            .disabled(!state.canSend)
-                    } else {
-                        recordButton
-                            .highPriorityGesture(dragGesture())
-                    }
+                .disabled(!viewModel.allowToSendMessage)
+                .padding(.vertical, 12)
+            } else {
+                Button {
+//                    checkShowPaywallOrSendMessage(chatViewmodel.text)
+                } label: {
+                    Image(viewModel.isGenerating ? "ic_send_disable" : "ic_send_enable")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
                 }
-                .compositingGroup()
-                .overlay(alignment: .top) {
-                    Group {
-                        if state == .isRecordingTap {
-                            stopRecordButton
-                        } else if state == .isRecordingHold {
-                            lockRecordButton
-                        }
-                    }
-                    .sizeGetter($overlaySize)
-                    // hardcode 28 for now because sizeGetter returns 0 somehow
-                    .offset(y: (state == .isRecordingTap ? -28 : -overlaySize.height) - 24)
-                }
+                .disabled(viewModel.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !viewModel.allowToSendMessage)
+                .padding(.vertical, 12)
             }
-            .viewSize(48)
         }
     }
     

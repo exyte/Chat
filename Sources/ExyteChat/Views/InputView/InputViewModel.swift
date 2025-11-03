@@ -19,6 +19,9 @@ final class InputViewModel: ObservableObject {
     @Published var mediaPickerMode = MediaPickerMode.photos
 
     @Published var showActivityIndicator = false
+    
+    @Published var allowToSendMessage: Bool = true
+    @Published var isGenerating: Bool = false
 
     var recordingPlayer: RecordingPlayer?
     var didSendMessage: ((DraftMessage) -> Void)?

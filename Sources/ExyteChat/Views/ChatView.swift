@@ -301,20 +301,23 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ZStack(alignment: .bottomTrailing) {
                 list
                 
-                if !isScrolledToBottom {
-                    Button {
-                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
-                    } label: {
-                        theme.images.scrollToBottom
-                            .frame(width: 40, height: 40)
-                            .circleBackground(theme.colors.messageFriendBG)
-                            .foregroundStyle(theme.colors.sendButtonBackground)
-                            .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
-                    }
-                    .padding(.trailing, MessageView.horizontalScreenEdgePadding)
-                    .padding(.bottom, 8)
+                Button {
+                    NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                } label: {
+                    Image("ic_arrow_scroll_down")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
                 }
+                .background(.white)
+                .cornerRadius(40)
+                .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 0)
+                .shadow(color: .black.opacity(0.06), radius: 16, x: 0, y: 8)
+                .padding(.horizontal, Constants.marginSpacingInterface)
+                .opacity(isScrolledToBottom ? 0 : 1)
+                .disabled(isScrolledToBottom)
             }
+            .animation(.smooth(duration: 0.25), value: isScrolledToBottom)
             
         case .comments:
             list

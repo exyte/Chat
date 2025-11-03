@@ -13,5 +13,19 @@
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
+    <key>UIAppFonts</key>
+    <array>
+        <string>PlusJakartaSans-Bold.ttf</string>
+        <string>PlusJakartaSans-SemiBold.ttf</string>
+        <string>PlusJakartaSans-Regular.ttf</string>
+        <string>PlusJakartaSans-Medium.ttf</string>
+        <string>QurovaDEMO-Medium.otf</string>
+        <string>Utendo-Medium.ttf</string>
+        <string>Utendo-Semibold.ttf</string>
+        <string>Utendo-Regular.ttf</string>
+        <string>Utendo-Bold.ttf</string>
+        <string>ClashDisplay-Bold.otf</string>
+        <string>ClashDisplay-Semibold.otf</string>
+    </array>
 </dict>
 </plist>

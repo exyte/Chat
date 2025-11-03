@@ -16,23 +16,43 @@ struct TextInputView: View {
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
     
-    var body: some View {
-        TextField("", text: $text, prompt: Text(style == .message ? localization.inputPlaceholder : localization.signatureText)
-            .foregroundColor(style == .message ? theme.colors.inputPlaceholderText : theme.colors.inputSignaturePlaceholderText), axis: .vertical)
-            .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
-            .foregroundColor(style == .message ? theme.colors.inputText : theme.colors.inputSignatureText)
-            .padding(.vertical, 10)
-            .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
-            .simultaneousGesture(
-                TapGesture().onEnded {
-                    globalFocusState.focus = .uuid(inputFieldId)
-                }
-            )
-    }
+    private let defaultMaxCharacters: Int = 1000
     
-    private func isMediaGiphyAvailable() -> Bool {
-        return availableInputs.contains(AvailableInputType.media)
-        || availableInputs.contains(AvailableInputType.giphy)
+    var body: some View {
+        ZStack(alignment: .leading) {
+            if text.isEmpty {
+                HStack(spacing: -2) {
+                    Text(" Ask Notica AI or tap")
+                        .foregroundColor(Color(hex: "#3C3C43").opacity(0.6))
+                        .font(Font.custom("PlusJakartaSans-Regular", size: UIDevice.current.userInterfaceIdiom == .pad ? 17 : 14))
+                    
+                    Image("ic_sparkle")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color(hex: "#3C3C43").opacity(0.6))
+                        .frame(width: 20, height: 20)
+                }
+            }
+            
+            TextField("", text: $text, axis: .vertical)
+                .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
+                .foregroundColor(.black)
+                .tint(.black)
+                .font(Font.custom("PlusJakartaSans-Regular", size: UIDevice.current.userInterfaceIdiom == .pad ? 19 : 16))
+                .autocorrectionDisabled(true)
+                .lineLimit(5)
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        globalFocusState.focus = .uuid(inputFieldId)
+                    }
+                )
+                .onChange(of: text) { newValue in
+                    if newValue.count > defaultMaxCharacters {
+                        text = String(newValue.prefix(defaultMaxCharacters))
+                    }
+                }
+        }
     }
 }
 
