@@ -22,7 +22,6 @@
 		13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6E2869E983004DF140 /* MockChatData.swift */; };
 		13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */; };
 		13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */; };
-		5B0636D72C2E9F6100E54AEE /* CommentsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */; };
 		5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */; };
 		5B6467A02D96F4FC00FFD920 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B64679F2D96F4FC00FFD920 /* ExyteChat */; };
 		5B6D3A732987D85A00765148 /* Color+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+hex.swift */; };
@@ -39,6 +38,7 @@
 		845EB37C2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36D2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf */; };
 		845EB37D2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36E2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf */; };
 		845EB37E2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 845EB36C2EB8BA00005347E5 /* PlusJakartaSans-Bold.ttf */; };
+		845EB4062EB8C84D005347E5 /* MySelfChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845EB4052EB8C84D005347E5 /* MySelfChatView.swift */; };
 		FF220E5D2DD9F0B700BE315E /* .editorconfig in Resources */ = {isa = PBXBuildFile; fileRef = FF220E5C2DD9F0AF00BE315E /* .editorconfig */; };
 /* End PBXBuildFile section */
 
@@ -73,7 +73,6 @@
 		13E17B6E2869E983004DF140 /* MockChatData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatData.swift; sourceTree = "<group>"; };
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
 		13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAttachment.swift; sourceTree = "<group>"; };
-		5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleView.swift; sourceTree = "<group>"; };
 		5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+asyncMap.swift"; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
 		845EB3602EB8BA00005347E5 /* ClashDisplay-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ClashDisplay-Semibold.otf"; sourceTree = "<group>"; };
@@ -89,6 +88,7 @@
 		845EB36D2EB8BA00005347E5 /* PlusJakartaSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-Medium.ttf"; sourceTree = "<group>"; };
 		845EB36E2EB8BA00005347E5 /* PlusJakartaSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-Regular.ttf"; sourceTree = "<group>"; };
 		845EB36F2EB8BA00005347E5 /* PlusJakartaSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlusJakartaSans-SemiBold.ttf"; sourceTree = "<group>"; };
+		845EB4052EB8C84D005347E5 /* MySelfChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySelfChatView.swift; sourceTree = "<group>"; };
 		FF220E5C2DD9F0AF00BE315E /* .editorconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = .editorconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -198,9 +198,9 @@
 		5B0636D92C2EA0CB00E54AEE /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				845EB4052EB8C84D005347E5 /* MySelfChatView.swift */,
 				13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */,
 				13DF043128647C070043DBBC /* ChatExampleViewModel.swift */,
-				5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -364,10 +364,10 @@
 				1376133E28782F8E00E7CF67 /* Date+Extensions.swift in Sources */,
 				13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */,
 				135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */,
-				5B0636D72C2E9F6100E54AEE /* CommentsExampleView.swift in Sources */,
 				5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */,
 				13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */,
 				135549342864620900C9459A /* ChatExampleApp.swift in Sources */,
+				845EB4062EB8C84D005347E5 /* MySelfChatView.swift in Sources */,
 				13E17B6D2869E940004DF140 /* MockUser.swift in Sources */,
 				13DF042D2864790B0043DBBC /* ContentView.swift in Sources */,
 				135987BD2869F6F2006388CF /* ChatInteractorProtocol.swift in Sources */,
@@ -516,7 +516,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -557,7 +557,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

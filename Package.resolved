@@ -12,7 +12,7 @@
     {
       "identity" : "anchoredpopup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/AnchoredPopup.git",
+      "location" : "https://github.com/ThanPD-iOS/MediaPicker.git",
       "state" : {
         "revision" : "787f27027d3ef38c01469d228ce062ab4d5645f5",
         "version" : "1.0.6"
@@ -39,7 +39,7 @@
     {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
+      "location" : "https://github.com/ThanPD-iOS/MediaPicker.git",
       "state" : {
         "revision" : "c287ee410e5d9e9d642ed9c715042830f174a1d6",
         "version" : "3.1.4"

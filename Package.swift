@@ -6,7 +6,7 @@ let package = Package(
     name: "Chat",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v17)
+        .iOS(.v16)
     ],
     products: [
         .library(
@@ -15,8 +15,8 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/exyte/MediaPicker.git",
-            from: "3.0.0"
+            url: "https://github.com/ThanPD-iOS/MediaPicker.git",
+            branch: "main"
         ),
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",

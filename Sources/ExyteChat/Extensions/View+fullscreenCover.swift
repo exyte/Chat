@@ -21,7 +21,7 @@ private struct TransparentNonAnimatableFullScreenModifier<Item, FullScreenConten
 
     func body(content: Content) -> some View {
         content
-            .onChange(of: item) {
+            .onChange(of: item) { _ in
                 UIView.setAnimationsEnabled(false)
             }
             .fullScreenCover(item: $item) { _ in

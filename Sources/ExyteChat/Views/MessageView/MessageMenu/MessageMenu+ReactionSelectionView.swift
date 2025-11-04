@@ -68,10 +68,10 @@ struct ReactionSelectionView: View {
                     if allowEmojiSearch, viewState.needsSearchButton {
                         // Finish the list with a `button` to open the keyboard in it's emoji state
                         additionalEmojiPickerView()
-                            .onChange(of: selectedEmoji) {
+                            .onChange(of: selectedEmoji) { _ in
                                 transitionToViewState(.picked(selectedEmoji))
                             }
-                            .onChange(of: emojiEntryIsFocused) {
+                            .onChange(of: emojiEntryIsFocused) { _ in
                                 if emojiEntryIsFocused {
                                     transitionToViewState(.search)
                                 }
@@ -107,7 +107,7 @@ struct ReactionSelectionView: View {
         }
         .offset(x: xOffset, y: yOffset)
         .onAppear { transitionToViewState(.row) }
-        .onChange(of: keyboardState.isShown) {
+        .onChange(of: keyboardState.isShown) { _ in
             if !keyboardState.isShown && viewState == .search {
                 // Someone closed the keyboard while we were searching, return to `.row`
                 transitionToViewState(.row)

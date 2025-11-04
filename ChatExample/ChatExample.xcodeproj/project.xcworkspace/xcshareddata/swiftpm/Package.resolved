@@ -13,10 +13,10 @@
     {
       "identity" : "anchoredpopup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/AnchoredPopup.git",
+      "location" : "https://github.com/ThanPD-iOS/AnchoredPopup.git",
       "state" : {
-        "revision" : "d7478c34e761725ff06ad74e44e675d0d56a4150",
-        "version" : "1.0.7"
+        "branch" : "main",
+        "revision" : "f9263dcbd7a3b6e43d2f27bb8c5e7f46b737421f"
       }
     },
     {
@@ -49,10 +49,10 @@
     {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
+      "location" : "https://github.com/ThanPD-iOS/MediaPicker.git",
       "state" : {
-        "revision" : "89c95cee740d5f3aa24263dcffcb83ebfd0a12ba",
-        "version" : "3.2.3"
+        "branch" : "main",
+        "revision" : "977e5017e13d94d6c7325bb0dc1bccb1708611aa"
       }
     }
   ],

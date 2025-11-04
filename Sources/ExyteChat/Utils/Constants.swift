@@ -8,8 +8,6 @@
 import Foundation
 import UIKit
 
-let iPad = UIDevice.current.userInterfaceIdiom == .pad
-
 struct Constants {
-    static let marginSpacingInterface: CGFloat = iPad ? 32 : 16
+    static let marginSpacingInterface: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16
 }

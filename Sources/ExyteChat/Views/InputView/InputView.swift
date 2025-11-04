@@ -106,28 +106,28 @@ struct InputView: View {
     @State private var cancelGesture = false
     private let tapDelay = 0.2
     
+    let isHaveSuggestion: Bool
+    
+    var showSuggestionBottomSheet: (() -> Void)?
+    var tapToButtonSend: ((String) -> Void)?
+    
     var body: some View {
-        VStack {
-            viewOnTop
+        HStack(spacing: 16) {
+            middleView
             
-            HStack(spacing: 16) {
-                middleView
-                
-                rightOutsideButton
-            }
-            .padding(.horizontal, Constants.marginSpacingInterface)
-            .cornerRadius(24)
-            .overlay {
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color(hex: "#EEEEEE"), lineWidth: 1.5)
-            }
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.horizontal, Constants.marginSpacingInterface)
-            .padding(.vertical, 8)
-            .padding(.bottom, 4)
-            .background(.white)
+            rightOutsideButton
         }
-        .background(backgroundColor)
+        .padding(.horizontal, Constants.marginSpacingInterface)
+        .cornerRadius(24)
+        .overlay {
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(Color(hex: "#EEEEEE"), lineWidth: 1.5)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.horizontal, Constants.marginSpacingInterface)
+        .padding(.vertical, 8)
+        .padding(.bottom, 4)
+        .background(.white)
         .onAppear {
             viewModel.recordingPlayer = recordingPlayer
             viewModel.setRecorderSettings(recorderSettings: recorderSettings)
@@ -159,8 +159,6 @@ struct InputView: View {
             }
         }
     }
-    
-    
     
     @ViewBuilder
     var middleView: some View {
@@ -235,19 +233,19 @@ struct InputView: View {
         Group {
             if viewModel.text.isEmpty {
                 Button {
-//                    chatViewmodel.showSuggestionBottomSheet = true
+                    showSuggestionBottomSheet?()
                 } label: {
                     Image(viewModel.isGenerating ? "ic_spakle_2_disable" : "ic_spakle_2")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
-//                        .opacity(listSuggestion.isEmpty ? 0 : 1)
+                        .opacity(isHaveSuggestion ? 1 : 0)
                 }
                 .disabled(!viewModel.allowToSendMessage)
                 .padding(.vertical, 12)
             } else {
                 Button {
-//                    checkShowPaywallOrSendMessage(chatViewmodel.text)
+                    tapToButtonSend?(viewModel.text)
                 } label: {
                     Image(viewModel.isGenerating ? "ic_send_disable" : "ic_send_enable")
                         .resizable()
