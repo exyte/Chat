@@ -21,11 +21,18 @@ struct ChatExampleView: View {
         VStack(spacing: 16) {
             Text("My name is Than")
             
-            ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
-                viewModel.send(draft: draft)
-            } messageBuilder: { message, positionInGroup, positionInMessagesSection, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
-                MySelfChatView()
-            }
+            ChatView(
+                messages: viewModel.messages,
+                showSuggestionBottomSheet: {
+                    
+                }, tapToButtonSend: { _ in
+                    
+                }, didSendMessage: { draft in
+                    viewModel.send(draft: draft)
+                }, messageBuilder: { message, positionInGroup, positionInMessagesSection, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
+                    MySelfChatView()
+                }
+            )
             .enableLoadMore(pageSize: 3) { message in
                 await MainActor.run {
                     viewModel.loadMoreMessage(before: message)

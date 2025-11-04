@@ -151,6 +151,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var giphyConfigured = false
     @State private var selectedMedia: GPHMedia? = nil
     
+    var showSuggestionBottomSheet: (() -> Void)?
+    var tapToButtonSend: ((String) -> Void)?
+    
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
@@ -403,7 +406,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 messageStyler: messageStyler,
                 recorderSettings: recorderSettings,
                 localization: localization,
-                isHaveSuggestion: true
+                isHaveSuggestion: true,
+                showSuggestionBottomSheet: showSuggestionBottomSheet,
+                tapToButtonSend: tapToButtonSend
             )
         }
         .sizeGetter($inputViewSize)

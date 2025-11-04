@@ -125,7 +125,7 @@ struct InputView: View {
         }
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, Constants.marginSpacingInterface)
-        .padding(.vertical, 8)
+        .padding(.top, 8)
         .padding(.bottom, 4)
         .background(.white)
         .onAppear {

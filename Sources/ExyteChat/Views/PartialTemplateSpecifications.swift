@@ -12,6 +12,8 @@ public extension ChatView where MessageContent == EmptyView {
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          inputViewBuilder: @escaping InputViewBuilderClosure,
@@ -23,6 +25,8 @@ public extension ChatView where MessageContent == EmptyView {
         self.ids = messages.map { $0.id }
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
 
@@ -31,6 +35,8 @@ public extension ChatView where InputViewContent == EmptyView {
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          messageBuilder: @escaping MessageBuilderClosure,
@@ -42,6 +48,8 @@ public extension ChatView where InputViewContent == EmptyView {
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.messageMenuAction = messageMenuAction
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
 
@@ -50,6 +58,8 @@ public extension ChatView where MenuAction == DefaultMessageMenuAction {
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          messageBuilder: @escaping MessageBuilderClosure,
@@ -61,6 +71,8 @@ public extension ChatView where MenuAction == DefaultMessageMenuAction {
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
 
@@ -69,6 +81,8 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          messageMenuAction: MessageMenuActionClosure?) {
@@ -78,6 +92,8 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageMenuAction = messageMenuAction
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
 
@@ -86,6 +102,8 @@ public extension ChatView where InputViewContent == EmptyView, MenuAction == Def
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          messageBuilder: @escaping MessageBuilderClosure) {
@@ -95,6 +113,8 @@ public extension ChatView where InputViewContent == EmptyView, MenuAction == Def
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.messageBuilder = messageBuilder
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
 
@@ -103,6 +123,8 @@ public extension ChatView where MessageContent == EmptyView, MenuAction == Defau
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil,
          inputViewBuilder: @escaping InputViewBuilderClosure) {
@@ -112,6 +134,8 @@ public extension ChatView where MessageContent == EmptyView, MenuAction == Defau
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
         self.inputViewBuilder = inputViewBuilder
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
 
@@ -120,6 +144,8 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
     init(messages: [Message],
          chatType: ChatType = .conversation,
          replyMode: ReplyMode = .quote,
+         showSuggestionBottomSheet: @escaping () -> Void,
+         tapToButtonSend: @escaping (String) -> Void,
          didSendMessage: @escaping (DraftMessage) -> Void,
          reactionDelegate: ReactionDelegate? = nil) {
         self.type = chatType
@@ -127,5 +153,7 @@ public extension ChatView where MessageContent == EmptyView, InputViewContent ==
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
+        self.showSuggestionBottomSheet = showSuggestionBottomSheet
+        self.tapToButtonSend = tapToButtonSend
     }
 }
