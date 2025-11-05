@@ -82,6 +82,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     let sections: [MessagesSection]
     let ids: [String]
     let didSendMessage: (DraftMessage) -> Void
+    let didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
     var reactionDelegate: ReactionDelegate?
 
     // MARK: - View builders
@@ -154,14 +155,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
-                didSendMessage: @escaping (DraftMessage) -> Void,
                 reactionDelegate: ReactionDelegate? = nil,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
                 messageMenuAction: MessageMenuActionClosure?,
-                localization: ChatLocalization) {
+                localization: ChatLocalization,
+                didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
+                didSendMessage: @escaping (DraftMessage) -> Void
+    ) {
         self.type = chatType
-        self.didSendMessage = didSendMessage
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -169,6 +171,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
         self.localization = localization
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
+        self.didSendMessage = didSendMessage
     }
     
     public var body: some View {
@@ -376,6 +380,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.didSendMessage = didSendMessage
             viewModel.inputViewModel = inputViewModel
             viewModel.globalFocusState = globalFocusState
+            if let didUpdateAttachmentStatus {
+                viewModel.didUpdateAttachmentStatus = didUpdateAttachmentStatus
+            }
 
             inputViewModel.didSendMessage = { value in
                 Task { @MainActor in
