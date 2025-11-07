@@ -254,7 +254,7 @@ These use `AnyView`, so please try to keep them easy enough
 `setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (assetsPickerLimit and others like mediaType, selectionStyle, etc.).   
 `orientationHandler` - handle screen rotation
 
-`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages. NOTE: New messages won't appear in the chat unless it's scrolled up to the very top - it's an optimization. 
+`enableLoadMore(handler: @escaping ChatPaginationClosure)` - when user scrolls to the final message, call the handler function, to load more messages
 
 ### Customize default UI
 You can use `chatTheme` to customize colors and images of default UI. You can pass all/some colors and images:
