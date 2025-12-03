@@ -92,7 +92,7 @@ public struct Attachment: Codable, Identifiable, Hashable, Sendable {
             type: type ?? self.type,
             thumbnailCacheKey: thumbnailCacheKey ?? self.thumbnailCacheKey,
             fullCacheKey: fullCacheKey ?? self.fullCacheKey,
-            fullUploadStatus: fullUploadStatus ?? self.fullUploadStatus,
+            fullUploadStatus: fullUploadStatus ?? self.fullUploadStatus
         )
     }
 }

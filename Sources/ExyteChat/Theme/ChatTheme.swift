@@ -448,7 +448,7 @@ public struct ChatTheme {
                 read: read ?? Image(uiImage: UIImage(named: "checkAll", in: .current, with: nil)!),
                 sending: sending ?? Image(systemName: "clock"),
                 delivered: delivered ?? Image(uiImage: UIImage(named: "checkAll", in: .current, with: nil)!),
-                sent: sent ?? Image(uiImage: UIImage(named: "check", in: .current, with: nil)!),
+                sent: sent ?? Image(uiImage: UIImage(named: "check", in: .current, with: nil)!)
             )
 
             self.messageMenu = MessageMenu(
