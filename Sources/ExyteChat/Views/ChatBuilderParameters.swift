@@ -16,13 +16,13 @@ import SwiftUI
 /// - closure to pass user interaction, .reply for example
 /// - pass attachment to this closure to use ChatView's fullscreen media viewer
 public struct MessageBuilderParameters {
-    let message: Message
-    let positionInGroup: PositionInUserGroup
-    let positionInMessagesSection: PositionInMessagesSection
-    let positionInCommentsGroup: CommentsPosition?
-    let showContextMenuClosure: () -> Void
-    let messageActionClosure: (Message, DefaultMessageMenuAction) -> Void
-    let showAttachmentClosure: (Attachment) -> Void
+    public let message: Message
+    public let positionInGroup: PositionInUserGroup
+    public let positionInMessagesSection: PositionInMessagesSection
+    public let positionInCommentsGroup: CommentsPosition?
+    public let showContextMenuClosure: () -> Void
+    public let messageActionClosure: (Message, DefaultMessageMenuAction) -> Void
+    public let showAttachmentClosure: (Attachment) -> Void
 }
 
 /// To build a custom input view use the following parameters passed by builder closure:
@@ -32,12 +32,12 @@ public struct MessageBuilderParameters {
 /// - closure to pass user interaction, .recordAudioTap for example
 /// - dismiss keyboard closure
 public struct InputViewBuilderParameters {
-    let text: Binding<String>
-    let attachments: InputViewAttachments
-    let inputViewState: InputViewState
-    let inputViewStyle: InputViewStyle
-    let inputViewActionClosure: (InputViewAction) -> Void
-    let dismissKeyboardClosure: ()->()
+    public let text: Binding<String>
+    public let attachments: InputViewAttachments
+    public let inputViewState: InputViewState
+    public let inputViewStyle: InputViewStyle
+    public let inputViewActionClosure: (InputViewAction) -> Void
+    public let dismissKeyboardClosure: ()->()
 }
 
 extension ChatView {
@@ -62,16 +62,22 @@ extension ChatView {
         chatType: ChatType = .conversation,
         replyMode: ReplyMode = .quote,
         reactionDelegate: ReactionDelegate? = nil,
+        localization: ChatLocalization = ChatLocalization.defaultLocalization,
+        didSendMessage: @escaping (DraftMessage) -> Void,
         messageBuilder: @escaping (_ params: MessageBuilderParameters) -> MessageContent = { _ in
             DummyView()
         },
         inputViewBuilder: @escaping (_ params: InputViewBuilderParameters) -> InputViewContent = { _ in
             DummyView()
         },
-        messageMenuAction: MessageMenuActionClosure? = nil,
-        localization: ChatLocalization = ChatLocalization.defaultLocalization,
-        didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
-        didSendMessage: @escaping (DraftMessage) -> Void
+        messageMenuAction: @escaping (
+            _ selectedMenuAction: MenuAction,
+            _ defaultActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
+            _ message: Message
+        ) -> Void = { (selectedMenuAction: DefaultMessageMenuAction, defaultActionClosure, message) in
+            defaultActionClosure(message, selectedMenuAction)
+        },
+        didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil
     ) {
         self.type = chatType
         self.reactionDelegate = reactionDelegate
@@ -80,11 +86,7 @@ extension ChatView {
         self.localization = localization
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
-        self.messageMenuAction = messageMenuAction ?? { (selectedMenuAction, defaultActionClosure, message) in
-            if let action = selectedMenuAction as? DefaultMessageMenuAction {
-                defaultActionClosure(message, action)
-            }
-        }
+        self.messageMenuAction = messageMenuAction
         self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
         self.didSendMessage = didSendMessage
     }

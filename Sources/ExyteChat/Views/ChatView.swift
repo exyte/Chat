@@ -107,7 +107,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var giphyConfigured = false
     @State private var selectedMedia: GPHMedia? = nil
-    
+
     public var body: some View {
         mainView
             .background(chatBackground())
