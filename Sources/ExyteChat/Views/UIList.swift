@@ -13,7 +13,7 @@ public extension Notification.Name {
 
 struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
-    typealias MessageBuilderClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderClosure
+    typealias MessageBuilderParamsClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderParamsClosure
 
     @Environment(\.chatTheme) var theme
 
@@ -24,7 +24,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     @Binding var shouldScrollToTop: () -> ()
     @Binding var tableContentHeight: CGFloat
 
-    var messageBuilder: MessageBuilderClosure?
+    var messageBuilder: MessageBuilderParamsClosure
     var mainHeaderBuilder: (()->AnyView)?
     var headerBuilder: ((Date)->AnyView)?
     var inputView: InputView
@@ -386,7 +386,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         @Binding var isScrolledToBottom: Bool
         @Binding var isScrolledToTop: Bool
 
-        let messageBuilder: MessageBuilderClosure?
+        let messageBuilder: MessageBuilderParamsClosure
         let mainHeaderBuilder: (()->AnyView)?
         let headerBuilder: ((Date)->AnyView)?
 
@@ -418,7 +418,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
             isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>,
-            messageBuilder: MessageBuilderClosure?, mainHeaderBuilder: (() -> AnyView)?,
+            messageBuilder: @escaping MessageBuilderParamsClosure, mainHeaderBuilder: (() -> AnyView)?,
             headerBuilder: ((Date) -> AnyView)?, type: ChatType, showDateHeaders: Bool,
             avatarSize: CGFloat, showMessageMenuOnLongPress: Bool,
             tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?,

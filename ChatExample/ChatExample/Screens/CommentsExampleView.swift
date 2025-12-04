@@ -62,56 +62,56 @@ struct CommentsExampleView: View {
             }
             .fixedSize(horizontal: false, vertical: true)
 
-            ChatView(messages: viewModel.messages, chatType: .comments, replyMode: .answer) { draft in
-                viewModel.send(draft: draft)
-            } messageBuilder: {
-                message, positionInGroup, positionInMessagesSection, positionInCommentsGroup,
-                showContextMenuClosure, messageActionClosure, showAttachmentClosure in
-                messageCell(message, positionInCommentsGroup, showMenuClosure: showContextMenuClosure, actionClosure: messageActionClosure, attachmentClosure: showAttachmentClosure)
-            } messageMenuAction: { (action: Action, defaultActionClosure, message) in
-                switch action {
-                case .reply:
-                    defaultActionClosure(message, .reply)
-                case .edit:
-                    defaultActionClosure(message, .edit { editedText in
-                        // update this message's text in your datasource
-                        print(editedText)
-                    })
-                case .delete:
-                    // delete this message in your datasource
-                    viewModel.messages.removeAll { msg in
-                        msg.id == message.id
-                    }
-                case .print:
-                    print(message.text)
-                }
-            }
-            .showDateHeaders(false)
-            .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: false, items: [
-                // SwipeActions are similar to Buttons, they accept an Action and a ViewBuilder
-                SwipeAction(action: onDelete, activeFor: { $0.user.isCurrentUser }, background: .red) {
-                    swipeActionButtonStandard(title: "Delete", image: "xmark.bin")
-                },
-                SwipeAction(action: onReply, background: .blue) {
-                    swipeActionButtonStandard(title: "Reply", image: "arrowshape.turn.up.left")
-                },
-                // SwipeActions can also be selectively shown based on the message, here we only show the Edit action when the message is from the current sender
-                SwipeAction(action: onEdit, activeFor: { $0.user.isCurrentUser }, background: .gray) {
-                    swipeActionButtonStandard(title: "Edit", image: "bubble.and.pencil")
-                }
-            ])
-            // Just like with UITableView's we can enable, or disable, `performsFirstActionWithFullSwipe` triggering the first action
-            .swipeActions(edge: .trailing, performsFirstActionWithFullSwipe: true, items: [
-                SwipeAction(action: onInfo) {
-                    Image(systemName: "info.bubble")
-                        .imageScale(.large)
-                        .foregroundStyle(.blue.gradient)
-                        .frame(height: 30)
-                    Text("Info")
-                        .foregroundStyle(.blue.gradient)
-                        .font(.footnote)
-                }
-            ])
+//            ChatView(messages: viewModel.messages, chatType: .comments, replyMode: .answer) { draft in
+//                viewModel.send(draft: draft)
+//            } messageBuilder: {
+//                message, positionInGroup, positionInMessagesSection, positionInCommentsGroup,
+//                showContextMenuClosure, messageActionClosure, showAttachmentClosure in
+//                messageCell(message, positionInCommentsGroup, showMenuClosure: showContextMenuClosure, actionClosure: messageActionClosure, attachmentClosure: showAttachmentClosure)
+//            } messageMenuAction: { (action: Action, defaultActionClosure, message) in
+//                switch action {
+//                case .reply:
+//                    defaultActionClosure(message, .reply)
+//                case .edit:
+//                    defaultActionClosure(message, .edit { editedText in
+//                        // update this message's text in your datasource
+//                        print(editedText)
+//                    })
+//                case .delete:
+//                    // delete this message in your datasource
+//                    viewModel.messages.removeAll { msg in
+//                        msg.id == message.id
+//                    }
+//                case .print:
+//                    print(message.text)
+//                }
+//            }
+//            .showDateHeaders(false)
+//            .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: false, items: [
+//                // SwipeActions are similar to Buttons, they accept an Action and a ViewBuilder
+//                SwipeAction(action: onDelete, activeFor: { $0.user.isCurrentUser }, background: .red) {
+//                    swipeActionButtonStandard(title: "Delete", image: "xmark.bin")
+//                },
+//                SwipeAction(action: onReply, background: .blue) {
+//                    swipeActionButtonStandard(title: "Reply", image: "arrowshape.turn.up.left")
+//                },
+//                // SwipeActions can also be selectively shown based on the message, here we only show the Edit action when the message is from the current sender
+//                SwipeAction(action: onEdit, activeFor: { $0.user.isCurrentUser }, background: .gray) {
+//                    swipeActionButtonStandard(title: "Edit", image: "bubble.and.pencil")
+//                }
+//            ])
+//            // Just like with UITableView's we can enable, or disable, `performsFirstActionWithFullSwipe` triggering the first action
+//            .swipeActions(edge: .trailing, performsFirstActionWithFullSwipe: true, items: [
+//                SwipeAction(action: onInfo) {
+//                    Image(systemName: "info.bubble")
+//                        .imageScale(.large)
+//                        .foregroundStyle(.blue.gradient)
+//                        .frame(height: 30)
+//                    Text("Info")
+//                        .foregroundStyle(.blue.gradient)
+//                        .font(.footnote)
+//                }
+//            ])
         }
         .navigationTitle("Comments example")
         .onAppear(perform: viewModel.onStart)

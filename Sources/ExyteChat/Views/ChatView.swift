@@ -25,50 +25,6 @@ public enum ReplyMode: CaseIterable, Sendable {
 
 public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction: MessageMenuAction>: View {
     
-    /// To build a custom message view use the following parameters passed by this closure:
-    /// - message containing user, attachments, etc.
-    /// - position of message in its continuous group of messages from the same user
-    /// - position of message in the section of messages from that day
-    /// - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)
-    /// - closure to show message context menu
-    /// - closure to pass user interaction, .reply for example
-    /// - pass attachment to this closure to use ChatView's fullscreen media viewer
-    public typealias MessageBuilderClosure = ((
-        _ message: Message,
-        _ positionInGroup: PositionInUserGroup,
-        _ positionInMessagesSection: PositionInMessagesSection,
-        _ positionInCommentsGroup: CommentsPosition?,
-        _ showContextMenuClosure: @escaping () -> Void,
-        _ messageActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
-        _ showAttachmentClosure: @escaping (Attachment) -> Void
-    ) -> MessageContent)
-    
-    /// To build a custom input view use the following parameters passed by this closure:
-    /// - binding to the text in input view
-    /// - InputViewAttachments to store the attachments from external pickers
-    /// - current input view state: .message for main input view mode and .signature for input view in media picker mode
-    /// - closure to pass user interaction, .recordAudioTap for example
-    /// - dismiss keyboard closure
-    public typealias InputViewBuilderClosure = (
-        _ text: Binding<String>,
-        _ attachments: InputViewAttachments,
-        _ inputViewState: InputViewState,
-        _ inputViewStyle: InputViewStyle,
-        _ inputViewActionClosure: @escaping (InputViewAction) -> Void,
-        _ dismissKeyboardClosure: ()->()
-    ) -> InputViewContent
-    
-    /// To define custom message menu actions declare an enum conforming to MessageMenuAction. The library will show your custom menu options on long tap on message. Once the action is selected the following callback will be called:
-    /// - action selected by the user from the menu. NOTE: when declaring this variable, specify its type (your custom descendant of MessageMenuAction) explicitly
-    /// - a closure taking a case of default implementation of MessageMenuAction which provides simple actions handlers; you call this closure passing the selected message and choosing one of the default actions if you need them; or you can write a custom implementation for all your actions, in that case just ignore this closure
-    /// - message for which the menu is displayed
-    /// When implementing your own MessageMenuActionClosure, write a switch statement passing through all the cases of your MessageMenuAction, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for .edit you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.
-    public typealias MessageMenuActionClosure = (
-        _ selectedMenuAction: MenuAction,
-        _ defaultActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
-        _ message: Message
-    ) -> Void
-    
     /// User and MessageId
     public typealias TapAvatarClosure = (User, String) -> ()
     
@@ -88,13 +44,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     // MARK: - View builders
     
     /// provide custom message view builder
-    var messageBuilder: MessageBuilderClosure? = nil
-    
+    @ViewBuilder var messageBuilder: MessageBuilderParamsClosure
+
     /// provide custom input view builder
-    var inputViewBuilder: InputViewBuilderClosure? = nil
-    
+    @ViewBuilder var inputViewBuilder: InputViewBuilderParamsClosure
+
     /// message menu customization: create enum complying to MessageMenuAction and pass a closure processing your enum cases
-    var messageMenuAction: MessageMenuActionClosure?
+    var messageMenuAction: MessageMenuActionClosure
     
     /// content to display in between the chat list view and the input view
     var betweenListAndInputViewBuilder: (()->AnyView)?
@@ -106,7 +62,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var headerBuilder: ((Date)->AnyView)?
     
     /// provide strings for the chat view, these can be localized in the Localizable.strings files
-    var localization: ChatLocalization = createLocalization()
+    var localization: ChatLocalization
     
     // MARK: - Customization
     
@@ -151,29 +107,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var giphyConfigured = false
     @State private var selectedMedia: GPHMedia? = nil
-    
-    public init(messages: [Message],
-                chatType: ChatType = .conversation,
-                replyMode: ReplyMode = .quote,
-                reactionDelegate: ReactionDelegate? = nil,
-                messageBuilder: @escaping MessageBuilderClosure,
-                inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?,
-                localization: ChatLocalization,
-                didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
-                didSendMessage: @escaping (DraftMessage) -> Void
-    ) {
-        self.type = chatType
-        self.reactionDelegate = reactionDelegate
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-        self.ids = messages.map { $0.id }
-        self.messageBuilder = messageBuilder
-        self.inputViewBuilder = inputViewBuilder
-        self.messageMenuAction = messageMenuAction
-        self.localization = localization
-        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
-        self.didSendMessage = didSendMessage
-    }
     
     public var body: some View {
         mainView
@@ -398,13 +331,20 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
 
     var inputView: some View {
-        Group {
-            if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
+        ZStack {
+            let customInputView = inputViewBuilder(
+                InputViewBuilderParameters(
+                    text: $inputViewModel.text,
+                    attachments: inputViewModel.attachments,
+                    inputViewState: inputViewModel.state,
+                    inputViewStyle: .message,
+                    inputViewActionClosure: inputViewModel.inputViewAction()
+                ) {
                     globalFocusState.focus = nil
                 }
-                .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
-            } else {
+            )
+
+            if customInputView is DummyView {
                 InputView(
                     viewModel: inputViewModel,
                     inputFieldId: viewModel.inputFieldId,
@@ -414,6 +354,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     recorderSettings: recorderSettings,
                     localization: localization
                 )
+            } else {
+                customInputView
+                    .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
             }
         }
         .sizeGetter($inputViewSize)
@@ -480,21 +423,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
         }
     }
-    
-    /// Our default Menu Action closure
+
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
-        if let messageMenuAction {
-            return { action in
-                hideMessageMenu()
-                messageMenuAction(action, viewModel.messageMenuAction(), message)
-            }
-        } else if MenuAction.self == DefaultMessageMenuAction.self {
-            return { action in
-                hideMessageMenu()
-                viewModel.messageMenuActionInternal(message: message, action: action as! DefaultMessageMenuAction)
-            }
+        { action in
+            hideMessageMenu()
+            messageMenuAction(action, viewModel.messageMenuAction(), message)
         }
-        return { _ in }
     }
 
     func showMessageMenu() {
@@ -542,18 +476,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     private func isGiphyAvailable() -> Bool {
         availableInputs.contains(AvailableInputType.giphy)
-    }
-    
-    private static func createLocalization() -> ChatLocalization {
-        ChatLocalization(
-            inputPlaceholder: String(localized: "Type a message..."),
-            signatureText: String(localized: "Add signature..."),
-            cancelButtonText: String(localized: "Cancel"),
-            recentToggleText: String(localized: "Recents"),
-            waitingForNetwork: String(localized: "Waiting for network"),
-            recordingText: String(localized: "Recording..."),
-            replyToText: String(localized: "Reply to")
-        )
     }
 }
 
@@ -766,54 +688,54 @@ public extension ChatView {
     }
 }
 
-#Preview {
-    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
-    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
-
-    let monday = try! Date.iso8601Date.parse("2025-05-12")
-    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
-
-    ChatView(messages: [
-        Message(
-            id: "26tb", user: romeo, status: .read, createdAt: monday,
-            text: "And I’ll still stay, to have thee still forget"),
-        Message(
-            id: "zee6", user: romeo, status: .read, createdAt: monday,
-            text: "Forgetting any other home but this"),
-
-        Message(
-            id: "oWUN", user: juliet, status: .read, createdAt: monday,
-            text: "’Tis almost morning. I would have thee gone"),
-        Message(
-            id: "P261", user: juliet, status: .read, createdAt: monday,
-            text: "And yet no farther than a wanton’s bird"),
-        Message(
-            id: "46hu", user: juliet, status: .read, createdAt: monday,
-            text: "That lets it hop a little from his hand"),
-        Message(
-            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
-            text: "Like a poor prisoner in his twisted gyves"),
-        Message(
-            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
-            text: "And with a silken thread plucks it back again"),
-        Message(
-            id: "kwWd", user: juliet, status: .read, createdAt: monday,
-            text: "So loving-jealous of his liberty"),
-
-        Message(
-            id: "9481", user: romeo, status: .read, createdAt: tuesday,
-            text: "I would I were thy bird"),
-
-        Message(
-            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
-        Message(
-            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
-            text: "Yet I should kill thee with much cherishing"),
-        Message(
-            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
-            text: "Good night, good night. Parting is such sweet sorrow"),
-        Message(
-            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
-            text: "That I shall say 'Good night' till it be morrow"),
-    ]) { draft in }
-}
+//#Preview {
+//    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
+//    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
+//
+//    let monday = try! Date.iso8601Date.parse("2025-05-12")
+//    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
+//
+//    ChatView(messages: [
+//        Message(
+//            id: "26tb", user: romeo, status: .read, createdAt: monday,
+//            text: "And I’ll still stay, to have thee still forget"),
+//        Message(
+//            id: "zee6", user: romeo, status: .read, createdAt: monday,
+//            text: "Forgetting any other home but this"),
+//
+//        Message(
+//            id: "oWUN", user: juliet, status: .read, createdAt: monday,
+//            text: "’Tis almost morning. I would have thee gone"),
+//        Message(
+//            id: "P261", user: juliet, status: .read, createdAt: monday,
+//            text: "And yet no farther than a wanton’s bird"),
+//        Message(
+//            id: "46hu", user: juliet, status: .read, createdAt: monday,
+//            text: "That lets it hop a little from his hand"),
+//        Message(
+//            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
+//            text: "Like a poor prisoner in his twisted gyves"),
+//        Message(
+//            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
+//            text: "And with a silken thread plucks it back again"),
+//        Message(
+//            id: "kwWd", user: juliet, status: .read, createdAt: monday,
+//            text: "So loving-jealous of his liberty"),
+//
+//        Message(
+//            id: "9481", user: romeo, status: .read, createdAt: tuesday,
+//            text: "I would I were thy bird"),
+//
+//        Message(
+//            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
+//        Message(
+//            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "Yet I should kill thee with much cherishing"),
+//        Message(
+//            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "Good night, good night. Parting is such sweet sorrow"),
+//        Message(
+//            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "That I shall say 'Good night' till it be morrow"),
+//    ]) { draft in }
+//}

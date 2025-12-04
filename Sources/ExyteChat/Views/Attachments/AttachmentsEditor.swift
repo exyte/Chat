@@ -11,8 +11,8 @@ import ActivityIndicatorView
 
 struct AttachmentsEditor<InputViewContent: View>: View {
     
-    typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderClosure
-    
+    typealias InputViewBuilderParamsClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderParamsClosure
+
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var mediaPickerTheme
     @Environment(\.mediaPickerThemeIsOverridden) var mediaPickerThemeIsOverridden
@@ -22,7 +22,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     @ObservedObject var inputViewModel: InputViewModel
 
-    var inputViewBuilder: InputViewBuilderClosure?
+    var inputViewBuilder: InputViewBuilderParamsClosure
     var chatTitle: String?
     var messageStyler: (String) -> AttributedString
     var orientationHandler: MediaPickerOrientationHandler
@@ -127,25 +127,30 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     @ViewBuilder
     var inputView: some View {
-        Group {
-            if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder(
-                    $inputViewModel.text, inputViewModel.attachments, inputViewModel.state,
-                    .signature, inputViewModel.inputViewAction()
-                ) {
-                    globalFocusState.focus = nil
-                }
-                .customFocus($globalFocusState.focus, equals: .uuid(UUID()))
-            } else {
-                InputView(
-                    viewModel: inputViewModel,
-                    inputFieldId: UUID(),
-                    style: .signature,
-                    availableInputs: availableInputs,
-                    messageStyler: messageStyler,
-                    localization: localization
-                )
+        let customInputView = inputViewBuilder(
+            InputViewBuilderParameters(
+                text: $inputViewModel.text,
+                attachments: inputViewModel.attachments,
+                inputViewState: inputViewModel.state,
+                inputViewStyle: .signature,
+                inputViewActionClosure: inputViewModel.inputViewAction()
+            ) {
+                globalFocusState.focus = nil
             }
+        )
+
+        if customInputView is DummyView {
+            InputView(
+                viewModel: inputViewModel,
+                inputFieldId: UUID(),
+                style: .signature,
+                availableInputs: availableInputs,
+                messageStyler: messageStyler,
+                localization: localization
+            )
+        } else {
+            customInputView
+                .customFocus($globalFocusState.focus, equals: .uuid(UUID()))
         }
     }
 

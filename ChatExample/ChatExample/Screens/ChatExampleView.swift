@@ -22,7 +22,24 @@ struct ChatExampleView: View {
     }
     
     var body: some View {
-        ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
+        ChatView(messages: viewModel.messages, chatType: .conversation, messageMenuAction: { (action: Action, defaultActionClosure, message) in
+            switch action {
+            case .reply:
+                defaultActionClosure(message, .reply)
+            case .edit:
+                defaultActionClosure(message, .edit { editedText in
+                    // update this message's text in your datasource
+                    print(editedText)
+                })
+            case .delete:
+                // delete this message in your datasource
+                viewModel.messages.removeAll { msg in
+                    msg.id == message.id
+                }
+            case .print:
+                print(message.text)
+            }
+        }) { draft in
             viewModel.send(draft: draft)
         }
         .enableLoadMore(pageSize: 3) { message in

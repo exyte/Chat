@@ -39,7 +39,7 @@ final class ChatViewModel: ObservableObject {
     }
     
     func updateAttachmentStatus(_ uploadUpdate: AttachmentUploadUpdate) {
-      didUpdateAttachmentStatus(uploadUpdate)
+        didUpdateAttachmentStatus(uploadUpdate)
     }
 
     func sendMessage(_ message: DraftMessage) {
