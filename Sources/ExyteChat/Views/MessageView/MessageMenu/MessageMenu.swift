@@ -39,6 +39,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     /// The vertical spacing between the main three components in out VStack (ReactionSelection, Message and Menu)
     let verticalSpacing:CGFloat = 0
     
+    /// The menu items to display on long press
+    let availableMessageMenuItems: [AvailableMesssageMenuType]
     /// The message whose menu we're presenting
     var message: Message
     /// The original message frame (the row / cell)
@@ -506,7 +508,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     
     @ViewBuilder
     func menuView() -> some View {
-        let buttons = ActionEnum.menuItems(for: message).enumerated().map { MenuButton(id: $0, action: $1) }
+        let buttons = ActionEnum.menuItems(for: message, availableMessageMenuItems: availableMessageMenuItems)
+            .enumerated().map { MenuButton(id: $0, action: $1) }
         HStack {
             if alignment == .right { Spacer() }
             

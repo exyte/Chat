@@ -129,6 +129,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var messageLinkPreviewLimit = 8
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
     var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
+    var availableMessageMenuItems: [AvailableMesssageMenuType] = [.edit, .reply, .copy]
     var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
@@ -428,6 +429,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         return MessageMenu(
             viewModel: viewModel,
             isShowingMenu: $isShowingMenu,
+            availableMessageMenuItems: availableMessageMenuItems,
             message: row.message,
             cellFrame: cellFrame,
             alignment: menuAlignment(row.message, chatType: type),
@@ -719,6 +721,12 @@ public extension ChatView {
     func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {
         var view = self
         view.availableInputs = types
+        return view
+    }
+    
+    public func setAvailableMessageMenuItems(_ types: [AvailableMesssageMenuType]) -> ChatView {
+        var view = self
+        view.availableMessageMenuItems = types
         return view
     }
     
