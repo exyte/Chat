@@ -24,6 +24,7 @@ final class ChatViewModel: ObservableObject {
     let inputFieldId = UUID()
 
     var didSendMessage: (DraftMessage) -> Void = {_ in }
+    var didDeleteMessage: (ExyteChat.Message, DeleteForType) -> Void = { _, _ in }
     var didUpdateAttachmentStatus: (AttachmentUploadUpdate) -> Void = { _ in }
     var inputViewModel: InputViewModel?
     var globalFocusState: GlobalFocusState?
@@ -63,6 +64,9 @@ final class ChatViewModel: ObservableObject {
             inputViewModel?.text = message.text
             inputViewModel?.edit(saveClosure)
             globalFocusState?.focus = .uuid(inputFieldId)
+        case .delete:
+          // Delete is handled directly in MessageMenu.deleteConfirmationView
+          break
         }
     }
 }

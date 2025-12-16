@@ -13,6 +13,11 @@ public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
 public typealias MediaPickerSelectionParameters = SelectionParamsHolder
 public typealias MediaPickerParameters = MediaPickerParamsHolder
 
+public enum DeleteForType: CaseIterable, Sendable {
+  case forMe
+  case forEveryone
+}
+
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
     case comments // the latest message is at the top, new messages appear from the top
@@ -82,6 +87,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     let sections: [MessagesSection]
     let ids: [String]
     let didSendMessage: (DraftMessage) -> Void
+    let didDeleteMessage: ((ExyteChat.Message, DeleteForType) -> Void)?
     let didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
     var reactionDelegate: ReactionDelegate?
 
@@ -161,7 +167,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 messageMenuAction: MessageMenuActionClosure?,
                 localization: ChatLocalization,
                 didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
-                didSendMessage: @escaping (DraftMessage) -> Void
+                didDeleteMessage: ((ExyteChat.Message, DeleteForType) -> Void)? = nil,
+                didSendMessage: @escaping (DraftMessage) -> Void,
+                
     ) {
         self.type = chatType
         self.reactionDelegate = reactionDelegate
@@ -172,6 +180,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.messageMenuAction = messageMenuAction
         self.localization = localization
         self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
+        self.didDeleteMessage = didDeleteMessage
         self.didSendMessage = didSendMessage
     }
     
