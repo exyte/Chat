@@ -107,13 +107,13 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
-`messageBuilder`'s parameters:  
-- `message` - the message containing user info, attachments, etc.   
-- `positionInUserGroup` - the position of the message in its continuous collection of messages from the same user    
-- `positionInMessagesSection` position of message in the section of messages from that day
-- `positionInCommentsGroup` - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)  
-- `showContextMenuClosure` - closure to show message context menu   
-- `messageActionClosure ` - closure to pass user interaction, .reply for example   
+`messageBuilder`'s parameters:
+- `message` - the message containing user info, attachments, etc.
+- `positionInUserGroup` - the position of the message in its continuous collection of messages from the same user
+- `positionInMessagesSection` - position of message in the section of messages from that day
+- `positionInCommentsGroup` - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)
+- `showContextMenuClosure` - closure to show message context menu
+- `messageActionClosure` - closure to pass user interaction, .reply for example
 - `showAttachmentClosure` - you can pass an attachment to this closure to use ChatView's fullscreen media viewer    
 
 You may customize the input view (a text field with buttons at the bottom) like this: 
@@ -143,12 +143,12 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
-`inputViewBuilder`'s parameters:  
-- `textBinding` to bind your own TextField   
-- `attachments` is a struct containing photos, videos, recordings and a message you are replying to     
+`inputViewBuilder`'s parameters:
+- `textBinding` - to bind your own TextField
+- `attachments` - is a struct containing photos, videos, recordings and a message you are replying to
 - `inputViewState` - the state of the input view that is controlled by the library automatically if possible or through your calls of `inputViewActionClosure`
-- `inputViewStyle` - `.message` or `.signature` (the chat screen or the photo selection screen)   
-- `inputViewActionClosure` for calling on taps on your custom buttons. For example, call `inputViewActionClosure(.send)` if you want to send your message with your own button, then the library will reset the text and attachments and call the `didSendMessage` sending closure   
+- `inputViewStyle` - `.message` or `.signature` (the chat screen or the photo selection screen)
+- `inputViewActionClosure` - for calling on taps on your custom buttons. For example, call `inputViewActionClosure(.send)` if you want to send your message with your own button, then the library will reset the text and attachments and call the `didSendMessage` sending closure
 - `dismissKeyboardClosure` - call this to dismiss keyboard    
 
 ## Custom message menu
@@ -201,8 +201,8 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
-`messageMenuAction`'s parameters:  
-- `selectedMenuAction` - action selected by the user from the menu. NOTE: when declaring this variable, specify its type (your custom descendant of MessageMenuAction) explicitly    
+`messageMenuAction`'s parameters:
+- `selectedMenuAction` - action selected by the user from the menu. NOTE: when declaring this variable, specify its type (your custom descendant of MessageMenuAction) explicitly
 - `defaultActionClosure` - a closure taking a case of default implementation of MessageMenuAction which provides simple actions handlers; you call this closure passing the selected message and choosing one of the default actions (.reply, .edit) if you need them; or you can write a custom implementation for all your actions, in that case just ignore this closure
 - `message` - message for which the menu is displayed
     
@@ -232,15 +232,15 @@ ChatView(messages: viewModel.messages) { draft in
     }
 ])
 ```
-`swipeActions`'s parameters:  
+`swipeActions`'s parameters:
 - `edge` - either the leading or trailing edge of the Message
 - `performsFirstActionWithFullSwipe` - if true, a full swipe will trigger the first `SwipeAction` provided in the `items` list
 - `items` - list of `SwipeAction`s to include
 
-## Small view builders:
-These use `AnyView`, so please try to keep them easy enough
-- `betweenListAndInputViewBuilder` - content to display in between the chat list view and the input view   
-- `mainHeaderBuilder` - a header for the whole chat, which will scroll together with all the messages and headers  
+## Small view builders
+These use `AnyView`, so please try to keep them easy enough:
+- `betweenListAndInputViewBuilder` - content to display in between the chat list view and the input view
+- `mainHeaderBuilder` - a header for the whole chat, which will scroll together with all the messages and headers
 - `headerBuilder` - date section header builder   
 
 ## Modifiers 
