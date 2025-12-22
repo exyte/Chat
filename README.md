@@ -433,18 +433,16 @@ There are 2 example projects:
 - One has a simple bot posting random text/media messages every 2 seconds. It has no back end and no local storage. Every new start is clean and fresh.     
 - Another has an integration with Firestore data base. It has all the necessary back end support, including storing media and audio messages, unread messages counters, etc. You'll have to create your own Firestore app and DB. Also replace `GoogleService-Info` with your own. After that you can test on multiple sims/devices.    
 
-Create your firestore app
-https://console.firebase.google.com/
-Create firestore database (for light weight text data)
-https://firebase.google.com/docs/firestore/manage-data/add-data
-Create cloud firestore database (for images and voice recordings)
-https://firebase.google.com/docs/storage/web/start
+To set up the Firestore example:
+1. Create your Firebase app at https://console.firebase.google.com/
+2. Create a Firestore database (for lightweight text data) - see https://firebase.google.com/docs/firestore/manage-data/add-data
+3. Create a Cloud Storage bucket (for images and voice recordings) - see https://firebase.google.com/docs/storage/web/start
 
 ## Examples
 
 To try the Chat examples:
 - Clone the repo `https://github.com/exyte/Chat.git`
-- Open `ChatExample.xcodeproj` or `ChatFirestoreExample.xcodeproj` in the Xcode
+- Open `ChatExample.xcodeproj` or `ChatFirestoreExample.xcodeproj` in Xcode
 - Try it!
 
 ## Installation
