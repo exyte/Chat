@@ -440,7 +440,7 @@ https://firebase.google.com/docs/firestore/manage-data/add-data
 Create cloud firestore database (for images and voice recordings)
 https://firebase.google.com/docs/storage/web/start
 
-## Examples
+## Running the Examples
 
 To try the Chat examples:
 - Clone the repo `https://github.com/exyte/Chat.git`
