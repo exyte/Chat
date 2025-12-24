@@ -304,7 +304,7 @@ By default the built-in MediaPicker will be auto-customized using the most logic
 `setMessageFont` - pass custom font to use for messages   
 
 ### makes sense only for built-in input view
-`setAvailableInput` - hide some buttons in default InputView. Available options are:    
+`setAvailableInputs` - hide some buttons in default InputView. Available options are:    
     - `.full` - media + text + audio   
     - `.textAndMedia`   
     - `.textAndAudio`   
