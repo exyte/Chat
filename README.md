@@ -438,7 +438,7 @@ To set up the Firestore example:
 2. Create a Firestore database (for lightweight text data) - see https://firebase.google.com/docs/firestore/manage-data/add-data
 3. Create a Cloud Storage bucket (for images and voice recordings) - see https://firebase.google.com/docs/storage/web/start
 
-## Examples
+## Running the Examples
 
 To try the Chat examples:
 - Clone the repo `https://github.com/exyte/Chat.git`
