@@ -22,9 +22,16 @@ struct ChatExampleView: View {
     }
     
     var body: some View {
-        ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
-            viewModel.send(draft: draft)
-        }
+        ChatView(
+            messages: viewModel.messages,
+            chatType: .conversation,
+            didSendMessage: { draft in
+                viewModel.send(draft: draft)
+            },
+            didDeleteMessage: { message, deleteFor in
+                print("delete message: \(message.id) deleteFor: \(deleteFor)")
+            }
+        )
         .enableLoadMore(pageSize: 3) { message in
             await MainActor.run {
                 viewModel.loadMoreMessage(before: message)
