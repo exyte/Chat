@@ -248,7 +248,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     var mainView: some View {
-        VStack {
+        VStack(spacing: 0) {
             if showNetworkConnectionProblem, !networkMonitor.isConnected {
                 waitingForNetwork
             }
@@ -301,17 +301,20 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                     } label: {
-                        theme.images.scrollToBottom
+                        Image("CaretDown")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(theme.colors.sendButtonBackground)
                             .frame(width: 40, height: 40)
                             .background(
                                 Circle()
-                                    .fill(colorScheme == .dark ? theme.colors.messageFriendBG : Color(red: 0xEF/255.0, green: 0xF5/255.0, blue: 0xF9/255.0))
+                                    .fill(.ultraThinMaterial)
                             )
-                            .foregroundStyle(theme.colors.sendButtonBackground)
-                            .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
                     }
                     .padding(.trailing, MessageView.horizontalScreenEdgePadding + 4)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 62) // Moved down from 72px to 62px (10px adjustment)
                 }
             }
             
@@ -393,7 +396,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var inputView: some View {
         // Replace default input view with transparent spacer for custom input
         Color.clear
-            .frame(height: 30)
+            .frame(height: 1)
     }
     
     func messageMenu(_ row: MessageRow) -> some View {

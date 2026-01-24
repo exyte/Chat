@@ -530,17 +530,18 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         HStack(spacing: 0) {
             ZStack {
                 theme.colors.messageFriendBG
-                    .cornerRadius(12)
+                    .cornerRadius(16) // Increased from 12 to 16
                 HStack {
                     Text(title)
+                        .font(.custom("SFProRounded-Semibold", size: 15))
+                        .kerning(0.375) // 2.5% of 15
                         .foregroundColor(theme.colors.menuText)
                     Spacer()
                     icon
                         .renderingMode(.template)
                         .foregroundStyle(theme.colors.menuText)
                 }
-                .font(getFont)
-                .padding(.vertical, 11)
+                .padding(.vertical, 13) // Increased from 11 to 13 (20% taller)
                 .padding(.horizontal, 12)
             }
             .frame(width: 208)

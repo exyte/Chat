@@ -65,8 +65,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = isScrollEnabled
         tableView.keyboardDismissMode = keyboardDismissMode
-        // Add 20px top content inset for spacing (becomes bottom due to 180° rotation)
-        tableView.contentInset = UIEdgeInsets(top: 28, left: 0, bottom: 0, right: 0)
+        // Reduced content inset for tighter spacing (becomes bottom due to 180° rotation)
+        tableView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 0, right: 0)
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
@@ -649,10 +649,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     .background(MessageMenuPreferenceViewSetter(id: row.id))
                     .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
                     .applyIf(showMessageMenuOnLongPress) {
-                        $0.simultaneousGesture(
+                        $0                        .simultaneousGesture(
                             TapGesture().onEnded { } // add empty tap to prevent iOS17 scroll breaking bug (drag on cells stops working)
                         )
-                        .onLongPressGesture(minimumDuration: 0.2) {
+                        .onLongPressGesture(minimumDuration: 0.05) {
                             // Trigger haptic feedback
                             self.impactGenerator.impactOccurred()
                             // Launch the message menu
