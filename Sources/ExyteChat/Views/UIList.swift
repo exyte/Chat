@@ -679,16 +679,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     // System message with username highlighting - allow wrapping but keep words together
                     (Text(parsedMessage.username)
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0, green: 0x78/255.0, blue: 1.0), // #0078FF (lighter)
-                                    Color(red: 0, green: 0, blue: 1.0)           // #0000FF (darker)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
+                        .foregroundStyle(Color(red: 0, green: 0x78/255.0, blue: 1.0)) // #0078FF solid color
                     +
                     Text(parsedMessage.action)
                         .font(.system(size: 14))
@@ -697,16 +688,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                     (parsedMessage.hasSecondUsername && parsedMessage.secondUsername != nil ?
                         Text(parsedMessage.secondUsername!)
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0, green: 0x78/255.0, blue: 1.0), // #0078FF (lighter)
-                                        Color(red: 0, green: 0, blue: 1.0)           // #0000FF (darker)
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
+                            .foregroundStyle(Color(red: 0, green: 0x78/255.0, blue: 1.0)) // #0078FF solid color
                         : Text("")
                     )
                     +
@@ -773,6 +755,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 " was promoted",
                 " was demoted",
                 " was kicked",
+                " was removed from the group",
                 " created the clan",
                 " accepted an invitation and joined the clan",
                 " accepted a clan invite",
