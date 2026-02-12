@@ -208,6 +208,28 @@ ChatView(messages: viewModel.messages) { draft in
     
 When implementing your own `MessageMenuActionClosure`, write a switch statement passing through all the cases of your `MessageMenuAction`, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for `.edit` you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.
 
+## Small view builders:
+These use `AnyView`, so please try to keep them easy enough
+- `mainHeaderBuilder` - a header for the whole chat, which will scroll together with all the messages and headers  
+- `headerBuilder` - date section header builder   
+- `betweenListAndInputViewBuilder` - content to display in between the chat list view and the input view   
+
+## Modifiers   
+`isListAboveInputView` - messages table above the input field view or not    
+`showNetworkConnectionProblem` - display network error on/off    
+`contentInsets` - set additional content insets for the messages list   
+`showDateHeaders` - show section headers with dates between days, default is `true`     
+`isScrollEnabled` - forbid scrolling for messages' `UITableView`      
+`keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
+`showMessageMenuOnLongPress` - turn menu on long tap on/off    
+`messageMenuAnimationDuration` - control how fast/snappy the message menu animations feel    
+`enableLoadMore(pageSize: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls up to `pageSize`-th message, call the handler function, so user can load more messages  
+`localization` - can be localized in the Localizable.strings files    
+
+### Reactions    
+`messageReactionDelegate` - provide a custom reaction delegate for handling and configuring message reactions    
+`onMessageReaction` - configure reactions using closures (didReactTo, canReactTo, available reactions, emoji search, overview, etc.)  
+
 ## Custom swipe actions
 
 ```swift
@@ -235,28 +257,32 @@ ChatView(messages: viewModel.messages) { draft in
 `swipeActions`'s parameters:  
 - `edge` - either the leading or trailing edge of the Message
 - `performsFirstActionWithFullSwipe` - if true, a full swipe will trigger the first `SwipeAction` provided in the `items` list
-- `items` - list of `SwipeAction`s to include
+- `items` - list of `SwipeAction`s to include  
 
-## Small view builders:
-These use `AnyView`, so please try to keep them easy enough
-- `betweenListAndInputViewBuilder` - content to display in between the chat list view and the input view   
-- `mainHeaderBuilder` - a header for the whole chat, which will scroll together with all the messages and headers  
-- `headerBuilder` - date section header builder   
+### makes sense only for built-in message view    
+`avatarSize` - the default avatar is a circle, you can specify its diameter here    
+`tapAvatarClosure` - closure to call on avatar tap    
+`showMessageTimeView` - show timestamp in a corner of the message    
+`messageLinkPreviewLimit` - limit the maximum number of link previews per message    
+`linkPreviewsEnabled` - enable or disable message link previews globally    
+`shouldShowPreviewForLink` - provide custom logic to decide whether a specific URL should show a preview    
+`setMessageFont` - pass custom font to use for messages    
+`messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not    
+`messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`    
 
-## Modifiers 
-`isListAboveInputView` - messages table above the input field view or not   
-`showDateHeaders` - show section headers with dates between days, default is `true`    
-`isScrollEnabled` - forbid scrolling for messages' `UITableView`   
-`showMessageMenuOnLongPress` - turn menu on long tap on/off    
-`showNetworkConnectionProblem` - display network error on/off    
-`keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
-`assetsPickerLimit` - set a limit for MediaPicker built into the library   
-`setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (assetsPickerLimit and others like mediaType, selectionStyle, etc.).   
-`orientationHandler` - handle screen rotation
+### makes sense only for built-in input view    
+`setAvailableInputs` - construct an array of these:    
+    - `.text`    
+    - `.media`    
+    - `.audio`    
+    - `.giphy`    
+`setRecorderSettings` - customize audio recorder settings    
+`assetsPickerLimit` - set a limit for MediaPicker built into the library    
+`setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (selection limit, media type, selection style, etc.)    
+`setMediaPickerParameters` - configure low-level MediaPicker parameters    
+`orientationHandler` - handle screen rotation during media picking    
 
-`enableLoadMore(offset: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls to `offset`-th message from the end, call the handler function, so the user can load more messages. NOTE: New messages won't appear in the chat unless it's scrolled up to the very top - it's an optimization. 
-
-### Customize default UI
+### Customize default colors and images
 You can use `chatTheme` to customize colors and images of default UI. You can pass all/some colors and images:
 
 ```swift
@@ -292,23 +318,6 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
 
 ```
 By default the built-in MediaPicker will be auto-customized using the most logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
-
-### makes sense only for built-in message view    
-`avatarSize` - the default avatar is a circle, you can specify its diameter here   
-`tapAvatarClosure` - closure to call on avatar tap    
-`messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not    
-`messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`    
-`showMessageTimeView` - show timestamp in a corner of the message    
-`messageLinkPreviewLimit` - limit the maximum number of link previews per message
-`linkPreviewsDisabled` - completely disable message link previews
-`setMessageFont` - pass custom font to use for messages   
-
-### makes sense only for built-in input view
-`setAvailableInput` - hide some buttons in default InputView. Available options are:    
-    - `.full` - media + text + audio   
-    - `.textAndMedia`   
-    - `.textAndAudio`   
-    - `.textOnly`    
   
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
 

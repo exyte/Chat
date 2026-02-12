@@ -31,18 +31,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.chatTheme) private var theme
     @Environment(\.giphyConfig) private var giphyConfig
-    
-    // MARK: - Parameters
-    
-    let type: ChatType
-    let sections: [MessagesSection]
-    let ids: [String]
-    let didSendMessage: (DraftMessage) -> Void
-    let didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
-    var reactionDelegate: ReactionDelegate?
 
-    // MARK: - View builders
-    
+    // MARK: - Parameters
+
     /// provide custom message view builder
     @ViewBuilder var messageBuilder: MessageBuilderParamsClosure
 
@@ -51,44 +42,60 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     /// message menu customization: create enum complying to MessageMenuAction and pass a closure processing your enum cases
     var messageMenuAction: MessageMenuActionClosure
-    
-    /// content to display in between the chat list view and the input view
-    var betweenListAndInputViewBuilder: (()->AnyView)?
-    
+
+    var type: ChatType
+    var sections: [MessagesSection]
+    var ids: [String]
+    var didSendMessage: (DraftMessage) -> Void
+    var didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
+
+    // MARK: - Simple view builders
+
     /// a header for the whole chat, which will scroll together with all the messages and headers
     var mainHeaderBuilder: (()->AnyView)?
-    
+
     /// date section header builder
     var headerBuilder: ((Date)->AnyView)?
-    
-    /// provide strings for the chat view, these can be localized in the Localizable.strings files
-    var localization: ChatLocalization
-    
+
+    /// content to display in between the chat list view and the input view
+    var betweenListAndInputViewBuilder: (()->AnyView)?
+
     // MARK: - Customization
-    
+
     var isListAboveInputView: Bool = true
+    var showNetworkConnectionProblem: Bool = false
+    var contentInsets: UIEdgeInsets = .zero
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = true
-    var avatarSize: CGFloat = 32
-    var messageStyler: (String) -> AttributedString = AttributedString.init
-    var shouldShowLinkPreview: (URL) -> Bool = { _ in true }
+    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     var showMessageMenuOnLongPress: Bool = true
-    var messageMenuAnimationDuration: Double = 0.3
-    var showNetworkConnectionProblem: Bool = false
+    var messageMenuAnimationDuration: CGFloat = 0.3
+
+    var paginationHandler: PaginationHandler?
+    var localization = ChatLocalization.defaultLocalization // these can be localized in the Localizable.strings files
+    var reactionDelegate: ReactionDelegate?
+    var listSwipeActions = ListSwipeActions()
+
+    // MARK: - Customization for built-in message view
+
+    var avatarSize: CGFloat = 32
     var tapAvatarClosure: TapAvatarClosure?
+    var showMessageTimeView = true
+    var messageLinkPreviewLimit = 8
+    var shouldShowPreviewForLink: (URL) -> Bool = { _ in true }
+    var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+    var messageStyler: (String) -> AttributedString = AttributedString.init
+
+    // MARK: - Customization for built-in input view
+
+    var availableInputs: [AvailableInputType] = [.text, .audio, .media]
+    var recorderSettings = RecorderSettings()
     var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
     var mediaPickerParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
-    var chatTitle: String?
-    var paginationHandler: PaginationHandler?
-    var showMessageTimeView = true
-    var messageLinkPreviewLimit = 8
-    var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
-    var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
-    var recorderSettings: RecorderSettings = RecorderSettings()
-    var listSwipeActions: ListSwipeActions = ListSwipeActions()
-    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
-    
+
+    // MARK: - State
+
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
@@ -131,7 +138,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .ignoresSafeArea()
                 }
             }
-            .onAppear() {
+            .onAppear {
                 if isGiphyAvailable() {
                     if let giphyKey = giphyConfig.giphyKey {
                         if !giphyConfigured {
@@ -164,7 +171,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 AttachmentsEditor(
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
-                    chatTitle: chatTitle,
                     messageStyler: messageStyler,
                     orientationHandler: orientationHandler,
                     mediaPickerSelectionParameters: mediaPickerSelectionParameters,
@@ -189,7 +195,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     var mainView: some View {
-        VStack {
+        VStack(spacing: 0) {
             if showNetworkConnectionProblem, !networkMonitor.isConnected {
                 waitingForNetwork
             }
@@ -237,7 +243,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         case .conversation:
             ZStack(alignment: .bottomTrailing) {
                 list
-                
+
                 if !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
@@ -261,32 +267,48 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @ViewBuilder
     var list: some View {
         UIList(
+            // MARK: - Core
+
             viewModel: viewModel,
             inputViewModel: inputViewModel,
+
             isScrolledToBottom: $isScrolledToBottom,
             shouldScrollToTop: $shouldScrollToTop,
             tableContentHeight: $tableContentHeight,
+
+            // MARK: - View builders
+
             messageBuilder: messageBuilder,
             mainHeaderBuilder: mainHeaderBuilder,
             headerBuilder: headerBuilder,
-            inputView: inputView,
+
+            // MARK: - Data / type
+
             type: type,
-            showDateHeaders: showDateHeaders,
-            isScrollEnabled: isScrollEnabled,
-            avatarSize: avatarSize,
-            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-            tapAvatarClosure: tapAvatarClosure,
-            paginationHandler: paginationHandler,
-            messageStyler: messageStyler,
-            shouldShowLinkPreview: shouldShowLinkPreview,
-            showMessageTimeView: showMessageTimeView,
-            messageLinkPreviewLimit: messageLinkPreviewLimit,
-            messageFont: messageFont,
             sections: sections,
             ids: ids,
+
+            // MARK: - Customization
+
+            contentInsets: contentInsets,
+            showDateHeaders: showDateHeaders,
+            isScrollEnabled: isScrollEnabled,
+            keyboardDismissMode: keyboardDismissMode,
+            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
+            paginationHandler: paginationHandler,
             listSwipeActions: listSwipeActions,
-            keyboardDismissMode: keyboardDismissMode
+
+            // MARK: - Built-in message view
+
+            avatarSize: avatarSize,
+            tapAvatarClosure: tapAvatarClosure,
+            showMessageTimeView: showMessageTimeView,
+            shouldShowPreviewForLink: shouldShowPreviewForLink,
+            messageLinkPreviewLimit: messageLinkPreviewLimit,
+            messageFont: messageFont,
+            messageStyler: messageStyler
         )
+
         .applyIf(!isScrollEnabled) {
             $0.frame(height: tableContentHeight)
         }
@@ -388,7 +410,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ChatMessageView(
                 viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
                 avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
-                shouldShowLinkPreview: shouldShowLinkPreview,
+                shouldShowPreviewForLink: shouldShowPreviewForLink,
                 isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
                 messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
             )
@@ -476,215 +498,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     private func isGiphyAvailable() -> Bool {
         availableInputs.contains(AvailableInputType.giphy)
-    }
-}
-
-public extension ChatView {
-    
-    func betweenListAndInputViewBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
-        var view = self
-        view.betweenListAndInputViewBuilder = {
-            AnyView(builder())
-        }
-        return view
-    }
-    
-    func mainHeaderBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
-        var view = self
-        view.mainHeaderBuilder = {
-            AnyView(builder())
-        }
-        return view
-    }
-    
-    func headerBuilder<V: View>(_ builder: @escaping (Date)->V) -> ChatView {
-        var view = self
-        view.headerBuilder = { date in
-            AnyView(builder(date))
-        }
-        return view
-    }
-    
-    func isListAboveInputView(_ isAbove: Bool) -> ChatView {
-        var view = self
-        view.isListAboveInputView = isAbove
-        return view
-    }
-    
-    func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
-        var view = self
-        view.showDateHeaders = showDateHeaders
-        return view
-    }
-    
-    func isScrollEnabled(_ isScrollEnabled: Bool) -> ChatView {
-        var view = self
-        view.isScrollEnabled = isScrollEnabled
-        return view
-    }
-    
-    func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
-        var view = self
-        view.showMessageMenuOnLongPress = show
-        return view
-    }
-    
-    /// Sets the keyboard dismiss mode for the chat list
-    /// - Parameter mode: The keyboard dismiss mode (.interactive, .onDrag, or .none)
-    /// - Default is .none
-    func keyboardDismissMode(_ mode: UIScrollView.KeyboardDismissMode) -> ChatView {
-        var view = self
-        view.keyboardDismissMode = mode
-        return view
-    }
-    
-    func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
-        var view = self
-        view.showNetworkConnectionProblem = show
-        return view
-    }
-    
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = MediaPickerSelectionParameters()
-        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
-        return view
-    }
-    
-    func setMediaPickerSelectionParameters(_ params: MediaPickerSelectionParameters) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = params
-        return view
-    }
-    
-    func setMediaPickerParameters(_ params: MediaPickerParameters) -> ChatView {
-        var view = self
-        view.mediaPickerParameters = params
-        return view
-    }
-    
-    func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
-        var view = self
-        view.orientationHandler = orientationHandler
-        return view
-    }
-    
-    /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
-    /// NOTE: doesn't work well with `isScrollEnabled` false
-    func enableLoadMore(pageSize: Int, _ handler: @escaping ChatPaginationClosure) -> ChatView {
-        var view = self
-        view.paginationHandler = PaginationHandler(handleClosure: handler, pageSize: pageSize)
-        return view
-    }
-    
-    @available(*, deprecated)
-    func chatNavigation(title: String, status: String? = nil, cover: URL? = nil) -> some View {
-        var view = self
-        view.chatTitle = title
-        return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
-    }
-    
-    // makes sense only for built-in message view
-    
-    func avatarSize(avatarSize: CGFloat) -> ChatView {
-        var view = self
-        view.avatarSize = avatarSize
-        return view
-    }
-    
-    func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
-        var view = self
-        view.tapAvatarClosure = closure
-        return view
-    }
-    
-    func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
-        return messageUseStyler(String.markdownStyler)
-    }
-
-    func messageUseStyler(_ styler: @escaping (String) -> AttributedString) -> ChatView {
-        var view = self
-        view.messageStyler = styler
-        return view
-    }
-    
-    func shouldShowLinkPreview(_ shouldShowLinkPreview: @escaping (URL) -> Bool) -> ChatView {
-        var view = self
-        view.shouldShowLinkPreview = shouldShowLinkPreview
-        return view
-    }
-
-    func showMessageTimeView(_ isShow: Bool) -> ChatView {
-        var view = self
-        view.showMessageTimeView = isShow
-        return view
-    }
-
-    func messageLinkPreviewLimit(_ limit: Int) -> ChatView {
-        var view = self
-        view.messageLinkPreviewLimit = limit
-        return view
-    }
-    
-    func linkPreviewsDisabled() -> ChatView {
-        return messageLinkPreviewLimit(0)
-    }
-
-    func setMessageFont(_ font: UIFont) -> ChatView {
-        var view = self
-        view.messageFont = font
-        return view
-    }
-    
-    // makes sense only for built-in input view
-    
-    func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {
-        var view = self
-        view.availableInputs = types
-        return view
-    }
-    
-    func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
-        var view = self
-        view.recorderSettings = settings
-        return view
-    }
-    
-    /// Sets the general duration of various message menu animations
-    ///
-    /// This value is more akin to 'how snappy' the message menu feels
-    /// - Note: Good values are between 0.15 - 0.5 (defaults to 0.3)
-    /// - Important: This value is clamped between 0.1 and 1.0
-    func messageMenuAnimationDuration(_ duration:Double) -> ChatView {
-        var view = self
-        view.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
-        return view
-    }
-    
-    /// Sets a ReactionDelegate on the ChatView for handling and configuring message reactions
-    func messageReactionDelegate(_ configuration: ReactionDelegate) -> ChatView {
-        var view = self
-        view.reactionDelegate = configuration
-        return view
-    }
-    
-    /// Constructs, and applies, a ReactionDelegate for you based on the provided closures
-    func onMessageReaction(
-        didReactTo: @escaping (Message, DraftReaction) -> Void,
-        canReactTo: ((Message) -> Bool)? = nil,
-        availableReactionsFor: ((Message) -> [ReactionType]?)? = nil,
-        allowEmojiSearchFor: ((Message) -> Bool)? = nil,
-        shouldShowOverviewFor: ((Message) -> Bool)? = nil
-    ) -> ChatView {
-        var view = self
-        view.reactionDelegate = DefaultReactionConfiguration(
-            didReact: didReactTo,
-            canReact: canReactTo,
-            reactions: availableReactionsFor,
-            allowEmojiSearch: allowEmojiSearchFor,
-            shouldShowOverview: shouldShowOverviewFor
-        )
-        return view
     }
 }
 

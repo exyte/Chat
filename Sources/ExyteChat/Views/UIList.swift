@@ -11,7 +11,7 @@ public extension Notification.Name {
     static let onScrollToBottom = Notification.Name("onScrollToBottom")
 }
 
-struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
+struct UIList<MessageContent: View>: UIViewRepresentable {
 
     typealias MessageBuilderParamsClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderParamsClosure
 
@@ -24,33 +24,44 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     @Binding var shouldScrollToTop: () -> ()
     @Binding var tableContentHeight: CGFloat
 
+    // MARK: - View builders
+
     var messageBuilder: MessageBuilderParamsClosure
     var mainHeaderBuilder: (()->AnyView)?
     var headerBuilder: ((Date)->AnyView)?
-    var inputView: InputView
+
+    // MARK: - Data / type
 
     let type: ChatType
-    let showDateHeaders: Bool
-    let isScrollEnabled: Bool
-    let avatarSize: CGFloat
-    let showMessageMenuOnLongPress: Bool
-    let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let paginationHandler: PaginationHandler?
-    let messageStyler: (String) -> AttributedString
-    let shouldShowLinkPreview: (URL) -> Bool
-    let showMessageTimeView: Bool
-    let messageLinkPreviewLimit: Int
-    let messageFont: UIFont
     let sections: [MessagesSection]
     let ids: [String]
-    let listSwipeActions: ListSwipeActions
+
+    // MARK: - Customization
+
+    let contentInsets: UIEdgeInsets
+    let showDateHeaders: Bool
+    let isScrollEnabled: Bool
     let keyboardDismissMode: UIScrollView.KeyboardDismissMode
+    let showMessageMenuOnLongPress: Bool
+    let paginationHandler: PaginationHandler?
+    let listSwipeActions: ListSwipeActions
+
+    // MARK: - Built-in message view
+
+    let avatarSize: CGFloat
+    let tapAvatarClosure: ChatView.TapAvatarClosure?
+    let showMessageTimeView: Bool
+    let shouldShowPreviewForLink: (URL) -> Bool
+    let messageLinkPreviewLimit: Int
+    let messageFont: UIFont
+    let messageStyler: (String) -> AttributedString
 
     @State var isScrolledToTop = false
     @State var updateQueue = UpdateQueue()
 
     func makeUIView(context: Context) -> UITableView {
-        let tableView = UITableView(frame: .zero, style: .grouped)
+        let style = mainHeaderBuilder != nil || showDateHeaders ? UITableView.Style.grouped : .plain
+        let tableView = UITableView(frame: .zero, style: style)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
         tableView.dataSource = context.coordinator
@@ -58,6 +69,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.transform = CGAffineTransform(rotationAngle: (type == .conversation ? .pi : 0))
 
+        tableView.sectionHeaderTopPadding = 0
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 1
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
@@ -89,6 +101,10 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             DispatchQueue.main.async {
                 tableContentHeight = tableView.contentSize.height
             }
+        }
+
+        if tableView.contentInset != contentInsets {
+            tableView.contentInset = contentInsets
         }
 
         if context.coordinator.sections == sections {
@@ -364,18 +380,35 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
-            viewModel: viewModel, inputViewModel: inputViewModel,
-            isScrolledToBottom: $isScrolledToBottom, isScrolledToTop: $isScrolledToTop,
-            messageBuilder: messageBuilder, mainHeaderBuilder: mainHeaderBuilder,
-            headerBuilder: headerBuilder, type: type, showDateHeaders: showDateHeaders,
-            avatarSize: avatarSize, showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-            tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
-            messageStyler: messageStyler, shouldShowLinkPreview: shouldShowLinkPreview,
-            showMessageTimeView: showMessageTimeView,
-            messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont,
-            sections: sections, ids: ids, mainBackgroundColor: theme.colors.mainBG,
+            viewModel: viewModel,
+            inputViewModel: inputViewModel,
+            isScrolledToBottom: $isScrolledToBottom,
+            isScrolledToTop: $isScrolledToTop,
+
+            messageBuilder: messageBuilder,
+            mainHeaderBuilder: mainHeaderBuilder,
+            headerBuilder: headerBuilder,
+
+            type: type,
+            sections: sections,
+            ids: ids,
+
+            showDateHeaders: showDateHeaders,
+            keyboardDismissMode: keyboardDismissMode,
+            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
+            paginationHandler: paginationHandler,
             listSwipeActions: listSwipeActions,
-            keyboardDismissMode: keyboardDismissMode)
+
+            avatarSize: avatarSize,
+            tapAvatarClosure: tapAvatarClosure,
+            showMessageTimeView: showMessageTimeView,
+            shouldShowPreviewForLink: shouldShowPreviewForLink,
+            messageLinkPreviewLimit: messageLinkPreviewLimit,
+            messageFont: messageFont,
+            messageStyler: messageStyler,
+
+            mainBackgroundColor: theme.colors.mainBG
+        )
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -386,21 +419,15 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         @Binding var isScrolledToBottom: Bool
         @Binding var isScrolledToTop: Bool
 
+        // MARK: - View builders
+
         let messageBuilder: MessageBuilderParamsClosure
         let mainHeaderBuilder: (()->AnyView)?
         let headerBuilder: ((Date)->AnyView)?
 
+        // MARK: - Data / type
+
         let type: ChatType
-        let showDateHeaders: Bool
-        let avatarSize: CGFloat
-        let showMessageMenuOnLongPress: Bool
-        let tapAvatarClosure: ChatView.TapAvatarClosure?
-        let paginationHandler: PaginationHandler?
-        let messageStyler: (String) -> AttributedString
-        let shouldShowLinkPreview: (URL) -> Bool
-        let showMessageTimeView: Bool
-        let messageLinkPreviewLimit: Int
-        let messageFont: UIFont
         var sections: [MessagesSection] {
             didSet {
                 if let lastSection = sections.last {
@@ -409,54 +436,92 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             }
         }
         let ids: [String]
-        let mainBackgroundColor: Color
-        let listSwipeActions: ListSwipeActions
+
+        // MARK: - Customization
+
+        let showDateHeaders: Bool
         let keyboardDismissMode: UIScrollView.KeyboardDismissMode
+        let showMessageMenuOnLongPress: Bool
+        let paginationHandler: PaginationHandler?
+        let listSwipeActions: ListSwipeActions
+
+        // MARK: - Built-in message view
+
+        let avatarSize: CGFloat
+        let tapAvatarClosure: ChatView.TapAvatarClosure?
+        let showMessageTimeView: Bool
+        let shouldShowPreviewForLink: (URL) -> Bool
+        let messageLinkPreviewLimit: Int
+        let messageFont: UIFont
+        let messageStyler: (String) -> AttributedString
+
+        let mainBackgroundColor: Color
+
+        /// call pagination handler when this row is reached
+        /// without this there is a bug: during new cells insertion willDisplay is called one extra time for the cell which used to be the last one while it is being updated (its position in group is changed from first to middle)
+        var paginationTargetIndexPath: IndexPath?
 
         private let impactGenerator = UIImpactFeedbackGenerator(style: .heavy)
 
         init(
-            viewModel: ChatViewModel, inputViewModel: InputViewModel,
-            isScrolledToBottom: Binding<Bool>, isScrolledToTop: Binding<Bool>,
-            messageBuilder: @escaping MessageBuilderParamsClosure, mainHeaderBuilder: (() -> AnyView)?,
-            headerBuilder: ((Date) -> AnyView)?, type: ChatType, showDateHeaders: Bool,
-            avatarSize: CGFloat, showMessageMenuOnLongPress: Bool,
-            tapAvatarClosure: ChatView.TapAvatarClosure?, paginationHandler: PaginationHandler?,
+            viewModel: ChatViewModel,
+            inputViewModel: InputViewModel,
+            isScrolledToBottom: Binding<Bool>,
+            isScrolledToTop: Binding<Bool>,
+
+            messageBuilder: @escaping MessageBuilderParamsClosure,
+            mainHeaderBuilder: (() -> AnyView)?,
+            headerBuilder: ((Date) -> AnyView)?,
+
+            type: ChatType,
+            sections: [MessagesSection],
+            ids: [String],
+
+            showDateHeaders: Bool,
+            keyboardDismissMode: UIScrollView.KeyboardDismissMode,
+            showMessageMenuOnLongPress: Bool,
+            paginationHandler: PaginationHandler?,
+            listSwipeActions: ListSwipeActions,
+
+            avatarSize: CGFloat,
+            tapAvatarClosure: ChatView.TapAvatarClosure?,
+            showMessageTimeView: Bool,
+            shouldShowPreviewForLink: @escaping (URL) -> Bool,
+            messageLinkPreviewLimit: Int,
+            messageFont: UIFont,
             messageStyler: @escaping (String) -> AttributedString,
-            shouldShowLinkPreview: @escaping (URL) -> Bool, showMessageTimeView: Bool,
-            messageLinkPreviewLimit: Int, messageFont: UIFont, sections: [MessagesSection],
-            ids: [String], mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
-            listSwipeActions: ListSwipeActions, keyboardDismissMode: UIScrollView.KeyboardDismissMode
+
+            mainBackgroundColor: Color
         ) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
             self._isScrolledToBottom = isScrolledToBottom
             self._isScrolledToTop = isScrolledToTop
+
             self.messageBuilder = messageBuilder
             self.mainHeaderBuilder = mainHeaderBuilder
             self.headerBuilder = headerBuilder
+
             self.type = type
-            self.showDateHeaders = showDateHeaders
-            self.avatarSize = avatarSize
-            self.showMessageMenuOnLongPress = showMessageMenuOnLongPress
-            self.tapAvatarClosure = tapAvatarClosure
-            self.paginationHandler = paginationHandler
-            self.messageStyler = messageStyler
-            self.shouldShowLinkPreview = shouldShowLinkPreview
-            self.showMessageTimeView = showMessageTimeView
-            self.messageLinkPreviewLimit = messageLinkPreviewLimit
-            self.messageFont = messageFont
             self.sections = sections
             self.ids = ids
-            self.mainBackgroundColor = mainBackgroundColor
-            self.paginationTargetIndexPath = paginationTargetIndexPath
-            self.listSwipeActions = listSwipeActions
-            self.keyboardDismissMode = keyboardDismissMode
-        }
 
-        /// call pagination handler when this row is reached
-        /// without this there is a bug: during new cells insertion willDisplay is called one extra time for the cell which used to be the last one while it is being updated (its position in group is changed from first to middle)
-        var paginationTargetIndexPath: IndexPath?
+            self.showDateHeaders = showDateHeaders
+            self.keyboardDismissMode = keyboardDismissMode
+            self.showMessageMenuOnLongPress = showMessageMenuOnLongPress
+            self.paginationHandler = paginationHandler
+            self.listSwipeActions = listSwipeActions
+
+            self.avatarSize = avatarSize
+            self.tapAvatarClosure = tapAvatarClosure
+            self.showMessageTimeView = showMessageTimeView
+            self.shouldShowPreviewForLink = shouldShowPreviewForLink
+            self.messageLinkPreviewLimit = messageLinkPreviewLimit
+            self.messageFont = messageFont
+            self.messageStyler = messageStyler
+
+            self.mainBackgroundColor = mainBackgroundColor
+        }
 
         func numberOfSections(in tableView: UITableView) -> Int {
             sections.count
@@ -482,14 +547,14 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
 
         func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
             if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
-                return 0.1
+                return 0
             }
             return type == .conversation ? 0.1 : UITableView.automaticDimension
         }
 
         func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
             if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
-                return 0.1
+                return 0
             }
             return type == .conversation ? UITableView.automaticDimension : 0.1
         }
@@ -566,7 +631,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
             let tableViewCell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             tableViewCell.selectionStyle = .none
             tableViewCell.backgroundColor = UIColor(mainBackgroundColor)
@@ -576,7 +640,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 ChatMessageView(
                     viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
                     avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure,
-                    messageStyler: messageStyler, shouldShowLinkPreview: shouldShowLinkPreview,
+                    messageStyler: messageStyler, shouldShowPreviewForLink: shouldShowPreviewForLink,
                     isDisplayingMessageMenu: false, showMessageTimeView: showMessageTimeView,
                     messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
                 )

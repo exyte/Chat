@@ -61,8 +61,6 @@ extension ChatView {
         messages: [Message],
         chatType: ChatType = .conversation,
         replyMode: ReplyMode = .quote,
-        reactionDelegate: ReactionDelegate? = nil,
-        localization: ChatLocalization = ChatLocalization.defaultLocalization,
         didSendMessage: @escaping (DraftMessage) -> Void,
         messageBuilder: @escaping (_ params: MessageBuilderParameters) -> MessageContent = { _ in
             DummyView()
@@ -80,10 +78,8 @@ extension ChatView {
         didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil
     ) {
         self.type = chatType
-        self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
-        self.localization = localization
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction

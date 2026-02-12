@@ -23,7 +23,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @ObservedObject var inputViewModel: InputViewModel
 
     var inputViewBuilder: InputViewBuilderParamsClosure
-    var chatTitle: String?
     var messageStyler: (String) -> AttributedString
     var orientationHandler: MediaPickerOrientationHandler
     var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
@@ -192,13 +191,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
             .tint(mediaPickerTheme.main.pickerText)
             .padding(.trailing, 30)
-
-            if let chatTitle = chatTitle {
-                theme.images.mediaPicker.chevronRight
-                Text(chatTitle)
-                    .font(.title3)
-                    .foregroundColor(mediaPickerTheme.main.pickerText)
-            }
 
             Spacer()
         }

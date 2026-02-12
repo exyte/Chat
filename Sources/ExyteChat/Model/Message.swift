@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct Message: Identifiable, Hashable, Sendable {
+public struct Message: Identifiable, Sendable {
 
     public enum Status: Equatable, Hashable, Sendable {
         case sending
@@ -60,6 +60,7 @@ public struct Message: Identifiable, Hashable, Sendable {
     public var giphyMediaId: String?
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
+    public var customData: [String: any Sendable]
 
     public var triggerRedraw: UUID?
 
@@ -72,7 +73,8 @@ public struct Message: Identifiable, Hashable, Sendable {
                 giphyMediaId: String? = nil,
                 reactions: [Reaction] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
+                replyMessage: ReplyMessage? = nil,
+                customData: [String: any Sendable] = [:]) {
 
         self.id = id
         self.user = user
@@ -84,6 +86,7 @@ public struct Message: Identifiable, Hashable, Sendable {
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
+        self.customData = customData
     }
 
     public static func makeMessage(
@@ -140,7 +143,8 @@ extension Message: Equatable {
         lhs.attachments == rhs.attachments &&
         lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&
-        lhs.replyMessage == rhs.replyMessage
+        lhs.replyMessage == rhs.replyMessage &&
+        lhs.triggerRedraw == rhs.triggerRedraw
     }
 }
 
