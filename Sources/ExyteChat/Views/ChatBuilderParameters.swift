@@ -62,10 +62,10 @@ extension ChatView {
         chatType: ChatType = .conversation,
         replyMode: ReplyMode = .quote,
         didSendMessage: @escaping (DraftMessage) -> Void,
-        messageBuilder: @escaping (_ params: MessageBuilderParameters) -> MessageContent = { _ in
+        @ViewBuilder messageBuilder: @escaping (_ params: MessageBuilderParameters) -> MessageContent = { _ in
             DummyView()
         },
-        inputViewBuilder: @escaping (_ params: InputViewBuilderParameters) -> InputViewContent = { _ in
+        @ViewBuilder inputViewBuilder: @escaping (_ params: InputViewBuilderParameters) -> InputViewContent = { _ in
             DummyView()
         },
         messageMenuAction: @escaping (
@@ -80,11 +80,11 @@ extension ChatView {
         self.type = chatType
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
+        self.didSendMessage = didSendMessage
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
         self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
-        self.didSendMessage = didSendMessage
     }
 }
 

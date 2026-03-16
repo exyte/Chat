@@ -53,6 +53,7 @@
     - Audio recording
     - Link with preview
     - Gif/Sticker
+    - Custom dictionary of any Sendable
     **Coming soon:**
     - User's location
     - Documents
@@ -216,13 +217,22 @@ These use `AnyView`, so please try to keep them easy enough
 
 ## Modifiers   
 `isListAboveInputView` - messages table above the input field view or not    
+`showScrollToBottomButton` - little arrow button appearing when offset != 0     
 `showNetworkConnectionProblem` - display network error on/off    
-`contentInsets` - set additional content insets for the messages list   
 `showDateHeaders` - show section headers with dates between days, default is `true`     
 `isScrollEnabled` - forbid scrolling for messages' `UITableView`      
 `keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
 `messageMenuAnimationDuration` - control how fast/snappy the message menu animations feel    
+`contentInsets` - set additional content insets for the messages list   
+`currentContentOffset` - a 2-sided binding to get/set table's content offset   
+`updateTransaction` - awaitable updates helper similar in usage to `tableView.performBatchUpdates`
+```swift
+await updateTransaction(animated: needToAnimate) {
+    self.messages.append(nextMessage)
+    self.currentTableContentOffset = offset
+}
+```
 `enableLoadMore(pageSize: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls up to `pageSize`-th message, call the handler function, so user can load more messages  
 `localization` - can be localized in the Localizable.strings files    
 

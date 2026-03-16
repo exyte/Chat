@@ -63,13 +63,18 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     // MARK: - Customization
 
     var isListAboveInputView: Bool = true
+    var showScrollToBottomButton: Bool = true
     var showNetworkConnectionProblem: Bool = false
-    var contentInsets: UIEdgeInsets = .zero
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = true
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     var showMessageMenuOnLongPress: Bool = true
     var messageMenuAnimationDuration: CGFloat = 0.3
+
+    var contentInsets: UIEdgeInsets = .zero
+    var externalContentOffset: CGPoint? // External → Internal
+    var onContentOffsetChange: ((CGPoint) -> Void)? // Internal → External
+    var onTransactionReady: ((TableUpdateTransaction) -> Void)?
 
     var paginationHandler: PaginationHandler?
     var localization = ChatLocalization.defaultLocalization // these can be localized in the Localizable.strings files
@@ -101,7 +106,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
-    
+
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
 
@@ -244,7 +249,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ZStack(alignment: .bottomTrailing) {
                 list
 
-                if !isScrolledToBottom {
+                if showScrollToBottomButton, !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                     } label: {
@@ -289,12 +294,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ids: ids,
 
             // MARK: - Customization
-
-            contentInsets: contentInsets,
             showDateHeaders: showDateHeaders,
             isScrollEnabled: isScrollEnabled,
             keyboardDismissMode: keyboardDismissMode,
             showMessageMenuOnLongPress: showMessageMenuOnLongPress,
+            contentInsets: contentInsets,
+            externalContentOffset: externalContentOffset,
+            onContentOffsetChange: onContentOffsetChange,
+            onTransactionReady: onTransactionReady,
             paginationHandler: paginationHandler,
             listSwipeActions: listSwipeActions,
 

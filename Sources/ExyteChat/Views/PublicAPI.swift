@@ -45,16 +45,15 @@ public extension ChatView {
         return view
     }
 
-    func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
+    func showScrollToBottomButton(_ show: Bool) -> ChatView {
         var view = self
-        view.showNetworkConnectionProblem = show
+        view.showScrollToBottomButton = show
         return view
     }
 
-    func contentInsets(top: CGFloat = 0, bottom: CGFloat = 0, left: CGFloat = 0, right: CGFloat = 0) -> ChatView {
+    func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
         var view = self
-        // NOTE: top and bottom are vice versa - because chat is an upside down UITableView
-        view.contentInsets = UIEdgeInsets(top: bottom, left: left, bottom: top, right: right)
+        view.showNetworkConnectionProblem = show
         return view
     }
 
@@ -93,6 +92,31 @@ public extension ChatView {
     func messageMenuAnimationDuration(_ duration: Double) -> ChatView {
         var view = self
         view.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
+        return view
+    }
+
+    func contentInsets(top: CGFloat = 0, bottom: CGFloat = 0, left: CGFloat = 0, right: CGFloat = 0) -> ChatView {
+        var view = self
+        if type == .conversation {
+            // NOTE: top and bottom are vice versa - because chat is an upside down UITableView
+            view.contentInsets = UIEdgeInsets(top: bottom, left: left, bottom: top, right: right)
+        } else {
+            view.contentInsets = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
+        }
+        return view
+    }
+
+    /// pass forced offset + receive scrolling offset updates
+    func currentContentOffset(_ binding: Binding<CGPoint?>) -> ChatView {
+        var view = self
+        view.externalContentOffset = binding.wrappedValue
+        view.onContentOffsetChange = { binding.wrappedValue = $0 }
+        return view
+    }
+
+    func updateTransaction(_ binding: Binding<TableUpdateTransaction?>) -> ChatView {
+        var view = self
+        view.onTransactionReady = { binding.wrappedValue = $0 }
         return view
     }
 
