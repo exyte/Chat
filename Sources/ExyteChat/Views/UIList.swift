@@ -272,8 +272,6 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         if !isScrollEnabled {
             tableContentHeight = tableView.contentSize.height
         }
-
-        print("update done")
     }
 
     // MARK: - Operations
