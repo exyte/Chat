@@ -503,7 +503,7 @@ struct InputView: View {
     
     @ViewBuilder
     var recordWaveform: some View {
-        if let samples = viewModel.attachments.recording?.waveformSamples {
+        if let recording = viewModel.attachments.recording {
             HStack(spacing: 8) {
                 Group {
                     if state == .hasRecording || state == .pausedRecording {
@@ -514,9 +514,9 @@ struct InputView: View {
                 }
                 .frame(width: 20)
                 
-                RecordWaveformPlaying(samples: samples, progress: recordingPlayer.progress, color: theme.colors.mainText, addExtraDots: true) { progress in
+                RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordingPlayer.progress, color: theme.colors.mainText, addExtraDots: true) { progress in
                     Task {
-                        await recordingPlayer.seek(with: viewModel.attachments.recording!, to: progress)
+                        await recordingPlayer.seek(with: recording, to: progress)
                     }
                 }
             }
