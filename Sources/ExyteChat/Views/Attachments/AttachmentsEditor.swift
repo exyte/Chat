@@ -135,6 +135,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 ) {
                     globalFocusState.focus = nil
                 }
+                .customFocus($globalFocusState.focus, equals: .uuid(UUID()))
             } else {
                 InputView(
                     viewModel: inputViewModel,

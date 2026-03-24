@@ -1,4 +1,5 @@
 {
+  "originHash" : "d3685ff8e7aeb7df5b3651de769910788682bfc88212e5cd9e890d4a83160ea1",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -14,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/AnchoredPopup.git",
       "state" : {
-        "revision" : "787f27027d3ef38c01469d228ce062ab4d5645f5",
-        "version" : "1.0.6"
+        "revision" : "dfcd04d7a265808333674a7ccf001838102a391e",
+        "version" : "1.1.0"
       }
     },
     {
@@ -37,5 +38,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

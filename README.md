@@ -303,13 +303,62 @@ By default the built-in MediaPicker will be auto-customized using the most logic
 `setMessageFont` - pass custom font to use for messages   
 
 ### makes sense only for built-in input view
-`setAvailableInput` - hide some buttons in default InputView. Available options are:    
-    - `.full` - media + text + audio   
-    - `.textAndMedia`   
-    - `.textAndAudio`   
-    - `.textOnly`    
+`setAvailableInputs` - configure which built-in controls are shown in the default `InputView`. Pass any combination of:    
+    - `.text`
+    - `.media`
+    - `.audio`
   
 <img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
+
+## Large Attachment Support
+
+The library provides full support for uploading multiple attachments larger than 100 MB and for reporting upload status on both the sender’s and receiver’s message views. It offers flexibility in how much progress tracking functionality the client implements, allowing developers to omit percentage-based updates if desired. Sending percentage updates to the receiver requires careful handling, as it involves multiple WebSocket calls to synchronize status between sender and receiver.
+
+*Option 1*
+
+No status is passed to an Attachment. This is the default behavior and shows no progress indicators. If the full attachment is uploaded to a resource server before the message is sent to the receiver, use this method, as it is the simplest and requires no progress tracking.
+
+```swift
+Attachment(
+  fullUploadStatus: Attachment.UploadStatus? = nil
+)
+```
+
+*Option 2*
+
+A progress indicator is displayed without a percentage. Most chat applications handle multiple large (100 MB+) files, which may take several minutes to upload. In these cases, Option 1 results in a poor user experience because the receiver has no indication that the files are being uploaded. Option 2 allows both the sender and receiver to see a generic progress indicator during the upload.
+
+```swift
+Attachment(
+  fullUploadStatus: Attachment.UploadStatus? = Attachment.UploadStatus.inProgress(nil)
+)
+```
+
+*Option 3*: 
+
+A progress indicator is displayed with a percentage. This option provides the best user experience, as it shows the progress of the upload. However, it adds implementation complexity: both the sender and receiver must remain synchronized through multiple WebSocket updates (e.g., 10%, 20%, …). For production-quality chat applications, implementing this option is recommended.
+
+```swift
+Attachment(
+  fullUploadStatus: Attachment.UploadStatus? = Attachment.UploadStatus.inProgress(0)
+)
+```
+
+When implementing status updates via Option 2/3 the following status updates need to be handled by the client:
+
+```swift
+// When the upload completes, send a final message to stop displaying the progress indicator.
+let completeUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.complete)
+sendToServer(initialProgress)
+
+// If the user cancels an attachment upload, report this to the receiver.
+let cancelUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.cancelled)
+sendToServer(cancelUpload)
+
+// If the upload to the resource server fails, send an error status to the receiver.
+let errorUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.error)
+sendToServer(errorUpload)
+```
 
 ## Localization
 
@@ -362,18 +411,16 @@ There are 2 example projects:
 - One has a simple bot posting random text/media messages every 2 seconds. It has no back end and no local storage. Every new start is clean and fresh.     
 - Another has an integration with Firestore data base. It has all the necessary back end support, including storing media and audio messages, unread messages counters, etc. You'll have to create your own Firestore app and DB. Also replace `GoogleService-Info` with your own. After that you can test on multiple sims/devices.    
 
-Create your firestore app
-https://console.firebase.google.com/
-Create firestore database (for light weight text data)
-https://firebase.google.com/docs/firestore/manage-data/add-data
-Create cloud firestore database (for images and voice recordings)
-https://firebase.google.com/docs/storage/web/start
+To set up the Firestore example:
+1. Create your Firebase app at https://console.firebase.google.com/
+2. Create a Firestore database (for lightweight text data) - see https://firebase.google.com/docs/firestore/manage-data/add-data
+3. Create a Cloud Storage bucket (for images and voice recordings) - see https://firebase.google.com/docs/storage/web/start
 
-## Examples
+## Running the Examples
 
 To try the Chat examples:
 - Clone the repo `https://github.com/exyte/Chat.git`
-- Open `ChatExample.xcodeproj` or `ChatFirestoreExample.xcodeproj` in the Xcode
+- Open `ChatExample.xcodeproj` or `ChatFirestoreExample.xcodeproj` in Xcode
 - Try it!
 
 ## Installation
@@ -407,4 +454,3 @@ dependencies: [
 [FlagAndCountryCode](https://github.com/exyte/FlagAndCountryCode) - Phone codes and flags for every country    
 [SVGView](https://github.com/exyte/SVGView) - SVG parser    
 [LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation
-

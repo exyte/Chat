@@ -223,6 +223,7 @@ private extension InputViewModel {
         Task { @MainActor in
             if let recordingPlayer {
                 recordPlayerSubscription = recordingPlayer.didPlayTillEnd
+                    .receive(on: DispatchQueue.main)
                     .sink { [weak self] in
                         self?.state = .hasRecording
                     }
