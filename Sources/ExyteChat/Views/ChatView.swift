@@ -93,6 +93,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     // MARK: - Customization for built-in input view
 
+    var externalInputText: String? // External → Internal
+    var onInputTextChange: ((String) -> Void)? // Internal → External
     var availableInputs: [AvailableInputType] = [.text, .audio, .media]
     var recorderSettings = RecorderSettings()
     var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
@@ -118,7 +120,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var cellFrames = [String: CGRect]()
 
     @State private var giphyConfigured = false
-    @State private var selectedMedia: GPHMedia? = nil
+    @State private var selectedGiphyMedia: GPHMedia? = nil
 
     public var body: some View {
         mainView
@@ -155,8 +157,16 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     }
                 }
             }
-            .onChange(of: selectedMedia) {
-                if let giphyMedia = selectedMedia {
+            .onChange(of: inputViewModel.text) { _ , newValue in
+                onInputTextChange?(newValue)
+            }
+            .onChange(of: externalInputText) {
+                DispatchQueue.main.async {
+                    inputViewModel.text = externalInputText ?? ""
+                }
+            }
+            .onChange(of: selectedGiphyMedia) {
+                if let giphyMedia = selectedGiphyMedia {
                     inputViewModel.attachments.giphyMedia = giphyMedia
                     inputViewModel.send()
                 }
@@ -165,7 +175,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 if giphyConfig.giphyKey != nil {
                     GiphyEditorView(
                         giphyConfig: giphyConfig,
-                        selectedMedia: $selectedMedia
+                        selectedMedia: $selectedGiphyMedia
                     )
                     .environmentObject(globalFocusState)
                 } else {

@@ -281,6 +281,7 @@ ChatView(messages: viewModel.messages) { draft in
 `messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`    
 
 ### makes sense only for built-in input view    
+`inputViewText` - binding to current text in the default input text field    
 `setAvailableInputs` - construct an array of these:    
     - `.text`    
     - `.media`    

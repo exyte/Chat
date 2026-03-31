@@ -12,6 +12,7 @@ struct ChatExampleView: View {
     @Environment(\.presentationMode) private var presentationMode
 
     @StateObject private var viewModel: ChatExampleViewModel
+    @State var text = ""
 
     private let title: String
     private let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
@@ -30,6 +31,7 @@ struct ChatExampleView: View {
                 viewModel.loadMoreMessage(before: message)
             }
         }
+        .inputViewText($text)
         .keyboardDismissMode(.interactive)
         .messageUseMarkdown(true)
         .setMediaPickerParameters(MediaPickerParameters(liveCameraCell: MediaPickerLiveCameraStyle.prominant))
@@ -61,37 +63,18 @@ struct ChatExampleView: View {
 
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
-                    if let url = viewModel.chatCover {
-                        CachedAsyncImage(url: url) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            default:
-                                Rectangle().fill(Color(hex: "AFB3B8"))
-                            }
-                        }
-                        .frame(width: 35, height: 35)
-                        .clipShape(Circle())
+                    Button("fwefe") {
+                        text = "rrrr"
                     }
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(viewModel.chatTitle)
-                            .fontWeight(.semibold)
-                            .font(.headline)
-                            .foregroundStyle(colorScheme == .dark ? .white : .black)
-                        Text(viewModel.chatStatus)
-                            .font(.footnote)
-                            .foregroundColor(Color(hex: "AFB3B8"))
-                    }
-                    Spacer()
                 }
                 .padding(.leading, 10)
             }
         }
         .onAppear(perform: viewModel.onStart)
         .onDisappear(perform: viewModel.onStop)
+        .onChange(of: text) { oldValue, newValue in
+            print(newValue)
+        }
     }
     
     // Swipe Action

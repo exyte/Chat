@@ -157,9 +157,7 @@ struct InputView: View {
             }
         }
     }
-    
-    
-    
+
     @ViewBuilder
     var middleView: some View {
         Group {

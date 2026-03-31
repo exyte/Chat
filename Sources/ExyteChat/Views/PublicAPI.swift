@@ -114,6 +114,7 @@ public extension ChatView {
         return view
     }
 
+    /// awaitable updates helper similar in usage to `tableView.performBatchUpdates`
     func updateTransaction(_ binding: Binding<TableUpdateTransaction?>) -> ChatView {
         var view = self
         view.onTransactionReady = { binding.wrappedValue = $0 }
@@ -230,6 +231,14 @@ public extension ChatView {
     }
 
     // MARK: - Built-in input view
+
+    /// binding to current text in the default input text field
+    public func inputViewText(_ binding: Binding<String>) -> ChatView {
+        var view = self
+        view.externalInputText = binding.wrappedValue
+        view.onInputTextChange = { binding.wrappedValue = $0 }
+        return view
+    }
 
     func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {
         var view = self
