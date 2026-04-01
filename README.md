@@ -233,7 +233,7 @@ await updateTransaction(animated: needToAnimate) {
     self.currentTableContentOffset = offset
 }
 ```
-`enableLoadMore(pageSize: Int, handler: @escaping ChatPaginationClosure)` - when user scrolls up to `pageSize`-th message, call the handler function, so user can load more messages  
+`enableLoadMore(offset: Int = 0, _ handler: @escaping ()->())` - when user scrolls up to `offset`-th message from the end, call the handler function, so user can load more messages  
 `localization` - can be localized in the Localizable.strings files    
 
 ### Reactions    

@@ -172,8 +172,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             return
         }
 
-        if let lastSection = sections.last {
-            coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1, section: sections.count - 1)
+        if let lastSection = sections.last, let paginationHandler {
+            coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1 - paginationHandler.offset, section: sections.count - 1)
         }
 
         let prevSections = coordinator.sections
@@ -689,10 +689,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                 return
             }
 
-            let row = self.sections[indexPath.section].rows[indexPath.row]
-            Task.detached {
-                await paginationHandler.handleClosure(row.message)
-            }
+            paginationHandler.handleClosure()
         }
 
         func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

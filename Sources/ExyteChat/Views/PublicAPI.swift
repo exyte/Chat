@@ -123,9 +123,9 @@ public extension ChatView {
 
     /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
     /// NOTE: doesn't work well with `isScrollEnabled` false
-    func enableLoadMore(pageSize: Int, _ handler: @escaping ChatPaginationClosure) -> ChatView {
+    func enableLoadMore(offset: Int = 0, _ handler: @escaping ()->()) -> ChatView {
         var view = self
-        view.paginationHandler = PaginationHandler(handleClosure: handler, pageSize: pageSize)
+        view.paginationHandler = PaginationHandler(offset: offset, handleClosure: handler)
         return view
     }
 

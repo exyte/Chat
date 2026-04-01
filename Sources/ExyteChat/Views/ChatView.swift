@@ -340,7 +340,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) { frames in
             DispatchQueue.main.async {
-                self.cellFrames = frames
+                if self.cellFrames != frames {
+                    self.cellFrames = frames
+                }
             }
         }
         .simultaneousGesture(

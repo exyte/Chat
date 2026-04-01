@@ -26,10 +26,8 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
-        .enableLoadMore(pageSize: 3) { message in
-            await MainActor.run {
-                viewModel.loadMoreMessage(before: message)
-            }
+        .enableLoadMore(offset: 1) {
+            viewModel.loadMoreMessages()
         }
         .inputViewText($text)
         .keyboardDismissMode(.interactive)

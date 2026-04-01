@@ -4,14 +4,14 @@
 
 import Foundation
 
-public typealias ChatPaginationClosure = @Sendable (Message) async -> Void
+struct PaginationHandler {
+    /// this mean that when (messages.count - 1 - offset)-th message is displayed handleClosure will be called
+    /// 0 means last message triggers handleClosure
+    let offset: Int
+    let handleClosure: ()->()
 
-final actor PaginationHandler: ObservableObject {
-    let handleClosure: ChatPaginationClosure
-    let pageSize: Int
-
-    init(handleClosure: @escaping ChatPaginationClosure, pageSize: Int) {
+    init(offset: Int = 0, handleClosure: @escaping ()->()) {
+        self.offset = offset
         self.handleClosure = handleClosure
-        self.pageSize = pageSize
     }
 }
