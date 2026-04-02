@@ -1,5 +1,5 @@
 {
-  "originHash" : "30d8a9708ef164f6438f7829243d5d315bdb83767254f043adbb127cadead5d6",
+  "originHash" : "30fbdde81d00bb752a8cc8bf058ad87e5945e5eb5681aabe5d0a7c0117a1681f",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/AnchoredPopup.git",
       "state" : {
-        "revision" : "dfcd04d7a265808333674a7ccf001838102a391e",
-        "version" : "1.1.0"
+        "revision" : "2fb9d1ac101b86cbcc12a3f8e571648ce4469d18",
+        "version" : "1.1.3"
       }
     },
     {
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
       "state" : {
-        "revision" : "c92b84898e34ab46ff0dad86c02a0acbe2d87008",
-        "version" : "8.8.0"
+        "revision" : "c152c1915f60c51e4afa0752656993ee5b3c63db",
+        "version" : "8.8.1"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "revision" : "fd71c0b560aa79eee1b87f73ce93fac5576a01df",
-        "version" : "3.2.4"
+        "revision" : "5c9a8df948602a9d61239b2dd8d5bbc9b38428d9",
+        "version" : "3.2.5"
       }
     }
   ],
