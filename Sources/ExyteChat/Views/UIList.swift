@@ -27,9 +27,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     // MARK: - View builders
 
-    var messageBuilder: MessageBuilderParamsClosure
-    var mainHeaderBuilder: (()->AnyView)?
-    var headerBuilder: ((Date)->AnyView)?
+    let messageBuilder: MessageBuilderParamsClosure
+    let mainHeaderBuilder: (()->AnyView)?
+    let headerBuilder: ((Date)->AnyView)?
 
     // MARK: - Data / type
 
@@ -39,27 +39,11 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     // MARK: - Customization
 
-    let showDateHeaders: Bool
-    let isScrollEnabled: Bool
-    let keyboardDismissMode: UIScrollView.KeyboardDismissMode
-    let showMessageMenuOnLongPress: Bool
-    let contentInsets: UIEdgeInsets
-    let externalContentOffset: CGPoint?
-    let onContentOffsetChange: ((CGPoint) -> Void)?
-    let onTransactionReady: ((TableUpdateTransaction) -> Void)?
-    let paginationHandler: PaginationHandler?
-    let listSwipeActions: ListSwipeActions
-
-    // MARK: - Built-in message view
-
-    let avatarSize: CGFloat
-    let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let showMessageTimeView: Bool
+    let chatParams: ChatCustomizationParameters
+    let messageParams: MessageCustomizationParameters
     let timeViewWidth: CGFloat
-    let shouldShowPreviewForLink: (URL) -> Bool
-    let messageLinkPreviewLimit: Int
-    let messageFont: UIFont
-    let messageStyler: (String) -> AttributedString
+
+    // MARK: - State
 
     @State private var isScrolledToTop = false
     @State private var updateQueue = UpdateQueue()
@@ -68,7 +52,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     @State private var cancellables = Set<AnyCancellable>()
 
     func makeUIView(context: Context) -> UITableView {
-        let style = mainHeaderBuilder != nil || showDateHeaders ? UITableView.Style.grouped : .plain
+        let style = mainHeaderBuilder != nil || chatParams.showDateHeaders ? UITableView.Style.grouped : .plain
         let tableView = UITableView(frame: .zero, style: style)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
@@ -85,8 +69,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.sectionFooterHeight = 0
         tableView.backgroundColor = UIColor(theme.colors.mainBG)
         tableView.scrollsToTop = false
-        tableView.isScrollEnabled = isScrollEnabled
-        tableView.keyboardDismissMode = keyboardDismissMode
+        tableView.isScrollEnabled = chatParams.isScrollEnabled
+        tableView.keyboardDismissMode = chatParams.keyboardDismissMode
         tableView.tableHeaderView = nil
         tableView.tableFooterView = UIView(frame: .zero)
 
@@ -106,23 +90,23 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         transaction.updateQueue = updateQueue
-        onTransactionReady?(transaction)
+        chatParams.onTransactionReady?(transaction)
 
         return tableView
     }
 
     func updateUIView(_ tableView: UITableView, context: Context) {
-        if !isScrollEnabled {
+        if !chatParams.isScrollEnabled {
             DispatchQueue.main.async {
                 tableContentHeight = tableView.contentSize.height
             }
         }
 
-        if tableView.contentInset != contentInsets {
-            tableView.contentInset = contentInsets
+        if tableView.contentInset != chatParams.contentInsets {
+            tableView.contentInset = chatParams.contentInsets
         }
 
-        if context.coordinator.sections != sections || tableView.contentOffset != externalContentOffset {
+        if context.coordinator.sections != sections || tableView.contentOffset != chatParams.externalContentOffset {
             updateQueue.didPerformRealUpdate = true
         }
 
@@ -133,7 +117,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     await updateIfNeeded(coordinator: context.coordinator, tableView: tableView)
                 }
                 //print("iii sections done")
-            } else if let offset = externalContentOffset, tableView.contentOffset != offset {
+            } else if let offset = chatParams.externalContentOffset, tableView.contentOffset != offset {
                 //print("iii offset", offset)
                 await updateQueue.enqueue() {
                     await withCheckedContinuation { continuation in
@@ -166,7 +150,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                 tableView.layoutIfNeeded()
             }
 
-            if !isScrollEnabled {
+            if !chatParams.isScrollEnabled {
                 DispatchQueue.main.async {
                     tableContentHeight = tableView.contentSize.height
                 }
@@ -175,7 +159,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             return
         }
 
-        if let lastSection = sections.last, let paginationHandler {
+        if let lastSection = sections.last, let paginationHandler = chatParams.paginationHandler {
             coordinator.paginationTargetIndexPath = IndexPath(row: lastSection.rows.count - 1 - paginationHandler.offset, section: sections.count - 1)
         }
 
@@ -254,7 +238,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         updateContextClosure(sections)
 
         //print(externalContentOffset, sections.last?.rows.first?.id)
-        if let newOffset = externalContentOffset {
+        if let newOffset = chatParams.externalContentOffset {
             if !transaction.animated {
                 UIView.setAnimationsEnabled(false)
             }
@@ -272,7 +256,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
         //print("4 finished inserts", runID)
 
-        if !isScrollEnabled {
+        if !chatParams.isScrollEnabled {
             tableContentHeight = tableView.contentSize.height
         }
     }
@@ -442,21 +426,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             sections: sections,
             ids: ids,
 
-            showDateHeaders: showDateHeaders,
-            keyboardDismissMode: keyboardDismissMode,
-            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-            onContentOffsetChange: onContentOffsetChange,
-            paginationHandler: paginationHandler,
-            listSwipeActions: listSwipeActions,
-
-            avatarSize: avatarSize,
-            tapAvatarClosure: tapAvatarClosure,
-            showMessageTimeView: showMessageTimeView,
+            chatParams: chatParams,
+            messageParams: messageParams,
             timeViewWidth: timeViewWidth,
-            shouldShowPreviewForLink: shouldShowPreviewForLink,
-            messageLinkPreviewLimit: messageLinkPreviewLimit,
-            messageFont: messageFont,
-            messageStyler: messageStyler,
 
             mainBackgroundColor: theme.colors.mainBG
         )
@@ -490,23 +462,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         // MARK: - Customization
 
-        let showDateHeaders: Bool
-        let keyboardDismissMode: UIScrollView.KeyboardDismissMode
-        let showMessageMenuOnLongPress: Bool
-        let onContentOffsetChange: ((CGPoint) -> Void)?
-        let paginationHandler: PaginationHandler?
-        let listSwipeActions: ListSwipeActions
-
-        // MARK: - Built-in message view
-
-        let avatarSize: CGFloat
-        let tapAvatarClosure: ChatView.TapAvatarClosure?
+        let chatParams: ChatCustomizationParameters
+        let messageParams: MessageCustomizationParameters
         let timeViewWidth: CGFloat
-        let showMessageTimeView: Bool
-        let shouldShowPreviewForLink: (URL) -> Bool
-        let messageLinkPreviewLimit: Int
-        let messageFont: UIFont
-        let messageStyler: (String) -> AttributedString
 
         let mainBackgroundColor: Color
 
@@ -530,21 +488,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             sections: [MessagesSection],
             ids: [String],
 
-            showDateHeaders: Bool,
-            keyboardDismissMode: UIScrollView.KeyboardDismissMode,
-            showMessageMenuOnLongPress: Bool,
-            onContentOffsetChange: ((CGPoint) -> Void)?,
-            paginationHandler: PaginationHandler?,
-            listSwipeActions: ListSwipeActions,
-
-            avatarSize: CGFloat,
-            tapAvatarClosure: ChatView.TapAvatarClosure?,
-            showMessageTimeView: Bool,
+            chatParams: ChatCustomizationParameters,
+            messageParams: MessageCustomizationParameters,
             timeViewWidth: CGFloat,
-            shouldShowPreviewForLink: @escaping (URL) -> Bool,
-            messageLinkPreviewLimit: Int,
-            messageFont: UIFont,
-            messageStyler: @escaping (String) -> AttributedString,
 
             mainBackgroundColor: Color
         ) {
@@ -561,21 +507,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             self.sections = sections
             self.ids = ids
 
-            self.showDateHeaders = showDateHeaders
-            self.keyboardDismissMode = keyboardDismissMode
-            self.showMessageMenuOnLongPress = showMessageMenuOnLongPress
-            self.onContentOffsetChange = onContentOffsetChange
-            self.paginationHandler = paginationHandler
-            self.listSwipeActions = listSwipeActions
-
-            self.avatarSize = avatarSize
-            self.tapAvatarClosure = tapAvatarClosure
-            self.showMessageTimeView = showMessageTimeView
+            self.chatParams = chatParams
+            self.messageParams = messageParams
             self.timeViewWidth = timeViewWidth
-            self.shouldShowPreviewForLink = shouldShowPreviewForLink
-            self.messageLinkPreviewLimit = messageLinkPreviewLimit
-            self.messageFont = messageFont
-            self.messageStyler = messageStyler
 
             self.mainBackgroundColor = mainBackgroundColor
         }
@@ -603,21 +537,21 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-            if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
+            if !chatParams.showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
                 return 0
             }
             return type == .conversation ? 0.1 : UITableView.automaticDimension
         }
 
         func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-            if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
+            if !chatParams.showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
                 return 0
             }
             return type == .conversation ? UITableView.automaticDimension : 0.1
         }
 
         func sectionHeaderView(_ section: Int) -> UIView? {
-            if !showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
+            if !chatParams.showDateHeaders && (section != 0 || mainHeaderBuilder == nil) {
                 return nil
             }
 
@@ -643,7 +577,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         @ViewBuilder
         func dateViewBuilder(_ section: Int) -> some View {
-            if showDateHeaders {
+            if chatParams.showDateHeaders {
                 if let headerBuilder {
                     headerBuilder(sections[section].date)
                 } else {
@@ -668,20 +602,14 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     messageBuilder: messageBuilder,
                     row: row,
                     chatType: type,
-                    avatarSize: avatarSize,
-                    tapAvatarClosure: tapAvatarClosure,
-                    showMessageTimeView: showMessageTimeView,
+                    messageParams: messageParams,
                     timeViewWidth: timeViewWidth,
-                    shouldShowPreviewForLink: shouldShowPreviewForLink,
-                    messageLinkPreviewLimit: messageLinkPreviewLimit,
-                    messageFont: messageFont,
-                    messageStyler: messageStyler,
                     isDisplayingMessageMenu: false
                 )
                 .transition(.scale)
                 .background(MessageMenuPreferenceViewSetter(id: row.id))
                 .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
-                .applyIf(showMessageMenuOnLongPress) {
+                .applyIf(chatParams.showMessageMenuOnLongPress) {
                     $0.simultaneousGesture(
                         TapGesture().onEnded { } // add empty tap to prevent iOS17 scroll breaking bug (drag on cells stops working)
                     )
@@ -700,7 +628,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-            guard let paginationHandler = self.paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
+            guard let paginationHandler = chatParams.paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
                 return
             }
 
@@ -708,7 +636,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-            guard let items = type == .conversation ? listSwipeActions.trailing : listSwipeActions.leading else { return nil }
+            guard let items = type == .conversation ? chatParams.listSwipeActions.trailing : chatParams.listSwipeActions.leading else { return nil }
             guard !items.actions.isEmpty else { return nil }
             let message = sections[indexPath.section].rows[indexPath.row].message
             let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
@@ -717,7 +645,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-            guard let items = type == .conversation ? listSwipeActions.leading : listSwipeActions.trailing else { return nil }
+            guard let items = type == .conversation ? chatParams.listSwipeActions.leading : chatParams.listSwipeActions.trailing else { return nil }
             guard !items.actions.isEmpty else { return nil }
             let message = sections[indexPath.section].rows[indexPath.row].message
             let conf = UISwipeActionsConfiguration(actions: items.actions.filter({ $0.activeFor(message) }).map { toContextualAction($0, message: message) })
@@ -739,8 +667,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            //print(scrollView.contentOffset, scrollView.contentSize.height)
-            onContentOffsetChange?(scrollView.contentOffset)
+            chatParams.onContentOffsetChange?(scrollView.contentOffset)
             isScrolledToBottom = scrollView.contentOffset.y <= 0
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
         }

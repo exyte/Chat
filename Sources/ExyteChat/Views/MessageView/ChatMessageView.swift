@@ -17,14 +17,8 @@ struct ChatMessageView<MessageContent: View>: View {
 
     let row: MessageRow
     let chatType: ChatType
-    let avatarSize: CGFloat
-    let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let showMessageTimeView: Bool
+    let messageParams: MessageCustomizationParameters
     let timeViewWidth: CGFloat
-    let shouldShowPreviewForLink: (URL) -> Bool
-    let messageLinkPreviewLimit: Int
-    let messageFont: UIFont
-    let messageStyler: (String) -> AttributedString
     let isDisplayingMessageMenu: Bool
 
     @State var timeViewSize: CGSize?
@@ -51,14 +45,8 @@ struct ChatMessageView<MessageContent: View>: View {
                     positionInUserGroup: row.positionInUserGroup,
                     positionInMessagesSection: row.positionInMessagesSection,
                     chatType: chatType,
-                    avatarSize: avatarSize,
-                    tapAvatarClosure: tapAvatarClosure,
-                    showMessageTimeView: showMessageTimeView,
+                    params: messageParams,
                     timeViewWidth: timeViewWidth,
-                    shouldShowPreviewForLink: shouldShowPreviewForLink,
-                    messageLinkPreviewLimit: messageLinkPreviewLimit,
-                    messageFont: messageFont,
-                    messageStyler: messageStyler,
                     isDisplayingMessageMenu: isDisplayingMessageMenu
                 )
             } else {

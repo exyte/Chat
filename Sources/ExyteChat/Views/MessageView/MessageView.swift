@@ -17,14 +17,8 @@ struct MessageView: View {
     let positionInUserGroup: PositionInUserGroup
     let positionInMessagesSection: PositionInMessagesSection
     let chatType: ChatType
-    let avatarSize: CGFloat
-    let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let showMessageTimeView: Bool
+    let params: MessageCustomizationParameters
     let timeViewWidth: CGFloat
-    let shouldShowPreviewForLink: (URL) -> Bool
-    let messageLinkPreviewLimit: Int
-    let messageFont: UIFont
-    let messageStyler: (String) -> AttributedString
     let isDisplayingMessageMenu: Bool
 
     @State var giphyAspectRatio: CGFloat = 1
@@ -57,7 +51,7 @@ struct MessageView: View {
         let widthWithoutMedia =
             UIScreen.main.bounds.width
             - (message.user.isCurrentUser
-               ? MessageView.horizontalNoAvatarPadding : avatarSize)
+               ? MessageView.horizontalNoAvatarPadding : params.avatarSize)
             - MessageView.statusViewWidth
             - MessageView.horizontalBubblePadding
             - textPaddings
@@ -65,13 +59,13 @@ struct MessageView: View {
         let maxWidth =
             message.attachments.isEmpty
             ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
-        let styledText = message.text.styled(using: messageStyler)
+        let styledText = message.text.styled(using: params.styler)
 
-        let finalWidth = styledText.width(withConstrainedWidth: maxWidth, font: messageFont)
-        let lastLineWidth = styledText.lastLineWidth(labelWidth: maxWidth, font: messageFont)
-        let numberOfLines = styledText.numberOfLines(labelWidth: maxWidth, font: messageFont)
+        let finalWidth = styledText.width(withConstrainedWidth: maxWidth, font: params.font)
+        let lastLineWidth = styledText.lastLineWidth(labelWidth: maxWidth, font: params.font)
+        let numberOfLines = styledText.numberOfLines(labelWidth: maxWidth, font: params.font)
 
-        if !styledText.urls.isEmpty && messageLinkPreviewLimit > 0 {
+        if !styledText.urls.isEmpty && params.linkPreviewLimit > 0 {
             return .vstack
         }
         if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
@@ -162,7 +156,7 @@ struct MessageView: View {
 
                 if !message.text.isEmpty {
                     textWithTimeView(message)
-                        .font(Font(messageFont))
+                        .font(Font(params.font))
                 }
 
                 if let recording = message.recording {
@@ -198,10 +192,10 @@ struct MessageView: View {
             if !message.text.isEmpty {
                 MessageTextView(
                     text: message.text,
-                    messageStyler: messageStyler,
+                    messageStyler: params.styler,
                     userType: message.user.type,
-                    shouldShowPreviewForLink: shouldShowPreviewForLink,
-                    messageLinkPreviewLimit: messageLinkPreviewLimit
+                    shouldShowPreviewForLink: params.shouldShowPreviewForLink,
+                    messageLinkPreviewLimit: params.linkPreviewLimit
                 )
                 .padding(.horizontal, MessageView.horizontalTextPadding)
             }
@@ -224,20 +218,20 @@ struct MessageView: View {
         Group {
             if showAvatar {
                 if let url = message.user.avatarURL {
-                    AvatarImageView(url: url, avatarSize: avatarSize, avatarCacheKey: message.user.avatarCacheKey)
+                    AvatarImageView(url: url, avatarSize: params.avatarSize, avatarCacheKey: message.user.avatarCacheKey)
                         .contentShape(Circle())
                         .onTapGesture {
-                            tapAvatarClosure?(message.user, message.id)
+                            params.tapAvatarClosure?(message.user, message.id)
                         }
                 } else {
-                    AvatarNameView(name: message.user.name, avatarSize: avatarSize)
+                    AvatarNameView(name: message.user.name, avatarSize: params.avatarSize)
                         .contentShape(Circle())
                         .onTapGesture {
-                            tapAvatarClosure?(message.user, message.id)
+                            params.tapAvatarClosure?(message.user, message.id)
                         }
                 }
             } else {
-                Color.clear.viewSize(avatarSize)
+                Color.clear.viewSize(params.avatarSize)
             }
         }
         .padding(.leading, MessageView.horizontalScreenEdgePadding)
@@ -282,10 +276,10 @@ struct MessageView: View {
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(
             text: message.text,
-            messageStyler: messageStyler,
+            messageStyler: params.styler,
             userType: message.user.type,
-            shouldShowPreviewForLink: shouldShowPreviewForLink,
-            messageLinkPreviewLimit: messageLinkPreviewLimit
+            shouldShowPreviewForLink: params.shouldShowPreviewForLink,
+            messageLinkPreviewLimit: params.linkPreviewLimit
         )
         .applyIf(!message.attachments.isEmpty) {
             $0.frame(maxWidth: .infinity, alignment: .leading)
@@ -340,7 +334,7 @@ struct MessageView: View {
 
     @ViewBuilder
     func messageTimeView(needsCapsule: Bool = false) -> some View {
-        if showMessageTimeView {
+        if params.showTimeView {
             if needsCapsule {
                 MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser)
             } else {
@@ -357,8 +351,7 @@ extension View {
     {
         let radius: CGFloat = !message.attachments.isEmpty ? 12 : 20
         let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
-        self
-            .frame(
+        self.frame(
                 width: message.attachments.isEmpty
                     ? nil : MessageView.widthWithMedia + additionalMediaInset
             )

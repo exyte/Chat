@@ -23,7 +23,7 @@ extension MessageView {
             }
             
             ForEach(Array(preparedReactions.reactions.enumerated()), id: \.element) { index, reaction in
-                ReactionBubble(reaction: reaction, font: Font(messageFont))
+                ReactionBubble(reaction: reaction, font: Font(params.font))
                     .transition(.scaleAndFade)
                     .zIndex(message.user.isCurrentUser ? Double(preparedReactions.reactions.count - index) : Double(index + 1))
                     .sizeGetter($bubbleSize)

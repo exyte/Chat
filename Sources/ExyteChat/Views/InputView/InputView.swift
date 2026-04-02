@@ -81,10 +81,10 @@ struct InputView: View {
     var inputFieldId: UUID
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]
-    var messageStyler: (String) -> AttributedString
     var recorderSettings: RecorderSettings = RecorderSettings()
     var localization: ChatLocalization
-    
+    var messageStyler: (String) -> AttributedString
+
     @StateObject var recordingPlayer = RecordingPlayer()
     
     private var onAction: (InputViewAction) -> Void {

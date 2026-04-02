@@ -23,12 +23,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     @ObservedObject var inputViewModel: InputViewModel
 
     var inputViewBuilder: InputViewBuilderParamsClosure
-    var messageStyler: (String) -> AttributedString
-    var orientationHandler: MediaPickerOrientationHandler
-    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
-    var mediaPickerParameters: MediaPickerParameters?
+    var mediaPickerParameters: MediaPickerParameters
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
+    var messageStyler: (String) -> AttributedString
 
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -80,10 +78,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.showPicker = false
             }
             .currentFullscreenMedia($currentFullscreenMedia)
-            .setSelectionParameters(mediaPickerSelectionParameters)
-            .setMediaPickerParameters(mediaPickerParameters)
             .pickerMode($inputViewModel.mediaPickerMode)
-            .orientationHandler(orientationHandler)
+            .setMediaPickerParameters(mediaPickerParameters)
             .padding(.top)
             .background(theme.colors.mainBG)
             .ignoresSafeArea(.all)
@@ -91,8 +87,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 assembleSelectedMedia()
             }
             .onChange(of: inputViewModel.showPicker) {
-                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
-                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
+                let showFullscreenPreview = mediaPickerParameters.selectionParameters.showFullscreenPreview
+                let selectionLimit = mediaPickerParameters.selectionParameters.selectionLimit ?? 1
 
                 if selectionLimit == 1 && !showFullscreenPreview {
                     assembleSelectedMedia()
@@ -144,8 +140,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputFieldId: UUID(),
                 style: .signature,
                 availableInputs: availableInputs,
-                messageStyler: messageStyler,
-                localization: localization
+                localization: localization,
+                messageStyler: messageStyler
             )
         } else {
             customInputView

@@ -10,8 +10,7 @@ import GiphyUISDK
 import ExyteMediaPicker
 
 public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
-public typealias MediaPickerSelectionParameters = SelectionParamsHolder
-public typealias MediaPickerParameters = MediaPickerParamsHolder
+public typealias MediaPickerSelectionParameters = SelectionParameters
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -62,44 +61,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     // MARK: - Customization
 
-    var isListAboveInputView: Bool = true
-    var showScrollToBottomButton: Bool = true
-    var showNetworkConnectionProblem: Bool = false
-    var showDateHeaders: Bool = true
-    var isScrollEnabled: Bool = true
-    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
-    var showMessageMenuOnLongPress: Bool = true
-    var messageMenuAnimationDuration: CGFloat = 0.3
-
-    var contentInsets: UIEdgeInsets = .zero
-    var externalContentOffset: CGPoint? // External → Internal
-    var onContentOffsetChange: ((CGPoint) -> Void)? // Internal → External
-    var onTransactionReady: ((TableUpdateTransaction) -> Void)?
-
-    var paginationHandler: PaginationHandler?
-    var localization = ChatLocalization.defaultLocalization // these can be localized in the Localizable.strings files
-    var reactionDelegate: ReactionDelegate?
-    var listSwipeActions = ListSwipeActions()
-
-    // MARK: - Customization for built-in message view
-
-    var avatarSize: CGFloat = 32
-    var tapAvatarClosure: TapAvatarClosure?
-    var showMessageTimeView = true
-    var messageLinkPreviewLimit = 8
-    var shouldShowPreviewForLink: (URL) -> Bool = { _ in true }
-    var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
-    var messageStyler: (String) -> AttributedString = AttributedString.init
-
-    // MARK: - Customization for built-in input view
-
-    var externalInputText: String? // External → Internal
-    var onInputTextChange: ((String) -> Void)? // Internal → External
-    var availableInputs: [AvailableInputType] = [.text, .audio, .media]
-    var recorderSettings = RecorderSettings()
-    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
-    var mediaPickerParameters: MediaPickerParameters?
-    var orientationHandler: MediaPickerOrientationHandler = {_ in}
+    var chatCustomizationParameters = ChatCustomizationParameters()
+    var messageCustomizationParameters = MessageCustomizationParameters()
+    var inputViewCustomizationParameters = InputViewCustomizationParameters()
 
     // MARK: - State
 
@@ -159,11 +123,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 }
             }
             .onChange(of: inputViewModel.text) { _ , newValue in
-                onInputTextChange?(newValue)
+                inputViewCustomizationParameters.onInputTextChange?(newValue)
             }
-            .onChange(of: externalInputText) {
+            .onChange(of: inputViewCustomizationParameters.externalInputText) {
                 DispatchQueue.main.async {
-                    inputViewModel.text = externalInputText ?? ""
+                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
                 }
             }
             .onChange(of: selectedGiphyMedia) {
@@ -187,12 +151,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 AttachmentsEditor(
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
-                    messageStyler: messageStyler,
-                    orientationHandler: orientationHandler,
-                    mediaPickerSelectionParameters: mediaPickerSelectionParameters,
-                    mediaPickerParameters: mediaPickerParameters,
-                    availableInputs: availableInputs,
-                    localization: localization
+                    mediaPickerParameters: inputViewCustomizationParameters.mediaPickerParameters,
+                    availableInputs: inputViewCustomizationParameters.availableInputs,
+                    localization: chatCustomizationParameters.localization,
+                    messageStyler: messageCustomizationParameters.styler
                 )
                 .environmentObject(globalFocusState)
                 .environmentObject(keyboardState)
@@ -220,11 +182,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     var mainView: some View {
         VStack(spacing: 0) {
-            if showNetworkConnectionProblem, !networkMonitor.isConnected {
+            if chatCustomizationParameters.showNetworkConnectionProblem, !networkMonitor.isConnected {
                 waitingForNetwork
             }
             
-            if isListAboveInputView {
+            if chatCustomizationParameters.isListAboveInputView {
                 listWithButton
                 if let builder = betweenListAndInputViewBuilder {
                     builder()
@@ -250,7 +212,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             HStack {
                 Spacer()
                 Image("waiting", bundle: .current)
-                Text(localization.waitingForNetwork)
+                Text(chatCustomizationParameters.localization.waitingForNetwork)
                 Spacer()
             }
             .padding(.top, 6)
@@ -268,7 +230,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ZStack(alignment: .bottomTrailing) {
                 list
 
-                if showScrollToBottomButton, !isScrolledToBottom {
+                if chatCustomizationParameters.showScrollToBottomButton, !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                     } label: {
@@ -314,30 +276,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
             // MARK: - Customization
 
-            showDateHeaders: showDateHeaders,
-            isScrollEnabled: isScrollEnabled,
-            keyboardDismissMode: keyboardDismissMode,
-            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-            contentInsets: contentInsets,
-            externalContentOffset: externalContentOffset,
-            onContentOffsetChange: onContentOffsetChange,
-            onTransactionReady: onTransactionReady,
-            paginationHandler: paginationHandler,
-            listSwipeActions: listSwipeActions,
-
-            // MARK: - Built-in message view
-
-            avatarSize: avatarSize,
-            tapAvatarClosure: tapAvatarClosure,
-            showMessageTimeView: showMessageTimeView,
-            timeViewWidth: timeViewSize.width,
-            shouldShowPreviewForLink: shouldShowPreviewForLink,
-            messageLinkPreviewLimit: messageLinkPreviewLimit,
-            messageFont: messageFont,
-            messageStyler: messageStyler
+            chatParams: chatCustomizationParameters,
+            messageParams: messageCustomizationParameters,
+            timeViewWidth: timeViewSize.width
         )
 
-        .applyIf(!isScrollEnabled) {
+        .applyIf(!chatCustomizationParameters.isScrollEnabled) {
             $0.frame(height: tableContentHeight)
         }
         .onStatusBarTap {
@@ -401,10 +345,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     viewModel: inputViewModel,
                     inputFieldId: viewModel.inputFieldId,
                     style: .message,
-                    availableInputs: availableInputs,
-                    messageStyler: messageStyler,
-                    recorderSettings: recorderSettings,
-                    localization: localization
+                    availableInputs: inputViewCustomizationParameters.availableInputs,
+                    recorderSettings: inputViewCustomizationParameters.recorderSettings,
+                    localization: chatCustomizationParameters.localization,
+                    messageStyler: messageCustomizationParameters.styler
                 )
             } else {
                 customInputView
@@ -427,13 +371,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             cellFrame: cellFrame,
             alignment: menuAlignment(row.message, chatType: type),
             positionInUserGroup: row.positionInUserGroup,
-            leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
+            leadingPadding: messageCustomizationParameters.avatarSize + MessageView.horizontalAvatarPadding * 2,
             trailingPadding: MessageView.statusViewWidth + MessageView.horizontalStatusPadding,
-            font: messageFont,
-            animationDuration: messageMenuAnimationDuration,
+            font: messageCustomizationParameters.font,
+            animationDuration: chatCustomizationParameters.messageMenuAnimationDuration,
             onAction: menuActionClosure(row.message),
             reactionHandler: MessageMenu.ReactionConfig(
-                delegate: reactionDelegate,
+                delegate: chatCustomizationParameters.reactionDelegate,
                 didReact: reactionClosure(row.message)
             )
         ) {
@@ -442,14 +386,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 messageBuilder: messageBuilder,
                 row: row,
                 chatType: type,
-                avatarSize: avatarSize,
-                tapAvatarClosure: nil,
-                showMessageTimeView: showMessageTimeView,
+                messageParams: messageCustomizationParameters,
                 timeViewWidth: timeViewSize.width,
-                shouldShowPreviewForLink: shouldShowPreviewForLink,
-                messageLinkPreviewLimit: messageLinkPreviewLimit,
-                messageFont: messageFont,
-                messageStyler: messageStyler,
                 isDisplayingMessageMenu: true
             )
             .onTapGesture {
@@ -470,16 +408,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     /// Our default reactionCallback flow if the user supports Reactions by implementing the didReactToMessage closure
     private func reactionClosure(_ message: Message) -> (ReactionType?) -> () {
-        return { reactionType in
-            Task {
-                // Run the callback on the main thread
-                await MainActor.run {
-                    // Hide the menu
-                    hideMessageMenu()
-                    // Send the draft reaction
-                    guard let reactionDelegate, let reactionType else { return }
-                    reactionDelegate.didReact(to: message, reaction: DraftReaction(messageID: message.id, type: reactionType))
-                }
+        { reactionType in
+            Task { @MainActor in
+                // Hide the menu
+                hideMessageMenu()
+                // Send the draft reaction
+                guard let reactionDelegate = chatCustomizationParameters.reactionDelegate, let reactionType else { return }
+                reactionDelegate.didReact(to: message, reaction: DraftReaction(messageID: message.id, type: reactionType))
             }
         }
     }
@@ -535,7 +470,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     private func isGiphyAvailable() -> Bool {
-        availableInputs.contains(AvailableInputType.giphy)
+        inputViewCustomizationParameters.availableInputs.contains(AvailableInputType.giphy)
     }
 }
 

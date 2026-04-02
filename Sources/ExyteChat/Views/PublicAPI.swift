@@ -41,31 +41,37 @@ public extension ChatView {
 
     func isListAboveInputView(_ isAbove: Bool) -> ChatView {
         var view = self
-        view.isListAboveInputView = isAbove
+        view.chatCustomizationParameters.isListAboveInputView = isAbove
         return view
     }
 
     func showScrollToBottomButton(_ show: Bool) -> ChatView {
         var view = self
-        view.showScrollToBottomButton = show
+        view.chatCustomizationParameters.showScrollToBottomButton = show
         return view
     }
 
     func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
         var view = self
-        view.showNetworkConnectionProblem = show
+        view.chatCustomizationParameters.showNetworkConnectionProblem = show
         return view
     }
 
     func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
         var view = self
-        view.showDateHeaders = showDateHeaders
+        view.chatCustomizationParameters.showDateHeaders = showDateHeaders
         return view
     }
 
     func isScrollEnabled(_ isScrollEnabled: Bool) -> ChatView {
         var view = self
-        view.isScrollEnabled = isScrollEnabled
+        view.chatCustomizationParameters.isScrollEnabled = isScrollEnabled
+        return view
+    }
+
+    func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.showMessageMenuOnLongPress = show
         return view
     }
 
@@ -74,13 +80,7 @@ public extension ChatView {
     /// - Default is .none
     func keyboardDismissMode(_ mode: UIScrollView.KeyboardDismissMode) -> ChatView {
         var view = self
-        view.keyboardDismissMode = mode
-        return view
-    }
-
-    func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
-        var view = self
-        view.showMessageMenuOnLongPress = show
+        view.chatCustomizationParameters.keyboardDismissMode = mode
         return view
     }
 
@@ -91,7 +91,7 @@ public extension ChatView {
     /// - Important: This value is clamped between 0.1 and 1.0
     func messageMenuAnimationDuration(_ duration: Double) -> ChatView {
         var view = self
-        view.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
+        view.chatCustomizationParameters.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
         return view
     }
 
@@ -99,9 +99,9 @@ public extension ChatView {
         var view = self
         if type == .conversation {
             // NOTE: top and bottom are vice versa - because chat is an upside down UITableView
-            view.contentInsets = UIEdgeInsets(top: bottom, left: left, bottom: top, right: right)
+            view.chatCustomizationParameters.contentInsets = UIEdgeInsets(top: bottom, left: left, bottom: top, right: right)
         } else {
-            view.contentInsets = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
+            view.chatCustomizationParameters.contentInsets = UIEdgeInsets(top: top, left: left, bottom: bottom, right: right)
         }
         return view
     }
@@ -109,15 +109,15 @@ public extension ChatView {
     /// pass forced offset + receive scrolling offset updates
     func currentContentOffset(_ binding: Binding<CGPoint?>) -> ChatView {
         var view = self
-        view.externalContentOffset = binding.wrappedValue
-        view.onContentOffsetChange = { binding.wrappedValue = $0 }
+        view.chatCustomizationParameters.externalContentOffset = binding.wrappedValue
+        view.chatCustomizationParameters.onContentOffsetChange = { binding.wrappedValue = $0 }
         return view
     }
 
     /// awaitable updates helper similar in usage to `tableView.performBatchUpdates`
     func updateTransaction(_ binding: Binding<TableUpdateTransaction?>) -> ChatView {
         var view = self
-        view.onTransactionReady = { binding.wrappedValue = $0 }
+        view.chatCustomizationParameters.onTransactionReady = { binding.wrappedValue = $0 }
         return view
     }
 
@@ -125,20 +125,20 @@ public extension ChatView {
     /// NOTE: doesn't work well with `isScrollEnabled` false
     func enableLoadMore(offset: Int = 0, _ handler: @escaping ()->()) -> ChatView {
         var view = self
-        view.paginationHandler = PaginationHandler(offset: offset, handleClosure: handler)
+        view.chatCustomizationParameters.paginationHandler = PaginationHandler(offset: offset, handleClosure: handler)
         return view
     }
 
     func localization(_ localization: ChatLocalization) -> ChatView {
         var view = self
-        view.localization = localization
+        view.chatCustomizationParameters.localization = localization
         return view
     }
 
     /// Sets a delegate for handling and configuring message reactions
     func messageReactionDelegate(_ reactionDelegate: ReactionDelegate) -> ChatView {
         var view = self
-        view.reactionDelegate = reactionDelegate
+        view.chatCustomizationParameters.reactionDelegate = reactionDelegate
         return view
     }
 
@@ -151,7 +151,7 @@ public extension ChatView {
         shouldShowOverviewFor: ((Message) -> Bool)? = nil
     ) -> ChatView {
         var view = self
-        view.reactionDelegate = DefaultReactionConfiguration(
+        view.chatCustomizationParameters.reactionDelegate = DefaultReactionConfiguration(
             didReact: didReactTo,
             canReact: canReactTo,
             reactions: availableReactionsFor,
@@ -165,13 +165,13 @@ public extension ChatView {
         var view = self
         switch edge {
         case .leading:
-            view.listSwipeActions = .init(
+            view.chatCustomizationParameters.listSwipeActions = .init(
                 leading: .init(performsFirstActionWithFullSwipe: performsFirstActionWithFullSwipe, actions: items),
-                trailing: view.listSwipeActions.trailing
+                trailing: view.chatCustomizationParameters.listSwipeActions.trailing
             )
         case .trailing:
-            view.listSwipeActions = .init(
-                leading: view.listSwipeActions.leading,
+            view.chatCustomizationParameters.listSwipeActions = .init(
+                leading: view.chatCustomizationParameters.listSwipeActions.leading,
                 trailing: .init(performsFirstActionWithFullSwipe: performsFirstActionWithFullSwipe, actions: items)
             )
         }
@@ -182,41 +182,41 @@ public extension ChatView {
 
     func avatarSize(avatarSize: CGFloat) -> ChatView {
         var view = self
-        view.avatarSize = avatarSize
+        view.messageCustomizationParameters.avatarSize = avatarSize
         return view
     }
 
     func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
         var view = self
-        view.tapAvatarClosure = closure
+        view.messageCustomizationParameters.tapAvatarClosure = closure
         return view
     }
 
     func showMessageTimeView(_ isShow: Bool) -> ChatView {
         var view = self
-        view.showMessageTimeView = isShow
+        view.messageCustomizationParameters.showTimeView = isShow
         return view
     }
 
     func messageLinkPreviewLimit(_ limit: Int) -> ChatView {
         var view = self
-        view.messageLinkPreviewLimit = limit
+        view.messageCustomizationParameters.linkPreviewLimit = limit
         return view
     }
 
     func linkPreviewsEnabled(_ enabled: Bool) -> ChatView {
-        messageLinkPreviewLimit(enabled ? self.messageLinkPreviewLimit : 0)
+        messageLinkPreviewLimit(enabled ? self.messageCustomizationParameters.linkPreviewLimit : 0)
     }
 
     func shouldShowPreviewForLink(_ shouldShowPreviewForLink: @escaping (URL) -> Bool) -> ChatView {
         var view = self
-        view.shouldShowPreviewForLink = shouldShowPreviewForLink
+        view.messageCustomizationParameters.shouldShowPreviewForLink = shouldShowPreviewForLink
         return view
     }
 
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
-        view.messageFont = font
+        view.messageCustomizationParameters.font = font
         return view
     }
 
@@ -226,7 +226,7 @@ public extension ChatView {
 
     func messageUseStyler(_ styler: @escaping (String) -> AttributedString) -> ChatView {
         var view = self
-        view.messageStyler = styler
+        view.messageCustomizationParameters.styler = styler
         return view
     }
 
@@ -235,45 +235,52 @@ public extension ChatView {
     /// binding to current text in the default input text field
     public func inputViewText(_ binding: Binding<String>) -> ChatView {
         var view = self
-        view.externalInputText = binding.wrappedValue
-        view.onInputTextChange = { binding.wrappedValue = $0 }
+        view.inputViewCustomizationParameters.externalInputText = binding.wrappedValue
+        view.inputViewCustomizationParameters.onInputTextChange = { binding.wrappedValue = $0 }
         return view
     }
 
     func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {
         var view = self
-        view.availableInputs = types
+        view.inputViewCustomizationParameters.availableInputs = types
         return view
     }
 
     func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
         var view = self
-        view.recorderSettings = settings
+        view.inputViewCustomizationParameters.recorderSettings = settings
+        return view
+    }
+
+    // MARK: - Media picker
+
+    func setMediaPickerLiveCameraStyle(_ style: MediaPickerLiveCameraStyle) -> ChatView {
+        var view = self
+        view.inputViewCustomizationParameters.mediaPickerParameters.liveCameraStyle = style
         return view
     }
 
     func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
         var view = self
-        view.mediaPickerSelectionParameters = MediaPickerSelectionParameters()
-        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
+        view.inputViewCustomizationParameters.mediaPickerParameters.selectionParameters.selectionLimit = assetsPickerLimit
         return view
     }
 
     func setMediaPickerSelectionParameters(_ params: MediaPickerSelectionParameters) -> ChatView {
         var view = self
-        view.mediaPickerSelectionParameters = params
-        return view
-    }
-
-    func setMediaPickerParameters(_ params: MediaPickerParameters) -> ChatView {
-        var view = self
-        view.mediaPickerParameters = params
+        view.inputViewCustomizationParameters.mediaPickerParameters.selectionParameters = params
         return view
     }
 
     func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
         var view = self
-        view.orientationHandler = orientationHandler
+        view.inputViewCustomizationParameters.mediaPickerParameters.orientationHandler = orientationHandler
+        return view
+    }
+
+    func setMediaPickerParameters(_ params: MediaPickerParameters) -> ChatView {
+        var view = self
+        view.inputViewCustomizationParameters.mediaPickerParameters = params
         return view
     }
 }
