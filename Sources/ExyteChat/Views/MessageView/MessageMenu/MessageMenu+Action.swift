@@ -23,6 +23,7 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
     case copy
     case reply
     case edit(saveClosure: @Sendable (String) -> Void)
+    case delete
 
     public func title() -> String {
         switch self {
@@ -32,6 +33,8 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
             "Reply"
         case .edit:
             "Edit"
+        case .delete:
+            "Delete"
         }
     }
 
@@ -47,6 +50,8 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
             } else {
                 Image(systemName: "square.and.pencil")
             }
+        case .delete:
+            Image(systemName: "trash")
         }
     }
 
@@ -54,7 +59,8 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
         switch (lhs, rhs) {
         case (.copy, .copy),
              (.reply, .reply),
-             (.edit(_), .edit(_)):
+             (.edit(_), .edit(_)),
+             (.delete, .delete):
             return true
         default:
             return false
@@ -62,14 +68,14 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
     }
 
     public static let allCases: [DefaultMessageMenuAction] = [
-        .copy, .reply, .edit(saveClosure: {_ in})
+        .copy, .reply, .edit(saveClosure: {_ in}), .delete,
     ]
     
     static public func menuItems(for message: Message) -> [DefaultMessageMenuAction] {
         if message.user.isCurrentUser {
             return allCases
         } else {
-            return [.copy, .reply]
+            return [.copy, .reply, .delete]
         }
     }
 }

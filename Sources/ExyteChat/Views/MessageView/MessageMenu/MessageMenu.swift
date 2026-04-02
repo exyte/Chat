@@ -111,6 +111,10 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     /// This flag is used to adjust the dismiss animation
     @State private var didReact: Bool = false
     /// We use this `onReaction` handler in order to set our `didReact` flag and kick off the dismissal sequence
+    
+    /// Controls whether the delete confirmation view is shown
+    @State private var showingDeleteConfirmation: Bool = false
+    
     private func handleOnReaction(_ rt: ReactionType?) {
         guard let rt else { transitionViewState(to: .ready); return }
         didReact = true
@@ -480,8 +484,13 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                 .allowsHitTesting(false)
             
             if menuIsVisible {
-                menuView()
-                    .transition(defaultTransition)
+                if showingDeleteConfirmation {
+                    deleteConfirmationView()
+                        .transition(defaultTransition)
+                } else {
+                    menuView()
+                        .transition(defaultTransition)
+                }
             }
         }
         .overflowContainer(messageMenuStyle, viewState: viewState, onTap: {
@@ -526,18 +535,44 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     }
     
     @ViewBuilder
-    func menuButton(title: String, icon: Image, action: ActionEnum) -> some View {
+    func deleteConfirmationView() -> some View {
+        HStack {
+            if alignment == .right { Spacer() }
+
+            VStack {
+                if message.user.isCurrentUser {
+                    deleteOptionButton(title: "Delete for everyone") {
+                        viewModel.didDeleteMessage(message, DeleteForType.forEveryone)
+                        dismissSelf()
+                    }
+                }
+                deleteOptionButton(title: "Delete for me") {
+                    viewModel.didDeleteMessage(message, DeleteForType.forMe)
+                    dismissSelf()
+                }
+            }
+            .menuContainer(menuStyle)
+
+            if alignment == .left { Spacer() }
+        }
+        .padding(
+            alignment == .right ? .trailing : .leading,
+            alignment == .right ? trailingPadding : leadingPadding
+        )
+        .padding(.top, 8)
+        .frame(maxWidth: .infinity)
+    }
+    
+    @ViewBuilder
+    func deleteOptionButton(title: String, action: @escaping () -> Void) -> some View {
         HStack(spacing: 0) {
             ZStack {
                 theme.colors.messageFriendBG
                     .cornerRadius(12)
                 HStack {
-                    Text(title)
-                        .foregroundColor(theme.colors.menuText)
+                    Text(LocalizedStringKey(title))
+                        .foregroundColor(theme.colors.menuTextDelete)
                     Spacer()
-                    icon
-                        .renderingMode(.template)
-                        .foregroundStyle(theme.colors.menuText)
                 }
                 .font(getFont)
                 .padding(.vertical, 11)
@@ -546,8 +581,47 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             .frame(width: 208)
             .fixedSize()
             .onTapGesture {
-                onAction(action)
-                dismissSelf()
+                action()
+            }
+
+            if alignment == .right {
+                Color.clear.viewWidth(12)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func menuButton(title: String, icon: Image, action: ActionEnum) -> some View {
+        HStack(spacing: 0) {
+            ZStack {
+                theme.colors.messageFriendBG
+                    .cornerRadius(12)
+                HStack {
+                    Text(LocalizedStringKey(title))
+                        .foregroundColor(
+                            title == "Delete" ? theme.colors.menuTextDelete : theme.colors.menuText)
+                    Spacer()
+                    icon
+                        .renderingMode(.template)
+                        .foregroundStyle(
+                            title == "Delete" ? theme.colors.menuTextDelete : theme.colors.menuText)
+                }
+                .font(getFont)
+                .padding(.vertical, 11)
+                .padding(.horizontal, 12)
+            }
+            .frame(width: 208)
+            .fixedSize()
+            .onTapGesture {
+                if title == "Delete" {
+                    withAnimation(.bouncy(duration: animationDuration)) {
+                        showingDeleteConfirmation = true
+                        reactionSelectionIsVisible = false
+                    }
+                } else {
+                    onAction(action)
+                    dismissSelf()
+                }
             }
 
             if alignment == .right {
