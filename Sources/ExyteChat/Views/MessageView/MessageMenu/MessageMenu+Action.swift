@@ -9,11 +9,11 @@ public protocol MessageMenuAction: Equatable, CaseIterable {
     func title() -> String
     func icon() -> Image
     
-    static func menuItems(for message: Message) -> [Self]
+    static func menuItems(for message: Message, availableMessageMenuItems: [AvailableMesssageMenuType]) -> [Self]
 }
 
 extension MessageMenuAction {
-    public static func menuItems(for message: Message) -> [Self] {
+    public static func menuItems(for message: Message, availableMessageMenuItems: [AvailableMesssageMenuType]) -> [Self] {
         Self.allCases.map { $0 }
     }
 }
@@ -65,11 +65,30 @@ public enum DefaultMessageMenuAction: MessageMenuAction, Sendable {
         .copy, .reply, .edit(saveClosure: {_ in})
     ]
     
-    static public func menuItems(for message: Message) -> [DefaultMessageMenuAction] {
+    static public func menuItems(
+        for message: Message, availableMessageMenuItems: [AvailableMesssageMenuType]
+    ) -> [DefaultMessageMenuAction] {
+
+        var menuItems: [DefaultMessageMenuAction] = []
         if message.user.isCurrentUser {
-            return allCases
+            if availableMessageMenuItems.contains(.copy) {
+                menuItems.append(.copy)
+            }
+            if availableMessageMenuItems.contains(.reply) {
+                menuItems.append(.reply)
+            }
+            if availableMessageMenuItems.contains(.edit) {
+                menuItems.append(.edit(saveClosure: { _ in }))
+            }
+            return menuItems
         } else {
-            return [.copy, .reply]
+            if availableMessageMenuItems.contains(.copy) {
+                menuItems.append(.copy)
+            }
+            if availableMessageMenuItems.contains(.reply) {
+                menuItems.append(.reply)
+            }
+            return menuItems
         }
     }
 }

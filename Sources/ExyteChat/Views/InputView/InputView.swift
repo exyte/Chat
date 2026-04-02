@@ -56,6 +56,12 @@ public enum InputViewState: Sendable {
     }
 }
 
+public enum AvailableMesssageMenuType: Sendable {
+    case edit
+    case reply
+    case copy
+}
+
 public enum AvailableInputType: Sendable {
     case text
     case media

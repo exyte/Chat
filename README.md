@@ -208,6 +208,20 @@ ChatView(messages: viewModel.messages) { draft in
     
 When implementing your own `MessageMenuActionClosure`, write a switch statement passing through all the cases of your `MessageMenuAction`, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for `.edit` you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.
 
+## Configure default menu options
+
+By default, the menu includes all options defined in AvailableMessageMenuType(edit, reply, copy). To customize which options are shown, use setAvailableMessageMenuItems:  
+
+```swift
+
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+}
+.setAvailableMessageMenuItems([.edit, .copy])
+
+
+```
+
 ## Custom swipe actions
 
 ```swift
