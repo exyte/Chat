@@ -64,21 +64,24 @@ final actor Recorder {
         let recordingUrl = FileManager.tempDirPath.appendingPathComponent(UUID().uuidString + fileExt)
 
         do {
-            try audioSession.setCategory(.record, mode: .default)
+            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.overrideOutputAudioPort(.speaker)
             try audioSession.setActive(true)
             audioRecorder = try AVAudioRecorder(url: recordingUrl, settings: settings)
             audioRecorder?.isMeteringEnabled = true
             audioRecorder?.record()
             durationProgressHandler(0.0, [])
 
-            let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
-                Task {
-                    await self?.onTimer(durationProgressHandler)
+            DispatchQueue.main.async { [weak self] in
+                self?.audioTimer?.invalidate()
+                self?.audioTimer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
+                    Task {
+                        await self?.onTimer(durationProgressHandler)
+                    }
                 }
-            }
-            audioTimer = timer
-            Task { @MainActor in
-                RunLoop.main.add(timer, forMode: .common)
+                if let timer = self?.audioTimer {
+                    RunLoop.main.add(timer, forMode: .common)
+                }
             }
 
             return recordingUrl
@@ -113,30 +116,14 @@ final actor Recorder {
             return ".aac"
         case kAudioFormatLinearPCM:
             return ".wav"
-        case kAudioFormatMPEGLayer3:
-            return ".mp3"
         case kAudioFormatAppleLossless:
             return ".m4a"
-        case kAudioFormatOpus:
-            return ".opus"
-        case kAudioFormatAC3:
-            return ".ac3"
         case kAudioFormatFLAC:
             return ".flac"
-        case kAudioFormatAMR:
-            return ".amr"
-        case kAudioFormatMIDIStream:
-            return ".midi"
         case kAudioFormatULaw:
-            return ".ulaw"
+            return ".wav"
         case kAudioFormatALaw:
-            return ".alaw"
-        case kAudioFormatAMR_WB:
-            return ".awb"
-        case kAudioFormatEnhancedAC3:
-            return ".eac3"
-        case kAudioFormatiLBC:
-            return ".ilbc"
+            return ".wav"
         default:
             return nil
         }
@@ -157,7 +144,7 @@ public struct RecorderSettings : Codable,Hashable {
     public init(audioFormatID: AudioFormatID = kAudioFormatMPEG4AAC,
                 sampleRate: CGFloat = 12000,
                 numberOfChannels: Int = 1,
-                encoderBitRateKey: Int = 128,
+                encoderBitRateKey: Int = 0,
                 linearPCMBitDepth: Int = 16,
                 linearPCMIsFloatKey: Bool = false,
                 linearPCMIsBigEndianKey: Bool = false,

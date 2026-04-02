@@ -1,0 +1,60 @@
+{
+  "originHash" : "30fbdde81d00bb752a8cc8bf058ad87e5945e5eb5681aabe5d0a7c0117a1681f",
+  "pins" : [
+    {
+      "identity" : "activityindicatorview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/ActivityIndicatorView",
+      "state" : {
+        "revision" : "36140867802ae4a1d2b11490bcbbefe058001d14",
+        "version" : "1.2.1"
+      }
+    },
+    {
+      "identity" : "anchoredpopup",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/AnchoredPopup.git",
+      "state" : {
+        "revision" : "2fb9d1ac101b86cbcc12a3f8e571648ce4469d18",
+        "version" : "1.1.3"
+      }
+    },
+    {
+      "identity" : "giphy-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Giphy/giphy-ios-sdk",
+      "state" : {
+        "revision" : "ed91784fe854a8204a9f994282d87f9c18df5fac",
+        "version" : "2.3.1"
+      }
+    },
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "c152c1915f60c51e4afa0752656993ee5b3c63db",
+        "version" : "8.8.1"
+      }
+    },
+    {
+      "identity" : "libwebp-xcode",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/libwebp-Xcode",
+      "state" : {
+        "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "mediapicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/MediaPicker.git",
+      "state" : {
+        "revision" : "5c9a8df948602a9d61239b2dd8d5bbc9b38428d9",
+        "version" : "3.2.5"
+      }
+    }
+  ],
+  "version" : 3
+}
