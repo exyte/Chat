@@ -117,6 +117,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var tableContentHeight: CGFloat = 0
     @State private var inputViewSize = CGSize.zero
+    @State private var timeViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
 
     @State private var giphyConfigured = false
@@ -205,6 +206,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             .onChange(of: inputViewModel.showGiphyPicker) { _ , newValue in
                 if newValue {
                     globalFocusState.focus = nil
+                }
+            }
+            .background {
+                // assume all the time views have same width, like "00:00"
+                if let anyMessage = sections.first?.rows.first?.message {
+                    FinalMeasuringTrickView(size: $timeViewSize) {
+                        MessageTimeView(text: anyMessage.time, userType: anyMessage.user.type)
+                    }
                 }
             }
     }
@@ -304,6 +313,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ids: ids,
 
             // MARK: - Customization
+
             showDateHeaders: showDateHeaders,
             isScrollEnabled: isScrollEnabled,
             keyboardDismissMode: keyboardDismissMode,
@@ -320,6 +330,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             avatarSize: avatarSize,
             tapAvatarClosure: tapAvatarClosure,
             showMessageTimeView: showMessageTimeView,
+            timeViewWidth: timeViewSize.width,
             shouldShowPreviewForLink: shouldShowPreviewForLink,
             messageLinkPreviewLimit: messageLinkPreviewLimit,
             messageFont: messageFont,
@@ -417,7 +428,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             alignment: menuAlignment(row.message, chatType: type),
             positionInUserGroup: row.positionInUserGroup,
             leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
-            trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
+            trailingPadding: MessageView.statusViewWidth + MessageView.horizontalStatusPadding,
             font: messageFont,
             animationDuration: messageMenuAnimationDuration,
             onAction: menuActionClosure(row.message),
@@ -427,11 +438,19 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             )
         ) {
             ChatMessageView(
-                viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
-                avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
+                viewModel: viewModel,
+                messageBuilder: messageBuilder,
+                row: row,
+                chatType: type,
+                avatarSize: avatarSize,
+                tapAvatarClosure: nil,
+                showMessageTimeView: showMessageTimeView,
+                timeViewWidth: timeViewSize.width,
                 shouldShowPreviewForLink: shouldShowPreviewForLink,
-                isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
-                messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
+                messageLinkPreviewLimit: messageLinkPreviewLimit,
+                messageFont: messageFont,
+                messageStyler: messageStyler,
+                isDisplayingMessageMenu: true
             )
             .onTapGesture {
                 hideMessageMenu()

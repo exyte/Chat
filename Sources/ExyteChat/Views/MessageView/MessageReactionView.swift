@@ -23,7 +23,7 @@ extension MessageView {
             }
             
             ForEach(Array(preparedReactions.reactions.enumerated()), id: \.element) { index, reaction in
-                ReactionBubble(reaction: reaction, font: Font(font))
+                ReactionBubble(reaction: reaction, font: Font(messageFont))
                     .transition(.scaleAndFade)
                     .zIndex(message.user.isCurrentUser ? Double(preparedReactions.reactions.count - index) : Double(index + 1))
                     .sizeGetter($bubbleSize)
@@ -45,7 +45,7 @@ extension MessageView {
     }
     
     @ViewBuilder
-    func overflowBubbleView(leadingSpacer:Bool, needsOverflowBubble:Bool, text:String, containsReactionFromCurrentUser:Bool) -> some View {
+    func overflowBubbleView(leadingSpacer: Bool, needsOverflowBubble: Bool, text: String, containsReactionFromCurrentUser: Bool) -> some View {
         if needsOverflowBubble {
             ReactionBubble(
                 reaction: .init(
@@ -66,16 +66,16 @@ extension MessageView {
     
     struct PreparedReactions {
         /// Sorted Reactions by most recent -> oldest (trimmed to maxReactions)
-        let reactions:[Reaction]
+        let reactions: [Reaction]
         /// Indicates whether we need to add an overflow bubble (due to the number of Reactions exceeding maxReactions)
-        let needsOverflowBubble:Bool
+        let needsOverflowBubble: Bool
         /// Indicates whether the clipped reactions (oldest reactions beyond maxReaction) contain a reaction from the current user
         /// - Note: This value is used to color the background of the overflow bubble
-        let overflowContainsCurrentUser:Bool
+        let overflowContainsCurrentUser: Bool
     }
     
     /// Orders the reactions by most recent to oldest, reverses their layout based on alignment and determines if an overflow bubble is necessary
-    private func prepareReactions(message:Message, maxReactions:Int) -> PreparedReactions {
+    private func prepareReactions(message: Message, maxReactions: Int) -> PreparedReactions {
         guard maxReactions > 1, !message.reactions.isEmpty else {
             return .init(reactions: [], needsOverflowBubble: false, overflowContainsCurrentUser: false)
         }

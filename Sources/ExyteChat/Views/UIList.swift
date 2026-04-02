@@ -55,6 +55,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
     let showMessageTimeView: Bool
+    let timeViewWidth: CGFloat
     let shouldShowPreviewForLink: (URL) -> Bool
     let messageLinkPreviewLimit: Int
     let messageFont: UIFont
@@ -67,10 +68,6 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     @State private var cancellables = Set<AnyCancellable>()
 
     func makeUIView(context: Context) -> UITableView {
-//        updateQueue.onProcessingChange = { value in
-//            self.onIsUpdatingChange?(value)
-//        }
-
         let style = mainHeaderBuilder != nil || showDateHeaders ? UITableView.Style.grouped : .plain
         let tableView = UITableView(frame: .zero, style: style)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -163,12 +160,18 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         if coordinator.sections.isEmpty {
             coordinator.sections = sections
-            tableView.reloadData()
+
+            UIView.performWithoutAnimation {
+                tableView.reloadData()
+                tableView.layoutIfNeeded()
+            }
+
             if !isScrollEnabled {
                 DispatchQueue.main.async {
                     tableContentHeight = tableView.contentSize.height
                 }
             }
+
             return
         }
 
@@ -449,6 +452,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             avatarSize: avatarSize,
             tapAvatarClosure: tapAvatarClosure,
             showMessageTimeView: showMessageTimeView,
+            timeViewWidth: timeViewWidth,
             shouldShowPreviewForLink: shouldShowPreviewForLink,
             messageLinkPreviewLimit: messageLinkPreviewLimit,
             messageFont: messageFont,
@@ -497,6 +501,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         let avatarSize: CGFloat
         let tapAvatarClosure: ChatView.TapAvatarClosure?
+        let timeViewWidth: CGFloat
         let showMessageTimeView: Bool
         let shouldShowPreviewForLink: (URL) -> Bool
         let messageLinkPreviewLimit: Int
@@ -535,6 +540,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             avatarSize: CGFloat,
             tapAvatarClosure: ChatView.TapAvatarClosure?,
             showMessageTimeView: Bool,
+            timeViewWidth: CGFloat,
             shouldShowPreviewForLink: @escaping (URL) -> Bool,
             messageLinkPreviewLimit: Int,
             messageFont: UIFont,
@@ -565,6 +571,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             self.avatarSize = avatarSize
             self.tapAvatarClosure = tapAvatarClosure
             self.showMessageTimeView = showMessageTimeView
+            self.timeViewWidth = timeViewWidth
             self.shouldShowPreviewForLink = shouldShowPreviewForLink
             self.messageLinkPreviewLimit = messageLinkPreviewLimit
             self.messageFont = messageFont
@@ -657,11 +664,19 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             let row = sections[indexPath.section].rows[indexPath.row]
             tableViewCell.contentConfiguration = UIHostingConfiguration {
                 ChatMessageView(
-                    viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
-                    avatarSize: avatarSize, tapAvatarClosure: tapAvatarClosure,
-                    messageStyler: messageStyler, shouldShowPreviewForLink: shouldShowPreviewForLink,
-                    isDisplayingMessageMenu: false, showMessageTimeView: showMessageTimeView,
-                    messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
+                    viewModel: viewModel,
+                    messageBuilder: messageBuilder,
+                    row: row,
+                    chatType: type,
+                    avatarSize: avatarSize,
+                    tapAvatarClosure: tapAvatarClosure,
+                    showMessageTimeView: showMessageTimeView,
+                    timeViewWidth: timeViewWidth,
+                    shouldShowPreviewForLink: shouldShowPreviewForLink,
+                    messageLinkPreviewLimit: messageLinkPreviewLimit,
+                    messageFont: messageFont,
+                    messageStyler: messageStyler,
+                    isDisplayingMessageMenu: false
                 )
                 .transition(.scale)
                 .background(MessageMenuPreferenceViewSetter(id: row.id))

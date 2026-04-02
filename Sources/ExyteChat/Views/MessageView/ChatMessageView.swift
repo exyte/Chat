@@ -19,12 +19,15 @@ struct ChatMessageView<MessageContent: View>: View {
     let chatType: ChatType
     let avatarSize: CGFloat
     let tapAvatarClosure: ChatView.TapAvatarClosure?
-    let messageStyler: (String) -> AttributedString
-    let shouldShowPreviewForLink: (URL) -> Bool
-    let isDisplayingMessageMenu: Bool
     let showMessageTimeView: Bool
+    let timeViewWidth: CGFloat
+    let shouldShowPreviewForLink: (URL) -> Bool
     let messageLinkPreviewLimit: Int
     let messageFont: UIFont
+    let messageStyler: (String) -> AttributedString
+    let isDisplayingMessageMenu: Bool
+
+    @State var timeViewSize: CGSize?
 
     var body: some View {
         ZStack {
@@ -50,12 +53,13 @@ struct ChatMessageView<MessageContent: View>: View {
                     chatType: chatType,
                     avatarSize: avatarSize,
                     tapAvatarClosure: tapAvatarClosure,
-                    messageStyler: messageStyler,
-                    shouldShowPreviewForLink: shouldShowPreviewForLink,
-                    isDisplayingMessageMenu: isDisplayingMessageMenu,
                     showMessageTimeView: showMessageTimeView,
+                    timeViewWidth: timeViewWidth,
+                    shouldShowPreviewForLink: shouldShowPreviewForLink,
                     messageLinkPreviewLimit: messageLinkPreviewLimit,
-                    font: messageFont
+                    messageFont: messageFont,
+                    messageStyler: messageStyler,
+                    isDisplayingMessageMenu: isDisplayingMessageMenu
                 )
             } else {
                 customMessageView

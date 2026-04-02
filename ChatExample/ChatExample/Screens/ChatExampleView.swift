@@ -61,8 +61,30 @@ struct ChatExampleView: View {
 
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
-                    Button("fwefe") {
-                        text = "rrrr"
+                    if let url = viewModel.chatCover {
+                        CachedAsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            default:
+                                Rectangle().fill(Color(hex: "AFB3B8"))
+                            }
+                        }
+                        .frame(width: 35, height: 35)
+                        .clipShape(Circle())
+
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(viewModel.chatTitle)
+                                .fontWeight(.semibold)
+                                .font(.headline)
+                                .foregroundStyle(colorScheme == .dark ? .white : .black)
+                            Text(viewModel.chatStatus)
+                                .font(.footnote)
+                                .foregroundColor(Color(hex: "AFB3B8"))
+                        }
+                        Spacer()
                     }
                 }
                 .padding(.leading, 10)
