@@ -172,8 +172,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
             .background {
                 // assume all the time views have same width, like "00:00"
-                if let anyMessage = sections.first?.rows.first?.message {
-                    FinalMeasuringTrickView(size: $timeViewSize) {
+                if let anyMessage = sections.first?.rows.first?.message, timeViewSize == .zero {
+                    FinalMeasuringTrickView(size: $timeViewSize, id: "uu") {
                         MessageTimeView(text: anyMessage.time, userType: anyMessage.user.type)
                     }
                 }
@@ -278,9 +278,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
             chatParams: chatCustomizationParameters,
             messageParams: messageCustomizationParameters,
-            timeViewWidth: timeViewSize.width
+            timeViewWidth: $timeViewSize.width
         )
-
         .applyIf(!chatCustomizationParameters.isScrollEnabled) {
             $0.frame(height: tableContentHeight)
         }
@@ -371,8 +370,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             cellFrame: cellFrame,
             alignment: menuAlignment(row.message, chatType: type),
             positionInUserGroup: row.positionInUserGroup,
-            leadingPadding: messageCustomizationParameters.avatarSize + MessageView.horizontalAvatarPadding * 2,
-            trailingPadding: MessageView.statusViewWidth + MessageView.horizontalStatusPadding,
+            leadingPadding: messageCustomizationParameters.avatarSize + MessageView.horizontalScreenEdgePadding + MessageView.horizontalSpacing,
+            trailingPadding: MessageView.statusViewWidth + MessageView.horizontalScreenEdgePadding + MessageView.horizontalSpacing,
             font: messageCustomizationParameters.font,
             animationDuration: chatCustomizationParameters.messageMenuAnimationDuration,
             onAction: menuActionClosure(row.message),
@@ -387,7 +386,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 row: row,
                 chatType: type,
                 messageParams: messageCustomizationParameters,
-                timeViewWidth: timeViewSize.width,
+                timeViewWidth: $timeViewSize.width,
                 isDisplayingMessageMenu: true
             )
             .onTapGesture {

@@ -18,7 +18,7 @@ struct ChatMessageView<MessageContent: View>: View {
     let row: MessageRow
     let chatType: ChatType
     let messageParams: MessageCustomizationParameters
-    let timeViewWidth: CGFloat
+    @Binding var timeViewWidth: CGFloat
     let isDisplayingMessageMenu: Bool
 
     @State var timeViewSize: CGSize?
@@ -46,7 +46,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     positionInMessagesSection: row.positionInMessagesSection,
                     chatType: chatType,
                     params: messageParams,
-                    timeViewWidth: timeViewWidth,
+                    timeViewWidth: $timeViewWidth,
                     isDisplayingMessageMenu: isDisplayingMessageMenu
                 )
             } else {

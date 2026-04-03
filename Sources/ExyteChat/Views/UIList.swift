@@ -41,7 +41,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     let chatParams: ChatCustomizationParameters
     let messageParams: MessageCustomizationParameters
-    let timeViewWidth: CGFloat
+    @Binding var timeViewWidth: CGFloat
 
     // MARK: - State
 
@@ -112,26 +112,19 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         Task {
             if context.coordinator.sections != sections {
-                //print("iii sections")
                 await updateQueue.enqueue() {
                     await updateIfNeeded(coordinator: context.coordinator, tableView: tableView)
                 }
-                //print("iii sections done")
             } else if let offset = chatParams.externalContentOffset, tableView.contentOffset != offset {
-                //print("iii offset", offset)
                 await updateQueue.enqueue() {
                     await withCheckedContinuation { continuation in
-                        //tableView.layoutIfNeeded()
-                        UIView.animate(withDuration: 0.25, animations: {
+                        UIView.animate(withDuration: 0.25) {
                             tableView.setContentOffset(offset, animated: false)
-                        }, completion: { _ in
+                        } completion: { _ in
                             continuation.resume()
-                        })
+                        }
                     }
                 }
-                //print("iii offset done")
-            } else {
-                //print("iii empty", sections.first?.rows.count, externalContentOffset)
             }
         }
     }
@@ -428,8 +421,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             chatParams: chatParams,
             messageParams: messageParams,
-            timeViewWidth: timeViewWidth,
-
+            timeViewWidth: $timeViewWidth,
             mainBackgroundColor: theme.colors.mainBG
         )
     }
@@ -464,8 +456,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         let chatParams: ChatCustomizationParameters
         let messageParams: MessageCustomizationParameters
-        let timeViewWidth: CGFloat
-
+        @Binding var timeViewWidth: CGFloat
         let mainBackgroundColor: Color
 
         /// call pagination handler when this row is reached
@@ -490,8 +481,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             chatParams: ChatCustomizationParameters,
             messageParams: MessageCustomizationParameters,
-            timeViewWidth: CGFloat,
-
+            timeViewWidth: Binding<CGFloat>,
             mainBackgroundColor: Color
         ) {
             self.viewModel = viewModel
@@ -509,8 +499,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             self.chatParams = chatParams
             self.messageParams = messageParams
-            self.timeViewWidth = timeViewWidth
-
+            self._timeViewWidth = timeViewWidth
             self.mainBackgroundColor = mainBackgroundColor
         }
 
@@ -603,7 +592,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     row: row,
                     chatType: type,
                     messageParams: messageParams,
-                    timeViewWidth: timeViewWidth,
+                    timeViewWidth: $timeViewWidth,
                     isDisplayingMessageMenu: false
                 )
                 .transition(.scale)

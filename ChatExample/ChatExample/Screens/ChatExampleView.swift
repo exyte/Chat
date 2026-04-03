@@ -32,6 +32,7 @@ struct ChatExampleView: View {
         .inputViewText($text)
         .keyboardDismissMode(.interactive)
         .messageUseMarkdown(true)
+        .showUsername(true)
         .setMediaPickerLiveCameraStyle(.prominant)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)

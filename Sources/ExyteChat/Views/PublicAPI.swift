@@ -180,6 +180,24 @@ public extension ChatView {
 
     // MARK: - Built-in message view
 
+    func showMessageTimeView(_ show: Bool) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.showTimeView = show
+        return view
+    }
+
+    func showUsername(_ show: Bool) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.showUsername = show
+        return view
+    }
+
+    func showAvatar(_ show: Bool) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.showAvatar = show
+        return view
+    }
+
     func avatarSize(avatarSize: CGFloat) -> ChatView {
         var view = self
         view.messageCustomizationParameters.avatarSize = avatarSize
@@ -189,12 +207,6 @@ public extension ChatView {
     func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
         var view = self
         view.messageCustomizationParameters.tapAvatarClosure = closure
-        return view
-    }
-
-    func showMessageTimeView(_ isShow: Bool) -> ChatView {
-        var view = self
-        view.messageCustomizationParameters.showTimeView = isShow
         return view
     }
 

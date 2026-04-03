@@ -19,13 +19,11 @@ struct MessageTextView: View {
     private static let minLinkPreviewWidth: CGFloat = 140
 
     let text: String
-    let messageStyler: (String) -> AttributedString
     let userType: UserType
-    let shouldShowPreviewForLink: (URL) -> Bool
-    let messageLinkPreviewLimit: Int
+    let params: MessageCustomizationParameters
 
     var styledText: AttributedString {
-        var result = text.styled(using: messageStyler)
+        var result = text.styled(using: params.styler)
         result.foregroundColor = theme.colors.messageText(userType)
 
         for (link, range) in result.runs[\.link] {
@@ -38,7 +36,7 @@ struct MessageTextView: View {
     }
 
     var urlsToPreview: [URL] {
-        Array(styledText.urls.filter(shouldShowPreviewForLink).prefix(messageLinkPreviewLimit))
+        Array(styledText.urls.filter(params.shouldShowPreviewForLink).prefix(params.linkPreviewLimit))
     }
 
     var body: some View {
@@ -65,15 +63,25 @@ struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
         MessageTextView(
             text: "Look at [this website](https://example.org)",
-            messageStyler: AttributedString.init, userType: .other,
-            shouldShowPreviewForLink: { _ in true }, messageLinkPreviewLimit: 8)
+            userType: .other,
+            params: MessageCustomizationParameters(
+                shouldShowPreviewForLink: { _ in true },
+                styler: AttributedString.init
+            ))
         MessageTextView(
             text: "Look at [this website](https://example.org)",
-            messageStyler: String.markdownStyler, userType: .other,
-            shouldShowPreviewForLink: { _ in true }, messageLinkPreviewLimit: 8)
+            userType: .other,
+            params: MessageCustomizationParameters(
+                shouldShowPreviewForLink: { _ in true },
+                styler: String.markdownStyler
+            )
+        )
         MessageTextView(
             text: "[@Dan](mention://user/123456789) look at [this website](https://example.org)!",
-            messageStyler: String.markdownStyler, userType: .other,
-            shouldShowPreviewForLink: { $0.scheme != "mention" }, messageLinkPreviewLimit: 8)
+            userType: .other,
+            params: MessageCustomizationParameters(
+                shouldShowPreviewForLink: { $0.scheme != "mention" },
+                styler: String.markdownStyler
+            ))
     }
 }

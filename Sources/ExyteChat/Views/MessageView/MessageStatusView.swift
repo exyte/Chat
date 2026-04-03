@@ -28,8 +28,6 @@ struct MessageStatusView: View {
                 }
             }
         }
-        .viewSize(MessageView.statusViewWidth)
-        .padding(.trailing, MessageView.horizontalStatusPadding)
     }
 
     private func statusImageStyled(image: Image, color: Color) -> some View {
