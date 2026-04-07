@@ -18,32 +18,20 @@ struct MessageTextView: View {
     /// Large enough to show the domain and icon, if needed, for most pages.
     private static let minLinkPreviewWidth: CGFloat = 140
 
-    let text: String
+    let attributedText: AttributedString
     let userType: UserType
     let params: MessageCustomizationParameters
 
-    var styledText: AttributedString {
-        var result = text.styled(using: params.styler)
-        result.foregroundColor = theme.colors.messageText(userType)
-
-        for (link, range) in result.runs[\.link] {
-            if link != nil {
-                result[range].underlineStyle = .single
-            }
-        }
-
-        return result
-    }
-
     var urlsToPreview: [URL] {
-        Array(styledText.urls.filter(params.shouldShowPreviewForLink).prefix(params.linkPreviewLimit))
+        Array(attributedText.urls.filter(params.shouldShowPreviewForLink).prefix(params.linkPreviewLimit))
     }
 
     var body: some View {
-        if !styledText.characters.isEmpty {
+        if !attributedText.characters.isEmpty {
             VStack(alignment: .leading) {
-                Text(styledText)
+                Text(attributedText)
                     .sizeGetter($textSize)
+                    .foregroundStyle(theme.colors.messageText(userType))
 
                 // We use .enumerated(), and \.offset as the id, so that a message with duplicate links will show a preview for each.
                 if !urlsToPreview.isEmpty {
@@ -62,26 +50,23 @@ struct MessageTextView: View {
 struct MessageTextView_Previews: PreviewProvider {
     static var previews: some View {
         MessageTextView(
-            text: "Look at [this website](https://example.org)",
+            attributedText: .init("Look at [this website](https://example.org)"), // no markdown
             userType: .other,
             params: MessageCustomizationParameters(
-                shouldShowPreviewForLink: { _ in true },
-                styler: AttributedString.init
+                shouldShowPreviewForLink: { _ in true }
             ))
         MessageTextView(
-            text: "Look at [this website](https://example.org)",
+            attributedText: "Look at [this website](https://example.org)",
             userType: .other,
             params: MessageCustomizationParameters(
-                shouldShowPreviewForLink: { _ in true },
-                styler: String.markdownStyler
+                shouldShowPreviewForLink: { _ in true }
             )
         )
         MessageTextView(
-            text: "[@Dan](mention://user/123456789) look at [this website](https://example.org)!",
+            attributedText: "[@Dan](mention://user/123456789) look at [this website](https://example.org)!",
             userType: .other,
             params: MessageCustomizationParameters(
-                shouldShowPreviewForLink: { $0.scheme != "mention" },
-                styler: String.markdownStyler
+                shouldShowPreviewForLink: { $0.scheme != "mention" }
             ))
     }
 }

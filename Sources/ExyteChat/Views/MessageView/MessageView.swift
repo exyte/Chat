@@ -45,6 +45,11 @@ struct MessageView: View {
     }
 
     var timeViewArrangement: TimeViewArrangement {
+        let text = message.attributedText
+        if !text.urls.isEmpty && params.linkPreviewLimit > 0 {
+            return .vstack
+        }
+
         let isCurrentUser = message.user.isCurrentUser
         let bubblePaddings = MessageView.horizontalScreenEdgePadding * 2 + MessageView.horizontalBubblePadding
         let avatarViewWithPaddings = params.avatarSize + MessageView.horizontalSpacing
@@ -61,17 +66,12 @@ struct MessageView: View {
             ? widthWithoutMedia
             : MessageView.widthWithMedia - textPaddings
 
-        let styledText = message.text.styled(using: params.styler)
-
-        let finalWidth = styledText.width(withConstrainedWidth: maxWidth, font: params.font)
-        let lastLineWidth = styledText.lastLineWidth(labelWidth: maxWidth, font: params.font)
-        let numberOfLines = styledText.numberOfLines(labelWidth: maxWidth, font: params.font)
+        let finalWidth = text.width(withConstrainedWidth: maxWidth, font: params.font)
+        let lastLineWidth = text.lastLineWidth(labelWidth: maxWidth, font: params.font)
+        let numberOfLines = text.numberOfLines(labelWidth: maxWidth, font: params.font)
 
         let timeWidth = timeViewWidth + MessageView.timeViewTextPadding * 2
 
-        if !styledText.urls.isEmpty && params.linkPreviewLimit > 0 {
-            return .vstack
-        }
         if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
             return .hstack
         }
@@ -166,7 +166,7 @@ struct MessageView: View {
                     attachmentsView(message)
                 }
 
-                if !message.text.isEmpty {
+                if message.hasText {
                     textWithTimeView(message)
                         .font(Font(params.font))
                 }
@@ -179,7 +179,7 @@ struct MessageView: View {
                     }
                 }
             }
-            .padding(.vertical, message.attachments.isEmpty ? 8 : 0)
+            .padding(.vertical, params.showUsername || message.attachments.isEmpty ? 8 : 0)
             .bubbleBackground(message, theme: theme)
             .zIndex(0)
         }
@@ -198,12 +198,12 @@ struct MessageView: View {
             if !message.attachments.isEmpty {
                 attachmentsView(message)
                     .padding(.top, 4)
-                    .padding(.bottom, message.text.isEmpty ? 0 : 4)
+                    .padding(.bottom, message.hasText ? 4 : 0)
             }
 
-            if !message.text.isEmpty {
+            if message.hasText {
                 MessageTextView(
-                    text: message.text,
+                    attributedText: message.attributedText,
                     userType: message.user.type,
                     params: params
                 )
@@ -266,7 +266,7 @@ struct MessageView: View {
                 .padding(.horizontal, MessageView.attachmentPadding)
         }
         .overlay(alignment: .bottomTrailing) {
-            if message.text.isEmpty {
+            if !message.hasText {
                 messageTimeView(needsCapsule: true)
                     .padding(4)
             }
@@ -283,7 +283,7 @@ struct MessageView: View {
     @ViewBuilder
     func textWithTimeView(_ message: Message) -> some View {
         let messageView = MessageTextView(
-            text: message.text,
+            attributedText: message.attributedText,
             userType: message.user.type,
             params: params
         )
@@ -358,7 +358,7 @@ extension View {
             )
             .foregroundColor(theme.colors.messageText(message.user.type))
             .background {
-                if isReply || !message.text.isEmpty || message.recording != nil {
+                if isReply || message.hasText || message.recording != nil {
                     RoundedRectangle(cornerRadius: radius)
                         .foregroundColor(theme.colors.messageBG(message.user.type))
                         .opacity(isReply ? theme.style.replyOpacity : 1)

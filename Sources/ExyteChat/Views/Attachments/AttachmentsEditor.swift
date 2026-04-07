@@ -140,8 +140,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputFieldId: UUID(),
                 style: .signature,
                 availableInputs: availableInputs,
-                localization: localization,
-                messageStyler: messageStyler
+                localization: localization
             )
         } else {
             customInputView

@@ -29,7 +29,6 @@ struct ChatExampleView: View {
         .inputViewText($text)
         .scrollToMessageID(scrollToID)
         .keyboardDismissMode(.interactive)
-        .messageUseMarkdown(true)
         .showUsername(true)
         .setMediaPickerLiveCameraStyle(.prominant)
         .setRecorderSettings(recorderSettings)

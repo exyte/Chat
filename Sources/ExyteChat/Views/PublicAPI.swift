@@ -114,12 +114,14 @@ public extension ChatView {
         return view
     }
 
+    /// scroll to message by id
     func scrollToMessageID(_ messageID: String?) -> ChatView {
         var view = self
         view.chatCustomizationParameters.scrollToMessageID = messageID
         return view
     }
 
+    /// UITableView's will display cell delegate calls this closure
     func onWillDisplayCell(_ closure: @escaping (Message) -> Void) -> ChatView {
         var view = self
         view.chatCustomizationParameters.onWillDisplayCell = closure
@@ -241,16 +243,6 @@ public extension ChatView {
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageCustomizationParameters.font = font
-        return view
-    }
-
-    func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
-        messageUseStyler(String.markdownStyler)
-    }
-
-    func messageUseStyler(_ styler: @escaping (String) -> AttributedString) -> ChatView {
-        var view = self
-        view.messageCustomizationParameters.styler = styler
         return view
     }
 

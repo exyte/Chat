@@ -81,7 +81,7 @@ struct CommentsExampleView: View {
                         msg.id == message.id
                     }
                 case .print:
-                    print(message.text)
+                    print(message.attributedText)
                 }
             }
             .showDateHeaders(false)
@@ -143,8 +143,8 @@ struct CommentsExampleView: View {
                             .font(.system(size: 12)).fontWeight(.medium)
                     }
 
-                    if !message.text.isEmpty {
-                        Text(message.text)
+                    if !message.hasText {
+                        Text(message.attributedText)
                             .font(.system(size: 12)).fontWeight(.medium)
                             .foregroundStyle(.gray)
                     }

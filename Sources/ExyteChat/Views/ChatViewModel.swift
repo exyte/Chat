@@ -55,12 +55,12 @@ final class ChatViewModel: ObservableObject {
     func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
         switch action {
         case .copy:
-            UIPasteboard.general.string = message.text
+            UIPasteboard.general.string = String(message.attributedText.characters)
         case .reply:
             inputViewModel?.attachments.replyMessage = message.toReplyMessage()
             globalFocusState?.focus = .uuid(inputFieldId)
         case .edit(let saveClosure):
-            inputViewModel?.text = message.text
+            inputViewModel?.text = String(message.attributedText.characters)
             inputViewModel?.edit(saveClosure)
             globalFocusState?.focus = .uuid(inputFieldId)
         }

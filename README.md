@@ -76,6 +76,8 @@ where:
 
 `Message` is a type that `Chat` uses for the internal implementation. In the code above it expects the user to provide a list of `Message` structs, and it returns a `DraftMessage` in the `didSendMessage` closure. You can map it both ways to your own `Message` model that your API expects or use as is.
 
+`Message` stores the text in an `AttributedString`. You can pass your own `AttributedString` or a simple `String`, in which case `Message`'s init will apply default attributes: markdown and links underlines.
+
 ## Available chat types
 Chat type - determines the order of messages and direction of new message animation. Available options:
 - `conversation` - the latest message is at the bottom, new messages appear from the bottom  
@@ -226,6 +228,8 @@ These use `AnyView`, so please try to keep them easy enough
 `messageMenuAnimationDuration` - control how fast/snappy the message menu animations feel    
 `contentInsets` - set additional content insets for the messages list   
 `currentContentOffset` - a 2-sided binding to get/set table's content offset   
+`scrollToMessageID` - scroll to any message
+`onWillDisplayCell` - UITableView's will display cell delegate calls this closure
 `updateTransaction` - awaitable updates helper similar in usage to `tableView.performBatchUpdates`
 ```swift
 await updateTransaction(animated: needToAnimate) {
@@ -276,9 +280,7 @@ ChatView(messages: viewModel.messages) { draft in
 `messageLinkPreviewLimit` - limit the maximum number of link previews per message    
 `linkPreviewsEnabled` - enable or disable message link previews globally    
 `shouldShowPreviewForLink` - provide custom logic to decide whether a specific URL should show a preview    
-`setMessageFont` - pass custom font to use for messages    
-`messageUseMarkdown` - use markdown (e.g. ** to make something bold) or not    
-`messageUseStyler` - pass a function that converts the message's `String` to the styled `AttributedString`    
+`setMessageFont` - pass custom font to use for messages      
 
 ### makes sense only for built-in input view    
 `inputViewText` - binding to current text in the default input text field    

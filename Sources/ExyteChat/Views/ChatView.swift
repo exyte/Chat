@@ -110,55 +110,55 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .ignoresSafeArea()
                 }
             }
-            .onAppear {
-                if isGiphyAvailable() {
-                    if let giphyKey = giphyConfig.giphyKey {
-                        if !giphyConfigured {
-                            giphyConfigured = true
-                            Giphy.configure(apiKey: giphyKey)
-                        }
-                    } else {
-                        print("WARNING: giphy key not provided, please pass a key using giphyConfig")
-                    }
-                }
-            }
-            .onChange(of: inputViewModel.text) { _ , newValue in
-                inputViewCustomizationParameters.onInputTextChange?(newValue)
-            }
-            .onChange(of: inputViewCustomizationParameters.externalInputText) {
-                DispatchQueue.main.async {
-                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
-                }
-            }
-            .onChange(of: selectedGiphyMedia) {
-                if let giphyMedia = selectedGiphyMedia {
-                    inputViewModel.attachments.giphyMedia = giphyMedia
-                    inputViewModel.send()
-                }
-            }
-            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
-                if giphyConfig.giphyKey != nil {
-                    GiphyEditorView(
-                        giphyConfig: giphyConfig,
-                        selectedMedia: $selectedGiphyMedia
-                    )
-                    .environmentObject(globalFocusState)
-                } else {
-                    Text("no giphy key found")
-                }
-            }
-            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-                AttachmentsEditor(
-                    inputViewModel: inputViewModel,
-                    inputViewBuilder: inputViewBuilder,
-                    mediaPickerParameters: inputViewCustomizationParameters.mediaPickerParameters,
-                    availableInputs: inputViewCustomizationParameters.availableInputs,
-                    localization: chatCustomizationParameters.localization,
-                    messageStyler: messageCustomizationParameters.styler
-                )
-                .environmentObject(globalFocusState)
-                .environmentObject(keyboardState)
-            }
+//            .onAppear {
+//                if isGiphyAvailable() {
+//                    if let giphyKey = giphyConfig.giphyKey {
+//                        if !giphyConfigured {
+//                            giphyConfigured = true
+//                            Giphy.configure(apiKey: giphyKey)
+//                        }
+//                    } else {
+//                        print("WARNING: giphy key not provided, please pass a key using giphyConfig")
+//                    }
+//                }
+//            }
+//            .onChange(of: inputViewModel.text) { _ , newValue in
+//                inputViewCustomizationParameters.onInputTextChange?(newValue)
+//            }
+//            .onChange(of: inputViewCustomizationParameters.externalInputText) {
+//                DispatchQueue.main.async {
+//                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
+//                }
+//            }
+//            .onChange(of: selectedGiphyMedia) {
+//                if let giphyMedia = selectedGiphyMedia {
+//                    inputViewModel.attachments.giphyMedia = giphyMedia
+//                    inputViewModel.send()
+//                }
+//            }
+//            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
+//                if giphyConfig.giphyKey != nil {
+//                    GiphyEditorView(
+//                        giphyConfig: giphyConfig,
+//                        selectedMedia: $selectedGiphyMedia
+//                    )
+//                    .environmentObject(globalFocusState)
+//                } else {
+//                    Text("no giphy key found")
+//                }
+//            }
+//            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
+//                AttachmentsEditor(
+//                    inputViewModel: inputViewModel,
+//                    inputViewBuilder: inputViewBuilder,
+//                    mediaPickerParameters: inputViewCustomizationParameters.mediaPickerParameters,
+//                    availableInputs: inputViewCustomizationParameters.availableInputs,
+//                    localization: chatCustomizationParameters.localization,
+//                    messageStyler: messageCustomizationParameters.styler
+//                )
+//                .environmentObject(globalFocusState)
+//                .environmentObject(keyboardState)
+//            }
         
             .onChange(of: inputViewModel.showPicker) { _ , newValue in
                 if newValue {
@@ -346,8 +346,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     style: .message,
                     availableInputs: inputViewCustomizationParameters.availableInputs,
                     recorderSettings: inputViewCustomizationParameters.recorderSettings,
-                    localization: chatCustomizationParameters.localization,
-                    messageStyler: messageCustomizationParameters.styler
+                    localization: chatCustomizationParameters.localization
                 )
             } else {
                 customInputView
