@@ -179,7 +179,7 @@ struct MessageView: View {
                     }
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, message.attachments.isEmpty ? 8 : 0)
             .bubbleBackground(message, theme: theme)
             .zIndex(0)
         }
@@ -301,7 +301,6 @@ struct MessageView: View {
                 case .hstack:
                     HStack(alignment: .lastTextBaseline, spacing: 0) {
                         messageView
-                            //.fixedSize(horizontal: true, vertical: true)
                         if !message.attachments.isEmpty {
                             Spacer()
                         }

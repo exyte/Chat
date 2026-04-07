@@ -106,20 +106,27 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             tableView.contentInset = chatParams.contentInsets
         }
 
-        if context.coordinator.sections != sections || tableView.contentOffset != chatParams.externalContentOffset {
+        if context.coordinator.sections != sections || tableView.contentOffset != chatParams.externalContentOffset, chatParams.scrollToMessageID != nil {
             updateQueue.didPerformRealUpdate = true
         }
 
+        let needToScroll = chatParams.externalContentOffset != nil || chatParams.scrollToMessageID != nil
+        let animateTableUpdate = transaction.animated && !needToScroll
+
         Task {
-            if context.coordinator.sections != sections {
-                await updateQueue.enqueue() {
-                    await updateIfNeeded(coordinator: context.coordinator, tableView: tableView)
+            await updateQueue.enqueue() {
+                if context.coordinator.sections != sections {
+                    await updateIfNeeded(coordinator: context.coordinator, tableView: tableView, animated: animateTableUpdate)
                 }
-            } else if let offset = chatParams.externalContentOffset, tableView.contentOffset != offset {
-                await updateQueue.enqueue() {
+
+                if needToScroll {
                     await withCheckedContinuation { continuation in
-                        UIView.animate(withDuration: 0.25) {
-                            tableView.setContentOffset(offset, animated: false)
+                        UIView.animate(withDuration: transaction.animated ? 0.25 : 0) {
+                            if let offset = chatParams.externalContentOffset, tableView.contentOffset != offset {
+                                tableView.setContentOffset(offset, animated: false)
+                            } else if let messageID = chatParams.scrollToMessageID, let indexPath = indexPath(for: messageID, in: sections) {
+                                tableView.scrollToRow(at: indexPath, at: .middle, animated: false)
+                            }
                         } completion: { _ in
                             continuation.resume()
                         }
@@ -129,8 +136,17 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
     }
 
+    func indexPath(for id: String, in sections: [MessagesSection]) -> IndexPath? {
+        for (sectionIndex, section) in sections.enumerated() {
+            if let rowIndex = section.rows.firstIndex(where: { $0.message.id == id }) {
+                return IndexPath(row: rowIndex, section: sectionIndex)
+            }
+        }
+        return nil
+    }
+
     @MainActor
-    private func updateIfNeeded(coordinator: Coordinator, tableView: UITableView) async {
+    private func updateIfNeeded(coordinator: Coordinator, tableView: UITableView, animated: Bool) async {
         if coordinator.sections == sections {
             return
         }
@@ -160,7 +176,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         //print("0 whole sections:", runID, "\n")
         //print("whole previous:\n", formatSections(prevSections), "\n")
         let splitInfo = await performSplitInBackground(prevSections, sections)
-        await applyUpdatesToTable(tableView, splitInfo: splitInfo) {
+        await applyUpdatesToTable(tableView, splitInfo: splitInfo, animated: animated) {
             coordinator.sections = $0
         }
     }
@@ -175,7 +191,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     @MainActor
-    private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, updateContextClosure: ([MessagesSection])->()) async {
+    private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, animated: Bool, updateContextClosure: ([MessagesSection])->()) async {
         // step 0: preparation
         // prepare intermediate sections and operations
         //print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
@@ -230,22 +246,20 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         //print("4 apply inserts", runID)
         updateContextClosure(sections)
 
-        //print(externalContentOffset, sections.last?.rows.first?.id)
-        if let newOffset = chatParams.externalContentOffset {
-            if !transaction.animated {
-                UIView.setAnimationsEnabled(false)
-            }
-            for operation in splitInfo.insertOperations {
-                applyOperation(operation, tableView: tableView)
-            }
-            tableView.setContentOffset(newOffset, animated: false)
-            UIView.setAnimationsEnabled(true)
-        } else if isScrolledToBottom || isScrolledToTop {
+        guard isScrolledToBottom || isScrolledToTop else { return }
+
+        if animated {
             await performBatchTableUpdates(tableView) {
                 for operation in splitInfo.insertOperations {
                     applyOperation(operation, tableView: tableView)
                 }
             }
+        } else {
+            UIView.setAnimationsEnabled(false)
+            for operation in splitInfo.insertOperations {
+                applyOperation(operation, tableView: tableView)
+            }
+            UIView.setAnimationsEnabled(true)
         }
         //print("4 finished inserts", runID)
 
@@ -617,6 +631,10 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         }
 
         func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+            if let onWillDisplayCell = chatParams.onWillDisplayCell {
+                onWillDisplayCell(sections[indexPath.section].rows[indexPath.row].message)
+            }
+
             guard let paginationHandler = chatParams.paginationHandler, let paginationTargetIndexPath, indexPath == paginationTargetIndexPath else {
                 return
             }

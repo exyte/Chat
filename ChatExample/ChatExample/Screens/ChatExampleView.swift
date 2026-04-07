@@ -9,18 +9,15 @@ import ExyteChat
 @MainActor
 struct ChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationMode) var presentationMode
 
-    @StateObject private var viewModel: ChatExampleViewModel
+    @StateObject var viewModel: ChatExampleViewModel
+    var title: String
+
     @State var text = ""
+    @State var scrollToID: String?
 
-    private let title: String
-    private let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
-    
-    init(viewModel: ChatExampleViewModel, title: String) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-        self.title = title
-    }
+    let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
     var body: some View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
@@ -30,6 +27,7 @@ struct ChatExampleView: View {
             viewModel.loadMoreMessages()
         }
         .inputViewText($text)
+        .scrollToMessageID(scrollToID)
         .keyboardDismissMode(.interactive)
         .messageUseMarkdown(true)
         .showUsername(true)
@@ -53,7 +51,9 @@ struct ChatExampleView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button { presentationMode.wrappedValue.dismiss() } label: {
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
                     Image("backArrow", bundle: .current)
                         .renderingMode(.template)
                         .foregroundStyle(colorScheme == .dark ? .white : .black)

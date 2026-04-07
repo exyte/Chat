@@ -21,6 +21,8 @@ struct ChatCustomizationParameters {
 
     var externalContentOffset: CGPoint? // External → Internal
     var onContentOffsetChange: ((CGPoint) -> Void)? // Internal → External
+    var scrollToMessageID: String?
+    var onWillDisplayCell: ((Message) -> Void)?
     var onTransactionReady: ((TableUpdateTransaction) -> Void)?
 
     var paginationHandler: PaginationHandler?

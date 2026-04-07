@@ -114,6 +114,18 @@ public extension ChatView {
         return view
     }
 
+    func scrollToMessageID(_ messageID: String?) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.scrollToMessageID = messageID
+        return view
+    }
+
+    func onWillDisplayCell(_ closure: @escaping (Message) -> Void) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.onWillDisplayCell = closure
+        return view
+    }
+
     /// awaitable updates helper similar in usage to `tableView.performBatchUpdates`
     func updateTransaction(_ binding: Binding<TableUpdateTransaction?>) -> ChatView {
         var view = self
