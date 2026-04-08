@@ -63,7 +63,7 @@ final class MockChatData {
     func randomMockImage() -> MockImage {
         let w = Int.random(in: 200...500)
         let h = Int.random(in: 200...500)
-        let url = "https://fakeimg.pl/\(w)x\(h)/"
+        let url = "https://picsum.photos/\(w)/\(h)/"
         return MockImage(
             id: UUID().uuidString,
             thumbnail: URL(string: url)!,

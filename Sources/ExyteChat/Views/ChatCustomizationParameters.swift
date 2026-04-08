@@ -34,12 +34,15 @@ struct ChatCustomizationParameters {
 struct MessageCustomizationParameters {
     var showTimeView = true
     var showUsername = false
-    var showAvatar = true
-    var avatarSize: CGFloat = 32
-    var tapAvatarClosure: ChatView.TapAvatarClosure?
     var linkPreviewLimit = 8
     var shouldShowPreviewForLink: (URL) -> Bool = { _ in true }
     var font = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+
+    // avatar
+    var showAvatar = true
+    var avatarSize: CGFloat = 32
+    var tapAvatarClosure: ChatView.TapAvatarClosure?
+    var avatarBuilder: ((User)->(AnyView))?
 }
 
 struct InputViewCustomizationParameters {

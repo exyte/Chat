@@ -194,14 +194,14 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, animated: Bool, updateContextClosure: ([MessagesSection])->()) async {
         // step 0: preparation
         // prepare intermediate sections and operations
-        //print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
-        //print("whole appliedDeletesSwapsAndEdits:\n", formatSections(splitInfo.appliedDeletesSwapsAndEdits), "\n")
-        //print("whole final sections:\n", formatSections(sections), "\n")
-
-        //print("operations delete:\n", splitInfo.deleteOperations.map { $0.description })
-        //print("operations swap:\n", splitInfo.swapOperations.map { $0.description })
-        //print("operations edit:\n", splitInfo.editOperations.map { $0.description })
-        //print("operations insert:\n", splitInfo.insertOperations.map { $0.description })
+//        print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
+//        print("whole appliedDeletesSwapsAndEdits:\n", formatSections(splitInfo.appliedDeletesSwapsAndEdits), "\n")
+//        print("whole final sections:\n", formatSections(sections), "\n")
+//
+//        print("operations delete:\n", splitInfo.deleteOperations.map { $0.description })
+//        print("operations swap:\n", splitInfo.swapOperations.map { $0.description })
+//        print("operations edit:\n", splitInfo.editOperations.map { $0.description })
+//        print("operations insert:\n", splitInfo.insertOperations.map { $0.description })
 
         await performBatchTableUpdates(tableView) {
             // step 1: deletes
@@ -246,9 +246,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         //print("4 apply inserts", runID)
         updateContextClosure(sections)
 
-        guard isScrolledToBottom || isScrolledToTop else { return }
-
-        if animated {
+        if animated, isScrolledToBottom || isScrolledToTop {
             await performBatchTableUpdates(tableView) {
                 for operation in splitInfo.insertOperations {
                     applyOperation(operation, tableView: tableView)
@@ -678,6 +676,25 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             isScrolledToBottom = scrollView.contentOffset.y <= 0
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
         }
+    }
+
+    func formatRow(_ row: MessageRow) -> String {
+        String(
+            "id: \(row.id) text: \(String(row.message.attributedText.characters)) status: \(row.message.status ?? .none) date: \(row.message.createdAt) position in user group: \(row.positionInUserGroup) position in messages section: \(row.positionInMessagesSection) trigger: \(row.message.triggerRedraw)"
+        )
+    }
+
+    func formatSections(_ sections: [MessagesSection]) -> String {
+        var res = "(\(sections.count))(\(sections.map{$0.rows.count})){\n"
+        for section in sections.reversed() {
+            res += String("\t{\n")
+            for row in section.rows {
+                res += String("\t\t\(formatRow(row))\n")
+            }
+            res += String("\t}\n")
+        }
+        res += String("}")
+        return res
     }
 }
 

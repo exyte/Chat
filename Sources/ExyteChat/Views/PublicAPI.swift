@@ -206,24 +206,6 @@ public extension ChatView {
         return view
     }
 
-    func showAvatar(_ show: Bool) -> ChatView {
-        var view = self
-        view.messageCustomizationParameters.showAvatar = show
-        return view
-    }
-
-    func avatarSize(avatarSize: CGFloat) -> ChatView {
-        var view = self
-        view.messageCustomizationParameters.avatarSize = avatarSize
-        return view
-    }
-
-    func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
-        var view = self
-        view.messageCustomizationParameters.tapAvatarClosure = closure
-        return view
-    }
-
     func messageLinkPreviewLimit(_ limit: Int) -> ChatView {
         var view = self
         view.messageCustomizationParameters.linkPreviewLimit = limit
@@ -243,6 +225,32 @@ public extension ChatView {
     func setMessageFont(_ font: UIFont) -> ChatView {
         var view = self
         view.messageCustomizationParameters.font = font
+        return view
+    }
+
+    func showAvatar(_ show: Bool) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.showAvatar = show
+        return view
+    }
+
+    func avatarSize(avatarSize: CGFloat) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.avatarSize = avatarSize
+        return view
+    }
+
+    func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.tapAvatarClosure = closure
+        return view
+    }
+
+    func avatarBuilder<V: View>(_ builder: @escaping (User)->V) -> ChatView {
+        var view = self
+        view.messageCustomizationParameters.avatarBuilder = { user in
+            AnyView(builder(user))
+        }
         return view
     }
 
