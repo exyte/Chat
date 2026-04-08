@@ -10,8 +10,8 @@ import GiphyUISDK
 import ExyteMediaPicker
 
 public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
-public typealias MediaPickerSelectionParameters = SelectionParamsHolder
-public typealias MediaPickerParameters = MediaPickerParamsHolder
+public typealias MediaPickerSelectionParameters = SelectionParameters
+public typealias MediaPickerParameters = MediaPickerCutomizationParameters
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
