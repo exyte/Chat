@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 extension String {
 
     private static var markdownOptions = AttributedString.MarkdownParsingOptions(
@@ -16,17 +15,16 @@ extension String {
         failurePolicy: .returnPartiallyParsedIfPossible,
         languageCode: nil
     )
+    
+    func applyDefaultAttributes() -> AttributedString {
+        var result = (try? AttributedString(markdown: self, options: String.markdownOptions)) ?? AttributedString(stringLiteral: self)
 
-    public static func markdownStyler(text: String) -> AttributedString {
-        if let attributed = try? AttributedString(markdown: text, options: String.markdownOptions) {
-            attributed
-        } else {
-            AttributedString(stringLiteral: text)
+        for (link, range) in result.runs[\.link] {
+            if link != nil {
+                result[range].underlineStyle = .single
+            }
         }
-    }
 
-    public func styled(using styler: (String) -> AttributedString) -> AttributedString {
-        styler(self)
+        return result
     }
-
 }

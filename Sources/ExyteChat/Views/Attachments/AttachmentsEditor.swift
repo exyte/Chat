@@ -11,8 +11,8 @@ import ActivityIndicatorView
 
 struct AttachmentsEditor<InputViewContent: View>: View {
     
-    typealias InputViewBuilderClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderClosure
-    
+    typealias InputViewBuilderParamsClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderParamsClosure
+
     @Environment(\.chatTheme) var theme
     @Environment(\.mediaPickerTheme) var mediaPickerTheme
     @Environment(\.mediaPickerThemeIsOverridden) var mediaPickerThemeIsOverridden
@@ -22,14 +22,11 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     @ObservedObject var inputViewModel: InputViewModel
 
-    var inputViewBuilder: InputViewBuilderClosure?
-    var chatTitle: String?
-    var messageStyler: (String) -> AttributedString
-    var orientationHandler: MediaPickerOrientationHandler
-    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
-    var mediaPickerParameters: MediaPickerParameters?
+    var inputViewBuilder: InputViewBuilderParamsClosure
+    var mediaPickerParameters: MediaPickerParameters
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
+    var messageStyler: (String) -> AttributedString
 
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?
@@ -81,10 +78,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.showPicker = false
             }
             .currentFullscreenMedia($currentFullscreenMedia)
-            .setSelectionParameters(mediaPickerSelectionParameters ?? SelectionParameters())
-            .setMediaPickerParameters(mediaPickerParameters ?? MediaPickerCutomizationParameters())
             .pickerMode($inputViewModel.mediaPickerMode)
-            .orientationHandler(orientationHandler)
+            .setMediaPickerParameters(mediaPickerParameters)
             .padding(.top)
             .background(theme.colors.mainBG)
             .ignoresSafeArea(.all)
@@ -92,8 +87,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 assembleSelectedMedia()
             }
             .onChange(of: inputViewModel.showPicker) {
-                let showFullscreenPreview = mediaPickerSelectionParameters?.showFullscreenPreview ?? true
-                let selectionLimit = mediaPickerSelectionParameters?.selectionLimit ?? 1
+                let showFullscreenPreview = mediaPickerParameters.selectionParameters.showFullscreenPreview
+                let selectionLimit = mediaPickerParameters.selectionParameters.selectionLimit ?? 1
 
                 if selectionLimit == 1 && !showFullscreenPreview {
                     assembleSelectedMedia()
@@ -127,25 +122,29 @@ struct AttachmentsEditor<InputViewContent: View>: View {
 
     @ViewBuilder
     var inputView: some View {
-        Group {
-            if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder(
-                    $inputViewModel.text, inputViewModel.attachments, inputViewModel.state,
-                    .signature, inputViewModel.inputViewAction()
-                ) {
-                    globalFocusState.focus = nil
-                }
-                .customFocus($globalFocusState.focus, equals: .uuid(UUID()))
-            } else {
-                InputView(
-                    viewModel: inputViewModel,
-                    inputFieldId: UUID(),
-                    style: .signature,
-                    availableInputs: availableInputs,
-                    messageStyler: messageStyler,
-                    localization: localization
-                )
+        let customInputView = inputViewBuilder(
+            InputViewBuilderParameters(
+                text: $inputViewModel.text,
+                attachments: inputViewModel.attachments,
+                inputViewState: inputViewModel.state,
+                inputViewStyle: .signature,
+                inputViewActionClosure: inputViewModel.inputViewAction()
+            ) {
+                globalFocusState.focus = nil
             }
+        )
+
+        if customInputView is DummyView {
+            InputView(
+                viewModel: inputViewModel,
+                inputFieldId: UUID(),
+                style: .signature,
+                availableInputs: availableInputs,
+                localization: localization
+            )
+        } else {
+            customInputView
+                .customFocus($globalFocusState.focus, equals: .uuid(UUID()))
         }
     }
 
@@ -187,13 +186,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             }
             .tint(mediaPickerTheme.main.pickerText)
             .padding(.trailing, 30)
-
-            if let chatTitle = chatTitle {
-                theme.images.mediaPicker.chevronRight
-                Text(chatTitle)
-                    .font(.title3)
-                    .foregroundColor(mediaPickerTheme.main.pickerText)
-            }
 
             Spacer()
         }

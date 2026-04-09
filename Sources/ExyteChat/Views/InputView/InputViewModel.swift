@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import ExyteMediaPicker
+import SwiftUI
 
 @MainActor
 final class InputViewModel: ObservableObject {
@@ -76,7 +77,7 @@ final class InputViewModel: ObservableObject {
             self?.inputViewActionInternal($0)
         }
     }
-    
+
     private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
         case .giphy:
@@ -160,7 +161,7 @@ final class InputViewModel: ObservableObject {
 
 private extension InputViewModel {
 
-    func validateDraft() {
+    public func validateDraft() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard state != .editing else { return } // special case
@@ -228,7 +229,7 @@ private extension InputViewModel {
     func sendMessage() {
         showActivityIndicator = true
         let draft = DraftMessage(
-            text: self.text,
+            text: text,
             medias: attachments.medias,
             giphyMedia: attachments.giphyMedia,
             recording: attachments.recording,

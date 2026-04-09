@@ -5,25 +5,6 @@
 
 import SwiftUI
 
-public extension ChatView {
-    func swipeActions<V:View>(edge: HorizontalEdge = .trailing, performsFirstActionWithFullSwipe: Bool = true, items: [SwipeAction<V>]) -> ChatView {
-        var view = self
-        switch edge {
-        case .leading:
-            view.listSwipeActions = .init(
-                leading: .init(performsFirstActionWithFullSwipe: performsFirstActionWithFullSwipe, actions: items),
-                trailing: view.listSwipeActions.trailing
-            )
-        case .trailing:
-            view.listSwipeActions = .init(
-                leading: view.listSwipeActions.leading,
-                trailing: .init(performsFirstActionWithFullSwipe: performsFirstActionWithFullSwipe, actions: items)
-            )
-        }
-        return view
-    }
-}
-
 protocol SwipeActionable {
     func render(type: ChatType) -> UIImage
     var action: (Message, @escaping (Message, DefaultMessageMenuAction) -> Void) -> Void { get }

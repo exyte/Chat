@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Giphy/giphy-ios-sdk",
       "state" : {
-        "revision" : "ed91784fe854a8204a9f994282d87f9c18df5fac",
-        "version" : "2.3.1"
+        "revision" : "37f5b1ff6cf8bc4a78c0bc5eb1b814381bac9580",
+        "version" : "2.2.16"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "revision" : "5c9a8df948602a9d61239b2dd8d5bbc9b38428d9",
-        "version" : "3.2.5"
+        "revision" : "b6b4ded954ed16fa66e70730abfde82846c7188e",
+        "version" : "3.3.0"
       }
     }
   ],

@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import UIKit
+import SwiftUI
 
 @MainActor
 final class ChatViewModel: ObservableObject {
@@ -39,7 +40,7 @@ final class ChatViewModel: ObservableObject {
     }
     
     func updateAttachmentStatus(_ uploadUpdate: AttachmentUploadUpdate) {
-      didUpdateAttachmentStatus(uploadUpdate)
+        didUpdateAttachmentStatus(uploadUpdate)
     }
 
     func sendMessage(_ message: DraftMessage) {
@@ -55,12 +56,14 @@ final class ChatViewModel: ObservableObject {
     func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
         switch action {
         case .copy:
-            UIPasteboard.general.string = message.text
+            UIPasteboard.general.string = String(message.attributedText.characters)
         case .reply:
-            inputViewModel?.attachments.replyMessage = message.toReplyMessage()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                inputViewModel?.attachments.replyMessage = message.toReplyMessage()
+            }
             globalFocusState?.focus = .uuid(inputFieldId)
         case .edit(let saveClosure):
-            inputViewModel?.text = message.text
+            inputViewModel?.text = String(message.attributedText.characters)
             inputViewModel?.edit(saveClosure)
             globalFocusState?.focus = .uuid(inputFieldId)
         }

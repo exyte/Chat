@@ -270,7 +270,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             /// Calculate our vertical safe area insets
             let safeArea = UIApplication.safeArea.top + UIApplication.safeArea.bottom
             /// Calculate our ReactionOverview height
-            let rOHeight:CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
+            let rOHeight: CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
             /// We calculate the total height here, instead of using messageMenuFrame.height
             /// messageMenuHeight renders the menu buttons in a VStack by default, and we need to account for the clamping of the menu height
             let totalMenuHeight = calculateMessageMenuHeight(including: [.message, .reactionSelection]) + min(menuHeight, maxMenuHeight)

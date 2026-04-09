@@ -9,30 +9,28 @@ import ExyteChat
 @MainActor
 struct ChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.presentationMode) var presentationMode
 
-    @StateObject private var viewModel: ChatExampleViewModel
+    @StateObject var viewModel: ChatExampleViewModel
+    var title: String
 
-    private let title: String
-    private let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
-    
-    init(viewModel: ChatExampleViewModel, title: String) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-        self.title = title
-    }
+    @State var text = ""
+    @State var scrollToID: String?
+
+    let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
     var body: some View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
-        .enableLoadMore(pageSize: 3) { message in
-            await MainActor.run {
-                viewModel.loadMoreMessage(before: message)
-            }
+        .enableLoadMore(offset: 1) {
+            viewModel.loadMoreMessages()
         }
+        .inputViewText($text)
+        .scrollToMessageID(scrollToID)
         .keyboardDismissMode(.interactive)
-        .messageUseMarkdown(true)
-        .setMediaPickerParameters(MediaPickerParameters(liveCameraCell: MediaPickerLiveCameraStyle.prominant))
+        .showUsername(true)
+        .setMediaPickerLiveCameraStyle(.prominant)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [
@@ -52,7 +50,9 @@ struct ChatExampleView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button { presentationMode.wrappedValue.dismiss() } label: {
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
                     Image("backArrow", bundle: .current)
                         .renderingMode(.template)
                         .foregroundStyle(colorScheme == .dark ? .white : .black)
@@ -74,24 +74,27 @@ struct ChatExampleView: View {
                         }
                         .frame(width: 35, height: 35)
                         .clipShape(Circle())
-                    }
 
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(viewModel.chatTitle)
-                            .fontWeight(.semibold)
-                            .font(.headline)
-                            .foregroundStyle(colorScheme == .dark ? .white : .black)
-                        Text(viewModel.chatStatus)
-                            .font(.footnote)
-                            .foregroundColor(Color(hex: "AFB3B8"))
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(viewModel.chatTitle)
+                                .fontWeight(.semibold)
+                                .font(.headline)
+                                .foregroundStyle(colorScheme == .dark ? .white : .black)
+                            Text(viewModel.chatStatus)
+                                .font(.footnote)
+                                .foregroundColor(Color(hex: "AFB3B8"))
+                        }
+                        Spacer()
                     }
-                    Spacer()
                 }
                 .padding(.leading, 10)
             }
         }
         .onAppear(perform: viewModel.onStart)
         .onDisappear(perform: viewModel.onStop)
+        .onChange(of: text) { oldValue, newValue in
+            print(newValue)
+        }
     }
     
     // Swipe Action

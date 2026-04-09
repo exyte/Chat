@@ -68,7 +68,7 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
         timer?.invalidate()
     }
 
-    func loadMoreMessage(before message: Message) {
+    func loadMoreMessages() {
         Task {
             await interactor.loadNextPage()
             updateMessages()

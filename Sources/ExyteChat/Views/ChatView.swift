@@ -11,7 +11,6 @@ import ExyteMediaPicker
 
 public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
 public typealias MediaPickerSelectionParameters = SelectionParameters
-public typealias MediaPickerParameters = MediaPickerCutomizationParameters
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -25,120 +24,55 @@ public enum ReplyMode: CaseIterable, Sendable {
 
 public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction: MessageMenuAction>: View {
     
-    /// To build a custom message view use the following parameters passed by this closure:
-    /// - message containing user, attachments, etc.
-    /// - position of message in its continuous group of messages from the same user
-    /// - position of message in the section of messages from that day
-    /// - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)
-    /// - closure to show message context menu
-    /// - closure to pass user interaction, .reply for example
-    /// - pass attachment to this closure to use ChatView's fullscreen media viewer
-    public typealias MessageBuilderClosure = ((
-        _ message: Message,
-        _ positionInGroup: PositionInUserGroup,
-        _ positionInMessagesSection: PositionInMessagesSection,
-        _ positionInCommentsGroup: CommentsPosition?,
-        _ showContextMenuClosure: @escaping () -> Void,
-        _ messageActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
-        _ showAttachmentClosure: @escaping (Attachment) -> Void
-    ) -> MessageContent)
-    
-    /// To build a custom input view use the following parameters passed by this closure:
-    /// - binding to the text in input view
-    /// - InputViewAttachments to store the attachments from external pickers
-    /// - current input view state: .message for main input view mode and .signature for input view in media picker mode
-    /// - closure to pass user interaction, .recordAudioTap for example
-    /// - dismiss keyboard closure
-    public typealias InputViewBuilderClosure = (
-        _ text: Binding<String>,
-        _ attachments: InputViewAttachments,
-        _ inputViewState: InputViewState,
-        _ inputViewStyle: InputViewStyle,
-        _ inputViewActionClosure: @escaping (InputViewAction) -> Void,
-        _ dismissKeyboardClosure: ()->()
-    ) -> InputViewContent
-    
-    /// To define custom message menu actions declare an enum conforming to MessageMenuAction. The library will show your custom menu options on long tap on message. Once the action is selected the following callback will be called:
-    /// - action selected by the user from the menu. NOTE: when declaring this variable, specify its type (your custom descendant of MessageMenuAction) explicitly
-    /// - a closure taking a case of default implementation of MessageMenuAction which provides simple actions handlers; you call this closure passing the selected message and choosing one of the default actions if you need them; or you can write a custom implementation for all your actions, in that case just ignore this closure
-    /// - message for which the menu is displayed
-    /// When implementing your own MessageMenuActionClosure, write a switch statement passing through all the cases of your MessageMenuAction, inside each case write your own action handler, or call the default one. NOTE: not all default actions work out of the box - e.g. for .edit you'll still need to provide a closure to save the edited text on your BE. Please see CommentsExampleView in ChatExample project for MessageMenuActionClosure usage example.
-    public typealias MessageMenuActionClosure = (
-        _ selectedMenuAction: MenuAction,
-        _ defaultActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
-        _ message: Message
-    ) -> Void
-    
     /// User and MessageId
     public typealias TapAvatarClosure = (User, String) -> ()
     
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.chatTheme) private var theme
     @Environment(\.giphyConfig) private var giphyConfig
-    
-    // MARK: - Parameters
-    
-    let type: ChatType
-    let sections: [MessagesSection]
-    let ids: [String]
-    let didSendMessage: (DraftMessage) -> Void
-    let didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
-    var reactionDelegate: ReactionDelegate?
 
-    // MARK: - View builders
-    
+    // MARK: - Parameters
+
     /// provide custom message view builder
-    var messageBuilder: MessageBuilderClosure? = nil
-    
+    @ViewBuilder var messageBuilder: MessageBuilderParamsClosure
+
     /// provide custom input view builder
-    var inputViewBuilder: InputViewBuilderClosure? = nil
-    
+    @ViewBuilder var inputViewBuilder: InputViewBuilderParamsClosure
+
     /// message menu customization: create enum complying to MessageMenuAction and pass a closure processing your enum cases
-    var messageMenuAction: MessageMenuActionClosure?
-    
-    /// content to display in between the chat list view and the input view
-    var betweenListAndInputViewBuilder: (()->AnyView)?
-    
+    var messageMenuAction: MessageMenuActionClosure
+
+    var type: ChatType
+    var sections: [MessagesSection]
+    var ids: [String]
+    var didSendMessage: (DraftMessage) -> Void
+    var didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
+
+    // MARK: - Simple view builders
+
     /// a header for the whole chat, which will scroll together with all the messages and headers
     var mainHeaderBuilder: (()->AnyView)?
-    
+
     /// date section header builder
     var headerBuilder: ((Date)->AnyView)?
-    
-    /// provide strings for the chat view, these can be localized in the Localizable.strings files
-    var localization: ChatLocalization = createLocalization()
-    
+
+    /// content to display in between the chat list view and the input view
+    var betweenListAndInputViewBuilder: (()->AnyView)?
+
     // MARK: - Customization
-    
-    var isListAboveInputView: Bool = true
-    var showDateHeaders: Bool = true
-    var isScrollEnabled: Bool = true
-    var avatarSize: CGFloat = 32
-    var messageStyler: (String) -> AttributedString = AttributedString.init
-    var shouldShowLinkPreview: (URL) -> Bool = { _ in true }
-    var showMessageMenuOnLongPress: Bool = true
-    var messageMenuAnimationDuration: Double = 0.3
-    var showNetworkConnectionProblem: Bool = false
-    var tapAvatarClosure: TapAvatarClosure?
-    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
-    var mediaPickerParameters: MediaPickerParameters?
-    var orientationHandler: MediaPickerOrientationHandler = {_ in}
-    var chatTitle: String?
-    var paginationHandler: PaginationHandler?
-    var showMessageTimeView = true
-    var messageLinkPreviewLimit = 8
-    var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
-    var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
-    var recorderSettings: RecorderSettings = RecorderSettings()
-    var listSwipeActions: ListSwipeActions = ListSwipeActions()
-    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
-    
+
+    var chatCustomizationParameters = ChatCustomizationParameters()
+    var messageCustomizationParameters = MessageCustomizationParameters()
+    var inputViewCustomizationParameters = InputViewCustomizationParameters()
+
+    // MARK: - State
+
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
-    
+
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
 
@@ -147,34 +81,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var tableContentHeight: CGFloat = 0
     @State private var inputViewSize = CGSize.zero
+    @State private var timeViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
 
     @State private var giphyConfigured = false
-    @State private var selectedMedia: GPHMedia? = nil
-    
-    public init(messages: [Message],
-                chatType: ChatType = .conversation,
-                replyMode: ReplyMode = .quote,
-                reactionDelegate: ReactionDelegate? = nil,
-                messageBuilder: @escaping MessageBuilderClosure,
-                inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?,
-                localization: ChatLocalization,
-                didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
-                didSendMessage: @escaping (DraftMessage) -> Void
-    ) {
-        self.type = chatType
-        self.reactionDelegate = reactionDelegate
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-        self.ids = messages.map { $0.id }
-        self.messageBuilder = messageBuilder
-        self.inputViewBuilder = inputViewBuilder
-        self.messageMenuAction = messageMenuAction
-        self.localization = localization
-        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
-        self.didSendMessage = didSendMessage
-    }
-    
+    @State private var selectedGiphyMedia: GPHMedia? = nil
+
     public var body: some View {
         mainView
             .background(chatBackground())
@@ -198,50 +110,55 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .ignoresSafeArea()
                 }
             }
-            .onAppear() {
-                if isGiphyAvailable() {
-                    if let giphyKey = giphyConfig.giphyKey {
-                        if !giphyConfigured {
-                            giphyConfigured = true
-                            Giphy.configure(apiKey: giphyKey)
-                        }
-                    } else {
-                        print("WARNING: giphy key not provided, please pass a key using giphyConfig")
-                    }
-                }
-            }
-            .onChange(of: selectedMedia) {
-                if let giphyMedia = selectedMedia {
-                    inputViewModel.attachments.giphyMedia = giphyMedia
-                    inputViewModel.send()
-                }
-            }
-            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
-                if giphyConfig.giphyKey != nil {
-                    GiphyEditorView(
-                        giphyConfig: giphyConfig,
-                        selectedMedia: $selectedMedia
-                    )
-                    .environmentObject(globalFocusState)
-                } else {
-                    Text("no giphy key found")
-                }
-            }
-            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-                AttachmentsEditor(
-                    inputViewModel: inputViewModel,
-                    inputViewBuilder: inputViewBuilder,
-                    chatTitle: chatTitle,
-                    messageStyler: messageStyler,
-                    orientationHandler: orientationHandler,
-                    mediaPickerSelectionParameters: mediaPickerSelectionParameters,
-                    mediaPickerParameters: mediaPickerParameters,
-                    availableInputs: availableInputs,
-                    localization: localization
-                )
-                .environmentObject(globalFocusState)
-                .environmentObject(keyboardState)
-            }
+//            .onAppear {
+//                if isGiphyAvailable() {
+//                    if let giphyKey = giphyConfig.giphyKey {
+//                        if !giphyConfigured {
+//                            giphyConfigured = true
+//                            Giphy.configure(apiKey: giphyKey)
+//                        }
+//                    } else {
+//                        print("WARNING: giphy key not provided, please pass a key using giphyConfig")
+//                    }
+//                }
+//            }
+//            .onChange(of: inputViewModel.text) { _ , newValue in
+//                inputViewCustomizationParameters.onInputTextChange?(newValue)
+//            }
+//            .onChange(of: inputViewCustomizationParameters.externalInputText) {
+//                DispatchQueue.main.async {
+//                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
+//                }
+//            }
+//            .onChange(of: selectedGiphyMedia) {
+//                if let giphyMedia = selectedGiphyMedia {
+//                    inputViewModel.attachments.giphyMedia = giphyMedia
+//                    inputViewModel.send()
+//                }
+//            }
+//            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
+//                if giphyConfig.giphyKey != nil {
+//                    GiphyEditorView(
+//                        giphyConfig: giphyConfig,
+//                        selectedMedia: $selectedGiphyMedia
+//                    )
+//                    .environmentObject(globalFocusState)
+//                } else {
+//                    Text("no giphy key found")
+//                }
+//            }
+//            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
+//                AttachmentsEditor(
+//                    inputViewModel: inputViewModel,
+//                    inputViewBuilder: inputViewBuilder,
+//                    mediaPickerParameters: inputViewCustomizationParameters.mediaPickerParameters,
+//                    availableInputs: inputViewCustomizationParameters.availableInputs,
+//                    localization: chatCustomizationParameters.localization,
+//                    messageStyler: messageCustomizationParameters.styler
+//                )
+//                .environmentObject(globalFocusState)
+//                .environmentObject(keyboardState)
+//            }
         
             .onChange(of: inputViewModel.showPicker) { _ , newValue in
                 if newValue {
@@ -253,15 +170,23 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
+            .background {
+                // assume all the time views have same width, like "00:00"
+                if let anyMessage = sections.first?.rows.first?.message, timeViewSize == .zero {
+                    FinalMeasuringTrickView(size: $timeViewSize, id: "uu") {
+                        MessageTimeView(text: anyMessage.time, userType: anyMessage.user.type)
+                    }
+                }
+            }
     }
     
     var mainView: some View {
-        VStack {
-            if showNetworkConnectionProblem, !networkMonitor.isConnected {
+        VStack(spacing: 0) {
+            if chatCustomizationParameters.showNetworkConnectionProblem, !networkMonitor.isConnected {
                 waitingForNetwork
             }
             
-            if isListAboveInputView {
+            if chatCustomizationParameters.isListAboveInputView {
                 listWithButton
                 if let builder = betweenListAndInputViewBuilder {
                     builder()
@@ -287,7 +212,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             HStack {
                 Spacer()
                 Image("waiting", bundle: .current)
-                Text(localization.waitingForNetwork)
+                Text(chatCustomizationParameters.localization.waitingForNetwork)
                 Spacer()
             }
             .padding(.top, 6)
@@ -304,8 +229,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         case .conversation:
             ZStack(alignment: .bottomTrailing) {
                 list
-                
-                if !isScrolledToBottom {
+
+                if chatCustomizationParameters.showScrollToBottomButton, !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
                     } label: {
@@ -328,33 +253,34 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @ViewBuilder
     var list: some View {
         UIList(
+            // MARK: - Core
+
             viewModel: viewModel,
             inputViewModel: inputViewModel,
+
             isScrolledToBottom: $isScrolledToBottom,
             shouldScrollToTop: $shouldScrollToTop,
             tableContentHeight: $tableContentHeight,
+
+            // MARK: - View builders
+
             messageBuilder: messageBuilder,
             mainHeaderBuilder: mainHeaderBuilder,
             headerBuilder: headerBuilder,
-            inputView: inputView,
+
+            // MARK: - Data / type
+
             type: type,
-            showDateHeaders: showDateHeaders,
-            isScrollEnabled: isScrollEnabled,
-            avatarSize: avatarSize,
-            showMessageMenuOnLongPress: showMessageMenuOnLongPress,
-            tapAvatarClosure: tapAvatarClosure,
-            paginationHandler: paginationHandler,
-            messageStyler: messageStyler,
-            shouldShowLinkPreview: shouldShowLinkPreview,
-            showMessageTimeView: showMessageTimeView,
-            messageLinkPreviewLimit: messageLinkPreviewLimit,
-            messageFont: messageFont,
             sections: sections,
             ids: ids,
-            listSwipeActions: listSwipeActions,
-            keyboardDismissMode: keyboardDismissMode
+
+            // MARK: - Customization
+
+            chatParams: chatCustomizationParameters,
+            messageParams: messageCustomizationParameters,
+            timeViewWidth: $timeViewSize.width
         )
-        .applyIf(!isScrollEnabled) {
+        .applyIf(!chatCustomizationParameters.isScrollEnabled) {
             $0.frame(height: tableContentHeight)
         }
         .onStatusBarTap {
@@ -368,7 +294,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) { frames in
             DispatchQueue.main.async {
-                self.cellFrames = frames
+                if self.cellFrames != frames {
+                    self.cellFrames = frames
+                }
             }
         }
         .simultaneousGesture(
@@ -398,22 +326,31 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
 
     var inputView: some View {
-        Group {
-            if let inputViewBuilder = inputViewBuilder {
-                inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
+        ZStack {
+            let customInputView = inputViewBuilder(
+                InputViewBuilderParameters(
+                    text: $inputViewModel.text,
+                    attachments: inputViewModel.attachments,
+                    inputViewState: inputViewModel.state,
+                    inputViewStyle: .message,
+                    inputViewActionClosure: inputViewModel.inputViewAction()
+                ) {
                     globalFocusState.focus = nil
                 }
-                .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
-            } else {
+            )
+
+            if customInputView is DummyView {
                 InputView(
                     viewModel: inputViewModel,
                     inputFieldId: viewModel.inputFieldId,
                     style: .message,
-                    availableInputs: availableInputs,
-                    messageStyler: messageStyler,
-                    recorderSettings: recorderSettings,
-                    localization: localization
+                    availableInputs: inputViewCustomizationParameters.availableInputs,
+                    recorderSettings: inputViewCustomizationParameters.recorderSettings,
+                    localization: chatCustomizationParameters.localization
                 )
+            } else {
+                customInputView
+                    .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
             }
         }
         .sizeGetter($inputViewSize)
@@ -432,22 +369,24 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             cellFrame: cellFrame,
             alignment: menuAlignment(row.message, chatType: type),
             positionInUserGroup: row.positionInUserGroup,
-            leadingPadding: avatarSize + MessageView.horizontalAvatarPadding * 2,
-            trailingPadding: MessageView.statusViewSize + MessageView.horizontalStatusPadding,
-            font: messageFont,
-            animationDuration: messageMenuAnimationDuration,
+            leadingPadding: messageCustomizationParameters.avatarSize + MessageView.horizontalScreenEdgePadding + MessageView.horizontalSpacing,
+            trailingPadding: MessageView.statusViewWidth + MessageView.horizontalScreenEdgePadding + MessageView.horizontalSpacing,
+            font: messageCustomizationParameters.font,
+            animationDuration: chatCustomizationParameters.messageMenuAnimationDuration,
             onAction: menuActionClosure(row.message),
             reactionHandler: MessageMenu.ReactionConfig(
-                delegate: reactionDelegate,
+                delegate: chatCustomizationParameters.reactionDelegate,
                 didReact: reactionClosure(row.message)
             )
         ) {
             ChatMessageView(
-                viewModel: viewModel, messageBuilder: messageBuilder, row: row, chatType: type,
-                avatarSize: avatarSize, tapAvatarClosure: nil, messageStyler: messageStyler,
-                shouldShowLinkPreview: shouldShowLinkPreview,
-                isDisplayingMessageMenu: true, showMessageTimeView: showMessageTimeView,
-                messageLinkPreviewLimit: messageLinkPreviewLimit, messageFont: messageFont
+                viewModel: viewModel,
+                messageBuilder: messageBuilder,
+                row: row,
+                chatType: type,
+                messageParams: messageCustomizationParameters,
+                timeViewWidth: $timeViewSize.width,
+                isDisplayingMessageMenu: true
             )
             .onTapGesture {
                 hideMessageMenu()
@@ -467,34 +406,22 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     /// Our default reactionCallback flow if the user supports Reactions by implementing the didReactToMessage closure
     private func reactionClosure(_ message: Message) -> (ReactionType?) -> () {
-        return { reactionType in
-            Task {
-                // Run the callback on the main thread
-                await MainActor.run {
-                    // Hide the menu
-                    hideMessageMenu()
-                    // Send the draft reaction
-                    guard let reactionDelegate, let reactionType else { return }
-                    reactionDelegate.didReact(to: message, reaction: DraftReaction(messageID: message.id, type: reactionType))
-                }
+        { reactionType in
+            Task { @MainActor in
+                // Hide the menu
+                hideMessageMenu()
+                // Send the draft reaction
+                guard let reactionDelegate = chatCustomizationParameters.reactionDelegate, let reactionType else { return }
+                reactionDelegate.didReact(to: message, reaction: DraftReaction(messageID: message.id, type: reactionType))
             }
         }
     }
-    
-    /// Our default Menu Action closure
+
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
-        if let messageMenuAction {
-            return { action in
-                hideMessageMenu()
-                messageMenuAction(action, viewModel.messageMenuAction(), message)
-            }
-        } else if MenuAction.self == DefaultMessageMenuAction.self {
-            return { action in
-                hideMessageMenu()
-                viewModel.messageMenuActionInternal(message: message, action: action as! DefaultMessageMenuAction)
-            }
+        { action in
+            hideMessageMenu()
+            messageMenuAction(action, viewModel.messageMenuAction(), message)
         }
-        return { _ in }
     }
 
     func showMessageMenu() {
@@ -541,279 +468,58 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     private func isGiphyAvailable() -> Bool {
-        availableInputs.contains(AvailableInputType.giphy)
-    }
-    
-    private static func createLocalization() -> ChatLocalization {
-        ChatLocalization(
-            inputPlaceholder: String(localized: "Type a message..."),
-            signatureText: String(localized: "Add signature..."),
-            cancelButtonText: String(localized: "Cancel"),
-            recentToggleText: String(localized: "Recents"),
-            waitingForNetwork: String(localized: "Waiting for network"),
-            recordingText: String(localized: "Recording..."),
-            replyToText: String(localized: "Reply to")
-        )
+        inputViewCustomizationParameters.availableInputs.contains(AvailableInputType.giphy)
     }
 }
 
-public extension ChatView {
-    
-    func betweenListAndInputViewBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
-        var view = self
-        view.betweenListAndInputViewBuilder = {
-            AnyView(builder())
-        }
-        return view
-    }
-    
-    func mainHeaderBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
-        var view = self
-        view.mainHeaderBuilder = {
-            AnyView(builder())
-        }
-        return view
-    }
-    
-    func headerBuilder<V: View>(_ builder: @escaping (Date)->V) -> ChatView {
-        var view = self
-        view.headerBuilder = { date in
-            AnyView(builder(date))
-        }
-        return view
-    }
-    
-    func isListAboveInputView(_ isAbove: Bool) -> ChatView {
-        var view = self
-        view.isListAboveInputView = isAbove
-        return view
-    }
-    
-    func showDateHeaders(_ showDateHeaders: Bool) -> ChatView {
-        var view = self
-        view.showDateHeaders = showDateHeaders
-        return view
-    }
-    
-    func isScrollEnabled(_ isScrollEnabled: Bool) -> ChatView {
-        var view = self
-        view.isScrollEnabled = isScrollEnabled
-        return view
-    }
-    
-    func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
-        var view = self
-        view.showMessageMenuOnLongPress = show
-        return view
-    }
-    
-    /// Sets the keyboard dismiss mode for the chat list
-    /// - Parameter mode: The keyboard dismiss mode (.interactive, .onDrag, or .none)
-    /// - Default is .none
-    func keyboardDismissMode(_ mode: UIScrollView.KeyboardDismissMode) -> ChatView {
-        var view = self
-        view.keyboardDismissMode = mode
-        return view
-    }
-    
-    func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
-        var view = self
-        view.showNetworkConnectionProblem = show
-        return view
-    }
-    
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = MediaPickerSelectionParameters()
-        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
-        return view
-    }
-    
-    func setMediaPickerSelectionParameters(_ params: MediaPickerSelectionParameters) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = params
-        return view
-    }
-    
-    func setMediaPickerParameters(_ params: MediaPickerParameters) -> ChatView {
-        var view = self
-        view.mediaPickerParameters = params
-        return view
-    }
-    
-    func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
-        var view = self
-        view.orientationHandler = orientationHandler
-        return view
-    }
-    
-    /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
-    /// NOTE: doesn't work well with `isScrollEnabled` false
-    func enableLoadMore(pageSize: Int, _ handler: @escaping ChatPaginationClosure) -> ChatView {
-        var view = self
-        view.paginationHandler = PaginationHandler(handleClosure: handler, pageSize: pageSize)
-        return view
-    }
-    
-    @available(*, deprecated)
-    func chatNavigation(title: String, status: String? = nil, cover: URL? = nil) -> some View {
-        var view = self
-        view.chatTitle = title
-        return view.modifier(ChatNavigationModifier(title: title, status: status, cover: cover))
-    }
-    
-    // makes sense only for built-in message view
-    
-    func avatarSize(avatarSize: CGFloat) -> ChatView {
-        var view = self
-        view.avatarSize = avatarSize
-        return view
-    }
-    
-    func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
-        var view = self
-        view.tapAvatarClosure = closure
-        return view
-    }
-    
-    func messageUseMarkdown(_ messageUseMarkdown: Bool) -> ChatView {
-        return messageUseStyler(String.markdownStyler)
-    }
-
-    func messageUseStyler(_ styler: @escaping (String) -> AttributedString) -> ChatView {
-        var view = self
-        view.messageStyler = styler
-        return view
-    }
-    
-    func shouldShowLinkPreview(_ shouldShowLinkPreview: @escaping (URL) -> Bool) -> ChatView {
-        var view = self
-        view.shouldShowLinkPreview = shouldShowLinkPreview
-        return view
-    }
-
-    func showMessageTimeView(_ isShow: Bool) -> ChatView {
-        var view = self
-        view.showMessageTimeView = isShow
-        return view
-    }
-
-    func messageLinkPreviewLimit(_ limit: Int) -> ChatView {
-        var view = self
-        view.messageLinkPreviewLimit = limit
-        return view
-    }
-    
-    func linkPreviewsDisabled() -> ChatView {
-        return messageLinkPreviewLimit(0)
-    }
-
-    func setMessageFont(_ font: UIFont) -> ChatView {
-        var view = self
-        view.messageFont = font
-        return view
-    }
-    
-    // makes sense only for built-in input view
-    
-    func setAvailableInputs(_ types: [AvailableInputType]) -> ChatView {
-        var view = self
-        view.availableInputs = types
-        return view
-    }
-    
-    func setRecorderSettings(_ settings: RecorderSettings) -> ChatView {
-        var view = self
-        view.recorderSettings = settings
-        return view
-    }
-    
-    /// Sets the general duration of various message menu animations
-    ///
-    /// This value is more akin to 'how snappy' the message menu feels
-    /// - Note: Good values are between 0.15 - 0.5 (defaults to 0.3)
-    /// - Important: This value is clamped between 0.1 and 1.0
-    func messageMenuAnimationDuration(_ duration:Double) -> ChatView {
-        var view = self
-        view.messageMenuAnimationDuration = max(0.1, min(1.0, duration))
-        return view
-    }
-    
-    /// Sets a ReactionDelegate on the ChatView for handling and configuring message reactions
-    func messageReactionDelegate(_ configuration: ReactionDelegate) -> ChatView {
-        var view = self
-        view.reactionDelegate = configuration
-        return view
-    }
-    
-    /// Constructs, and applies, a ReactionDelegate for you based on the provided closures
-    func onMessageReaction(
-        didReactTo: @escaping (Message, DraftReaction) -> Void,
-        canReactTo: ((Message) -> Bool)? = nil,
-        availableReactionsFor: ((Message) -> [ReactionType]?)? = nil,
-        allowEmojiSearchFor: ((Message) -> Bool)? = nil,
-        shouldShowOverviewFor: ((Message) -> Bool)? = nil
-    ) -> ChatView {
-        var view = self
-        view.reactionDelegate = DefaultReactionConfiguration(
-            didReact: didReactTo,
-            canReact: canReactTo,
-            reactions: availableReactionsFor,
-            allowEmojiSearch: allowEmojiSearchFor,
-            shouldShowOverview: shouldShowOverviewFor
-        )
-        return view
-    }
-}
-
-#Preview {
-    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
-    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
-
-    let monday = try! Date.iso8601Date.parse("2025-05-12")
-    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
-
-    ChatView(messages: [
-        Message(
-            id: "26tb", user: romeo, status: .read, createdAt: monday,
-            text: "And I’ll still stay, to have thee still forget"),
-        Message(
-            id: "zee6", user: romeo, status: .read, createdAt: monday,
-            text: "Forgetting any other home but this"),
-
-        Message(
-            id: "oWUN", user: juliet, status: .read, createdAt: monday,
-            text: "’Tis almost morning. I would have thee gone"),
-        Message(
-            id: "P261", user: juliet, status: .read, createdAt: monday,
-            text: "And yet no farther than a wanton’s bird"),
-        Message(
-            id: "46hu", user: juliet, status: .read, createdAt: monday,
-            text: "That lets it hop a little from his hand"),
-        Message(
-            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
-            text: "Like a poor prisoner in his twisted gyves"),
-        Message(
-            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
-            text: "And with a silken thread plucks it back again"),
-        Message(
-            id: "kwWd", user: juliet, status: .read, createdAt: monday,
-            text: "So loving-jealous of his liberty"),
-
-        Message(
-            id: "9481", user: romeo, status: .read, createdAt: tuesday,
-            text: "I would I were thy bird"),
-
-        Message(
-            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
-        Message(
-            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
-            text: "Yet I should kill thee with much cherishing"),
-        Message(
-            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
-            text: "Good night, good night. Parting is such sweet sorrow"),
-        Message(
-            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
-            text: "That I shall say 'Good night' till it be morrow"),
-    ]) { draft in }
-}
+//#Preview {
+//    let romeo = User(id: "romeo", name: "Romeo Montague", avatarURL: nil, isCurrentUser: true)
+//    let juliet = User(id: "juliet", name: "Juliet Capulet", avatarURL: nil, isCurrentUser: false)
+//
+//    let monday = try! Date.iso8601Date.parse("2025-05-12")
+//    let tuesday = try! Date.iso8601Date.parse("2025-05-13")
+//
+//    ChatView(messages: [
+//        Message(
+//            id: "26tb", user: romeo, status: .read, createdAt: monday,
+//            text: "And I’ll still stay, to have thee still forget"),
+//        Message(
+//            id: "zee6", user: romeo, status: .read, createdAt: monday,
+//            text: "Forgetting any other home but this"),
+//
+//        Message(
+//            id: "oWUN", user: juliet, status: .read, createdAt: monday,
+//            text: "’Tis almost morning. I would have thee gone"),
+//        Message(
+//            id: "P261", user: juliet, status: .read, createdAt: monday,
+//            text: "And yet no farther than a wanton’s bird"),
+//        Message(
+//            id: "46hu", user: juliet, status: .read, createdAt: monday,
+//            text: "That lets it hop a little from his hand"),
+//        Message(
+//            id: "Gjbm", user: juliet, status: .read, createdAt: monday,
+//            text: "Like a poor prisoner in his twisted gyves"),
+//        Message(
+//            id: "IhRQ", user: juliet, status: .read, createdAt: monday,
+//            text: "And with a silken thread plucks it back again"),
+//        Message(
+//            id: "kwWd", user: juliet, status: .read, createdAt: monday,
+//            text: "So loving-jealous of his liberty"),
+//
+//        Message(
+//            id: "9481", user: romeo, status: .read, createdAt: tuesday,
+//            text: "I would I were thy bird"),
+//
+//        Message(
+//            id: "dzmY", user: juliet, status: .sent, createdAt: tuesday, text: "Sweet, so would I"),
+//        Message(
+//            id: "r5HH", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "Yet I should kill thee with much cherishing"),
+//        Message(
+//            id: "quy1", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "Good night, good night. Parting is such sweet sorrow"),
+//        Message(
+//            id: "Mwh6", user: juliet, status: .sent, createdAt: tuesday,
+//            text: "That I shall say 'Good night' till it be morrow"),
+//    ]) { draft in }
+//}

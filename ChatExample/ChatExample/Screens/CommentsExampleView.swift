@@ -65,9 +65,7 @@ struct CommentsExampleView: View {
             ChatView(messages: viewModel.messages, chatType: .comments, replyMode: .answer) { draft in
                 viewModel.send(draft: draft)
             } messageBuilder: {
-                message, positionInGroup, positionInMessagesSection, positionInCommentsGroup,
-                showContextMenuClosure, messageActionClosure, showAttachmentClosure in
-                messageCell(message, positionInCommentsGroup, showMenuClosure: showContextMenuClosure, actionClosure: messageActionClosure, attachmentClosure: showAttachmentClosure)
+                messageCell(params: $0)
             } messageMenuAction: { (action: Action, defaultActionClosure, message) in
                 switch action {
                 case .reply:
@@ -83,7 +81,7 @@ struct CommentsExampleView: View {
                         msg.id == message.id
                     }
                 case .print:
-                    print(message.text)
+                    print(message.attributedText)
                 }
             }
             .showDateHeaders(false)
@@ -119,7 +117,8 @@ struct CommentsExampleView: View {
     }
 
     @ViewBuilder
-    func messageCell(_ message: Message, _ commentsPosition: CommentsPosition?, showMenuClosure: @escaping ()->(), actionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void, attachmentClosure: @escaping (Attachment) -> Void) -> some View {
+    func messageCell(params: MessageBuilderParameters) -> some View {
+        let message = params.message
         VStack {
             HStack(alignment: .top, spacing: 12) {
                 CachedAsyncImage(
@@ -144,8 +143,8 @@ struct CommentsExampleView: View {
                             .font(.system(size: 12)).fontWeight(.medium)
                     }
 
-                    if !message.text.isEmpty {
-                        Text(message.text)
+                    if !message.hasText {
+                        Text(message.attributedText)
                             .font(.system(size: 12)).fontWeight(.medium)
                             .foregroundStyle(.gray)
                     }
@@ -154,7 +153,7 @@ struct CommentsExampleView: View {
                         LazyVGrid(columns: Array(repeating: GridItem(), count: 2), spacing: 8) {
                             ForEach(message.attachments) { attachment in
                                 AttachmentCell(attachment: attachment, size: CGSize(width: 150, height: 150), showCancel: message.user.isCurrentUser) { _,_ in
-                                    attachmentClosure(attachment)
+                                    params.showAttachmentClosure(attachment)
                                 }
                                 .cornerRadius(12)
                                 .clipped()
@@ -172,7 +171,7 @@ struct CommentsExampleView: View {
                                     .font(.system(size: 14)).fontWeight(.medium)
                             }
                             .onTapGesture {
-                                actionClosure(message, .reply)
+                                params.messageActionClosure(message, .reply)
                             }
                         }
 
@@ -182,7 +181,7 @@ struct CommentsExampleView: View {
             }
             .padding(.leading, message.replyMessage != nil ? 40 : 0)
 
-            if let commentsPosition {
+            if let commentsPosition = params.positionInCommentsGroup {
                 if commentsPosition.isLastInCommentsGroup {
                     Color.gray.frame(height: 0.5)
                         .padding(.vertical, 10)

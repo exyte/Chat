@@ -15,36 +15,28 @@ struct MessageStatusView: View {
         Group {
             switch status {
             case .sending:
-                statusImageStyled(image: theme.images.message.sending, color: getTheme().colors.statusGray)
+                statusImageStyled(image: theme.images.message.sending, color: theme.colors.statusGray)
             case .sent:
-                statusImageStyled(image: theme.images.message.sent, color: getTheme().colors.statusGray)
+                statusImageStyled(image: theme.images.message.sent, color: theme.colors.statusGray)
             case .delivered:
-                statusImageStyled(image: theme.images.message.delivered, color: getTheme().colors.statusGray)
+                statusImageStyled(image: theme.images.message.delivered, color: theme.colors.statusGray)
             case .read:
-                statusImageStyled(image: theme.images.message.read, color: getTheme().colors.messageReadStatus)
+                statusImageStyled(image: theme.images.message.read, color: theme.colors.messageReadStatus)
             case .error:
                 Button(action: onRetry) {
-                    statusImageStyled(image: theme.images.message.error, color: getTheme().colors.statusError)
+                    statusImageStyled(image: theme.images.message.error, color: theme.colors.statusError)
                 }
             }
         }
-        .viewSize(MessageView.statusViewSize)
-        .padding(.trailing, MessageView.horizontalStatusPadding)
     }
 
     private func statusImageStyled(image: Image, color: Color) -> some View {
-        return
-            image
+        image
             .renderingMode(.template)
             .resizable()
             .aspectRatio(contentMode: .fit)
             .foregroundColor(color)
             .frame(width: 40)
-    }
-
-    @MainActor
-    private func getTheme() -> ChatTheme {
-        return theme
     }
 }
 

@@ -106,7 +106,7 @@ final actor MockChatInteractor {
                 let originalReaction = originalMessage.reactions[reactionIndex]
 
                 var reactions = originalMessage.reactions
-                var status:Reaction.Status = .sent
+                var status: Reaction.Status = .sent
                 if Int.random(min: 0, max: 20) == 0 {
                     status = .error(.init(id: originalReaction.id, messageID: originalMessage.uid, createdAt: originalReaction.createdAt, type: originalReaction.type))
                 }

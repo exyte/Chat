@@ -25,4 +25,16 @@ public struct ChatLocalization: Hashable {
         self.recordingText = recordingText
         self.replyToText = replyToText
     }
+
+   public static var defaultLocalization: ChatLocalization {
+        ChatLocalization(
+            inputPlaceholder: String(localized: "Type a message..."),
+            signatureText: String(localized: "Add signature..."),
+            cancelButtonText: String(localized: "Cancel"),
+            recentToggleText: String(localized: "Recents"),
+            waitingForNetwork: String(localized: "Waiting for network"),
+            recordingText: String(localized: "Recording..."),
+            replyToText: String(localized: "Reply to")
+        )
+    }
 }

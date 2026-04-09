@@ -24,7 +24,7 @@ let package = Package(
         ),
         .package(
            url: "https://github.com/Giphy/giphy-ios-sdk",
-           from: "2.2.16"
+           exact: "2.2.16"
         ),
         .package(
             url: "https://github.com/onevcat/Kingfisher",
