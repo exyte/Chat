@@ -58,6 +58,13 @@
     - User's location
     - Documents
 
+## Migration to version 3
+
+`enableLoadMore(pageSize...)` renamed `enableLoadMore(offset...)`
+`linkPreviewsDisabled` refactored `linkPreviewsEnabled`
+`shouldShowLinkPreview` renamed `shouldShowPreviewForLink`
+`messageUseMarkdown` and `messageUseStyler` removed. now messages use markdown and underline links by default. if you'd like to use your own attributes, use `Message`'s init taking AttributedString. storing `AttributedString` directly instead of storing a string and applying attributes on-the-fly is more efficient.
+
 # Usage
 
 Create a chat view like this:
