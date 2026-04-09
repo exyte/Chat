@@ -81,8 +81,8 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.showPicker = false
             }
             .currentFullscreenMedia($currentFullscreenMedia)
-            .setSelectionParameters(mediaPickerSelectionParameters)
-            .setMediaPickerParameters(mediaPickerParameters)
+            .setSelectionParameters(mediaPickerSelectionParameters ?? SelectionParameters())
+            .setMediaPickerParameters(mediaPickerParameters ?? MediaPickerCutomizationParameters())
             .pickerMode($inputViewModel.mediaPickerMode)
             .orientationHandler(orientationHandler)
             .padding(.top)
