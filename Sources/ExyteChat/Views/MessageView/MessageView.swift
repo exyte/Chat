@@ -179,7 +179,7 @@ struct MessageView: View {
                     }
                 }
             }
-            .padding(.vertical, params.showUsername || message.attachments.isEmpty ? 8 : 0)
+            .padding(.vertical, (params.showUsername && !message.user.isCurrentUser) || message.attachments.isEmpty ? 8 : 0)
             .bubbleBackground(message, theme: theme)
             .zIndex(0)
         }

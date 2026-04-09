@@ -210,6 +210,10 @@ public struct ReplyMessage: Codable, Identifiable, Hashable, Sendable {
     public var attachments: [Attachment]
     public var recording: Recording?
 
+    public var text: String {
+        String(attributedText.characters)
+    }
+
     public init(
         id: String,
         user: User,

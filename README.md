@@ -274,13 +274,17 @@ ChatView(messages: viewModel.messages) { draft in
 - `items` - list of `SwipeAction`s to include  
 
 ### makes sense only for built-in message view    
-`avatarSize` - the default avatar is a circle, you can specify its diameter here    
-`tapAvatarClosure` - closure to call on avatar tap    
 `showMessageTimeView` - show timestamp in a corner of the message    
+`showUsername` - show username on top of message
 `messageLinkPreviewLimit` - limit the maximum number of link previews per message    
 `linkPreviewsEnabled` - enable or disable message link previews globally    
 `shouldShowPreviewForLink` - provide custom logic to decide whether a specific URL should show a preview    
 `setMessageFont` - pass custom font to use for messages      
+
+`showAvatar` - show user avatars    
+`avatarSize` - the default avatar is a circle, you can specify its diameter here    
+`tapAvatarClosure` - closure to call on avatar tap    
+`avatarBuilder` - custom avatar view builder. NOTE: this view is not autosizing, `avatarSize` will still be applied, since it neeeds to be fixed and same for all user avatars   
 
 ### makes sense only for built-in input view    
 `inputViewText` - binding to current text in the default input text field    

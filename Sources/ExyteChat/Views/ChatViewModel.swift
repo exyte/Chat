@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import UIKit
+import SwiftUI
 
 @MainActor
 final class ChatViewModel: ObservableObject {
@@ -57,7 +58,9 @@ final class ChatViewModel: ObservableObject {
         case .copy:
             UIPasteboard.general.string = String(message.attributedText.characters)
         case .reply:
-            inputViewModel?.attachments.replyMessage = message.toReplyMessage()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                inputViewModel?.attachments.replyMessage = message.toReplyMessage()
+            }
             globalFocusState?.focus = .uuid(inputFieldId)
         case .edit(let saveClosure):
             inputViewModel?.text = String(message.attributedText.characters)

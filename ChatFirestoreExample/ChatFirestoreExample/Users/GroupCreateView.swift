@@ -79,7 +79,7 @@ struct GroupCreateView: View {
             }
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
-            .showLiveCameraCell()
+            .liveCameraCell(.small)
             .orientationHandler {
                 switch $0 {
                 case .lock: AppDelegate.lockOrientationToPortrait()

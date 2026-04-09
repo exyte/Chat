@@ -43,6 +43,7 @@ struct MessageTextView: View {
                     .frame(width: max(textSize.width, Self.minLinkPreviewWidth))
                 }
             }
+            .font(Font(params.font as CTFont))
         }
     }
 }

@@ -54,7 +54,7 @@ struct AuthView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            hideKeyboard()
+            dismissKeyboard()
         }
         .fullScreenCover(isPresented: $showPicker) {
             MediaPicker(isPresented: $showPicker) { media in
@@ -65,7 +65,7 @@ struct AuthView: View {
             }
             .mediaSelectionLimit(1)
             .mediaSelectionType(.photo)
-            .showLiveCameraCell()
+            .liveCameraCell(.prominant)
             .orientationHandler {
                 switch $0 {
                 case .lock: AppDelegate.lockOrientationToPortrait()
