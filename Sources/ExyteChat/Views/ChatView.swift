@@ -34,6 +34,20 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     // MARK: - Parameters
 
     /// provide custom message view builder
+    /// To customize only some messages while keeping the default style for others,
+    /// use `messageBuilder` and return your custom view for the messages you want to style, and `DefaultMessageView(params:)` for the rest.
+    /// This way you can mix your custom message view with ExyteChat's built-in styling in the same chat.
+    /// ```swift
+    /// ChatView(messages: viewModel.messages) { draft in
+    ///     viewModel.send(draft: draft)
+    /// } messageBuilder: { params in
+    ///     if needsCustomUI(params.message) {
+    ///         MyCustomMessageView(message: params.message)
+    ///     } else {
+    ///         DefaultMessageView(params: params)
+    ///     }
+    /// }
+    /// ```
     @ViewBuilder var messageBuilder: MessageBuilderParamsClosure
 
     /// provide custom input view builder

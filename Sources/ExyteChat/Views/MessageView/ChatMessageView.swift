@@ -51,6 +51,11 @@ struct ChatMessageView<MessageContent: View>: View {
                 )
             } else {
                 customMessageView
+                    .environmentObject(viewModel)
+                    .environment(\.chatMessageType, chatType)
+                    .environment(\.messageCustomizationParams, messageParams)
+                    .environment(\.timeViewWidthBinding, $timeViewWidth)
+                    .environment(\.isDisplayingMessageMenu, isDisplayingMessageMenu)
             }
         }
         .id(row.message.id)
