@@ -27,6 +27,10 @@ jobs:
         with:
           xcode-version: '16.4'
 
+      - name: Install xcbeautify
+        shell: bash
+        run: brew install xcbeautify
+
       - name: Build
         shell: bash
         run: |
@@ -38,7 +42,7 @@ jobs:
             -derivedDataPath ./DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            build-for-testing
+            build-for-testing 2>&1 | xcbeautify
 
       - name: Test
         shell: bash
@@ -51,4 +55,4 @@ jobs:
             -derivedDataPath ./DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            test-without-building
+            test-without-building 2>&1 | xcbeautify
