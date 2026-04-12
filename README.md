@@ -117,7 +117,7 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
-To customize only some messages while keeping the default style for others, use `messageBuilder` and return your custom view for the messages you want to style, and `DefaultMessageView(params:)` for the rest. This way you can mix custom message cards with ExyteChat's built-in styling in the same chat.
+To customize only some messages while keeping the default style for others, use `messageBuilder` and return your custom view for the messages you want to style, and `params.defaultMessageView()` for the rest. This way you can mix custom message cards with ExyteChat's built-in styling in the same chat.
 
 ```swift
 ChatView(messages: viewModel.messages) { draft in
@@ -126,7 +126,7 @@ ChatView(messages: viewModel.messages) { draft in
     if needsCustomUI(params.message) {
         MyCustomMessageView(message: params.message)
     } else {
-        DefaultMessageView(params: params)
+        params.defaultMessageView()
     }
 }
 ```

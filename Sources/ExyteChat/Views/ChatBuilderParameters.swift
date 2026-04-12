@@ -23,6 +23,10 @@ public struct MessageBuilderParameters {
     public let showContextMenuClosure: () -> Void
     public let messageActionClosure: (Message, DefaultMessageMenuAction) -> Void
     public let showAttachmentClosure: (Attachment) -> Void
+
+    @MainActor public func defaultMessageView() -> some View {
+        DefaultMessageView(params: self)
+    }
 }
 
 /// To build a custom input view use the following parameters passed by builder closure:
