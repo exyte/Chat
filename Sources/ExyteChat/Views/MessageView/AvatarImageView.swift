@@ -18,6 +18,7 @@ struct AvatarImageView: View {
         } placeholder: {
             Rectangle().fill(Color.gray)
         }
+        .viewSize(avatarSize)
         .clipShape(Circle())
     }
 }
