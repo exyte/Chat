@@ -61,18 +61,13 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.transform = CGAffineTransform(rotationAngle: (type == .conversation ? .pi : 0))
 
-        tableView.sectionHeaderTopPadding = 0
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 1
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
-        tableView.sectionHeaderHeight = 0
-        tableView.sectionFooterHeight = 0
         tableView.backgroundColor = UIColor(theme.colors.mainBG)
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = chatParams.isScrollEnabled
         tableView.keyboardDismissMode = chatParams.keyboardDismissMode
-        tableView.tableHeaderView = nil
-        tableView.tableFooterView = UIView(frame: .zero)
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
@@ -154,10 +149,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         if coordinator.sections.isEmpty {
             coordinator.sections = sections
 
-            UIView.performWithoutAnimation {
-                tableView.reloadData()
-                tableView.layoutIfNeeded()
-            }
+            tableView.reloadData()
 
             if !chatParams.isScrollEnabled {
                 DispatchQueue.main.async {
@@ -192,6 +184,19 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     @MainActor
     private func applyUpdatesToTable(_ tableView: UITableView, splitInfo: SplitInfo, animated: Bool, updateContextClosure: ([MessagesSection])->()) async {
+        if shouldFallbackToFullReload(splitInfo: splitInfo) {
+            updateContextClosure(sections)
+            UIView.performWithoutAnimation {
+                tableView.reloadData()
+                tableView.layoutIfNeeded()
+            }
+
+            if !chatParams.isScrollEnabled {
+                tableContentHeight = tableView.contentSize.height
+            }
+            return
+        }
+
         // step 0: preparation
         // prepare intermediate sections and operations
 //        print("whole appliedDeletes:\n", formatSections(splitInfo.appliedDeletes), "\n")
@@ -263,6 +268,32 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         if !chatParams.isScrollEnabled {
             tableContentHeight = tableView.contentSize.height
+        }
+    }
+
+    private func shouldFallbackToFullReload(splitInfo: SplitInfo) -> Bool {
+        let hasSectionOperations =
+            splitInfo.deleteOperations.contains(where: isSectionOperation)
+            || splitInfo.insertOperations.contains(where: isSectionOperation)
+
+        if hasSectionOperations {
+            return true
+        }
+
+        // Diff-based row inserts are only stable at the live edges in this inverted table setup.
+        if !splitInfo.insertOperations.isEmpty && !(isScrolledToBottom || isScrolledToTop) {
+            return true
+        }
+
+        return false
+    }
+
+    private func isSectionOperation(_ operation: Operation) -> Bool {
+        switch operation {
+        case .deleteSection, .insertSection:
+            return true
+        case .delete, .insert, .swap, .edit:
+            return false
         }
     }
 
@@ -607,7 +638,6 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     timeViewWidth: $timeViewWidth,
                     isDisplayingMessageMenu: false
                 )
-                .transition(.scale)
                 .background(MessageMenuPreferenceViewSetter(id: row.id))
                 .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
                 .applyIf(chatParams.showMessageMenuOnLongPress) {
