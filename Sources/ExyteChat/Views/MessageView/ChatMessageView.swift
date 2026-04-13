@@ -32,10 +32,11 @@ struct ChatMessageView<MessageContent: View>: View {
                     positionInMessagesSection: row.positionInMessagesSection,
                     positionInCommentsGroup: row.commentsPosition,
                     showContextMenuClosure: { viewModel.messageMenuRow = row },
-                    messageActionClosure: viewModel.messageMenuAction()
-                ) { attachment in
-                    self.viewModel.presentAttachmentFullScreen(attachment)
-                }
+                    messageActionClosure: viewModel.messageMenuAction(),
+                    showAttachmentClosure: { attachment in
+                        self.viewModel.presentAttachmentFullScreen(attachment)
+                    }
+                )
             )
 
             if customMessageView is DummyView {
@@ -51,6 +52,11 @@ struct ChatMessageView<MessageContent: View>: View {
                 )
             } else {
                 customMessageView
+                    .environmentObject(viewModel)
+                    .environment(\.chatMessageType, chatType)
+                    .environment(\.messageCustomizationParams, messageParams)
+                    .environment(\.timeViewWidthBinding, $timeViewWidth)
+                    .environment(\.isDisplayingMessageMenu, isDisplayingMessageMenu)
             }
         }
         .id(row.message.id)

@@ -1,0 +1,58 @@
+name: iOS CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+
+      - name: Install xcbeautify
+        shell: bash
+        run: brew install xcbeautify
+
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace .swiftpm/xcode/package.xcworkspace \
+            -scheme ExyteChat \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -derivedDataPath ./DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            build-for-testing 2>&1 | xcbeautify
+
+      - name: Test
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace .swiftpm/xcode/package.xcworkspace \
+            -scheme ExyteChat \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -derivedDataPath ./DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            test-without-building 2>&1 | xcbeautify

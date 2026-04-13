@@ -120,7 +120,29 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
-Here `params` is a [`MessageBuilderParameters`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift) struct.
+
+To customize only some messages while keeping the default style for others, use `messageBuilder` and return your custom view for the messages you want to style, and `params.defaultMessageView()` for the rest. This way you can mix custom message cards with ExyteChat's built-in styling in the same chat.
+
+```swift
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+} messageBuilder: { params in
+    if needsCustomUI(params.message) {
+        MyCustomMessageView(message: params.message)
+    } else {
+        params.defaultMessageView()
+    }
+}
+```
+
+Here `params` is a [`MessageBuilderParameters`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift) struct, it has the following parameters:  
+- `message` - the message containing user info, attachments, etc.   
+- `positionInUserGroup` - the position of the message in its continuous collection of messages from the same user    
+- `positionInMessagesSection` position of message in the section of messages from that day
+- `positionInCommentsGroup` - position of message in its continuous group of comments (only works for .answer ReplyMode, nil for .quote mode)  
+- `showContextMenuClosure` - closure to show message context menu   
+- `messageActionClosure ` - closure to pass user interaction, .reply for example   
+- `showAttachmentClosure` - you can pass an attachment to this closure to use ChatView's fullscreen media viewer    
 
 You may customize the input view (a text field with buttons at the bottom) like this: 
 ```swift
@@ -149,8 +171,15 @@ ChatView(messages: viewModel.messages) { draft in
         }
     }
 }
+
 ```
-Here `params` is an [`InputViewBuilderParameters`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift) struct.
+Here `params` is an [`InputViewBuilderParameters`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift) struct, it has the following parameters:   
+- `textBinding` to bind your own TextField   
+- `attachments` is a struct containing photos, videos, recordings and a message you are replying to     
+- `inputViewState` - the state of the input view that is controlled by the library automatically if possible or through your calls of `inputViewActionClosure`
+- `inputViewStyle` - `.message` or `.signature` (the chat screen or the photo selection screen)   
+- `inputViewActionClosure` for calling on taps on your custom buttons. For example, call `inputViewActionClosure(.send)` if you want to send your message with your own button, then the library will reset the text and attachments and call the `didSendMessage` sending closure   
+- `dismissKeyboardClosure` - call this to dismiss keyboard    
 
 ## Custom message menu
 Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callback will be called. Here is a simple example:
@@ -282,7 +311,7 @@ ChatView(messages: viewModel.messages) { draft in
 `showAvatar` - show user avatars    
 `avatarSize` - the default avatar is a circle, you can specify its diameter here    
 `tapAvatarClosure` - closure to call on avatar tap    
-`avatarBuilder` - custom avatar view builder. NOTE: this view is not autosizing, `avatarSize` will still be applied, since it neeeds to be fixed and same for all user avatars   
+`avatarBuilder` - custom avatar view builder. NOTE: this view is not autosizing, `avatarSize` will still be applied, since it needs to be fixed and same for all user avatars   
 
 ### makes sense only for built-in input view    
 `inputViewText` - binding to current text in the default input text field    
@@ -500,4 +529,3 @@ dependencies: [
 [FlagAndCountryCode](https://github.com/exyte/FlagAndCountryCode) - Phone codes and flags for every country    
 [SVGView](https://github.com/exyte/SVGView) - SVG parser    
 [LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation
-
