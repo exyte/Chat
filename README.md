@@ -54,16 +54,18 @@
     - Link with preview
     - Gif/Sticker
     - Custom dictionary of any Sendable
+
     **Coming soon:**
     - User's location
     - Documents
 
 ## Migration to version 3
 
-`enableLoadMore(pageSize...)` renamed `enableLoadMore(offset...)`
-`linkPreviewsDisabled` refactored `linkPreviewsEnabled`
-`shouldShowLinkPreview` renamed `shouldShowPreviewForLink`
-`messageUseMarkdown` and `messageUseStyler` removed. now messages use markdown and underline links by default. if you'd like to use your own attributes, use `Message`'s init taking AttributedString. storing `AttributedString` directly instead of storing a string and applying attributes on-the-fly is more efficient.
+- `enableLoadMore(pageSize...)` renamed `enableLoadMore(offset...)` and its trailing closure doesn't have any arguments
+- `linkPreviewsDisabled` refactored `linkPreviewsEnabled`
+- `shouldShowLinkPreview` renamed `shouldShowPreviewForLink`
+- `messageUseMarkdown` and `messageUseStyler` removed. now messages use markdown and underline links by default. if you'd like to use your own attributes, use `Message`'s init taking AttributedString. storing `AttributedString` directly instead of storing a string and applying attributes on-the-fly is more efficient.
+- The closure arguments of `messageBuilder` and `inputViewBuilder` now each consist of a single struct (they are different structs). See [`ChatBuilderParameters.swift`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift)
 
 # Usage
 
@@ -106,9 +108,10 @@ You may customize message cells like this:
 ```swift
 ChatView(messages: viewModel.messages) { draft in
     viewModel.send(draft: draft)
-} messageBuilder: { message, positionInUserGroup, positionInMessagesSection, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
+} messageBuilder: { params in
+    let message = params.message
     VStack {
-        Text(message.text)
+        Text(message.attributedText)
         if !message.attachments.isEmpty {
             ForEach(message.attachments, id: \.id) { at in
                 AsyncImage(url: at.thumbnail)
@@ -117,6 +120,7 @@ ChatView(messages: viewModel.messages) { draft in
     }
 }
 ```
+
 To customize only some messages while keeping the default style for others, use `messageBuilder` and return your custom view for the messages you want to style, and `params.defaultMessageView()` for the rest. This way you can mix custom message cards with ExyteChat's built-in styling in the same chat.
 
 ```swift
@@ -131,7 +135,7 @@ ChatView(messages: viewModel.messages) { draft in
 }
 ```
 
-`messageBuilder`'s parameters:  
+Here `params` is a [`MessageBuilderParameters`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift) struct, it has the following parameters:  
 - `message` - the message containing user info, attachments, etc.   
 - `positionInUserGroup` - the position of the message in its continuous collection of messages from the same user    
 - `positionInMessagesSection` position of message in the section of messages from that day
@@ -144,30 +148,32 @@ You may customize the input view (a text field with buttons at the bottom) like 
 ```swift
 ChatView(messages: viewModel.messages) { draft in
     viewModel.send(draft: draft)
-} inputViewBuilder: { textBinding, attachments, inputViewState, inputViewStyle, inputViewActionClosure, dismissKeyboardClosure in
+} inputViewBuilder: { params in
+    let action = params.inputViewActionClosure
     Group {
-        switch inputViewStyle {
+        switch params.inputViewStyle {
         case .message: // input view on chat screen
             VStack {
                 HStack {
-                    Button("Send") { inputViewActionClosure(.send) }
-                    Button("Attach") { inputViewActionClosure(.photo) }
+                    Button("Send") { action(.send) }
+                    Button("Attach") { action(.photo) }
                 }
-                TextField("Write your message", text: textBinding)
+                TextField("Write your message", text: params.text)
             }
         case .signature: // input view on photo selection screen
             VStack {
                 HStack {
-                    Button("Send") { inputViewActionClosure(.send) }
+                    Button("Send") { action(.send) }
                 }
-                TextField("Compose a signature for photo", text: textBinding)
+                TextField("Compose a signature for photo", text: params.text)
                     .background(Color.green)
             }
         }
     }
 }
+
 ```
-`inputViewBuilder`'s parameters:  
+Here `params` is an [`InputViewBuilderParameters`](./Sources/ExyteChat/Views/ChatBuilderParameters.swift) struct, it has the following parameters:   
 - `textBinding` to bind your own TextField   
 - `attachments` is a struct containing photos, videos, recordings and a message you are replying to     
 - `inputViewState` - the state of the input view that is controlled by the library automatically if possible or through your calls of `inputViewActionClosure`
@@ -305,7 +311,7 @@ ChatView(messages: viewModel.messages) { draft in
 `showAvatar` - show user avatars    
 `avatarSize` - the default avatar is a circle, you can specify its diameter here    
 `tapAvatarClosure` - closure to call on avatar tap    
-`avatarBuilder` - custom avatar view builder. NOTE: this view is not autosizing, `avatarSize` will still be applied, since it neeeds to be fixed and same for all user avatars   
+`avatarBuilder` - custom avatar view builder. NOTE: this view is not autosizing, `avatarSize` will still be applied, since it needs to be fixed and same for all user avatars   
 
 ### makes sense only for built-in input view    
 `inputViewText` - binding to current text in the default input text field    

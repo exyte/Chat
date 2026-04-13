@@ -13,6 +13,7 @@ struct AvatarNameView: View {
                 ""
             }
         Text(letter)
+            .viewSize(avatarSize)
             .clipShape(Circle())
     }
 }
