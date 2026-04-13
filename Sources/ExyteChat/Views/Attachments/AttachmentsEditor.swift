@@ -26,7 +26,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     var mediaPickerParameters: MediaPickerParameters
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
-    var messageStyler: (String) -> AttributedString
 
     @State private var seleсtedMedias: [Media] = []
     @State private var currentFullscreenMedia: Media?

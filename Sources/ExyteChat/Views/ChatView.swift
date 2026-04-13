@@ -105,11 +105,68 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         mainView
             .background(chatBackground())
             .environmentObject(keyboardState)
-        
+            .onAppear {
+                if isGiphyAvailable() {
+                    if let giphyKey = giphyConfig.giphyKey {
+                        if !giphyConfigured {
+                            giphyConfigured = true
+                            Giphy.configure(apiKey: giphyKey)
+                        }
+                    } else {
+                        print("WARNING: giphy key not provided, please pass a key using giphyConfig")
+                    }
+                }
+            }
+            .onChange(of: inputViewModel.text) { _ , newValue in
+                inputViewCustomizationParameters.onInputTextChange?(newValue)
+            }
+            .onChange(of: inputViewCustomizationParameters.externalInputText) {
+                DispatchQueue.main.async {
+                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
+                }
+            }
+            .onChange(of: selectedGiphyMedia) {
+                if let giphyMedia = selectedGiphyMedia {
+                    inputViewModel.attachments.giphyMedia = giphyMedia
+                    inputViewModel.send()
+                }
+            }
+            .onChange(of: inputViewModel.showPicker) { _ , newValue in
+                if newValue {
+                    globalFocusState.focus = nil
+                }
+            }
+            .onChange(of: inputViewModel.showGiphyPicker) { _ , newValue in
+                if newValue {
+                    globalFocusState.focus = nil
+                }
+            }
+            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
+                if giphyConfig.giphyKey != nil {
+                    GiphyEditorView(
+                        giphyConfig: giphyConfig,
+                        selectedMedia: $selectedGiphyMedia
+                    )
+                    .environmentObject(globalFocusState)
+                } else {
+                    Text("no giphy key found")
+                }
+            }
+            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
+                AttachmentsEditor(
+                    inputViewModel: inputViewModel,
+                    inputViewBuilder: inputViewBuilder,
+                    mediaPickerParameters: inputViewCustomizationParameters.mediaPickerParameters,
+                    availableInputs: inputViewCustomizationParameters.availableInputs,
+                    localization: chatCustomizationParameters.localization
+                )
+                .environmentObject(globalFocusState)
+                .environmentObject(keyboardState)
+            }
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
-                
+
                 GeometryReader { g in
                     FullscreenMediaPages(
                         viewModel: FullscreenMediaPagesViewModel(
@@ -122,66 +179,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         }
                     )
                     .ignoresSafeArea()
-                }
-            }
-//            .onAppear {
-//                if isGiphyAvailable() {
-//                    if let giphyKey = giphyConfig.giphyKey {
-//                        if !giphyConfigured {
-//                            giphyConfigured = true
-//                            Giphy.configure(apiKey: giphyKey)
-//                        }
-//                    } else {
-//                        print("WARNING: giphy key not provided, please pass a key using giphyConfig")
-//                    }
-//                }
-//            }
-//            .onChange(of: inputViewModel.text) { _ , newValue in
-//                inputViewCustomizationParameters.onInputTextChange?(newValue)
-//            }
-//            .onChange(of: inputViewCustomizationParameters.externalInputText) {
-//                DispatchQueue.main.async {
-//                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
-//                }
-//            }
-//            .onChange(of: selectedGiphyMedia) {
-//                if let giphyMedia = selectedGiphyMedia {
-//                    inputViewModel.attachments.giphyMedia = giphyMedia
-//                    inputViewModel.send()
-//                }
-//            }
-//            .sheet(isPresented: $inputViewModel.showGiphyPicker) {
-//                if giphyConfig.giphyKey != nil {
-//                    GiphyEditorView(
-//                        giphyConfig: giphyConfig,
-//                        selectedMedia: $selectedGiphyMedia
-//                    )
-//                    .environmentObject(globalFocusState)
-//                } else {
-//                    Text("no giphy key found")
-//                }
-//            }
-//            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-//                AttachmentsEditor(
-//                    inputViewModel: inputViewModel,
-//                    inputViewBuilder: inputViewBuilder,
-//                    mediaPickerParameters: inputViewCustomizationParameters.mediaPickerParameters,
-//                    availableInputs: inputViewCustomizationParameters.availableInputs,
-//                    localization: chatCustomizationParameters.localization,
-//                    messageStyler: messageCustomizationParameters.styler
-//                )
-//                .environmentObject(globalFocusState)
-//                .environmentObject(keyboardState)
-//            }
-        
-            .onChange(of: inputViewModel.showPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
-                }
-            }
-            .onChange(of: inputViewModel.showGiphyPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
                 }
             }
             .background {
