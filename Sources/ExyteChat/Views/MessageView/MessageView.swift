@@ -19,11 +19,8 @@ struct MessageView: View {
     let chatType: ChatType
     let params: MessageCustomizationParameters
     @Binding var timeViewWidth: CGFloat // hack to pass real updates through UIKit
+    @Binding var reactionViewWidth: CGFloat // hack to pass real updates through UIKit
     let isDisplayingMessageMenu: Bool
-
-    // The size of our reaction bubbles are based on the users font size,
-    // Therefore we need to capture its rendered size in order to place it correctly
-    @State var bubbleSize: CGSize = .zero
 
     @State var giphyAspectRatio: CGFloat = 1
 
@@ -144,7 +141,7 @@ struct MessageView: View {
     func bubbleView(_ message: Message) -> some View {
         VStack(
             alignment: message.user.isCurrentUser ? .leading : .trailing,
-            spacing: -bubbleSize.height / 3
+            spacing: -reactionViewWidth / 3
         ) {
             if !isDisplayingMessageMenu && !message.reactions.isEmpty {
                 reactionsView(message)

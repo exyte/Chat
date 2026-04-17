@@ -68,7 +68,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var mainHeaderBuilder: (()->AnyView)?
 
     /// date section header builder
-    var headerBuilder: ((Date)->AnyView)?
+    var dateHeaderBuilder: ((Date)->AnyView)?
 
     /// content to display in between the chat list view and the input view
     var betweenListAndInputViewBuilder: (()->AnyView)?
@@ -96,6 +96,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @State private var tableContentHeight: CGFloat = 0
     @State private var inputViewSize = CGSize.zero
     @State private var timeViewSize = CGSize.zero
+    @State private var reactionViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
 
     @State private var giphyConfigured = false
@@ -184,8 +185,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             .background {
                 // assume all the time views have same width, like "00:00"
                 if let anyMessage = sections.first?.rows.first?.message, timeViewSize == .zero {
-                    FinalMeasuringTrickView(size: $timeViewSize, id: "uu") {
+                    FinalMeasuringTrickView(size: $timeViewSize) {
                         MessageTimeView(text: anyMessage.time, userType: anyMessage.user.type)
+                    }
+                }
+                if let anyMessage = sections.first?.rows.first?.message, reactionViewSize == .zero {
+                    FinalMeasuringTrickView(size: $reactionViewSize) {
+                        ReactionBubble(reaction: Reaction(id: "0", user: anyMessage.user, createdAt: anyMessage.createdAt, type: .emoji("🙃️️️️"), status: .sent), font: messageCustomizationParameters.font)
                     }
                 }
             }
@@ -277,7 +283,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
             messageBuilder: messageBuilder,
             mainHeaderBuilder: mainHeaderBuilder,
-            headerBuilder: headerBuilder,
+            dateHeaderBuilder: dateHeaderBuilder,
 
             // MARK: - Data / type
 
@@ -289,7 +295,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
             chatParams: chatCustomizationParameters,
             messageParams: messageCustomizationParameters,
-            timeViewWidth: $timeViewSize.width
+            timeViewWidth: $timeViewSize.width,
+            reactionViewWidth: $reactionViewSize.width
         )
         .applyIf(!chatCustomizationParameters.isScrollEnabled) {
             $0.frame(height: tableContentHeight)
@@ -397,6 +404,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 chatType: type,
                 messageParams: messageCustomizationParameters,
                 timeViewWidth: $timeViewSize.width,
+                reactionViewWidth: $reactionViewSize.width,
                 isDisplayingMessageMenu: true
             )
             .onTapGesture {

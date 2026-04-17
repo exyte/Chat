@@ -19,6 +19,7 @@ struct ChatMessageView<MessageContent: View>: View {
     let chatType: ChatType
     let messageParams: MessageCustomizationParameters
     @Binding var timeViewWidth: CGFloat
+    @Binding var reactionViewWidth: CGFloat
     let isDisplayingMessageMenu: Bool
 
     @State var timeViewSize: CGSize?
@@ -48,6 +49,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     chatType: chatType,
                     params: messageParams,
                     timeViewWidth: $timeViewWidth,
+                    reactionViewWidth: $reactionViewWidth,
                     isDisplayingMessageMenu: isDisplayingMessageMenu
                 )
             } else {
@@ -56,7 +58,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     .environment(\.chatMessageType, chatType)
                     .environment(\.messageCustomizationParams, messageParams)
                     .environment(\.timeViewWidthBinding, $timeViewWidth)
-                    .environment(\.isDisplayingMessageMenu, isDisplayingMessageMenu)
+                    .environment(\.reactionViewWidthBinding, $reactionViewWidth)
             }
         }
         .id(row.message.id)

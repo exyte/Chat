@@ -29,7 +29,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
     let messageBuilder: MessageBuilderParamsClosure
     let mainHeaderBuilder: (()->AnyView)?
-    let headerBuilder: ((Date)->AnyView)?
+    let dateHeaderBuilder: ((Date)->AnyView)?
 
     // MARK: - Data / type
 
@@ -42,6 +42,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     let chatParams: ChatCustomizationParameters
     let messageParams: MessageCustomizationParameters
     @Binding var timeViewWidth: CGFloat
+    @Binding var reactionViewWidth: CGFloat
 
     // MARK: - State
 
@@ -456,7 +457,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             messageBuilder: messageBuilder,
             mainHeaderBuilder: mainHeaderBuilder,
-            headerBuilder: headerBuilder,
+            dateHeaderBuilder: dateHeaderBuilder,
 
             type: type,
             sections: sections,
@@ -465,6 +466,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             chatParams: chatParams,
             messageParams: messageParams,
             timeViewWidth: $timeViewWidth,
+            reactionViewWidth: $reactionViewWidth,
             mainBackgroundColor: theme.colors.mainBG
         )
     }
@@ -481,7 +483,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         let messageBuilder: MessageBuilderParamsClosure
         let mainHeaderBuilder: (()->AnyView)?
-        let headerBuilder: ((Date)->AnyView)?
+        let dateHeaderBuilder: ((Date)->AnyView)?
 
         // MARK: - Data / type
 
@@ -500,6 +502,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         let chatParams: ChatCustomizationParameters
         let messageParams: MessageCustomizationParameters
         @Binding var timeViewWidth: CGFloat
+        @Binding var reactionViewWidth: CGFloat
         let mainBackgroundColor: Color
 
         /// call pagination handler when this row is reached
@@ -516,7 +519,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             messageBuilder: @escaping MessageBuilderParamsClosure,
             mainHeaderBuilder: (() -> AnyView)?,
-            headerBuilder: ((Date) -> AnyView)?,
+            dateHeaderBuilder: ((Date) -> AnyView)?,
 
             type: ChatType,
             sections: [MessagesSection],
@@ -525,6 +528,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             chatParams: ChatCustomizationParameters,
             messageParams: MessageCustomizationParameters,
             timeViewWidth: Binding<CGFloat>,
+            reactionViewWidth: Binding<CGFloat>,
             mainBackgroundColor: Color
         ) {
             self.viewModel = viewModel
@@ -534,7 +538,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             self.messageBuilder = messageBuilder
             self.mainHeaderBuilder = mainHeaderBuilder
-            self.headerBuilder = headerBuilder
+            self.dateHeaderBuilder = dateHeaderBuilder
 
             self.type = type
             self.sections = sections
@@ -543,6 +547,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             self.chatParams = chatParams
             self.messageParams = messageParams
             self._timeViewWidth = timeViewWidth
+            self._reactionViewWidth = reactionViewWidth
             self.mainBackgroundColor = mainBackgroundColor
         }
 
@@ -610,8 +615,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         @ViewBuilder
         func dateViewBuilder(_ section: Int) -> some View {
             if chatParams.showDateHeaders {
-                if let headerBuilder {
-                    headerBuilder(sections[section].date)
+                if let dateHeaderBuilder {
+                    dateHeaderBuilder(sections[section].date)
                 } else {
                     Text(sections[section].formattedDate)
                         .font(.system(size: 11))
@@ -636,6 +641,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     chatType: type,
                     messageParams: messageParams,
                     timeViewWidth: $timeViewWidth,
+                    reactionViewWidth: $reactionViewWidth,
                     isDisplayingMessageMenu: false
                 )
                 .background(MessageMenuPreferenceViewSetter(id: row.id))

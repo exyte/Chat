@@ -96,7 +96,7 @@ public struct CachedAsyncImage<Content>: View where Content: View {
                 ) { result in
                     switch result {
                     case .success(let value):
-                        print("[CachedAsyncImage] Loaded image from: \(value.cacheType)")
+                        //print("[CachedAsyncImage] Loaded image from: \(value.cacheType)")
                         continuation.resume(returning: value.image)
                     case .failure(let error):
                         print("[CachedAsyncImage] Failed to load image: \(error)")

@@ -10,7 +10,7 @@ public enum ReactionType: Codable, Equatable, Hashable, Sendable {
     //case sticker(Image / Giphy / Memoji)
     //case other...
     
-    var toString:String {
+    var toString: String {
         switch self {
         case .emoji(let emoji):
             return emoji

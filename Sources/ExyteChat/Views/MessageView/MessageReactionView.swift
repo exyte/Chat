@@ -12,7 +12,7 @@ extension MessageView {
         let preparedReactions = prepareReactions(message: message, maxReactions: maxReactions)
         let overflowBubbleText = "+\(message.reactions.count - maxReactions + 1)"
         
-        HStack(spacing: -bubbleSize.width / 5) {
+        HStack(spacing: -reactionViewWidth / 5) {
             if !message.user.isCurrentUser {
                 overflowBubbleView(
                     leadingSpacer: true,
@@ -23,10 +23,9 @@ extension MessageView {
             }
             
             ForEach(Array(preparedReactions.reactions.enumerated()), id: \.element) { index, reaction in
-                ReactionBubble(reaction: reaction, font: Font(params.font))
+                ReactionBubble(reaction: reaction, font: params.font)
                     .transition(.scaleAndFade)
                     .zIndex(message.user.isCurrentUser ? Double(preparedReactions.reactions.count - index) : Double(index + 1))
-                    .sizeGetter($bubbleSize)
             }
             
             if message.user.isCurrentUser {
@@ -39,7 +38,7 @@ extension MessageView {
             }
         }
         .offset(
-            x: message.user.isCurrentUser ? -(bubbleSize.height / 2) : (bubbleSize.height / 2),
+            x: message.user.isCurrentUser ? -(reactionViewWidth / 2) : (reactionViewWidth / 2),
             y: 0
         )
     }
@@ -105,7 +104,17 @@ struct ReactionBubble: View {
     
     let reaction: Reaction
     let font: Font
-    
+
+    init(reaction: Reaction, font: UIFont) {
+        self.reaction = reaction
+        self.font = Font(font)
+    }
+
+    init(reaction: Reaction, font: Font) {
+        self.reaction = reaction
+        self.font = font
+    }
+
     @State private var phase = 0.0
     
     var fillColor: Color {

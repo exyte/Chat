@@ -21,9 +21,18 @@ public extension ChatView {
         return view
     }
 
+    func dateHeaderBuilder<V: View>(_ builder: @escaping (Date)->V) -> ChatView {
+        var view = self
+        view.dateHeaderBuilder = { date in
+            AnyView(builder(date))
+        }
+        return view
+    }
+
+    @available(*, deprecated, message: "use dateHeaderBuilder instead")
     func headerBuilder<V: View>(_ builder: @escaping (Date)->V) -> ChatView {
         var view = self
-        view.headerBuilder = { date in
+        view.dateHeaderBuilder = { date in
             AnyView(builder(date))
         }
         return view

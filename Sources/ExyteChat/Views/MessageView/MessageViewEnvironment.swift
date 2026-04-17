@@ -12,8 +12,8 @@ private struct TimeViewWidthBindingEnvironmentKey: EnvironmentKey {
     static let defaultValue: Binding<CGFloat> = .constant(0)
 }
 
-private struct IsDisplayingMessageMenuEnvironmentKey: EnvironmentKey {
-    static let defaultValue = false
+private struct ReactionViewWidthBindingEnvironmentKey: EnvironmentKey {
+    static let defaultValue: Binding<CGFloat> = .constant(0)
 }
 
 extension EnvironmentValues {
@@ -32,8 +32,8 @@ extension EnvironmentValues {
         set { self[TimeViewWidthBindingEnvironmentKey.self] = newValue }
     }
 
-    var isDisplayingMessageMenu: Bool {
-        get { self[IsDisplayingMessageMenuEnvironmentKey.self] }
-        set { self[IsDisplayingMessageMenuEnvironmentKey.self] = newValue }
+    var reactionViewWidthBinding: Binding<CGFloat> {
+        get { self[ReactionViewWidthBindingEnvironmentKey.self] }
+        set { self[ReactionViewWidthBindingEnvironmentKey.self] = newValue }
     }
 }
