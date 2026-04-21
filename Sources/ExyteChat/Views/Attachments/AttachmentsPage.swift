@@ -13,7 +13,7 @@ struct AttachmentsPage: View {
 
     var body: some View {
         if attachment.type == .image {
-            ZoomableScrollView {
+            ZoomableContainer {
                 CachedAsyncImage(
                     url: attachment.full,
                     cacheKey: attachment.fullCacheKey
