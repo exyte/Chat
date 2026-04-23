@@ -53,6 +53,10 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
+    func focusTheInputTextView() {
+        globalFocusState?.focus = .uuid(inputFieldId)
+    }
+
     func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
         switch action {
         case .copy:
@@ -61,11 +65,11 @@ final class ChatViewModel: ObservableObject {
             withAnimation(.easeInOut(duration: 0.2)) {
                 inputViewModel?.attachments.replyMessage = message.toReplyMessage()
             }
-            globalFocusState?.focus = .uuid(inputFieldId)
+            focusTheInputTextView()
         case .edit(let saveClosure):
             inputViewModel?.text = String(message.attributedText.characters)
             inputViewModel?.edit(saveClosure)
-            globalFocusState?.focus = .uuid(inputFieldId)
+            focusTheInputTextView()
         }
     }
 }
