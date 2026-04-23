@@ -14,6 +14,7 @@ struct ChatCustomizationParameters {
     var showNetworkConnectionProblem: Bool = false
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = true
+    var autoFocusTextInputOnChatOpen: Bool = false
     var showMessageMenuOnLongPress: Bool = true
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     var messageMenuAnimationDuration: CGFloat = 0.3
