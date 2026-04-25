@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.1
 
 import PackageDescription
 
@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
-            from: "3.2.4"
+            from: "3.3.2"
         ),
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",
@@ -47,5 +47,6 @@ let package = Package(
         .testTarget(
             name: "ExyteChatTests",
             dependencies: ["ExyteChat"]),
-    ]
+    ],
+    swiftLanguageModes: [.v5]
 )
