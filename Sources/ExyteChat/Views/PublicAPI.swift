@@ -78,6 +78,12 @@ public extension ChatView {
         return view
     }
 
+    func autoFocusTextInputOnChatOpen(_ autoFocus: Bool) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.autoFocusTextInputOnChatOpen = autoFocus
+        return view
+    }
+
     func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
         var view = self
         view.chatCustomizationParameters.showMessageMenuOnLongPress = show

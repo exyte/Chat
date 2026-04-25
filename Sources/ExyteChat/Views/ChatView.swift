@@ -326,6 +326,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.didSendMessage = didSendMessage
             viewModel.inputViewModel = inputViewModel
             viewModel.globalFocusState = globalFocusState
+            if chatCustomizationParameters.autoFocusTextInputOnChatOpen {
+                viewModel.focusTheInputTextView()
+            }
             if let didUpdateAttachmentStatus {
                 viewModel.didUpdateAttachmentStatus = didUpdateAttachmentStatus
             }
