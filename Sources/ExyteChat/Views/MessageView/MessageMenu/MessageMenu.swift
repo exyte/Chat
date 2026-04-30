@@ -30,7 +30,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     @Binding var isShowingMenu: Bool
     
     /// Overall ChatView Frame
-    let chatViewFrame: CGRect = UIScreen.main.bounds
+    @State private var chatViewFrame: CGRect = .zero
     
     /// The max height for the menu
     /// - Note: menus that exceed this value will be placed in a ScrollView
@@ -152,62 +152,75 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     }
     
     public var body: some View {
-        ZStack(alignment: .top) {
-            
-            // Reaction Overview Rectangle
-            if reactionOverviewIsVisible, case .vStack = messageMenuStyle {
-                ReactionOverview(viewModel: viewModel, message: message, width: reactionOverviewWidth, backgroundColor: theme.colors.messageFriendBG, inScrollView: false)
-                    .frame(width: reactionOverviewWidth)
-                    .maxHeightGetter($reactionOverviewHeight)
-                    .offset(y: UIApplication.safeArea.top)
-                    .transition(defaultTransition)
+        GeometryReader { geometry in
+            ZStack(alignment: .top) {
+
+                // Reaction Overview Rectangle
+                if reactionOverviewIsVisible, case .vStack = messageMenuStyle {
+                    ReactionOverview(viewModel: viewModel, message: message, width: reactionOverviewWidth, backgroundColor: theme.colors.messageFriendBG, inScrollView: false)
+                        .frame(width: reactionOverviewWidth)
+                        .maxHeightGetter($reactionOverviewHeight)
+                        .offset(y: UIApplication.safeArea.top)
+                        .transition(defaultTransition)
+                        .opacity(messageMenuOpacity)
+                }
+
+                // Some views to help debug layout and animations
+                //debugViews()
+
+                // The message and menu view
+                messageMenuView()
+                    .frameGetter($messageMenuFrame)
+                    .position(x: chatViewFrame.width / 2 + horizontalOffset, y: verticalOffset)
                     .opacity(messageMenuOpacity)
+
             }
-            
-            // Some views to help debug layout and animations
-            //debugViews()
-            
-            // The message and menu view
-            messageMenuView()
-                .frameGetter($messageMenuFrame)
-                .position(x: chatViewFrame.width / 2 + horizontalOffset, y: verticalOffset)
-                .opacity(messageMenuOpacity)
-            
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .edgesIgnoringSafeArea(.all)
-        .background(
-            ZStack {
-                Rectangle()
-                    .foregroundStyle(.ultraThinMaterial)
-                Rectangle()
-                    .fill(.primary.opacity(0.1))
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .edgesIgnoringSafeArea(.all)
-            .opacity(backgroundOpacity)
-            .onTapGesture {
-                if viewState == .keyboard {
-                    keyboardState.resignFirstResponder()
+            .background(
+                ZStack {
+                    Rectangle()
+                        .foregroundStyle(.ultraThinMaterial)
+                    Rectangle()
+                        .fill(.primary.opacity(0.1))
+                }
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(backgroundOpacity)
+                    .onTapGesture {
+                        if viewState == .keyboard {
+                            keyboardState.resignFirstResponder()
+                            transitionViewState(to: .ready)
+                        } else {
+                            dismissSelf()
+                        }
+                    }
+            )
+            .onAppear {
+                chatViewFrame = geometry.frame(in: .global)
+
+                transitionViewState(to: .prepare)
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(animationDuration * 333))) {
+                    transitionViewState(to: .original)
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(animationDuration * 666))) {
                     transitionViewState(to: .ready)
-                } else {
-                    dismissSelf()
                 }
             }
-        )
-        .onAppear {
-            transitionViewState(to: .prepare)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(animationDuration * 333))) {
-                transitionViewState(to: .original)
+            .onChange(of: keyboardState.keyboardFrame) {
+                if viewState == .ready, keyboardState.isShown {
+                    transitionViewState(to: .keyboard)
+                }
             }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(animationDuration * 666))) {
-                transitionViewState(to: .ready)
-            }
-        }
-        .onChange(of: keyboardState.keyboardFrame) {
-            if viewState == .ready, keyboardState.isShown {
-                transitionViewState(to: .keyboard)
+            .onChange(of: geometry.size) { _ , newSize in
+                chatViewFrame = CGRect(
+                    origin: chatViewFrame.origin,
+                    size: CGSize(width: newSize.width, height: newSize.height)
+                )
+
+                // Recalculate reaction overview width
+                reactionOverviewWidth = chatViewFrame.width - UIApplication.safeArea.leading - UIApplication.safeArea.trailing
             }
         }
     }
@@ -231,7 +244,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             reactionOverviewIsVisible = shouldShowReactionOverviewView
             reactionSelectionIsVisible = shouldShowReactionSelectionView
             menuIsVisible = true
-            verticalOffset = UIScreen.main.bounds.height * 2
+            verticalOffset = chatViewFrame.height * 2
             
             /// Kick off the background animation
             withAnimation(.easeInOut(duration: animationDuration)) {
@@ -250,7 +263,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
             
             /// If we're in landscape mode, adjust the `horizontalOffset` appropriately
-            if UIScreen.main.bounds.width > UIScreen.main.bounds.height {
+            if chatViewFrame.width > chatViewFrame.height {
                 switch alignment {
                 case .left:
                     horizontalOffset = UIApplication.safeArea.leading
@@ -456,6 +469,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             if reactionSelectionIsVisible {
                 ReactionSelectionView(
                     viewModel: viewModel,
+                    chatViewFrame: $chatViewFrame,
                     backgroundColor: theme.colors.messageFriendBG,
                     selectedColor: theme.colors.messageMyBG,
                     animation: .bouncy(duration: animationDuration),

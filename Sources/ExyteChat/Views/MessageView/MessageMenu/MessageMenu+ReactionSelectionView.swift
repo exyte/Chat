@@ -28,6 +28,7 @@ struct ReactionSelectionView: View {
     @State private var xOffset: CGFloat = 0.0
     @State private var yOffset: CGFloat = 0.0
     @State private var viewState: ViewState = .initial
+    @Binding var chatViewFrame: CGRect
     
     @State private var bubbleDiameter: CGFloat = .zero
     
@@ -177,7 +178,7 @@ struct ReactionSelectionView: View {
             Color.clear.viewWidth(max(1, leadingPadding - 8))
             Spacer()
         } else {
-            let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - trailingPadding)
+            let additionalPadding = max(0, chatViewFrame.width - maxSelectionRowWidth - trailingPadding)
             Color.clear.viewWidth(additionalPadding + trailingPadding * 3)
         }
     }
@@ -188,7 +189,7 @@ struct ReactionSelectionView: View {
             Spacer()
             Color.clear.viewWidth(trailingPadding)
         } else {
-            let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - leadingPadding)
+            let additionalPadding = max(0, chatViewFrame.width - maxSelectionRowWidth - leadingPadding)
             Color.clear.viewWidth(additionalPadding + trailingPadding * 3)
         }
     }
@@ -287,16 +288,16 @@ struct ReactionSelectionView: View {
     /// - Note: If the messageFrame's width is equal to, or larger than, the Screens width then we skip the offset animation
     /// - Note: This also prevents the offset animation from occuring when the user uses a custom message builder
     private func getXOffset() -> CGFloat {
-        guard viewModel.messageFrame.width < UIScreen.main.bounds.width else { return .leastNonzeroMagnitude }
+        guard viewModel.messageFrame.width < chatViewFrame.width else { return .leastNonzeroMagnitude }
         switch viewState {
         case .initial, .row:
             return .leastNonzeroMagnitude
         case .search, .picked:
             if alignment == .left {
-                let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - leadingPadding) - UIApplication.safeArea.leading
-                return -((UIScreen.main.bounds.width - (additionalPadding + trailingPadding * 3) - (bubbleDiameter * 0.8)) - viewModel.messageFrame.maxX)
+                let additionalPadding = max(0, chatViewFrame.width - maxSelectionRowWidth - leadingPadding) - UIApplication.safeArea.leading
+                return -((chatViewFrame.width - (additionalPadding + trailingPadding * 3) - (bubbleDiameter * 0.8)) - viewModel.messageFrame.maxX)
             } else {
-                let additionalPadding = max(0, UIScreen.main.bounds.width - maxSelectionRowWidth - trailingPadding) - UIApplication.safeArea.leading
+                let additionalPadding = max(0, chatViewFrame.width - maxSelectionRowWidth - trailingPadding) - UIApplication.safeArea.leading
                 return viewModel.messageFrame.minX - ((additionalPadding + trailingPadding * 3) + (bubbleDiameter * 0.8))
             }
         }
@@ -307,7 +308,7 @@ struct ReactionSelectionView: View {
     /// - Note: If the messageFrame's width is equal to, or larger than, the Screens width then we skip the offset animation
     /// - Note: This also prevents the offset animation from occuring when the user uses a custom message builder
     private func getYOffset() -> CGFloat {
-        guard viewModel.messageFrame.width < UIScreen.main.bounds.width else { return .leastNonzeroMagnitude }
+        guard viewModel.messageFrame.width < chatViewFrame.width else { return .leastNonzeroMagnitude }
         switch viewState {
         case .initial, .row:
             return .leastNonzeroMagnitude
@@ -396,6 +397,7 @@ internal struct InteriorRadialShadow: ViewModifier {
     VStack {
         ReactionSelectionView(
             viewModel: ChatViewModel(),
+            chatViewFrame: .constant(UIScreen.main.bounds),
             backgroundColor: .gray,
             selectedColor: .blue,
             animation: .linear(duration: 0.2),
