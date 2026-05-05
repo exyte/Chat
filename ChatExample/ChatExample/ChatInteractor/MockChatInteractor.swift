@@ -14,8 +14,9 @@ final actor MockChatInteractor {
 
     private let isActive: Bool
     private var isLoading = false
-    private var lastDate = Date()
-    
+    private var newestDate = Date().addingTimeInterval(60*60*24)
+    private var oldestDate = Date()
+
     var senders: [MockUser] {
         var members = [chatData.steve, chatData.tim]
         if isActive { members.append(chatData.bob) }
@@ -141,26 +142,41 @@ final actor MockChatInteractor {
         }
     }
 
-    func loadNextPage() async {
-        guard !isLoading else { return }
+    func loadNewerMessagesPage() async {
+        //guard !isLoading else { return }
 
         isLoading = true
         try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
 
-        messages.append(contentsOf: generateStartMessages())
+        messages.append(contentsOf: generateStartMessages(older: false))
+        isLoading = false
+    }
+
+    func loadOlderMessagesPage() async {
+        //guard !isLoading else { return }
+
+        isLoading = true
+        try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+
+        messages.insert(contentsOf: generateStartMessages(), at: 0)
         isLoading = false
     }
 }
 
 private extension MockChatInteractor {
-    func generateStartMessages() -> [MockMessage] {
+    func generateStartMessages(older: Bool = true) -> [MockMessage] {
         defer {
-            lastDate = lastDate.addingTimeInterval(-(60*60*24))
+            if older {
+                oldestDate = oldestDate.addingTimeInterval(-(60*60*24))
+            } else {
+                newestDate = newestDate.addingTimeInterval(60*60*24)
+            }
         }
-        return (0...10)
+        let date = older ? oldestDate : newestDate
+        return (0...20)
             .map { index in
                 // Generate a random message
-                var msg = chatData.randomMessage(senders: senders, date: lastDate.randomTime())
+                var msg = chatData.randomMessage(senders: senders, date: date.randomTime())
                 // 20% of the time, generate a random reaction to the message
                 if Int.random(in: 0...4) == 0 { msg = chatData.reactToMessage(msg, senders: senders) }
                 // Return the message

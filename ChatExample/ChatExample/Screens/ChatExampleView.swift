@@ -5,6 +5,7 @@
 import Foundation
 import SwiftUI
 import ExyteChat
+import ActivityIndicatorView
 
 @MainActor
 struct ChatExampleView: View {
@@ -15,7 +16,6 @@ struct ChatExampleView: View {
     var title: String
 
     @State var text = ""
-    @State var scrollToID: String?
 
     let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
@@ -23,11 +23,21 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
-        .enableLoadMore(offset: 1) {
-            viewModel.loadMoreMessages()
-        }
+        .enableLoadMoreNewerMessages(paginationHandler: PaginationHandler(triggerType: .pixels(0)) {
+            await viewModel.loadNewerMessagesPage()
+        } loadingIndicatorBuilder: {
+            activityIndicatorView
+                .foregroundStyle(Color(.exampleBlue))
+        })
+        .enableLoadMoreOlderMessages(paginationHandler: PaginationHandler(triggerType: .pixels(0)) {
+            await viewModel.loadOlderMessagesPage()
+        } loadingIndicatorBuilder: {
+            activityIndicatorView
+                .foregroundStyle(Color(.exampleGrey))
+        })
+        .updateTransaction($viewModel.tableTransaction)
+        .scrollToMessage(viewModel.scrollToParams)
         .inputViewText($text)
-        .scrollToMessageID(scrollToID)
         .keyboardDismissMode(.interactive)
         .showUsername(true)
         .setMediaPickerLiveCameraStyle(.prominant)
@@ -96,7 +106,13 @@ struct ChatExampleView: View {
             print(newValue)
         }
     }
-    
+
+    var activityIndicatorView: some View {
+        ActivityIndicatorView(type: .default())
+            .frame(width: 30, height: 30)
+            .padding(.vertical, 10)
+    }
+
     // Swipe Action
     func onReply(message: Message, defaultActions: @escaping (Message, DefaultMessageMenuAction) -> Void) {
         print("Swipe Action - Reply: \(message)")

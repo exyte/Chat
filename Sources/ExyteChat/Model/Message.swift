@@ -68,6 +68,10 @@ public struct Message: Identifiable, Sendable {
         !attributedText.characters.isEmpty
     }
 
+    public var text: String {
+        String(attributedText.characters)
+    }
+
     public init(
         id: String,
         user: User,

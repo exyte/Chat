@@ -19,16 +19,33 @@ struct ChatCustomizationParameters {
     var messageMenuAnimationDuration: CGFloat = 0.3
     var contentInsets: UIEdgeInsets = .zero
 
-    var externalContentOffset: CGPoint? // External → Internal
-    var onContentOffsetChange: ((CGPoint) -> Void)? // Internal → External
-    var scrollToMessageID: String?
+    var scrollToParams: ScrollToParams?
+    var onContentOffsetChange: ((CGFloat) -> Void)? // Internal → External
     var onWillDisplayCell: ((Message) -> Void)?
     var onTransactionReady: ((TableUpdateTransaction) -> Void)?
 
-    var paginationHandler: PaginationHandler?
+    var olderMessagesPaginationHandler: PaginationHandler?
+    var newerMessagesPaginationHandler: PaginationHandler?
     var localization = ChatLocalization.defaultLocalization // these can be localized in the Localizable.strings files
     var reactionDelegate: ReactionDelegate?
     var listSwipeActions = ListSwipeActions()
+}
+
+public struct ScrollToParams: Equatable {
+    enum ScrollTo: Equatable {
+        case messageID(messageID: String, position: UITableView.ScrollPosition, offset: CGFloat)
+        case tableOffset(CGFloat)
+    }
+
+    let scrollTo: ScrollTo
+
+    public init(messageID: String, position: UITableView.ScrollPosition, offset: CGFloat = 0) {
+        self.scrollTo = .messageID(messageID: messageID, position: position, offset: offset)
+    }
+
+    public init(offset: CGFloat) {
+        self.scrollTo = .tableOffset(offset)
+    }
 }
 
 struct MessageCustomizationParameters {

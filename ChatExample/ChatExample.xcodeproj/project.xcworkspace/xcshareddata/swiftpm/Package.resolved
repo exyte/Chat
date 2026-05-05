@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/ActivityIndicatorView",
       "state" : {
-        "revision" : "36140867802ae4a1d2b11490bcbbefe058001d14",
-        "version" : "1.2.1"
+        "revision" : "15384b0f9ca3a9b072e12ab779d545e9717adba4",
+        "version" : "2.0.0"
       }
     },
     {

@@ -302,21 +302,25 @@ struct MessageView: View {
                 case .hstack:
                     HStack(alignment: .lastTextBaseline, spacing: 0) {
                         messageView
+                            .lineLimit(1)
                         if !message.attachments.isEmpty {
                             Spacer()
                         }
                         timeView
                     }
+                    .border(Color.red, width: 2)
                 case .vstack:
                     VStack(alignment: .trailing, spacing: 4) {
                         messageView
                         timeView
                     }
+                    .border(Color.blue, width: 2)
                 case .overlay:
                     messageView
                         .overlay(alignment: .bottomTrailing) {
                             timeView
                         }
+                        .border(Color.yellow, width: 2)
                 }
             }
     }

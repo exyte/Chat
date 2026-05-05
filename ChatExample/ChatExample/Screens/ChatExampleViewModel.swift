@@ -14,6 +14,9 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     @Published var chatStatus: String = ""
     @Published var chatCover: URL?
 
+    var tableTransaction: TableUpdateTransaction?
+    var scrollToParams: ScrollToParams?
+
     private let interactor: MockChatInteractor
     private var timer: Timer?
 
@@ -31,14 +34,14 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     func send(draft: DraftMessage) {
         Task {
             await interactor.send(draftMessage: draft)
-            self.updateMessages()
+            self.messages = await self.convertMessages()
         }
     }
     
     func remove(messageID: String) {
         Task {
             await interactor.remove(messageID: messageID)
-            self.updateMessages()
+            self.messages = await self.convertMessages()
         }
     }
 
@@ -50,16 +53,16 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     func onStart() {
         Task {
-            self.updateMessages()
+            self.messages = await self.convertMessages()
             connect()
         }
     }
 
     func connect() {
         timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
-            Task {
+            Task { @MainActor in
                 await self.interactor.timerTick()
-                await self.updateMessages()
+                self.messages = await self.convertMessages()
             }
         }
     }
@@ -68,16 +71,29 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
         timer?.invalidate()
     }
 
-    func loadMoreMessages() {
-        Task {
-            await interactor.loadNextPage()
-            updateMessages()
+    func loadNewerMessagesPage() async {
+        guard let tableTransaction, let id = messages.last?.id else { return }
+        await interactor.loadNewerMessagesPage()
+        let messages = await convertMessages()
+        await tableTransaction(animated: false) {
+            print(id, self.messages.last?.text)
+            self.messages = messages
+            self.scrollToParams = .init(messageID: id, position: .bottom, offset: -50)
+        }
+        self.scrollToParams = nil
+    }
+
+    func loadOlderMessagesPage() async {
+        print("load more")
+        guard let tableTransaction else { return }
+        await interactor.loadOlderMessagesPage()
+        let messages = await convertMessages()
+        await tableTransaction(animated: false) {
+            self.messages = messages
         }
     }
 
-    func updateMessages() {
-        Task {
-            self.messages = await interactor.messages.compactMap { $0.toChatMessage() }
-        }
+    func convertMessages() async -> [Message] {
+        await interactor.messages.compactMap { $0.toChatMessage() }
     }
 }
