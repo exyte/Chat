@@ -75,12 +75,9 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
         guard let tableTransaction, let id = messages.last?.id else { return }
         await interactor.loadNewerMessagesPage()
         let messages = await convertMessages()
-        await tableTransaction(animated: false) {
-            print(id, self.messages.last?.text)
+        await tableTransaction(animationMode: .keepStable) {
             self.messages = messages
-            self.scrollToParams = .init(messageID: id, position: .bottom, offset: -50)
         }
-        self.scrollToParams = nil
     }
 
     func loadOlderMessagesPage() async {

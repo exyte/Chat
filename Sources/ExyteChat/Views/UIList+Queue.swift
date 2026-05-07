@@ -33,13 +33,13 @@ actor UpdateQueue {
     // MARK: - Transaction
 
     func beginTransaction() {
-        print("UpdateQueue beginTransaction")
+        //print("UpdateQueue beginTransaction")
         didPerformRealUpdate = false
         debug("after beginTransaction")
     }
 
     func waitForTransactionToFinish() async {
-        print("UpdateQueue waitForTransactionToFinish")
+        //print("UpdateQueue waitForTransactionToFinish")
 
         await withCheckedContinuation { continuation in
             Task { await self.attachToLastJob(continuation) }
@@ -47,7 +47,7 @@ actor UpdateQueue {
     }
 
     private func attachToLastJob(_ continuation: CheckedContinuation<Void, Never>) {
-        print("UpdateQueue attachToLastJob")
+        //print("UpdateQueue attachToLastJob")
 
         if !queue.isEmpty {
             let index = queue.count - 1
@@ -68,7 +68,7 @@ actor UpdateQueue {
     }
 
     func finishEarlyIfNeeded() {
-        print("UpdateQueue finishEarlyIfNeeded \(didPerformRealUpdate)")
+        //print("UpdateQueue finishEarlyIfNeeded \(didPerformRealUpdate)")
         debug("before finishEarlyIfNeeded")
 
         if didPerformRealUpdate == false {
@@ -79,7 +79,7 @@ actor UpdateQueue {
     // MARK: - Job creation (THIS is where continuation is created)
 
     func createJob(_ work: @escaping @Sendable () async -> Void) {
-        print("UpdateQueue createJob")
+        //print("UpdateQueue createJob")
 
         Task {
             await withCheckedContinuation { continuation in
@@ -108,7 +108,7 @@ actor UpdateQueue {
 
         isProcessing = true
 
-        print("UpdateQueue start job")
+        //print("UpdateQueue start job")
         debug("before job")
 
         Task {
@@ -121,7 +121,7 @@ actor UpdateQueue {
     }
 
     private func completeCurrentJob() {
-        print("UpdateQueue completeCurrentJob")
+        //print("UpdateQueue completeCurrentJob")
 
         var job = queue.removeFirst()
 
@@ -130,7 +130,7 @@ actor UpdateQueue {
 
         // ✅ resume ONLY this job's transaction
         if let transaction = job.transactionContinuation {
-            print("UpdateQueue → resuming transaction")
+            //print("UpdateQueue → resuming transaction")
             transaction.resume()
         }
 
@@ -144,12 +144,27 @@ actor UpdateQueue {
 }
 
 public final class TableUpdateTransaction {
+    public enum AnimationMode {
+        case none
+        case automatic // standard UITableView insertion and content offset animations
+        case keepStable // keep the visible scroll position even when cells are inserted at the beginning, effectively shifting the meaning of the current content offset
+    }
+
+    var animated: Bool {
+        animationMode == .automatic
+    }
+
     var updateQueue: UpdateQueue?
-    var animated: Bool = true
+    var animationMode: AnimationMode = .automatic
 
     @MainActor
     public func callAsFunction(animated: Bool = true, _ updates: @MainActor @escaping () -> Void) async {
-        self.animated = animated
+        self.animationMode = animated ? .automatic : .none
+    }
+
+    @MainActor
+    public func callAsFunction(animationMode: AnimationMode = .automatic, _ updates: @MainActor @escaping () -> Void) async {
+        self.animationMode = animationMode
         //print("TableUpdateTransaction callAsFunction")
         await updateQueue?.beginTransaction()
 

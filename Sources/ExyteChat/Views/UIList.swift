@@ -110,45 +110,51 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         let needToUpdateSections = context.coordinator.latestUpdateSections != sections
         let needToScroll = chatParams.scrollToParams != nil && context.coordinator.latestUpdateScrollTo != chatParams.scrollToParams
 
-        if needToUpdateSections || needToScroll {
-            updateQueue.didPerformRealUpdate = true
-        } else {
-            return
-        }
+        guard needToUpdateSections || needToScroll else { return }
 
+        updateQueue.didPerformRealUpdate = true
         context.coordinator.latestUpdateSections = sections
         context.coordinator.latestUpdateScrollTo = chatParams.scrollToParams
+        context.coordinator.updateInProgress = true
 
-        print("changes needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), chatParams.scrollToParams: \(chatParams.scrollToParams)")
+        //print("changes needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), chatParams.scrollToParams: \(chatParams.scrollToParams)")
 
         updateQueue.createJob {
             Task { @MainActor in
-                context.coordinator.updateInProgress = true
-                //await updateQueue.enqueue() {
                 if !transaction.animated { UIView.setAnimationsEnabled(false) }
 
                 if needToUpdateSections {
                     // if we're gonna scroll later, then update cells without animation, and animate scrolling later
                     let animateTableUpdate = transaction.animated && chatParams.scrollToParams == nil
-                    await updateIfNeeded(coordinator: context.coordinator, tableView: tableView, animated: animateTableUpdate)
+                    let perform = {
+                        await updateIfNeeded(tableView, context.coordinator, animated: animateTableUpdate)
+                    }
+
+                    if transaction.animationMode == .keepStable {
+                        await performInsertPreservingOffset(tableView, context.coordinator) {
+                            await perform()
+                        }
+                    } else {
+                        await perform()
+                    }
                 }
 
-                let perform = {
-                    if let scrollToParams = chatParams.scrollToParams {
+                if needToScroll, let scrollToParams = chatParams.scrollToParams {
+                    let perform = {
                         performScrollTo(tableView, scrollToParams: scrollToParams)
                     }
-                }
 
-                if transaction.animated {
-                    await withCheckedContinuation { continuation in
-                        UIView.animate(withDuration: 0.25) {
-                            perform()
-                        } completion: { _ in
-                            continuation.resume()
+                    if transaction.animated {
+                        await withCheckedContinuation { continuation in
+                            UIView.animate(withDuration: 0.25) {
+                                perform()
+                            } completion: { _ in
+                                continuation.resume()
+                            }
                         }
+                    } else {
+                        perform()
                     }
-                } else {
-                    perform()
                 }
 
                 if !transaction.animated { UIView.setAnimationsEnabled(true) }
@@ -158,6 +164,25 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                 context.coordinator.paginationState.newerInProgress = false
             }
         }
+    }
+
+    func performInsertPreservingOffset(_ tableView: UITableView, _ coordinator: Coordinator, _ updateClosure: () async -> Void) async {
+        guard let firstVisibleIndexPath = tableView.indexPathsForVisibleRows?.first,
+              let preservedVisibleRect = tableView.rectForRow(at: firstVisibleIndexPath) as CGRect? else { return }
+
+        let firstVisibleRow = coordinator.sections[firstVisibleIndexPath.section].rows[firstVisibleIndexPath.row]
+        let preservedVisibleMessageID = firstVisibleRow.message.id
+        let preservedOffset = tableView.contentOffset.y
+
+        await updateClosure()
+        tableView.setNeedsLayout()
+        tableView.layoutIfNeeded()
+
+        guard let newIndexPath = indexPath(for: preservedVisibleMessageID, in: sections),
+              let newRectForCell = tableView.rectForRow(at: newIndexPath) as CGRect? else { return }
+        let newOffset = preservedOffset + (newRectForCell.minY - preservedVisibleRect.minY)
+        //print("firstVisibleIndexPath: \(firstVisibleIndexPath), newIndexPath: \(newIndexPath), preservedOffset: \(preservedOffset), newOffset: \(newOffset), preservedVisibleRect: \(preservedVisibleRect), newRectForCell: \(newRectForCell)")
+        tableView.setContentOffset(CGPoint(x: 0, y: newOffset), animated: false)
     }
 
     func performScrollTo(_ tableView: UITableView, scrollToParams: ScrollToParams) {
@@ -208,7 +233,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     @MainActor
-    private func updateIfNeeded(coordinator: Coordinator, tableView: UITableView, animated: Bool) async {
+    private func updateIfNeeded(_ tableView: UITableView, _ coordinator: Coordinator, animated: Bool) async {
         if coordinator.sections == sections {
             return
         }
@@ -730,7 +755,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                let handler = chatParams.olderMessagesPaginationHandler,
                handler.hasMoreToLoad,
                case let .pixels(offset) = handler.triggerType,
-               contentOffset <= offset,
+               contentOffset >= maxTopOffset,
                let tableView = scrollView as? UITableView {
                 performOlderPagination(tableView)
             }
