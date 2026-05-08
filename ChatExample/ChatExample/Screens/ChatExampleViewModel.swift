@@ -17,6 +17,9 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     var tableTransaction: TableUpdateTransaction?
     var scrollToParams: ScrollToParams?
 
+    var newPagesCount = 0
+    let maxNewPagesCount = 2
+
     private let interactor: MockChatInteractor
     private var timer: Timer?
 
@@ -73,6 +76,7 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     func loadNewerMessagesPage() async {
         guard let tableTransaction, let id = messages.last?.id else { return }
+        newPagesCount += 1
         await interactor.loadNewerMessagesPage()
         let messages = await convertMessages()
         await tableTransaction(animationMode: .keepStable) {
@@ -81,7 +85,6 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     }
 
     func loadOlderMessagesPage() async {
-        print("load more")
         guard let tableTransaction else { return }
         await interactor.loadOlderMessagesPage()
         let messages = await convertMessages()

@@ -153,17 +153,27 @@ public extension ChatView {
 
     /// called when the oldest message appears (if offset is non zero, paginationHandler's offset-th message)
     /// for conversation type chat it's the top-most one
-    func enableLoadMoreOlderMessages(paginationHandler: PaginationHandler) -> ChatView {
+    func enableLoadMoreOlderMessages<V: View>(
+        triggerType: PaginationHandler.TriggerType = .pixels(0),
+        hasMoreToLoad: Bool = true,
+        handleClosure: @escaping () async -> (),
+        loadingIndicatorBuilder: @escaping ()->V = { DefaultActivityIndicator() }
+    ) -> ChatView {
         var view = self
-        view.chatCustomizationParameters.olderMessagesPaginationHandler = paginationHandler
+        view.chatCustomizationParameters.olderMessagesPaginationHandler = PaginationHandler(triggerType: triggerType, hasMoreToLoad: hasMoreToLoad, handleClosure: handleClosure, loadingIndicatorBuilder: loadingIndicatorBuilder)
         return view
     }
 
     /// called when the newest message appears (if offset is non zero, paginationHandler's offset-th message from the end)
     /// for conversation type chat it's the bottom-most one
-    func enableLoadMoreNewerMessages(paginationHandler: PaginationHandler) -> ChatView {
+    func enableLoadMoreNewerMessages<V: View>(
+        triggerType: PaginationHandler.TriggerType = .pixels(0),
+        hasMoreToLoad: Bool = true,
+        handleClosure: @escaping () async -> (),
+        loadingIndicatorBuilder: @escaping ()->V = { DefaultActivityIndicator() }
+    ) -> ChatView {
         var view = self
-        view.chatCustomizationParameters.newerMessagesPaginationHandler = paginationHandler
+        view.chatCustomizationParameters.newerMessagesPaginationHandler = PaginationHandler(triggerType: triggerType, hasMoreToLoad: hasMoreToLoad, handleClosure: handleClosure, loadingIndicatorBuilder: loadingIndicatorBuilder)
         return view
     }
 
@@ -199,7 +209,7 @@ public extension ChatView {
         return view
     }
 
-    func swipeActions<V: View>(edge: HorizontalEdge = .trailing, performsFirstActionWithFullSwipe: Bool = true, items: [SwipeAction<V>]) -> ChatView {
+    func swipeActions(edge: HorizontalEdge = .trailing, performsFirstActionWithFullSwipe: Bool = true, items: [SwipeAction]) -> ChatView {
         var view = self
         switch edge {
         case .leading:

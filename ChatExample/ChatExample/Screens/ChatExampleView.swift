@@ -23,18 +23,18 @@ struct ChatExampleView: View {
         ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
             viewModel.send(draft: draft)
         }
-        .enableLoadMoreNewerMessages(paginationHandler: PaginationHandler(triggerType: .pixels(0)) {
+        .enableLoadMoreNewerMessages(triggerType: .pixels(0), hasMoreToLoad: viewModel.newPagesCount < viewModel.maxNewPagesCount) {
             await viewModel.loadNewerMessagesPage()
         } loadingIndicatorBuilder: {
             activityIndicatorView
                 .foregroundStyle(Color(.exampleBlue))
-        })
-        .enableLoadMoreOlderMessages(paginationHandler: PaginationHandler(triggerType: .pixels(0)) {
+        }
+        .enableLoadMoreOlderMessages(triggerType: .pixels(0)) {
             await viewModel.loadOlderMessagesPage()
         } loadingIndicatorBuilder: {
             activityIndicatorView
                 .foregroundStyle(Color(.exampleGrey))
-        })
+        }
         .updateTransaction($viewModel.tableTransaction)
         .scrollToMessage(viewModel.scrollToParams)
         .inputViewText($text)
@@ -43,62 +43,12 @@ struct ChatExampleView: View {
         .setMediaPickerLiveCameraStyle(.prominant)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
-        .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [
-            SwipeAction(action: onReply, activeFor: { !$0.user.isCurrentUser }, background: .blue) {
-                VStack {
-                    Image(systemName: "arrowshape.turn.up.left")
-                        .imageScale(.large)
-                        .foregroundStyle(.white)
-                        .frame(height: 30)
-                    Text("Reply")
-                        .foregroundStyle(.white)
-                        .font(.footnote)
-                }
-            }
-        ])
+        .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [replyAction])
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    presentationMode.wrappedValue.dismiss()
-                } label: {
-                    Image("backArrow", bundle: .current)
-                        .renderingMode(.template)
-                        .foregroundStyle(colorScheme == .dark ? .white : .black)
-                }
-            }
-
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack {
-                    if let url = viewModel.chatCover {
-                        CachedAsyncImage(url: url) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            default:
-                                Rectangle().fill(Color(hex: "AFB3B8"))
-                            }
-                        }
-                        .frame(width: 35, height: 35)
-                        .clipShape(Circle())
-
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(viewModel.chatTitle)
-                                .fontWeight(.semibold)
-                                .font(.headline)
-                                .foregroundStyle(colorScheme == .dark ? .white : .black)
-                            Text(viewModel.chatStatus)
-                                .font(.footnote)
-                                .foregroundColor(Color(hex: "AFB3B8"))
-                        }
-                        Spacer()
-                    }
-                }
-                .padding(.leading, 10)
-            }
+            backToolbarItem
+            titleToolbarItems
         }
         .onAppear(perform: viewModel.onStart)
         .onDisappear(perform: viewModel.onStop)
@@ -118,5 +68,63 @@ struct ChatExampleView: View {
         print("Swipe Action - Reply: \(message)")
         // This places the message in the ChatView's InputView ready for the sender to reply
         defaultActions(message, .reply)
+    }
+
+    var replyAction: SwipeAction {
+        SwipeAction(action: onReply, activeFor: { !$0.user.isCurrentUser }, background: .blue) {
+            VStack {
+                Image(systemName: "arrowshape.turn.up.left")
+                    .imageScale(.large)
+                    .foregroundStyle(.white)
+                    .frame(height: 30)
+                Text("Reply")
+                    .foregroundStyle(.white)
+                    .font(.footnote)
+            }
+        }
+    }
+
+    var backToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button {
+                presentationMode.wrappedValue.dismiss()
+            } label: {
+                Image("backArrow", bundle: .current)
+                    .renderingMode(.template)
+                    .foregroundStyle(colorScheme == .dark ? .white : .black)
+            }
+        }
+    }
+
+    var titleToolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            HStack {
+                if let url = viewModel.chatCover {
+                    CachedAsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        default:
+                            Rectangle().fill(Color(hex: "AFB3B8"))
+                        }
+                    }
+                    .frame(width: 35, height: 35)
+                    .clipShape(Circle())
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(viewModel.chatTitle)
+                            .fontWeight(.semibold)
+                            .font(.headline)
+                            .foregroundStyle(colorScheme == .dark ? .white : .black)
+                        Text(viewModel.chatStatus)
+                            .font(.footnote)
+                            .foregroundColor(Color(hex: "AFB3B8"))
+                    }
+                }
+            }
+            .padding(.leading, 10)
+        }
     }
 }

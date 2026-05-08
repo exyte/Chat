@@ -29,29 +29,27 @@ struct ListSwipeAction {
     let actions: [SwipeActionable]
 }
 
-public struct SwipeAction<V: View>: SwipeActionable {
+public struct SwipeAction: SwipeActionable {
     let action: (Message, @escaping (Message, DefaultMessageMenuAction) -> Void) -> Void
     let activeFor: (Message) -> Bool
-    let content: () -> V
     let background: Color?
-    
-    public init(@ViewBuilder content: @escaping () -> V, background: Color? = nil, activeFor: @escaping (Message) -> Bool = { _ in true}, action: @escaping (Message, @escaping (Message, DefaultMessageMenuAction) -> Void) -> Void) {
-        self.content = content
+    let content: AnyView
+
+    public init<V: View>(
+        action: @escaping (Message, @escaping (Message, DefaultMessageMenuAction) -> Void) -> Void,
+        activeFor: @escaping (Message) -> Bool = { _ in true},
+        background: Color? = nil,
+        @ViewBuilder content: @escaping () -> V
+    ) {
+        self.background = background
         self.action = action
         self.activeFor = activeFor
-        self.background = background
-    }
-    
-    public init(action: @escaping (Message, @escaping (Message, DefaultMessageMenuAction) -> Void) -> Void, activeFor: @escaping (Message) -> Bool = { _ in true}, background: Color? = nil, @ViewBuilder content: @escaping () -> V) {
-        self.content = content
-        self.action = action
-        self.activeFor = activeFor
-        self.background = background
+        self.content = AnyView(content())
     }
     
     @MainActor
     func render(type: ChatType) -> UIImage {
-        let renderer = ImageRenderer(content: self.content().rotationEffect(type == .conversation ? .degrees(180) : .degrees(0)))
+        let renderer = ImageRenderer(content: self.content.rotationEffect(type == .conversation ? .degrees(180) : .degrees(0)))
         renderer.scale = UIScreen.main.scale
         return renderer.uiImage!
     }

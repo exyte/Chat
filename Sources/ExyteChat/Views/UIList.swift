@@ -107,6 +107,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             tableView.contentInset = chatParams.contentInsets
         }
 
+        context.coordinator.chatParams = chatParams
+
         let needToUpdateSections = context.coordinator.latestUpdateSections != sections
         let needToScroll = chatParams.scrollToParams != nil && context.coordinator.latestUpdateScrollTo != chatParams.scrollToParams
 
@@ -159,9 +161,12 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
                 if !transaction.animated { UIView.setAnimationsEnabled(true) }
 
+                tableView.beginUpdates()
                 context.coordinator.updateInProgress = false
                 context.coordinator.paginationState.olderInProgress = false
                 context.coordinator.paginationState.newerInProgress = false
+                tableView.endUpdates()
+                tableView.relayoutHeadersFooters()
             }
         }
     }
@@ -490,7 +495,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         // MARK: - Customization
 
-        let chatParams: ChatCustomizationParameters
+        var chatParams: ChatCustomizationParameters
         let messageParams: MessageCustomizationParameters
         @Binding var timeViewWidth: CGFloat
         @Binding var reactionViewWidth: CGFloat
@@ -773,7 +778,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         func performOlderPagination(_ tableView: UITableView) {
             if let handler = chatParams.olderMessagesPaginationHandler {
                 Task { @MainActor in
+                    tableView.beginUpdates()
                     paginationState.olderInProgress = true
+                    tableView.endUpdates()
                     tableView.relayoutHeadersFooters()
                     await handler.handleClosure()
                     // set olderInProgress to false after table update is complete
@@ -784,7 +791,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         func performNewerPagination(_ tableView: UITableView) {
             if let handler = chatParams.newerMessagesPaginationHandler {
                 Task { @MainActor in
+                    tableView.beginUpdates()
                     paginationState.newerInProgress = true
+                    tableView.endUpdates()
                     tableView.relayoutHeadersFooters()
                     await handler.handleClosure()
                     // set newerInProgress to false after table update is complete

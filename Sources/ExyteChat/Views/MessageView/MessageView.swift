@@ -308,19 +308,19 @@ struct MessageView: View {
                         }
                         timeView
                     }
-                    .border(Color.red, width: 2)
+                    //.border(Color.red, width: 2)
                 case .vstack:
                     VStack(alignment: .trailing, spacing: 4) {
                         messageView
                         timeView
                     }
-                    .border(Color.blue, width: 2)
+                    //.border(Color.blue, width: 2)
                 case .overlay:
                     messageView
                         .overlay(alignment: .bottomTrailing) {
                             timeView
                         }
-                        .border(Color.yellow, width: 2)
+                        //.border(Color.yellow, width: 2)
                 }
             }
     }
