@@ -2,7 +2,6 @@
 //  Created by Alex.M on 28.06.2022.
 //
 
-import Foundation
 import SwiftUI
 import ExyteChat
 import ActivityIndicatorView
@@ -12,8 +11,7 @@ struct ChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.presentationMode) var presentationMode
 
-    @StateObject var viewModel: ChatExampleViewModel
-    var title: String
+    @StateObject var viewModel = ChatExampleViewModel()
 
     @State var text = ""
 
@@ -39,7 +37,6 @@ struct ChatExampleView: View {
         .scrollToMessage(viewModel.scrollToParams)
         .inputViewText($text)
         .keyboardDismissMode(.interactive)
-        .showUsername(true)
         .setMediaPickerLiveCameraStyle(.prominant)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
@@ -48,10 +45,9 @@ struct ChatExampleView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             backToolbarItem
-            titleToolbarItems
+            titleToolbarItem
         }
         .onAppear(perform: viewModel.onStart)
-        .onDisappear(perform: viewModel.onStop)
         .onChange(of: text) { oldValue, newValue in
             print(newValue)
         }
@@ -96,10 +92,11 @@ struct ChatExampleView: View {
         }
     }
 
-    var titleToolbarItems: some ToolbarContent {
+    var titleToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .principal) {
             HStack {
-                if let url = viewModel.chatCover {
+                let steve = MockChatData().steve
+                if let url = steve.avatar {
                     CachedAsyncImage(url: url) { phase in
                         switch phase {
                         case .success(let image):
@@ -114,11 +111,11 @@ struct ChatExampleView: View {
                     .clipShape(Circle())
 
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(viewModel.chatTitle)
+                        Text(steve.name)
                             .fontWeight(.semibold)
                             .font(.headline)
                             .foregroundStyle(colorScheme == .dark ? .white : .black)
-                        Text(viewModel.chatStatus)
+                        Text("online")
                             .font(.footnote)
                             .foregroundColor(Color(hex: "AFB3B8"))
                     }

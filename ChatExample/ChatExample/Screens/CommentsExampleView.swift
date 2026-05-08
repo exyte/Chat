@@ -113,7 +113,6 @@ struct CommentsExampleView: View {
         }
         .navigationTitle("Comments example")
         .onAppear(perform: viewModel.onStart)
-        .onDisappear(perform: viewModel.onStop)
     }
 
     @ViewBuilder
@@ -143,7 +142,7 @@ struct CommentsExampleView: View {
                             .font(.system(size: 12)).fontWeight(.medium)
                     }
 
-                    if !message.hasText {
+                    if message.hasText {
                         Text(message.attributedText)
                             .font(.system(size: 12)).fontWeight(.medium)
                             .foregroundStyle(.gray)

@@ -10,29 +10,13 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     @Published var messages: [Message] = []
 
-    @Published var chatTitle: String = ""
-    @Published var chatStatus: String = ""
-    @Published var chatCover: URL?
-
     var tableTransaction: TableUpdateTransaction?
     var scrollToParams: ScrollToParams?
 
     var newPagesCount = 0
     let maxNewPagesCount = 2
 
-    private let interactor: MockChatInteractor
-    private var timer: Timer?
-
-    init(interactor: MockChatInteractor = MockChatInteractor()) {
-        self.interactor = interactor
-
-        Task {
-            let senders = await interactor.otherSenders
-            self.chatTitle = senders.count == 1 ? senders.first!.name : "Group chat"
-            self.chatStatus = senders.count == 1 ? "online" : "\(senders.count + 1) members"
-            self.chatCover = senders.count == 1 ? senders.first!.avatar : nil
-        }
-    }
+    private let interactor = MockChatInteractor(isActive: false)
 
     func send(draft: DraftMessage) {
         Task {
@@ -57,21 +41,7 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     func onStart() {
         Task {
             self.messages = await self.convertMessages()
-            connect()
         }
-    }
-
-    func connect() {
-        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
-            Task { @MainActor in
-                await self.interactor.timerTick()
-                self.messages = await self.convertMessages()
-            }
-        }
-    }
-
-    func onStop() {
-        timer?.invalidate()
     }
 
     func loadNewerMessagesPage() async {

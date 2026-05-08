@@ -27,6 +27,8 @@
 		5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */; };
 		5B6467A02D96F4FC00FFD920 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B64679F2D96F4FC00FFD920 /* ExyteChat */; };
 		5B6D3A732987D85A00765148 /* Color+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D3A722987D85A00765148 /* Color+hex.swift */; };
+		5BE239E92FADEA5200B95E5B /* ActiveChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE239E82FADEA4700B95E5B /* ActiveChatExampleView.swift */; };
+		5BE239EB2FADEB2200B95E5B /* ActiveChatExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE239EA2FADEB1F00B95E5B /* ActiveChatExampleViewModel.swift */; };
 		FF220E5D2DD9F0B700BE315E /* .editorconfig in Resources */ = {isa = PBXBuildFile; fileRef = FF220E5C2DD9F0AF00BE315E /* .editorconfig */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +66,8 @@
 		5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleView.swift; sourceTree = "<group>"; };
 		5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+asyncMap.swift"; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
+		5BE239E82FADEA4700B95E5B /* ActiveChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveChatExampleView.swift; sourceTree = "<group>"; };
+		5BE239EA2FADEB1F00B95E5B /* ActiveChatExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveChatExampleViewModel.swift; sourceTree = "<group>"; };
 		FF220E5C2DD9F0AF00BE315E /* .editorconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = .editorconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -173,6 +177,8 @@
 		5B0636D92C2EA0CB00E54AEE /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				5BE239E82FADEA4700B95E5B /* ActiveChatExampleView.swift */,
+				5BE239EA2FADEB1F00B95E5B /* ActiveChatExampleViewModel.swift */,
 				13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */,
 				13DF043128647C070043DBBC /* ChatExampleViewModel.swift */,
 				5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */,
@@ -267,6 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13DF043228647C070043DBBC /* ChatExampleViewModel.swift in Sources */,
+				5BE239E92FADEA5200B95E5B /* ActiveChatExampleView.swift in Sources */,
 				5B6D3A732987D85A00765148 /* Color+hex.swift in Sources */,
 				13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */,
 				1376F7BB286472530016CD1B /* ChatError.swift in Sources */,
@@ -279,6 +286,7 @@
 				5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */,
 				13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */,
 				135549342864620900C9459A /* ChatExampleApp.swift in Sources */,
+				5BE239EB2FADEB2200B95E5B /* ActiveChatExampleViewModel.swift in Sources */,
 				13E17B6D2869E940004DF140 /* MockUser.swift in Sources */,
 				13DF042D2864790B0043DBBC /* ContentView.swift in Sources */,
 				135987BD2869F6F2006388CF /* ChatInteractorProtocol.swift in Sources */,
