@@ -33,6 +33,7 @@ struct ChatExampleView: View {
             activityIndicatorView
                 .foregroundStyle(Color(.exampleGrey))
         }
+        .mainHeaderBuilder { mainHeaderView }
         .updateTransaction($viewModel.tableTransaction)
         .scrollToMessage(viewModel.scrollToParams)
         .inputViewText($text)
@@ -123,5 +124,15 @@ struct ChatExampleView: View {
             }
             .padding(.leading, 10)
         }
+    }
+
+    var mainHeaderView: some View {
+        Text("This view is on top")
+            .frame(height: 60)
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(.white)
+            .background(Color(.exampleBlue))
+            .cornerRadius(10)
+            .padding(.horizontal, 15)
     }
 }

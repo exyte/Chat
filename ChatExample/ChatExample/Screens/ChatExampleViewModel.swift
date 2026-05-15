@@ -45,7 +45,7 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     }
 
     func loadNewerMessagesPage() async {
-        guard let tableTransaction, let id = messages.last?.id else { return }
+        guard let tableTransaction else { return }
         newPagesCount += 1
         await interactor.loadNewerMessagesPage()
         let messages = await convertMessages()

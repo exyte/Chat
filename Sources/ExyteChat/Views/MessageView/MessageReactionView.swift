@@ -57,7 +57,7 @@ extension MessageView {
                     type: .emoji(text),
                     status: .sent
                 ),
-                font: .footnote.weight(.light)
+                font: params.font
             )
             .padding(message.user.isCurrentUser ? .trailing : .leading, -3)
         }
@@ -103,17 +103,9 @@ struct ReactionBubble: View {
     @Environment(\.chatTheme) var theme
     
     let reaction: Reaction
-    let font: Font
+    let font: UIFont
 
-    init(reaction: Reaction, font: UIFont) {
-        self.reaction = reaction
-        self.font = Font(font)
-    }
-
-    init(reaction: Reaction, font: Font) {
-        self.reaction = reaction
-        self.font = font
-    }
+    static let padding: CGFloat = 6
 
     @State private var phase = 0.0
     
@@ -137,10 +129,10 @@ struct ReactionBubble: View {
     
     var body: some View {
         Text(reaction.emoji ?? "?")
-            .font(font)
+            .font(Font(font))
             .opacity(opacity)
             .foregroundStyle(theme.colors.messageText(reaction.user.type))
-            .padding(6)
+            .padding(ReactionBubble.padding)
             .background(
                 ZStack {
                     Circle()

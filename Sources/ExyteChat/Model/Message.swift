@@ -163,7 +163,7 @@ public struct Message: Identifiable, Sendable {
 }
 
 extension Message {
-    var time: String {
+    var formattedDate: String {
         DateFormatter.timeFormatter.string(from: createdAt)
     }
 }

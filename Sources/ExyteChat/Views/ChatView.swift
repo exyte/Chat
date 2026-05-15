@@ -95,7 +95,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var tableContentHeight: CGFloat = 0
     @State private var inputViewSize = CGSize.zero
-    @State private var timeViewSize = CGSize.zero
     @State private var reactionViewSize = CGSize.zero
     @State private var cellFrames = [String: CGRect]()
 
@@ -183,12 +182,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 }
             }
             .background {
-                // assume all the time views have same width, like "00:00"
-                if let anyMessage = sections.first?.rows.first?.message, timeViewSize == .zero {
-                    FinalMeasuringTrickView(size: $timeViewSize) {
-                        MessageTimeView(text: anyMessage.time, userType: anyMessage.user.type)
-                    }
-                }
                 if let anyMessage = sections.first?.rows.first?.message, reactionViewSize == .zero {
                     FinalMeasuringTrickView(size: $reactionViewSize) {
                         ReactionBubble(reaction: Reaction(id: "0", user: anyMessage.user, createdAt: anyMessage.createdAt, type: .emoji("🙃️️️️"), status: .sent), font: messageCustomizationParameters.font)
@@ -294,9 +287,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             // MARK: - Customization
 
             chatParams: chatCustomizationParameters,
-            messageParams: messageCustomizationParameters,
-            timeViewWidth: $timeViewSize.width,
-            reactionViewWidth: $reactionViewSize.width
+            messageParams: messageCustomizationParameters
         )
         .applyIf(!chatCustomizationParameters.isScrollEnabled) {
             $0.frame(height: tableContentHeight)
@@ -403,8 +394,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 row: row,
                 chatType: type,
                 messageParams: messageCustomizationParameters,
-                timeViewWidth: $timeViewSize.width,
-                reactionViewWidth: $reactionViewSize.width,
                 isDisplayingMessageMenu: true
             )
             .onTapGesture {

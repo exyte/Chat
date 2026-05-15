@@ -8,136 +8,137 @@
 import Foundation
 
 actor UpdateQueue {
-    private struct Job {
-        let work: @Sendable @MainActor () async -> Void
-        let continuation: CheckedContinuation<Void, Never>
-        var transactionContinuation: CheckedContinuation<Void, Never>?
-    }
-
-    private var queue: [Job] = []
-    private var isProcessing = false
-
-    var didPerformRealUpdate = false
-
-    // MARK: - Debug
 
     private func debug(_ prefix: String) {
 //        print("""
 //        \(prefix)
-//          queue.count = \(queue.count)
-//          isProcessing = \(isProcessing)
-//          didPerformRealUpdate = \(didPerformRealUpdate)
+//          queue: \(queue.count) transactions: \(queue.map { $0.transactionContinuation != nil ? "yes" : "no" })
+//          orphanTransactions: \(orphanTransactions.count) didPerformRealUpdate: \(orphanTransactions.map { $0.didPerformRealUpdate })
 //        """)
     }
 
-    // MARK: - Transaction
+    private struct Job {
+        let work: @Sendable @MainActor () async -> Void
+        let continuation: CheckedContinuation<Void, Never>
+        let transactionContinuation: CheckedContinuation<Void, Never>?
+    }
 
-    func beginTransaction() {
-        //print("UpdateQueue beginTransaction")
-        didPerformRealUpdate = false
-        debug("after beginTransaction")
+    private struct PendingTransaction {
+        var animationMode: TableUpdateTransaction.AnimationMode
+        var continuation: CheckedContinuation<Void, Never>?
+        var didPerformRealUpdate: Bool
+    }
+
+    private var queue: [Job] = []
+    private var orphanTransactions: [PendingTransaction] = []
+    private var isProcessing = false
+
+    // MARK: - Transaction lifecycle
+
+    func startTransaction(animationMode: TableUpdateTransaction.AnimationMode) {
+        orphanTransactions.append(
+            PendingTransaction(
+                animationMode: animationMode,
+                continuation: nil,
+                didPerformRealUpdate: false
+            )
+        )
+        debug("startTransaction")
     }
 
     func waitForTransactionToFinish() async {
-        //print("UpdateQueue waitForTransactionToFinish")
-
         await withCheckedContinuation { continuation in
-            Task { await self.attachToLastJob(continuation) }
+
+            guard let i = orphanTransactions.indices.last(where: {
+                orphanTransactions[$0].continuation == nil
+            }) else {
+                continuation.resume()
+                return
+            }
+
+            orphanTransactions[i].continuation = continuation
+
+            debug("attachWaiter")
         }
     }
 
-    private func attachToLastJob(_ continuation: CheckedContinuation<Void, Never>) {
-        //print("UpdateQueue attachToLastJob")
+    func markRealUpdate() {
+        guard let i = orphanTransactions.indices.first else { return }
+        orphanTransactions[i].didPerformRealUpdate = true
+        debug("markRealUpdate")
+    }
 
-        if !queue.isEmpty {
-            let index = queue.count - 1
-            queue[index].transactionContinuation = continuation
-            debug("attached transaction to job \(index)")
-        } else {
-            // nothing yet → wait until job appears
-            Task {
-                while true {
-                    if !self.queue.isEmpty {
-                        await self.attachToLastJob(continuation)
-                        return
-                    }
-                    await Task.yield()
-                }
-            }
-        }
+    func getAnimationMode() -> TableUpdateTransaction.AnimationMode {
+        guard let i = orphanTransactions.indices.first else { return .natural }
+        return orphanTransactions[i].animationMode
     }
 
     func finishEarlyIfNeeded() {
-        //print("UpdateQueue finishEarlyIfNeeded \(didPerformRealUpdate)")
-        debug("before finishEarlyIfNeeded")
+        guard let i = orphanTransactions.indices.first else {
+            debug("finishEarly skipped")
+            return
+        }
 
-        if didPerformRealUpdate == false {
-            didPerformRealUpdate = true
+        if orphanTransactions[i].didPerformRealUpdate == false {
+            let tx = orphanTransactions.remove(at: i)
+            tx.continuation?.resume()
+            debug("finishEarly")
         }
     }
 
-    // MARK: - Job creation (THIS is where continuation is created)
+    // MARK: - Job scheduling
 
-    func createJob(_ work: @escaping @Sendable () async -> Void) {
-        //print("UpdateQueue createJob")
-
+    func createJob(_ work: @escaping @Sendable @MainActor () async -> Void) {
         Task {
-            await withCheckedContinuation { continuation in
-                let job = Job(
+            await withCheckedContinuation { jobContinuation in
+
+                var txContinuation: CheckedContinuation<Void, Never>? = nil
+
+                if let i = orphanTransactions.indices.first {
+                    let tx = orphanTransactions.remove(at: i)
+                    txContinuation = tx.continuation
+                }
+
+                queue.append(Job(
                     work: work,
-                    continuation: continuation,
-                    transactionContinuation: nil
-                )
+                    continuation: jobContinuation,
+                    transactionContinuation: txContinuation
+                ))
 
-                queue.append(job)
-
-                debug("after createJob")
-
+                debug("createJob")
                 processNextIfNeeded()
             }
         }
     }
 
-    // MARK: - Processing
+    // MARK: - Execution
 
     private func processNextIfNeeded() {
         guard !isProcessing, !queue.isEmpty else {
-            debug("processNextIfNeeded skipped")
+            debug("processNext skipped")
             return
         }
 
         isProcessing = true
 
-        //print("UpdateQueue start job")
-        debug("before job")
-
         Task {
-            let work = await self.queue[0].work
-
-            await work()
-
-            await self.completeCurrentJob()
+            let job = await dequeueJob()
+            await job.work()
+            await completeCurrentJob(job)
         }
     }
 
-    private func completeCurrentJob() {
-        //print("UpdateQueue completeCurrentJob")
+    private func dequeueJob() -> Job {
+        queue.removeFirst()
+    }
 
-        var job = queue.removeFirst()
-
-        // ✅ resume job continuation
+    private func completeCurrentJob(_ job: Job) async {
         job.continuation.resume()
+        job.transactionContinuation?.resume()
 
-        // ✅ resume ONLY this job's transaction
-        if let transaction = job.transactionContinuation {
-            //print("UpdateQueue → resuming transaction")
-            transaction.resume()
-        }
-
-        didPerformRealUpdate = true
         isProcessing = false
 
-        debug("after completeCurrentJob")
+        debug("completeJob")
 
         processNextIfNeeded()
     }
@@ -146,40 +147,39 @@ actor UpdateQueue {
 public final class TableUpdateTransaction {
     public enum AnimationMode {
         case none
-        case automatic // standard UITableView insertion and content offset animations
         case keepStable // keep the visible scroll position even when cells are inserted at the beginning, effectively shifting the meaning of the current content offset
-    }
-
-    var animated: Bool {
-        animationMode == .automatic
+        case natural // if scrolled to bottom - insert with standard UITableView animation, if not - keep stable
     }
 
     var updateQueue: UpdateQueue?
-    var animationMode: AnimationMode = .automatic
 
     @MainActor
-    public func callAsFunction(animated: Bool = true, _ updates: @MainActor @escaping () -> Void) async {
-        self.animationMode = animated ? .automatic : .none
+    public func callAsFunction(animated: Bool, _ updates: @MainActor @escaping () -> Void) async {
+        await callAsFunction(animationMode: animated ? .natural : .none, updates)
     }
 
     @MainActor
-    public func callAsFunction(animationMode: AnimationMode = .automatic, _ updates: @MainActor @escaping () -> Void) async {
-        self.animationMode = animationMode
-        //print("TableUpdateTransaction callAsFunction")
-        await updateQueue?.beginTransaction()
+    public func callAsFunction(animationMode: AnimationMode = .natural, _ updates: @MainActor @escaping () -> Void) async {
+        //print("TableUpdateTransaction callAsFunction animationMode: \(animationMode)")
+        // 1. register transaction BEFORE SwiftUI mutation
+        await updateQueue?.startTransaction(animationMode: animationMode)
 
+        // 2. perform mutation
         await MainActor.run {
             updates()
         }
 
-        // This runs AFTER SwiftUI had a chance to react
+        // 3. give SwiftUI a chance to call updateUIView
         DispatchQueue.main.async {
             Task {
-                //print("TableUpdateTransaction finishIfNeeded sssssss")
+                //print("TableUpdateTransaction finishIfNeeded")
                 await self.updateQueue?.finishEarlyIfNeeded()
             }
         }
 
+        // 4. wait until either:
+        //    - job consumes transaction
+        //    - or finishEarlyIfNeeded happens
         await updateQueue?.waitForTransactionToFinish()
 
         //print("TableUpdateTransaction completed")

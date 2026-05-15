@@ -54,6 +54,7 @@ struct MessageCustomizationParameters {
     var linkPreviewLimit = 8
     var shouldShowPreviewForLink: (URL) -> Bool = { _ in true }
     var font = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+    var timeFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 10))
 
     // avatar
     var showAvatar = true

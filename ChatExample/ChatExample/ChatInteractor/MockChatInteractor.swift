@@ -14,8 +14,8 @@ final actor MockChatInteractor {
 
     private let isActive: Bool
     private var isLoading = false
-    private var newestDate = Date().addingTimeInterval(60*60*24)
-    private var oldestDate = Date()
+    private var newestDate = Date().addingTimeInterval(-2*60*60*24)
+    private var oldestDate = Date().addingTimeInterval(-3*60*60*24)
 
     var senders: [MockUser] {
         var members = [chatData.steve, chatData.tim]

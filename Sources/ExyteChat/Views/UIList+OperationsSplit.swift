@@ -10,9 +10,9 @@ extension UIList {
         let appliedDeletes: [MessagesSection]
         let appliedDeletesSwapsAndEdits: [MessagesSection]
         let deleteOperations: [Operation]
+        let insertOperations: [Operation]
         let swapOperations: [Operation]
         let editOperations: [Operation]
-        let insertOperations: [Operation]
 
         static func operationsSplit(oldSections: [MessagesSection], newSections: [MessagesSection]) -> SplitInfo {
             var appliedDeletes = oldSections // start with old sections, remove rows that need to be deleted
@@ -20,9 +20,10 @@ extension UIList {
             // appliedDeletesSwapsEditsAndInserts == newSection
 
             var deleteOperations = [Operation]()
+            var insertOperations = [Operation]()
             var swapOperations = [Operation]()
             var editOperations = [Operation]()
-            var insertOperations = [Operation]()
+            var editChangingHeightOperations = [Operation]()
 
             // 1 compare sections
 
@@ -91,7 +92,9 @@ extension UIList {
                                 swapOperations.append(.swap(oldIndex, i, index))
                             }
                         }
-                    } else if oldRow != newRow { // same ids om same positions but something changed - reload rows without animation
+                    } else if oldRow.message.reactions != newRow.message.reactions { // same ids on same positions but reactions changed - this will change cell's height, perform a deeper reload
+                        editOperations.append(.editChangingHeight(oldIndex, i))
+                    } else if oldRow != newRow { // same ids on same positions but something else changed - reload rows without animation
                         editOperations.append(.edit(oldIndex, i))
                     }
                 }
@@ -102,7 +105,7 @@ extension UIList {
                 appliedDeletesSwapsAndEdits[newIndex].rows = newRows
             }
 
-            return SplitInfo(appliedDeletes: appliedDeletes, appliedDeletesSwapsAndEdits: appliedDeletesSwapsAndEdits, deleteOperations: deleteOperations, swapOperations: swapOperations, editOperations: editOperations, insertOperations: insertOperations)
+            return SplitInfo(appliedDeletes: appliedDeletes, appliedDeletesSwapsAndEdits: appliedDeletesSwapsAndEdits, deleteOperations: deleteOperations, insertOperations: insertOperations, swapOperations: swapOperations, editOperations: editOperations)
         }
 
         static func swapsContain(swaps: [Operation], section: Int, index: Int) -> Bool {

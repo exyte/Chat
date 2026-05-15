@@ -13,6 +13,8 @@ final class ActiveChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     @Published var messages: [Message] = []
     @Published var users: [User] = []
+    
+    var tableTransaction: TableUpdateTransaction?
 
     private let interactor = MockChatInteractor(isActive: true)
     private var timer: Timer?
@@ -54,7 +56,11 @@ final class ActiveChatExampleViewModel: ObservableObject, ReactionDelegate {
         timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
             Task { @MainActor in
                 await self.interactor.timerTick()
-                self.messages = await self.convertMessages()
+                let messages = await self.convertMessages()
+                guard let tableTransaction = self.tableTransaction else { return }
+                await tableTransaction(animationMode: .natural) {
+                    self.messages = messages
+                }
             }
         }
     }
