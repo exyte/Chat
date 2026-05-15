@@ -32,9 +32,11 @@ struct ChatCustomizationParameters {
 }
 
 public struct ScrollToParams: Equatable {
-    enum ScrollTo: Equatable {
+    public enum ScrollTo: Equatable {
         case messageID(messageID: String, position: UITableView.ScrollPosition, offset: CGFloat)
         case tableOffset(CGFloat)
+        case newestMessage
+        case oldestMessage
     }
 
     let scrollTo: ScrollTo
@@ -45,6 +47,10 @@ public struct ScrollToParams: Equatable {
 
     public init(offset: CGFloat) {
         self.scrollTo = .tableOffset(offset)
+    }
+
+    public init(_ scrollTo: ScrollTo) {
+        self.scrollTo = scrollTo
     }
 }
 

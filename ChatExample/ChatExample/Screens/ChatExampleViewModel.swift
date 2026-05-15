@@ -51,6 +51,7 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
         let messages = await convertMessages()
         await tableTransaction(animationMode: .keepStable) {
             self.messages = messages
+            self.scrollToParams = ScrollToParams(.oldestMessage)
         }
     }
 

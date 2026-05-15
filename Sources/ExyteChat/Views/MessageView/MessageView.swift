@@ -185,7 +185,7 @@ struct MessageView: View {
                 }
             }
             .padding(.top, (params.showUsername && !message.user.isCurrentUser) || message.attachments.isEmpty ? 8 : 0)
-            .padding(.bottom, message.attachments.isEmpty ? 8 : 0)
+            .padding(.bottom, message.hasText ? 8 : 0)
             .bubbleBackground(message, params: params, theme: theme)
             .zIndex(0)
         }

@@ -35,7 +35,7 @@ struct ChatExampleView: View {
         }
         .mainHeaderBuilder { mainHeaderView }
         .updateTransaction($viewModel.tableTransaction)
-        .scrollToMessage(viewModel.scrollToParams)
+        .scrollTo(viewModel.scrollToParams)
         .inputViewText($text)
         .keyboardDismissMode(.interactive)
         .setMediaPickerLiveCameraStyle(.prominant)

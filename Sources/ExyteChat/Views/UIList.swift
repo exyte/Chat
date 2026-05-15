@@ -8,10 +8,6 @@
 import SwiftUI
 import Combine
 
-public extension Notification.Name {
-    static let onScrollToBottom = Notification.Name("onScrollToBottom")
-}
-
 struct UIList<MessageContent: View>: UIViewRepresentable {
 
     typealias MessageBuilderParamsClosure = ChatView<MessageContent, InputView, DefaultMessageMenuAction>.MessageBuilderParamsClosure
@@ -21,8 +17,8 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     @ObservedObject var viewModel: ChatViewModel
     @ObservedObject var inputViewModel: InputViewModel
 
+    @Binding var pendingScrollTo: ScrollToParams?
     @Binding var isScrolledToBottom: Bool
-    @Binding var shouldScrollToTop: () -> ()
     @Binding var tableContentHeight: CGFloat
 
     // MARK: - View builders
@@ -73,22 +69,6 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.tableHeaderView = nil
         tableView.tableFooterView = UIView(frame: .zero)
 
-        NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
-            DispatchQueue.main.async {
-                if !context.coordinator.sections.isEmpty {
-                    guard tableView.numberOfSections > 0, tableView.numberOfRows(inSection: 0) > 0 else { return }
-                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
-                }
-            }
-        }
-
-        DispatchQueue.main.async {
-            shouldScrollToTop = {
-                tableView.relayoutHeadersFooters()
-                tableView.setContentOffset(CGPoint(x: 0, y: tableView.contentSize.height - tableView.frame.height), animated: false)
-            }
-        }
-
         transaction.updateQueue = updateQueue
         chatParams.onTransactionReady?(transaction)
 
@@ -109,16 +89,15 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         context.coordinator.chatParams = chatParams
 
         let needToUpdateSections = context.coordinator.latestUpdateSections != sections
-        let needToScroll = chatParams.scrollToParams != nil && context.coordinator.latestUpdateScrollTo != chatParams.scrollToParams
+        let needToScroll = pendingScrollTo != nil
         let animationMode = updateQueue.getAnimationMode()
 
-        print("changes animationMode: \(animationMode) needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), chatParams.scrollToParams: \(chatParams.scrollToParams)")
+        print("changes animationMode: \(animationMode) needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), pendingScrollTo: \(pendingScrollTo)")
 
         guard needToUpdateSections || needToScroll else { return }
 
         updateQueue.markRealUpdate()
         context.coordinator.latestUpdateSections = sections
-        context.coordinator.latestUpdateScrollTo = chatParams.scrollToParams
         context.coordinator.updateInProgress = true
 
         updateQueue.createJob {
@@ -126,7 +105,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                 if needToUpdateSections {
                     if animationMode == .none
                         || context.coordinator.sections.isEmpty
-                        || chatParams.scrollToParams != nil { // if we're gonna scroll later, then update cells without animation, and animate scrolling later
+                        || pendingScrollTo != nil { // if we're gonna scroll later, then update cells without animation, and animate scrolling later
                         updateTableNoAnimation(tableView, context.coordinator)
                     } else if animationMode == .natural, tableView.contentOffset == .zero {
                         await updateTableWithAnimation(tableView, context.coordinator)
@@ -137,7 +116,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                     }
                 }
 
-                if needToScroll, let scrollToParams = chatParams.scrollToParams {
+                if needToScroll, let scrollToParams = pendingScrollTo {
+                    pendingScrollTo = nil // reset to only scroll once
+
                     let perform = {
                         performScrollTo(tableView, scrollToParams: scrollToParams)
                     }
@@ -173,6 +154,19 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
             scrollToRow(tableView, messageID: messageID, position: position, additionalOffset: offset)
         case .tableOffset(let offset):
             tableView.setContentOffset(CGPoint(x: 0, y: offset), animated: false)
+        case .newestMessage:
+            tableView.setContentOffset(CGPoint(x: 0, y: 0), animated: false)
+        case .oldestMessage:
+            let lastSection = max(tableView.numberOfSections - 1, 0)
+            let lastRow = max(tableView.numberOfRows(inSection: lastSection) - 1, 0)
+
+            guard lastRow >= 0 else { return }
+
+            tableView.scrollToRow(
+                at: IndexPath(row: lastRow, section: lastSection),
+                at: .bottom,
+                animated: false
+            )
         }
     }
 
@@ -471,7 +465,6 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         // helpers to avoid queueing same updates multiple times
         var latestUpdateSections: [MessagesSection] = []
-        var latestUpdateScrollTo: ScrollToParams?
 
         private let impactGenerator = UIImpactFeedbackGenerator(style: .heavy)
 

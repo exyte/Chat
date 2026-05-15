@@ -87,16 +87,13 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     @StateObject private var networkMonitor = NetworkMonitor()
     @StateObject private var keyboardState = KeyboardState()
 
+    @State private var pendingScrollTo: ScrollToParams?
     @State private var isScrolledToBottom: Bool = true
-    @State private var shouldScrollToTop: () -> () = {}
+    @State private var tableContentHeight: CGFloat = 0
 
+    @State private var cellFrames = [String: CGRect]()
     /// Used to prevent the MainView from responding to keyboard changes while the Menu is active
     @State private var isShowingMenu = false
-
-    @State private var tableContentHeight: CGFloat = 0
-    @State private var inputViewSize = CGSize.zero
-    @State private var reactionViewSize = CGSize.zero
-    @State private var cellFrames = [String: CGRect]()
 
     @State private var giphyConfigured = false
     @State private var selectedGiphyMedia: GPHMedia? = nil
@@ -141,6 +138,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
+            .onChange(of: chatCustomizationParameters.scrollToParams) { scrollToParams in
+                self.pendingScrollTo = scrollToParams
+            }
             .sheet(isPresented: $inputViewModel.showGiphyPicker) {
                 if giphyConfig.giphyKey != nil {
                     GiphyEditorView(
@@ -179,13 +179,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         }
                     )
                     .ignoresSafeArea()
-                }
-            }
-            .background {
-                if let anyMessage = sections.first?.rows.first?.message, reactionViewSize == .zero {
-                    FinalMeasuringTrickView(size: $reactionViewSize) {
-                        ReactionBubble(reaction: Reaction(id: "0", user: anyMessage.user, createdAt: anyMessage.createdAt, type: .emoji("🙃️️️️"), status: .sent), font: messageCustomizationParameters.font)
-                    }
                 }
             }
     }
@@ -242,7 +235,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
                 if chatCustomizationParameters.showScrollToBottomButton, !isScrolledToBottom {
                     Button {
-                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                        self.pendingScrollTo = ScrollToParams(.newestMessage) // Cannot assign to property: 'self' is immutable
                     } label: {
                         theme.images.scrollToBottom
                             .frame(width: 40, height: 40)
@@ -268,8 +261,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel: viewModel,
             inputViewModel: inputViewModel,
 
+            pendingScrollTo: $pendingScrollTo,
             isScrolledToBottom: $isScrolledToBottom,
-            shouldScrollToTop: $shouldScrollToTop,
             tableContentHeight: $tableContentHeight,
 
             // MARK: - View builders
@@ -293,7 +286,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             $0.frame(height: tableContentHeight)
         }
         .onStatusBarTap {
-            shouldScrollToTop()
+            self.pendingScrollTo = ScrollToParams(.oldestMessage)
         }
         .transparentNonAnimatingFullScreenCover(item: $viewModel.messageMenuRow) {
             if let row = viewModel.messageMenuRow {
@@ -327,7 +320,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 }
                 if type == .conversation {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                        self.pendingScrollTo = ScrollToParams(.newestMessage)
                     }
                 }
             }
@@ -362,7 +355,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
             }
         }
-        .sizeGetter($inputViewSize)
         .environmentObject(globalFocusState)
         .onAppear(perform: inputViewModel.onStart)
         .onDisappear(perform: inputViewModel.onStop)

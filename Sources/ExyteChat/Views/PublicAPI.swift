@@ -123,7 +123,7 @@ public extension ChatView {
     }
 
     /// scroll to message by id
-    func scrollToMessage(_ scrollToParams: ScrollToParams?) -> ChatView {
+    func scrollTo(_ scrollToParams: ScrollToParams?) -> ChatView {
         var view = self
         view.chatCustomizationParameters.scrollToParams = scrollToParams
         return view
