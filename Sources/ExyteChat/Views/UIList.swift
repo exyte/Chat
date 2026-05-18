@@ -92,7 +92,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         let needToScroll = pendingScrollTo != nil
         let animationMode = updateQueue.getAnimationMode()
 
-        print("changes animationMode: \(animationMode) needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), pendingScrollTo: \(pendingScrollTo)")
+        //print("changes animationMode: \(animationMode) needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), pendingScrollTo: \(pendingScrollTo)")
 
         guard needToUpdateSections || needToScroll else { return }
 
@@ -228,7 +228,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         guard let newIndexPath = indexPath(for: preservedVisibleMessageID, in: sections) else { return }
         let newRectForCell = tableView.rectForRow(at: newIndexPath)
         let newOffset = preservedOffset + (newRectForCell.minY - preservedVisibleRect.minY)
-        print("firstVisibleIndexPath: \(firstVisibleIndexPath), newIndexPath: \(newIndexPath), preservedOffset: \(preservedOffset), newOffset: \(newOffset), preservedVisibleRect: \(preservedVisibleRect), newRectForCell: \(newRectForCell)")
+        //print("firstVisibleIndexPath: \(firstVisibleIndexPath), newIndexPath: \(newIndexPath), preservedOffset: \(preservedOffset), newOffset: \(newOffset), preservedVisibleRect: \(preservedVisibleRect), newRectForCell: \(newRectForCell)")
         tableView.setContentOffset(CGPoint(x: 0, y: newOffset), animated: false)
 
         tableView.relayoutHeadersFooters()
