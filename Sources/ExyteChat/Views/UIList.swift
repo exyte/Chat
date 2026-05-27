@@ -59,7 +59,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         tableView.showsVerticalScrollIndicator = false
         tableView.estimatedSectionHeaderHeight = 1
         tableView.estimatedSectionFooterHeight = UITableView.automaticDimension
-        tableView.backgroundColor = UIColor(theme.colors.mainBG)
+        tableView.backgroundColor = UIColor(theme.contentBG)
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = chatParams.isScrollEnabled
         tableView.keyboardDismissMode = chatParams.keyboardDismissMode
@@ -417,7 +417,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
             chatParams: chatParams,
             messageParams: messageParams,
-            mainBackgroundColor: theme.colors.mainBG
+            mainBackgroundColor: theme.contentBG
         )
     }
 

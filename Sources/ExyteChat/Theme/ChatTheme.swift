@@ -58,6 +58,10 @@ public struct ChatTheme {
     public let images: ChatTheme.Images
     public let style: ChatTheme.Style
 
+    public var contentBG: Color {
+        images.background != nil ? .clear : colors.mainBG
+    }
+
     public init(
         colors: ChatTheme.Colors = .init(),
         images: ChatTheme.Images = .init(),
@@ -65,13 +69,7 @@ public struct ChatTheme {
     ) {
         self.style = style
         self.images = images
-        
-        // if background images have been set then override the mainBG color to be clear
-        self.colors = if images.background != nil {
-            ChatTheme.Colors(copy: colors, mainBG: .clear)
-        } else {
-            colors
-        }
+        self.colors = colors
     }
     
     internal init(accentColor: Color, images: ChatTheme.Images) {
