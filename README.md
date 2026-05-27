@@ -251,6 +251,7 @@ These use `AnyView`, so please try to keep them easy enough
 `showDateHeaders` - show section headers with dates between days, default is `true`     
 `isScrollEnabled` - forbid scrolling for messages' `UITableView`      
 `keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
+`autoFocusTextInputOnChatOpen` - automatically focus the inputTextView when the chat view is opened, default is `false`
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
 `messageMenuAnimationDuration` - control how fast/snappy the message menu animations feel    
 `contentInsets` - set additional content insets for the messages list   
