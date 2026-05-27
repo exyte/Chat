@@ -47,20 +47,17 @@ struct AttachmentsGrid: View {
     var body: some View {
         VStack(spacing: 4) {
             if let attachment = single {
-                AttachmentCell(attachment: attachment, size: CGSize(width: 204, height: grid.isEmpty ? 200 : 100),
-                               showCancel: isCurrentUser, onTap: onTap)
-                .clipped()
-                .cornerRadius(onlyOne ? 0 : 12)
+                AttachmentCell(attachment: attachment, size: CGSize(width: 204, height: grid.isEmpty ? 200 : 100), showCancel: isCurrentUser, onTap: onTap)
+                    .clipped()
+                    .cornerRadius(onlyOne ? 0 : 12)
             }
             if !grid.isEmpty {
                 ForEach(pair(), id: \.id) { pair in
                     HStack(spacing: 4) {
-                        AttachmentCell(attachment: pair.left, size: CGSize(width: 100, height: 100),
-                                       showCancel: isCurrentUser, onTap: onTap)
+                        AttachmentCell(attachment: pair.left, size: CGSize(width: 100, height: 100), showCancel: isCurrentUser, onTap: onTap)
                             .clipped()
                             .cornerRadius(12)
-                        AttachmentCell(attachment: pair.right, size: CGSize(width: 100, height: 100),
-                                       showCancel: isCurrentUser, onTap: onTap)
+                        AttachmentCell(attachment: pair.right, size: CGSize(width: 100, height: 100), showCancel: isCurrentUser, onTap: onTap)
                             .clipped()
                             .overlay {
                                 if pair.right.id == showMoreAttachmentId, let hidden = hidden {

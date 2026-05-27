@@ -26,12 +26,10 @@ extension ChatView {
     }
 
     nonisolated static func mapMessagesQuoteModeReplies(_ messages: [Message], chatType: ChatType, replyMode: ReplyMode) -> [MessagesSection] {
-        let dates = Set(messages.map({ $0.createdAt.startOfDay() }))
-            .sorted()
-            .reversed()
+        let dates = Set(messages.map { $0.createdAt.startOfDay() }).sorted()
         var result: [MessagesSection] = []
 
-        for date in dates {
+        for date in dates.reversed() {
             let section = MessagesSection(
                 date: date,
                 // use fake isFirstSection/isLastSection because they are not needed for quote replies

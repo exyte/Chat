@@ -18,8 +18,6 @@ struct MessageView: View {
     let positionInMessagesSection: PositionInMessagesSection
     let chatType: ChatType
     let params: MessageCustomizationParameters
-    @Binding var timeViewWidth: CGFloat // hack to pass real updates through UIKit
-    @Binding var reactionViewWidth: CGFloat // hack to pass real updates through UIKit
     let isDisplayingMessageMenu: Bool
 
     @State var giphyAspectRatio: CGFloat = 1
@@ -67,7 +65,7 @@ struct MessageView: View {
         let lastLineWidth = text.lastLineWidth(labelWidth: maxWidth, font: params.font)
         let numberOfLines = text.numberOfLines(labelWidth: maxWidth, font: params.font)
 
-        let timeWidth = timeViewWidth + MessageView.timeViewTextPadding * 2
+        let timeWidth = AttributedString(message.formattedDate).width(withConstrainedWidth: maxWidth, font: params.timeFont) + MessageView.timeViewTextPadding * 2
 
         if numberOfLines == 1, finalWidth + CGFloat(timeWidth) < maxWidth {
             return .hstack
@@ -76,6 +74,16 @@ struct MessageView: View {
             return .overlay
         }
         return .vstack
+    }
+
+    var reactionViewWidth: CGFloat {
+        struct Cache { static var value: CGFloat? }
+        if let value = Cache.value { return value }
+
+        let value = AttributedString("🙃️️️️").width(withConstrainedWidth: UIScreen.main.bounds.width, font: params.font) + ReactionBubble.padding * 2
+
+        Cache.value = value
+        return value
     }
 
     var showAvatar: Bool {
@@ -177,8 +185,8 @@ struct MessageView: View {
                 }
             }
             .padding(.top, (params.showUsername && !message.user.isCurrentUser) || message.attachments.isEmpty ? 8 : 0)
-            .padding(.bottom, 8)
-            .bubbleBackground(message, theme: theme)
+            .padding(.bottom, message.hasText ? 8 : 0)
+            .bubbleBackground(message, params: params, theme: theme)
             .zIndex(0)
         }
         .applyIf(isDisplayingMessageMenu) {
@@ -214,11 +222,7 @@ struct MessageView: View {
         }
         .font(.caption2)
         .padding(.vertical, 8)
-        .frame(
-            width: message.attachments.isEmpty
-                ? nil : MessageView.widthWithMedia + additionalMediaInset
-        )
-        .bubbleBackground(message, theme: theme, isReply: true)
+        .bubbleBackground(message, params: params, theme: theme, isReply: true)
     }
 
     @ViewBuilder
@@ -302,6 +306,7 @@ struct MessageView: View {
                 case .hstack:
                     HStack(alignment: .lastTextBaseline, spacing: 0) {
                         messageView
+                            .lineLimit(1)
                         if !message.attachments.isEmpty {
                             Spacer()
                         }
@@ -338,11 +343,14 @@ struct MessageView: View {
     @ViewBuilder
     func messageTimeView(needsCapsule: Bool = false) -> some View {
         if params.showTimeView {
-            if needsCapsule {
-                MessageTimeWithCapsuleView(text: message.time, isCurrentUser: message.user.isCurrentUser)
-            } else {
-                MessageTimeView(text: message.time, userType: message.user.type)
+            Group {
+                if needsCapsule {
+                    MessageTimeWithCapsuleView(text: message.formattedDate, isCurrentUser: message.user.isCurrentUser)
+                } else {
+                    MessageTimeView(text: message.formattedDate, userType: message.user.type)
+                }
             }
+            .font(Font(params.timeFont))
         }
     }
 }
@@ -350,22 +358,22 @@ struct MessageView: View {
 extension View {
 
     @ViewBuilder
-    func bubbleBackground(_ message: Message, theme: ChatTheme, isReply: Bool = false) -> some View {
+    func bubbleBackground(_ message: Message, params: MessageCustomizationParameters, theme: ChatTheme, isReply: Bool = false) -> some View {
         let radius: CGFloat = !message.attachments.isEmpty ? 12 : 20
         let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
         self.frame(
-                width: message.attachments.isEmpty
-                    ? nil : MessageView.widthWithMedia + additionalMediaInset
-            )
-            .foregroundColor(theme.colors.messageText(message.user.type))
-            .background {
-                if isReply || message.hasText || message.recording != nil {
-                    RoundedRectangle(cornerRadius: radius)
-                        .foregroundColor(theme.colors.messageBG(message.user.type))
-                        .opacity(isReply ? theme.style.replyOpacity : 1)
-                }
+            width: message.attachments.isEmpty
+            ? nil : MessageView.widthWithMedia + additionalMediaInset
+        )
+        .foregroundColor(theme.colors.messageText(message.user.type))
+        .background {
+            if (params.showUsername && !message.user.isCurrentUser) || isReply || message.hasText || message.recording != nil {
+                RoundedRectangle(cornerRadius: radius)
+                    .foregroundColor(theme.colors.messageBG(message.user.type))
+                    .opacity(isReply ? theme.style.replyOpacity : 1)
             }
-            .cornerRadius(radius)
+        }
+        .cornerRadius(radius)
     }
 }
 

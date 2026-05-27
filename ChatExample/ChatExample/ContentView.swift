@@ -17,29 +17,23 @@ struct ContentView: View {
                 Section {
                     NavigationLink("Active chat example") {
                         if !theme.isAccent, #available(iOS 18.0, *) {
-                            ChatExampleView(
-                                viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
-                                title: "Active chat example"
-                            )
-                            .chatTheme(themeColor: color)
+                            ActiveChatExampleView()
+                                .chatTheme(themeColor: color)
                         } else {
-                            ChatExampleView(
-                                viewModel: ChatExampleViewModel(interactor: MockChatInteractor(isActive: true)),
-                                title: "Active chat example"
-                            )
-                            .chatTheme(
-                                accentColor: color,
-                                images: theme.images
-                            )
+                            ActiveChatExampleView()
+                                .chatTheme(
+                                    accentColor: color,
+                                    images: theme.images
+                                )
                         }
                     }
                     
                     NavigationLink("Simple chat example") {
                         if !theme.isAccent, #available(iOS 18.0, *) {
-                            ChatExampleView(viewModel: ChatExampleViewModel(), title: "Simple chat example")
+                            ChatExampleView()
                                 .chatTheme(themeColor: color)
                         } else {
-                            ChatExampleView(viewModel: ChatExampleViewModel(), title: "Simple chat example")
+                            ChatExampleView()
                                 .chatTheme(
                                     accentColor: color,
                                     images: theme.images

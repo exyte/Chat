@@ -23,7 +23,7 @@ struct ActivityIndicator: View {
                     .cornerRadius(8)
             }
 
-            ActivityIndicatorView(isVisible: .constant(true), type: .flickeringDots())
+            ActivityIndicatorView(type: .flickeringDots())
                 .foregroundColor(color != nil ? color! : theme.colors.sendButtonBackground)
                 .frame(width: size, height: size)
         }

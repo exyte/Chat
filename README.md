@@ -251,21 +251,28 @@ These use `AnyView`, so please try to keep them easy enough
 `showDateHeaders` - show section headers with dates between days, default is `true`     
 `isScrollEnabled` - forbid scrolling for messages' `UITableView`      
 `keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
+`autoFocusTextInputOnChatOpen` - automatically focus the inputTextView when the chat view is opened, default is `false`
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
 `messageMenuAnimationDuration` - control how fast/snappy the message menu animations feel    
 `contentInsets` - set additional content insets for the messages list   
-`currentContentOffset` - a 2-sided binding to get/set table's content offset   
-`scrollToMessageID` - scroll to any message
-`onWillDisplayCell` - UITableView's will display cell delegate calls this closure
+`onContentOffsetChange` - get table's content offset updates  
+`scrollTo` - scroll to messageID, certain pixels offset, top or bottom
+`onWillDisplayCell` - UITableView's will display cell delegate calls this closure     
+`enableLoadMore(offset: Int = 0, _ handler: @escaping ()->())` - when user scrolls up to `offset`-th message from the end, call the handler   function, so user can load more messages    
+`localization` - can be localized in the Localizable.strings files    
+
+### Update transactions
 `updateTransaction` - awaitable updates helper similar in usage to `tableView.performBatchUpdates`
 ```swift
-await updateTransaction(animated: needToAnimate) {
+await updateTransaction(animationMode: .natural) {
     self.messages.append(nextMessage)
     self.currentTableContentOffset = offset
 }
-```
-`enableLoadMore(offset: Int = 0, _ handler: @escaping ()->())` - when user scrolls up to `offset`-th message from the end, call the handler function, so user can load more messages  
-`localization` - can be localized in the Localizable.strings files    
+``` 
+available modes are:
+- `none` - no animations
+- `natural` - standard UITableView's animations
+- `keepStable` - no animations + if you insert rows to the "front" of the table - it keeps the current scroll position (normally it would jump because contentSize and contentOffset changed)
 
 ### Reactions    
 `messageReactionDelegate` - provide a custom reaction delegate for handling and configuring message reactions    

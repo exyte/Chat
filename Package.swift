@@ -20,7 +20,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",
-            from: "1.0.0"
+            from: "2.0.0"
         ),
         .package(
            url: "https://github.com/Giphy/giphy-ios-sdk",

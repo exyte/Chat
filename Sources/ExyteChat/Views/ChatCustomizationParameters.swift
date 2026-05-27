@@ -14,21 +14,45 @@ struct ChatCustomizationParameters {
     var showNetworkConnectionProblem: Bool = false
     var showDateHeaders: Bool = true
     var isScrollEnabled: Bool = true
+    var autoFocusTextInputOnChatOpen: Bool = false
     var showMessageMenuOnLongPress: Bool = true
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     var messageMenuAnimationDuration: CGFloat = 0.3
     var contentInsets: UIEdgeInsets = .zero
 
-    var externalContentOffset: CGPoint? // External → Internal
-    var onContentOffsetChange: ((CGPoint) -> Void)? // Internal → External
-    var scrollToMessageID: String?
+    var scrollToParams: ScrollToParams?
+    var onContentOffsetChange: ((CGFloat) -> Void)? // Internal → External
     var onWillDisplayCell: ((Message) -> Void)?
     var onTransactionReady: ((TableUpdateTransaction) -> Void)?
 
-    var paginationHandler: PaginationHandler?
+    var olderMessagesPaginationHandler: PaginationHandler?
+    var newerMessagesPaginationHandler: PaginationHandler?
     var localization = ChatLocalization.defaultLocalization // these can be localized in the Localizable.strings files
     var reactionDelegate: ReactionDelegate?
     var listSwipeActions = ListSwipeActions()
+}
+
+public struct ScrollToParams: Equatable {
+    public enum ScrollTo: Equatable {
+        case messageID(messageID: String, position: UITableView.ScrollPosition, offset: CGFloat)
+        case tableOffset(CGFloat)
+        case newestMessage
+        case oldestMessage
+    }
+
+    let scrollTo: ScrollTo
+
+    public init(messageID: String, position: UITableView.ScrollPosition, offset: CGFloat = 0) {
+        self.scrollTo = .messageID(messageID: messageID, position: position, offset: offset)
+    }
+
+    public init(offset: CGFloat) {
+        self.scrollTo = .tableOffset(offset)
+    }
+
+    public init(_ scrollTo: ScrollTo) {
+        self.scrollTo = scrollTo
+    }
 }
 
 struct MessageCustomizationParameters {
@@ -37,6 +61,7 @@ struct MessageCustomizationParameters {
     var linkPreviewLimit = 8
     var shouldShowPreviewForLink: (URL) -> Bool = { _ in true }
     var font = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+    var timeFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 10))
 
     // avatar
     var showAvatar = true

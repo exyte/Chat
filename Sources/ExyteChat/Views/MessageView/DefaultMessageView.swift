@@ -6,8 +6,6 @@ struct DefaultMessageView: View {
     @EnvironmentObject private var viewModel: ChatViewModel
     @Environment(\.chatMessageType) private var chatType
     @Environment(\.messageCustomizationParams) private var customizationParams
-    @Environment(\.timeViewWidthBinding) private var timeViewWidth
-    @Environment(\.reactionViewWidthBinding) private var reactionViewWidth
 
     init(params: MessageBuilderParameters) {
         self.params = params
@@ -21,8 +19,6 @@ struct DefaultMessageView: View {
             positionInMessagesSection: params.positionInMessagesSection,
             chatType: chatType,
             params: customizationParams,
-            timeViewWidth: timeViewWidth,
-            reactionViewWidth: reactionViewWidth,
             isDisplayingMessageMenu: false
         )
     }

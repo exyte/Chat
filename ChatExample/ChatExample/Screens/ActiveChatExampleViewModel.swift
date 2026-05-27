@@ -1,22 +1,29 @@
 //
-//  Created by Alex.M on 23.06.2022.
+//  ActiveChatExampleViewModel.swift
+//  ChatExample
+//
+//  Created by Alisa Mylnikova on 08.05.2026.
 //
 
 import Foundation
 import ExyteChat
 
 @MainActor
-final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
+final class ActiveChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     @Published var messages: [Message] = []
-
+    @Published var users: [User] = []
+    
     var tableTransaction: TableUpdateTransaction?
-    var scrollToParams: ScrollToParams?
 
-    var newPagesCount = 0
-    let maxNewPagesCount = 2
+    private let interactor = MockChatInteractor(isActive: true)
+    private var timer: Timer?
 
-    private let interactor = MockChatInteractor(isActive: false)
+    init() {
+        Task {
+            self.users = await interactor.otherSenders.map { $0.toChatUser() }
+        }
+    }
 
     func send(draft: DraftMessage) {
         Task {
@@ -24,7 +31,7 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
             self.messages = await self.convertMessages()
         }
     }
-    
+
     func remove(messageID: String) {
         Task {
             await interactor.remove(messageID: messageID)
@@ -41,27 +48,25 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     func onStart() {
         Task {
             self.messages = await self.convertMessages()
+            connect()
         }
     }
 
-    func loadNewerMessagesPage() async {
-        guard let tableTransaction else { return }
-        newPagesCount += 1
-        await interactor.loadNewerMessagesPage()
-        let messages = await convertMessages()
-        await tableTransaction(animationMode: .keepStable) {
-            self.messages = messages
-            self.scrollToParams = ScrollToParams(.oldestMessage)
+    func connect() {
+        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { timer in
+            Task { @MainActor in
+                await self.interactor.timerTick()
+                let messages = await self.convertMessages()
+                guard let tableTransaction = self.tableTransaction else { return }
+                await tableTransaction(animationMode: .natural) {
+                    self.messages = messages
+                }
+            }
         }
     }
 
-    func loadOlderMessagesPage() async {
-        guard let tableTransaction else { return }
-        await interactor.loadOlderMessagesPage()
-        let messages = await convertMessages()
-        await tableTransaction(animated: false) {
-            self.messages = messages
-        }
+    func onStop() {
+        timer?.invalidate()
     }
 
     func convertMessages() async -> [Message] {

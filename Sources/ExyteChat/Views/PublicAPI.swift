@@ -78,6 +78,12 @@ public extension ChatView {
         return view
     }
 
+    func autoFocusTextInputOnChatOpen(_ autoFocus: Bool) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.autoFocusTextInputOnChatOpen = autoFocus
+        return view
+    }
+
     func showMessageMenuOnLongPress(_ show: Bool) -> ChatView {
         var view = self
         view.chatCustomizationParameters.showMessageMenuOnLongPress = show
@@ -115,18 +121,17 @@ public extension ChatView {
         return view
     }
 
-    /// pass forced offset + receive scrolling offset updates
-    func currentContentOffset(_ binding: Binding<CGPoint?>) -> ChatView {
+    /// receive scrolling offset updates
+    func onContentOffsetChange(_ closure: @escaping (CGFloat) -> Void) -> ChatView {
         var view = self
-        view.chatCustomizationParameters.externalContentOffset = binding.wrappedValue
-        view.chatCustomizationParameters.onContentOffsetChange = { binding.wrappedValue = $0 }
+        view.chatCustomizationParameters.onContentOffsetChange = closure
         return view
     }
 
     /// scroll to message by id
-    func scrollToMessageID(_ messageID: String?) -> ChatView {
+    func scrollTo(_ scrollToParams: ScrollToParams?) -> ChatView {
         var view = self
-        view.chatCustomizationParameters.scrollToMessageID = messageID
+        view.chatCustomizationParameters.scrollToParams = scrollToParams
         return view
     }
 
@@ -148,7 +153,33 @@ public extension ChatView {
     /// NOTE: doesn't work well with `isScrollEnabled` false
     func enableLoadMore(offset: Int = 0, _ handler: @escaping ()->()) -> ChatView {
         var view = self
-        view.chatCustomizationParameters.paginationHandler = PaginationHandler(offset: offset, handleClosure: handler)
+        view.chatCustomizationParameters.olderMessagesPaginationHandler = PaginationHandler(offset: offset, handleClosure: handler)
+        return view
+    }
+
+    /// called when the oldest message appears (if offset is non zero, paginationHandler's offset-th message)
+    /// for conversation type chat it's the top-most one
+    func enableLoadMoreOlderMessages<V: View>(
+        triggerType: PaginationHandler.TriggerType = .pixels(0),
+        hasMoreToLoad: Bool = true,
+        handleClosure: @escaping () async -> (),
+        loadingIndicatorBuilder: @escaping ()->V = { DefaultActivityIndicator() }
+    ) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.olderMessagesPaginationHandler = PaginationHandler(triggerType: triggerType, hasMoreToLoad: hasMoreToLoad, handleClosure: handleClosure, loadingIndicatorBuilder: loadingIndicatorBuilder)
+        return view
+    }
+
+    /// called when the newest message appears (if offset is non zero, paginationHandler's offset-th message from the end)
+    /// for conversation type chat it's the bottom-most one
+    func enableLoadMoreNewerMessages<V: View>(
+        triggerType: PaginationHandler.TriggerType = .pixels(0),
+        hasMoreToLoad: Bool = true,
+        handleClosure: @escaping () async -> (),
+        loadingIndicatorBuilder: @escaping ()->V = { DefaultActivityIndicator() }
+    ) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.newerMessagesPaginationHandler = PaginationHandler(triggerType: triggerType, hasMoreToLoad: hasMoreToLoad, handleClosure: handleClosure, loadingIndicatorBuilder: loadingIndicatorBuilder)
         return view
     }
 
@@ -184,7 +215,7 @@ public extension ChatView {
         return view
     }
 
-    func swipeActions<V: View>(edge: HorizontalEdge = .trailing, performsFirstActionWithFullSwipe: Bool = true, items: [SwipeAction<V>]) -> ChatView {
+    func swipeActions(edge: HorizontalEdge = .trailing, performsFirstActionWithFullSwipe: Bool = true, items: [SwipeAction]) -> ChatView {
         var view = self
         switch edge {
         case .leading:
