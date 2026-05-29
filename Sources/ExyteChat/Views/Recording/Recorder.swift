@@ -64,7 +64,7 @@ final actor Recorder {
         let recordingUrl = FileManager.tempDirPath.appendingPathComponent(UUID().uuidString + fileExt)
 
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.setCategory(.playAndRecord, mode: .voiceChat)
             try audioSession.overrideOutputAudioPort(.speaker)
             try audioSession.setActive(true)
             audioRecorder = try AVAudioRecorder(url: recordingUrl, settings: settings)
