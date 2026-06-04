@@ -122,14 +122,10 @@ actor UpdateQueue {
         isProcessing = true
 
         Task {
-            let job = await dequeueJob()
+            let job = queue.removeFirst()
             await job.work()
             await completeCurrentJob(job)
         }
-    }
-
-    private func dequeueJob() -> Job {
-        queue.removeFirst()
     }
 
     private func completeCurrentJob(_ job: Job) async {
@@ -145,7 +141,7 @@ actor UpdateQueue {
 }
 
 public final class TableUpdateTransaction {
-    public enum AnimationMode {
+    public enum AnimationMode: Sendable {
         case none
         case keepStable // keep the visible scroll position even when cells are inserted at the beginning, effectively shifting the meaning of the current content offset
         case natural // if scrolled to bottom - insert with standard UITableView animation, if not - keep stable

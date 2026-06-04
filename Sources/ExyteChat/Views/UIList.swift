@@ -90,18 +90,19 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
 
         let needToUpdateSections = context.coordinator.latestUpdateSections != sections
         let needToScroll = pendingScrollTo != nil
-        let animationMode = updateQueue.getAnimationMode()
 
         //print("changes animationMode: \(animationMode) needToUpdateSections: \(needToUpdateSections), needToScroll: \(needToScroll), pendingScrollTo: \(pendingScrollTo)")
 
         guard needToUpdateSections || needToScroll else { return }
 
-        updateQueue.markRealUpdate()
         context.coordinator.latestUpdateSections = sections
         context.coordinator.updateInProgress = true
 
-        updateQueue.createJob {
-            Task { @MainActor in
+        Task {
+            let animationMode = await updateQueue.getAnimationMode()
+            await updateQueue.markRealUpdate()
+
+            await updateQueue.createJob {
                 if needToUpdateSections {
                     if animationMode == .none
                         || context.coordinator.sections.isEmpty
@@ -283,42 +284,42 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         await performBatchTableUpdates(tableView) {
             // step 1: deletes
             // delete sections and rows if necessary
-            //print("1 apply deletes", runID)
+            //print("1 apply deletes")
             updateContextClosure(splitInfo.appliedDeletes)
             //context.coordinator.sections = appliedDeletes
             for operation in splitInfo.deleteOperations {
                 applyOperation(operation, tableView: tableView)
             }
         }
-        //print("1 finished deletes", runID)
+        //print("1 finished deletes")
 
         await performBatchTableUpdates(tableView) {
             // step 2: swaps
             // swap places for rows that moved inside the table
             // (example of how this happens. send two messages: first m1, then m2. if m2 is delivered to server faster, then it should jump above m1 even though it was sent later)
-            //print("2 apply swaps", runID)
+            //print("2 apply swaps")
             updateContextClosure(splitInfo.appliedDeletesSwapsAndEdits) // NOTE: this array already contains necessary edits, but won't be a problem for appplying swaps
             for operation in splitInfo.swapOperations {
                 applyOperation(operation, tableView: tableView)
             }
         }
-        //print("2 finished swaps", runID)
+        //print("2 finished swaps")
 
         await performBatchTableUpdates(tableView) {
             // step 3: edits
             // check only sections that are already in the table for existing rows that changed and apply only them to table's dataSource without animation
-            //print("3 apply edits", runID)
+            //print("3 apply edits")
             updateContextClosure(splitInfo.appliedDeletesSwapsAndEdits)
 
             for operation in splitInfo.editOperations {
                 applyOperation(operation, tableView: tableView)
             }
         }
-        //print("3 finished edits", runID)
+        //print("3 finished edits")
 
         // step 4: inserts
         // apply the rest of the changes to table's dataSource, i.e. inserts
-        //print("4 apply inserts", runID)
+        //print("4 apply inserts")
         updateContextClosure(sections)
 
         let animated = isScrolledToBottom || isScrolledToTop
@@ -327,7 +328,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                 applyOperation(operation, tableView: tableView, animateInserts: animated)
             }
         }
-        //print("4 finished inserts", runID)
+        //print("4 finished inserts")
 
         tableView.relayoutHeadersFooters()
 

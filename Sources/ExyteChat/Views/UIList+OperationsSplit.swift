@@ -23,7 +23,6 @@ extension UIList {
             var insertOperations = [Operation]()
             var swapOperations = [Operation]()
             var editOperations = [Operation]()
-            var editChangingHeightOperations = [Operation]()
 
             // 1 compare sections
 
