@@ -159,7 +159,7 @@ struct MessageView: View {
             VStack(alignment: .leading, spacing: 4) {
                 if params.showUsername, !message.user.isCurrentUser {
                     Text(message.user.name)
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.caption.weight(.bold))
                         .padding(.horizontal, MessageView.horizontalTextPadding)
                 }
 
