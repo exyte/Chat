@@ -12,9 +12,6 @@ struct MessageTextView: View {
 
     @Environment(\.chatTheme) private var theme
 
-    /// If the message contains links, this property is used to correctly size the link previews, so they have the same width as the message text.
-    @State private var textSize: CGSize = .zero
-
     /// Large enough to show the domain and icon, if needed, for most pages.
     private static let minLinkPreviewWidth: CGFloat = 140
 
@@ -30,7 +27,6 @@ struct MessageTextView: View {
         if !attributedText.characters.isEmpty {
             VStack(alignment: .leading) {
                 Text(attributedText)
-                    .sizeGetter($textSize)
                     .foregroundStyle(theme.colors.messageText(userType))
 
                 // We use .enumerated(), and \.offset as the id, so that a message with duplicate links will show a preview for each.
@@ -40,7 +36,7 @@ struct MessageTextView: View {
                             LinkPillView(url: url)
                         }
                     }
-                    .frame(width: max(textSize.width, Self.minLinkPreviewWidth))
+                    .frame(minWidth: Self.minLinkPreviewWidth)
                 }
             }
             .font(Font(params.font as CTFont))

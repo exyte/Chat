@@ -29,13 +29,14 @@ private struct LinkViewRepresentable: UIViewRepresentable {
 
     func updateUIView(_ uiView: LPLinkView, context: Context) {}
 
-    func sizeThatFits(_ proposal: ProposedViewSize, uiView: LPLinkView, context: Context) -> CGSize?
-    {
-        let width = proposal.width ?? uiView.intrinsicContentSize.width
-        let height = proposal.height ?? uiView.intrinsicContentSize.height
-        return CGSize(width: width, height: height)
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: LPLinkView, context: Context) -> CGSize? {
+        let proposedWidth = proposal.width ?? .greatestFiniteMagnitude
+        let fit = uiView.sizeThatFits(
+            CGSize(width: proposedWidth, height: .greatestFiniteMagnitude)
+        )
+        let height = proposal.height ?? fit.height
+        return CGSize(width: fit.width, height: height)
     }
-
 }
 
 /// In our default chat view, link previews appear in the message itself.
@@ -61,7 +62,6 @@ private struct PlaceholderOrEnrichedLinkPillView: View {
         LinkViewRepresentable(metadata: metadata)
             .frame(height: Self.pillHeight)
     }
-
 }
 
 /// PlaceholderOrEnrichedLinkPillView has two mutually exclusive cases - either displaying a placeholder, or enriched content.
@@ -108,7 +108,6 @@ struct LinkPillView: View {
         }
         .animation(.default, value: metadata)
     }
-
 }
 
 #Preview {
