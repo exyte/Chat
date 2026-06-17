@@ -124,7 +124,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
                         performScrollTo(tableView, scrollToParams: scrollToParams)
                     }
 
-                    if animationMode == .natural, tableView.contentOffset == .zero {
+                    if animationMode == .natural {
                         await withCheckedContinuation { continuation in
                             UIView.animate(withDuration: 0.25) {
                                 perform()
