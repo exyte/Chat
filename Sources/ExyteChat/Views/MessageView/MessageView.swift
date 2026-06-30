@@ -329,6 +329,7 @@ struct MessageView: View {
     @ViewBuilder
     func recordingView(_ recording: Recording) -> some View {
         RecordWaveformWithButtons(
+            recordPlayer: viewModel.messageRecordingPlayer,
             recording: recording,
             colorButton: message.user.isCurrentUser
                 ? theme.colors.messageMyBG : theme.colors.mainBG,
