@@ -112,7 +112,8 @@ struct InputView: View {
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
     private let tapDelay = 0.2
-    
+    private let stopRecordButtonOffset: CGFloat = 24
+
     var body: some View {
         VStack {
             viewOnTop
@@ -275,8 +276,7 @@ struct InputView: View {
                     }
                 }
                 .sizeGetter($overlaySize)
-                // hardcode 28 for now because sizeGetter returns 0 somehow
-                .offset(y: (state == .isRecordingTap ? -28 : -overlaySize.height) - 24)
+                .offset(y: -overlaySize.height - stopRecordButtonOffset)
             }
         }
         .viewSize(48)
