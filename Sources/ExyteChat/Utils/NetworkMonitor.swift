@@ -15,12 +15,10 @@ class NetworkMonitor: ObservableObject {
     var isConnected = false
 
     init() {
-        networkMonitor.pathUpdateHandler = { path in
-            Task {
-                await MainActor.run {
-                    self.isConnected = path.status == .satisfied
-                    self.objectWillChange.send()
-                }
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            Task { @MainActor [weak self] in
+                self?.isConnected = path.status == .satisfied
+                self?.objectWillChange.send()
             }
         }
         networkMonitor.start(queue: workerQueue)

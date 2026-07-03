@@ -26,9 +26,16 @@ final class VideoViewModel: ObservableObject {
         if player == nil {
             self.player = AVPlayer(url: attachment.full)
             self.player?.publisher(for: \.status)
+                .receive(on: DispatchQueue.main)
                 .assign(to: &$status)
 
-            NotificationCenter.default.addObserver(self, selector: #selector(finishVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+            NotificationCenter.default.addObserver(
+                forName: .AVPlayerItemDidPlayToEndTime,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.finishVideo()
+            }
         }
     }
 
@@ -59,7 +66,7 @@ final class VideoViewModel: ObservableObject {
         isPlaying = player?.isPlaying ?? false
     }
 
-    @objc func finishVideo() {
+    func finishVideo() {
         player?.seek(to: CMTime(seconds: 0, preferredTimescale: 10))
         isPlaying = false
     }

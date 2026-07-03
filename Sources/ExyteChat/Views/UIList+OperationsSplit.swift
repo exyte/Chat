@@ -108,12 +108,12 @@ extension UIList {
         }
 
         static func swapsContain(swaps: [Operation], section: Int, index: Int) -> Bool {
-            swaps.filter {
-                if case let .swap(section, rowFrom, rowTo) = $0 {
-                    return section == section && (rowFrom == index || rowTo == index)
+            swaps.contains {
+                if case let .swap(swapSection, rowFrom, rowTo) = $0 {
+                    return swapSection == section && (rowFrom == index || rowTo == index)
                 }
                 return false
-            }.count > 0
+            }
         }
     }
 }

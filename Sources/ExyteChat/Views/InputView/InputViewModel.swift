@@ -140,10 +140,8 @@ final class InputViewModel: ObservableObject {
     }
 
     private func recordAudio() {
-        Task {
-            if await recorder.isRecording { return }
-        }
         Task { @MainActor [recorder] in
+            if await recorder.isRecording { return }
             attachments.recording = Recording()
             let url = await recorder.startRecording { duration, samples in
                 DispatchQueue.main.async { [weak self] in

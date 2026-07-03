@@ -260,12 +260,9 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
     }
 
     nonisolated private func performSplitInBackground(_ prevSections: [MessagesSection], _ sections: [MessagesSection]) async -> SplitInfo {
-        await withCheckedContinuation { continuation in
-            Task.detached {
-                let result = SplitInfo.operationsSplit(oldSections: prevSections, newSections: sections)
-                continuation.resume(returning: result)
-            }
-        }
+        await Task.detached {
+            SplitInfo.operationsSplit(oldSections: prevSections, newSections: sections)
+        }.value
     }
 
     @MainActor

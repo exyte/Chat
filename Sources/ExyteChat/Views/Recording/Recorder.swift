@@ -15,7 +15,7 @@ final actor Recorder {
 
     private let audioSession = AVAudioSession()
     private var audioRecorder: AVAudioRecorder?
-    private var audioTimer: Timer?
+    private var recordingTask: Task<Void, Never>?
 
     private var soundSamples: [CGFloat] = []
     private var recorderSettings = RecorderSettings()
@@ -72,15 +72,12 @@ final actor Recorder {
             audioRecorder?.record()
             durationProgressHandler(0.0, [])
 
-            DispatchQueue.main.async { [weak self] in
-                self?.audioTimer?.invalidate()
-                self?.audioTimer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
-                    Task {
-                        await self?.onTimer(durationProgressHandler)
-                    }
-                }
-                if let timer = self?.audioTimer {
-                    RunLoop.main.add(timer, forMode: .common)
+            recordingTask?.cancel()
+            recordingTask = Task { [weak self] in
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    guard !Task.isCancelled else { break }
+                    await self?.onTimer(durationProgressHandler)
                 }
             }
 
@@ -106,8 +103,8 @@ final actor Recorder {
     func stopRecording() {
         audioRecorder?.stop()
         audioRecorder = nil
-        audioTimer?.invalidate()
-        audioTimer = nil
+        recordingTask?.cancel()
+        recordingTask = nil
     }
 
     private func fileExtension(for formatID: AudioFormatID) -> String? {

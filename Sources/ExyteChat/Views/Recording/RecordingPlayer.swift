@@ -19,10 +19,11 @@ final actor RecordingPlayer: ObservableObject {
 
     private var recording: Recording? {
         didSet {
+            let newRecording = recording
             internalPlaying = false
             Task { @MainActor in
                 self.progress = 0
-                if let r = await self.recording {
+                if let r = newRecording {
                     self.duration = r.duration
                     self.secondsLeft = r.duration
                 } else {
@@ -119,7 +120,9 @@ final actor RecordingPlayer: ObservableObject {
         NotificationCenter.default.addObserver(forName: .chatAudioIsPlaying, object: nil, queue: nil) { notification in
             if let sender = notification.object as? RecordingPlayer {
                 Task { [weak self] in
-                    if await sender.recording?.url == self?.recording?.url {
+                    let senderURL = await sender.recording?.url
+                    let selfURL = await self?.recording?.url
+                    if senderURL == selfURL {
                         return
                     }
                     await self?.pause()
