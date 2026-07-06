@@ -11,7 +11,7 @@ struct RecordWaveformWithButtons: View {
 
     @Environment(\.chatTheme) private var theme
 
-    @StateObject var recordPlayer = RecordingPlayer()
+    @ObservedObject var recordPlayer: RecordingPlayer
 
     // 160 is screen left-padding/right-padding and playButton's width.
     // ensure that the view does not exceed the screen, need to subtract
@@ -24,14 +24,19 @@ struct RecordWaveformWithButtons: View {
     var colorButtonBg: Color
     var colorWaveform: Color
 
+    var isPlaying: Bool {
+        recordPlayer.playing && recordPlayer.currentURL == recording.url
+    }
+
     var duration: Int {
-        max(Int((recordPlayer.secondsLeft != 0 ? recordPlayer.secondsLeft : recording.duration) - 0.5), 0)
+        let secondsLeft = isPlaying ? recordPlayer.secondsLeft : 0
+        return max(Int((secondsLeft != 0 ? secondsLeft : recording.duration) - 0.5), 0)
     }
 
     var body: some View {
         HStack(spacing: 12) {
             Group {
-                if recordPlayer.playing {
+                if isPlaying {
                     theme.images.message.pauseAudio
                         .renderingMode(.template)
                 } else {
@@ -49,7 +54,7 @@ struct RecordWaveformWithButtons: View {
             }
             
             VStack(alignment: .leading, spacing: 5) {
-                RecordWaveformPlaying(samples: recording.waveformSamples, progress: recordPlayer.progress, color: colorWaveform, addExtraDots: false) { progress in
+                RecordWaveformPlaying(samples: recording.waveformSamples, progress: isPlaying ? recordPlayer.progress : 0, color: colorWaveform, addExtraDots: false) { progress in
                     Task {
                         await recordPlayer.seek(with: recording, to: progress)
                     }
@@ -58,11 +63,6 @@ struct RecordWaveformWithButtons: View {
                     .font(.caption2)
                     .monospacedDigit()
                     .foregroundColor(colorWaveform)
-            }
-        }
-        .onDisappear {
-            Task {
-                await recordPlayer.pause()
             }
         }
     }

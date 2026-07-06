@@ -23,6 +23,7 @@ final class ChatViewModel: ObservableObject {
     /// - Note: Used when launching the MessageMenu
     
     let inputFieldId = UUID()
+    let messageRecordingPlayer = RecordingPlayer()
 
     var didSendMessage: (DraftMessage) -> Void = {_ in }
     var didUpdateAttachmentStatus: (AttachmentUploadUpdate) -> Void = { _ in }

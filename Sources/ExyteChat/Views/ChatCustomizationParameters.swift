@@ -75,6 +75,7 @@ struct InputViewCustomizationParameters {
     var onInputTextChange: ((String) -> Void)? // Internal → External
     var availableInputs: [AvailableInputType] = [.text, .audio, .media]
     var recorderSettings = RecorderSettings()
+    var audioRecordingMode: AudioRecordingMode = .holdToRecord
     var mediaPickerParameters = MediaPickerParameters()
 }
 

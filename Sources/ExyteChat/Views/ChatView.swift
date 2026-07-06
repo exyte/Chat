@@ -351,6 +351,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     style: .message,
                     availableInputs: inputViewCustomizationParameters.availableInputs,
                     recorderSettings: inputViewCustomizationParameters.recorderSettings,
+                    audioRecordingMode: inputViewCustomizationParameters.audioRecordingMode,
                     localization: chatCustomizationParameters.localization
                 )
             } else {

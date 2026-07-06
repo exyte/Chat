@@ -14,6 +14,13 @@ public enum InputViewStyle: Sendable {
     case signature
 }
 
+public enum AudioRecordingMode: Sendable {
+    /// Default: hold the mic button to record; slide up to lock into hands-free mode.
+    case holdToRecord
+    /// Tap the mic button once to start recording, tap the stop button to finish. No lock capsule.
+    case tapToToggle
+}
+
 public enum InputViewAction: Sendable {
     case giphy
     case photo
@@ -82,6 +89,7 @@ struct InputView: View {
     var style: InputViewStyle
     var availableInputs: [AvailableInputType]
     var recorderSettings: RecorderSettings = RecorderSettings()
+    var audioRecordingMode: AudioRecordingMode = .holdToRecord
     var localization: ChatLocalization
 
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -104,7 +112,8 @@ struct InputView: View {
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
     private let tapDelay = 0.2
-    
+    private let stopRecordButtonOffset: CGFloat = 24
+
     var body: some View {
         VStack {
             viewOnTop
@@ -234,39 +243,65 @@ struct InputView: View {
         if state == .editing {
             editingButtons
                 .frame(height: 48)
+        } else if audioRecordingMode == .tapToToggle {
+            tapToToggleButton
+        } else {
+            holdToRecordButton
         }
-        else {
-            ZStack {
-                if [.isRecordingTap, .isRecordingHold].contains(state) {
-                    RecordIndicator()
-                        .viewSize(80)
-                        .foregroundColor(theme.colors.sendButtonBackground)
-                }
-                Group {
-                    if state.canSend || !isAudioAvailable()   {
-                        sendButton
-                            .disabled(!state.canSend)
-                    } else {
-                        recordButton
-                            .highPriorityGesture(dragGesture())
-                    }
-                }
-                .compositingGroup()
-                .overlay(alignment: .top) {
-                    Group {
-                        if state == .isRecordingTap {
-                            stopRecordButton
-                        } else if state == .isRecordingHold {
-                            lockRecordButton
-                        }
-                    }
-                    .sizeGetter($overlaySize)
-                    // hardcode 28 for now because sizeGetter returns 0 somehow
-                    .offset(y: (state == .isRecordingTap ? -28 : -overlaySize.height) - 24)
+    }
+
+    var holdToRecordButton: some View {
+        ZStack {
+            if [.isRecordingTap, .isRecordingHold].contains(state) {
+                RecordIndicator()
+                    .viewSize(80)
+                    .foregroundColor(theme.colors.sendButtonBackground)
+            }
+            Group {
+                if state.canSend || !isAudioAvailable() {
+                    sendButton
+                        .disabled(!state.canSend)
+                } else {
+                    recordButton
+                        .highPriorityGesture(dragGesture())
                 }
             }
-            .viewSize(48)
+            .compositingGroup()
+            .overlay(alignment: .top) {
+                Group {
+                    if state == .isRecordingTap {
+                        stopRecordButton
+                    } else if state == .isRecordingHold {
+                        lockRecordButton
+                    }
+                }
+                .sizeGetter($overlaySize)
+                .offset(y: -overlaySize.height - stopRecordButtonOffset)
+            }
         }
+        .viewSize(48)
+    }
+
+    var tapToToggleButton: some View {
+        ZStack {
+            if state == .isRecordingTap {
+                RecordIndicator()
+                    .viewSize(80)
+                    .foregroundColor(theme.colors.sendButtonBackground)
+            }
+            if state == .isRecordingTap {
+                stopRecordButton
+            } else if state.canSend || !isAudioAvailable() {
+                sendButton
+                    .disabled(!state.canSend)
+            } else {
+                recordButton
+                    .onTapGesture {
+                        onAction(.recordAudioTap)
+                    }
+            }
+        }
+        .viewSize(48)
     }
     
     @ViewBuilder
