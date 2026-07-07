@@ -39,7 +39,6 @@ final class InputViewModel: ObservableObject {
 
     func onStart() {
         subscribeValidation()
-        subscribePicker()
         subscribeGiphyPicker()
     }
 
@@ -195,16 +194,6 @@ private extension InputViewModel {
             .store(in: &subscriptions)
     }
   
-    func subscribePicker() {
-        $showPicker
-            .sink { [weak self] value in
-                if !value {
-                    self?.attachments.medias = []
-                }
-            }
-            .store(in: &subscriptions)
-    }
-
     func subscribeRecordPlayer() {
         Task { @MainActor in
             if let recordingPlayer {

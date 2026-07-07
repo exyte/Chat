@@ -74,6 +74,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
             }
             .didPressCancelCamera {
+                inputViewModel.attachments.medias = []
                 inputViewModel.showPicker = false
             }
             .currentFullscreenMedia($currentFullscreenMedia)
@@ -152,6 +153,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             HStack {
                 Button {
                     seleсtedMedias = []
+                    inputViewModel.attachments.medias = []
                     inputViewModel.showPicker = false
                 } label: {
                     Text(localization.cancelButtonText)
