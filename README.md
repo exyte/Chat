@@ -527,6 +527,7 @@ dependencies: [
 [ScalingHeaderScrollView](https://github.com/exyte/ScalingHeaderScrollView) - A scroll view with a sticky header which shrinks as you scroll    
 [AnimatedTabBar](https://github.com/exyte/AnimatedTabBar) - A tabbar with a number of preset animations   
 [MediaPicker](https://github.com/exyte/mediapicker) - Customizable media picker     
+[CalendarView](https://github.com/exyte/CalendarView) - Calendar view with fully customizable month/day cells     
 [OpenAI](https://github.com/exyte/OpenAI) Wrapper lib for [OpenAI REST API](https://platform.openai.com/docs/api-reference/introduction)    
 [AnimatedGradient](https://github.com/exyte/AnimatedGradient) - Animated linear gradient     
 [ConcentricOnboarding](https://github.com/exyte/ConcentricOnboarding) - Animated onboarding flow    
