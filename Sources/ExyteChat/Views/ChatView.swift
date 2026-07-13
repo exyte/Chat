@@ -11,7 +11,7 @@ import GiphyUISDK
 import ExyteMediaPicker
 
 public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
-public typealias MediaPickerSelectionParameters = SelectionParameters
+public typealias MediaPickerSelectionParameters = SelectionParameters // showFullscreenPreview doesn't work with the system picker
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom

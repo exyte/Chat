@@ -27,12 +27,20 @@ struct SystemPhotoPickerModifier: ViewModifier {
         }
     }
 
+    private var selectionBehavior: PhotosPickerSelectionBehavior {
+        switch selectionParameters.selectionStyle {
+        case .checkmark: return .default
+        case .count: return .ordered
+        }
+    }
+
     func body(content: Content) -> some View {
         content
             .photosPicker(
                 isPresented: $isPresented,
                 selection: $selection,
                 maxSelectionCount: selectionParameters.selectionLimit,
+                selectionBehavior: selectionBehavior,
                 matching: matchingFilter
             )
             .onChange(of: selection) { _, newValue in
