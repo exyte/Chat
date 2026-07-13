@@ -356,9 +356,9 @@ public extension ChatView {
 
     /// Choose which photo/video picker backend is presented when the user taps to attach media.
     /// - `.custom` (default): ExyteChat's fully customizable built-in media picker.
-    /// - `.system`: Apple's native PhotosPicker, which better handles limited photo library access.
+    /// - `.system`: Apple's native PhotosPicker.
     ///
-    /// Camera capture always uses the built-in picker regardless of this setting.
+    /// Camera capture always uses the ExyteMediaPicker regardless of this setting.
     func photoPickerBackend(_ backend: PhotoPickerBackend) -> ChatView {
         var view = self
         view.inputViewCustomizationParameters.photoPickerBackend = backend

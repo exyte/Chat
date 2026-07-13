@@ -158,7 +158,7 @@ final class InputViewModel: ObservableObject {
 
 private extension InputViewModel {
 
-    public func validateDraft() {
+    func validateDraft() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard state != .editing else { return } // special case

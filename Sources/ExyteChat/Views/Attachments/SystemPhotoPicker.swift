@@ -10,7 +10,7 @@ import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
 import AVFoundation
-import ExyteMediaPicker
+@preconcurrency import ExyteMediaPicker
 
 struct SystemPhotoPickerModifier: ViewModifier {
     @Binding var isPresented: Bool

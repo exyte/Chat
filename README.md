@@ -328,10 +328,16 @@ ChatView(messages: viewModel.messages) { draft in
     - `.audio`    
     - `.giphy`    
 `setRecorderSettings` - customize audio recorder settings    
+`audioRecordingMode` - choose how audio recording is triggered:    
+    - `.holdToRecord` (default) - hold the mic button to record; slide up to lock into hands-free mode    
+    - `.tapToToggle` - tap the mic button once to start recording, tap the stop button to finish. No lock capsule    
 `assetsPickerLimit` - set a limit for MediaPicker built into the library    
 `setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (selection limit, media type, selection style, etc.)    
 `setMediaPickerParameters` - configure low-level MediaPicker parameters    
 `orientationHandler` - handle screen rotation during media picking    
+`photoPickerBackend` - choose which photo/video picker is presented when the user taps to attach media:    
+    - `.custom` (default) - ExyteMediaPicker fully customizable built-in media picker    
+    - `.system` - Apple's native `PhotosPicker` for apps that don't need a customized picker UI. Selected items are shown as a removable thumbnail strip above the input field, and camera capture always uses the ExyteMediaPicker regardless of this setting.    
 
 ### Customize default colors and images
 You can use `chatTheme` to customize colors and images of default UI. You can pass all/some colors and images:

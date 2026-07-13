@@ -191,7 +191,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
 
     /// the system picker only handles photo/video library browsing, not camera capture,
-    /// so camera requests always fall through to the built-in picker
+    /// so camera requests always fall through to the ExyteMediaPicker
     private var useSystemPhotoPicker: Bool {
         inputViewCustomizationParameters.photoPickerBackend == .system && inputViewModel.mediaPickerMode == .photos
     }
@@ -379,6 +379,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     availableInputs: inputViewCustomizationParameters.availableInputs,
                     recorderSettings: inputViewCustomizationParameters.recorderSettings,
                     audioRecordingMode: inputViewCustomizationParameters.audioRecordingMode,
+                    photoPickerBackend: inputViewCustomizationParameters.photoPickerBackend,
                     localization: chatCustomizationParameters.localization
                 )
             } else {

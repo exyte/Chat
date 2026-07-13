@@ -90,6 +90,7 @@ struct InputView: View {
     var availableInputs: [AvailableInputType]
     var recorderSettings: RecorderSettings = RecorderSettings()
     var audioRecordingMode: AudioRecordingMode = .holdToRecord
+    var photoPickerBackend: PhotoPickerBackend = .custom
     var localization: ChatLocalization
 
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -306,7 +307,7 @@ struct InputView: View {
     
     @ViewBuilder
     var viewOnTop: some View {
-        if style == .message, !viewModel.attachments.medias.isEmpty {
+        if style == .message, photoPickerBackend == .system, !viewModel.attachments.medias.isEmpty {
             mediaAttachmentsPreview
         }
         if let message = viewModel.attachments.replyMessage {
@@ -655,26 +656,29 @@ private struct MediaAttachmentThumbnail: View {
 
     @State private var thumbnail: UIImage?
 
-    var body: some View {
-        ZStack(alignment: .topTrailing) {
-            ZStack {
-                if let thumbnail {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    Rectangle()
-                        .fill(theme.colors.messageFriendBG)
-                }
-                if media.type == .video {
-                    Image(systemName: "play.circle.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 20))
-                }
-            }
-            .frame(width: 56, height: 56)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+    private var thumbnailSize: CGFloat {
+        UIScreen.main.bounds.width / 5
+    }
 
+    var body: some View {
+        ZStack {
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Rectangle()
+                    .fill(theme.colors.messageFriendBG)
+            }
+            if media.type == .video {
+                Image(systemName: "play.circle.fill")
+                    .foregroundColor(.white)
+                    .font(.system(size: 20))
+            }
+        }
+        .frame(width: thumbnailSize, height: thumbnailSize)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(alignment: .topTrailing) {
             Button(action: onRemove) {
                 theme.images.mediaPicker.cross
                     .resizable()

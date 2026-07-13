@@ -84,10 +84,9 @@ public typealias MediaPickerParameters = ExyteMediaPicker.MediaPickerCutomizatio
 
 /// Which photo/video picker is presented when the user taps to attach media.
 public enum PhotoPickerBackend: Sendable, Equatable {
-    /// ExyteChat's fully customizable built-in media picker (default)
+    /// ExyteMediaPicker fully customizable built-in media picker (default)
     case custom
-    /// Apple's native PhotosPicker, which better handles limited photo library access
-    /// and offers a more familiar experience for apps that don't need a customized picker UI.
-    /// Camera capture always uses the built-in picker regardless of this setting.
+    /// Apple's native PhotosPicker
+    /// Camera capture always uses the ExyteMediaPicker regardless of this setting.
     case system
 }
