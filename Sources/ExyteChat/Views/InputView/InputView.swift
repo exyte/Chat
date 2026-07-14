@@ -90,6 +90,7 @@ struct InputView: View {
     var availableInputs: [AvailableInputType]
     var recorderSettings: RecorderSettings = RecorderSettings()
     var audioRecordingMode: AudioRecordingMode = .holdToRecord
+    var photoPickerBackend: PhotoPickerBackend = .custom
     var localization: ChatLocalization
 
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -306,6 +307,9 @@ struct InputView: View {
     
     @ViewBuilder
     var viewOnTop: some View {
+        if style == .message, photoPickerBackend == .system, !viewModel.attachments.medias.isEmpty {
+            mediaAttachmentsPreview
+        }
         if let message = viewModel.attachments.replyMessage {
             VStack(spacing: 8) {
                 Rectangle()
@@ -357,7 +361,23 @@ struct InputView: View {
             .fixedSize(horizontal: false, vertical: true)
         }
     }
-    
+
+    var mediaAttachmentsPreview: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(viewModel.attachments.medias) { media in
+                    MediaAttachmentThumbnail(media: media) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewModel.attachments.medias.removeAll { $0.id == media.id }
+                        }
+                    }
+                }
+            }
+            .padding(.top, 8)
+            .padding(.horizontal, 26)
+        }
+    }
+
     var attachButton: some View {
         Button {
             onAction(.photo)
@@ -625,6 +645,55 @@ struct InputView: View {
     
     private func isMediaAvailable() -> Bool {
         return availableInputs.contains(AvailableInputType.media)
+    }
+}
+
+private struct MediaAttachmentThumbnail: View {
+    @Environment(\.chatTheme) private var theme
+
+    let media: Media
+    let onRemove: () -> Void
+
+    @State private var thumbnail: UIImage?
+
+    private var thumbnailSize: CGFloat {
+        UIScreen.main.bounds.width / 5
+    }
+
+    var body: some View {
+        ZStack {
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Rectangle()
+                    .fill(theme.colors.messageFriendBG)
+            }
+            if media.type == .video {
+                Image(systemName: "play.circle.fill")
+                    .foregroundColor(.white)
+                    .font(.system(size: 20))
+            }
+        }
+        .frame(width: thumbnailSize, height: thumbnailSize)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(alignment: .topTrailing) {
+            Button(action: onRemove) {
+                theme.images.mediaPicker.cross
+                    .resizable()
+                    .frame(width: 10, height: 10)
+                    .padding(4)
+                    .background(Circle().fill(Color.black.opacity(0.6)))
+                    .foregroundColor(.white)
+            }
+            .offset(x: 6, y: -6)
+        }
+        .task(id: media.id) {
+            if let data = await media.getThumbnailData(), let image = UIImage(data: data) {
+                thumbnail = image
+            }
+        }
     }
 }
 

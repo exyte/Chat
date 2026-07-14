@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import PhotosUI
 import GiphyUISDK
 import ExyteMediaPicker
 
 public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
-public typealias MediaPickerSelectionParameters = SelectionParameters
+public typealias MediaPickerSelectionParameters = SelectionParameters // showFullscreenPreview doesn't work with the system picker
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -152,7 +153,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     Text("no giphy key found")
                 }
             }
-            .fullScreenCover(isPresented: $inputViewModel.showPicker) {
+            .fullScreenCover(isPresented: customMediaPickerBinding) {
                 AttachmentsEditor(
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
@@ -162,6 +163,12 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 )
                 .environmentObject(globalFocusState)
                 .environmentObject(keyboardState)
+            }
+            .systemPhotoPicker(
+                isPresented: systemMediaPickerBinding,
+                selectionParameters: inputViewCustomizationParameters.mediaPickerParameters.selectionParameters
+            ) { medias in
+                inputViewModel.attachments.medias = medias
             }
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
@@ -182,7 +189,27 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 }
             }
     }
-    
+
+    /// the system picker only handles photo/video library browsing, not camera capture,
+    /// so camera requests always fall through to the ExyteMediaPicker
+    private var useSystemPhotoPicker: Bool {
+        inputViewCustomizationParameters.photoPickerBackend == .system && inputViewModel.mediaPickerMode == .photos
+    }
+
+    private var customMediaPickerBinding: Binding<Bool> {
+        Binding(
+            get: { inputViewModel.showPicker && !useSystemPhotoPicker },
+            set: { inputViewModel.showPicker = $0 }
+        )
+    }
+
+    private var systemMediaPickerBinding: Binding<Bool> {
+        Binding(
+            get: { inputViewModel.showPicker && useSystemPhotoPicker },
+            set: { inputViewModel.showPicker = $0 }
+        )
+    }
+
     var mainView: some View {
         VStack(spacing: 0) {
             if chatCustomizationParameters.showNetworkConnectionProblem, !networkMonitor.isConnected {
@@ -352,6 +379,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     availableInputs: inputViewCustomizationParameters.availableInputs,
                     recorderSettings: inputViewCustomizationParameters.recorderSettings,
                     audioRecordingMode: inputViewCustomizationParameters.audioRecordingMode,
+                    photoPickerBackend: inputViewCustomizationParameters.photoPickerBackend,
                     localization: chatCustomizationParameters.localization
                 )
             } else {

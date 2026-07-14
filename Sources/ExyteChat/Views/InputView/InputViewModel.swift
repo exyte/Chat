@@ -39,7 +39,6 @@ final class InputViewModel: ObservableObject {
 
     func onStart() {
         subscribeValidation()
-        subscribePicker()
         subscribeGiphyPicker()
     }
 
@@ -159,7 +158,7 @@ final class InputViewModel: ObservableObject {
 
 private extension InputViewModel {
 
-    public func validateDraft() {
+    func validateDraft() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard state != .editing else { return } // special case
@@ -195,16 +194,6 @@ private extension InputViewModel {
             .store(in: &subscriptions)
     }
   
-    func subscribePicker() {
-        $showPicker
-            .sink { [weak self] value in
-                if !value {
-                    self?.attachments.medias = []
-                }
-            }
-            .store(in: &subscriptions)
-    }
-
     func subscribeRecordPlayer() {
         Task { @MainActor in
             if let recordingPlayer {
