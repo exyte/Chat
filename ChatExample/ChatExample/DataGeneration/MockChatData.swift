@@ -27,7 +27,7 @@ final class MockChatData {
         avatar: AssetExtractor.createLocalUrl(forImageNamed: "bob")!
     )
 
-    func randomMessage(senders: [MockUser] = [], date: Date? = nil) -> MockMessage {
+    func randomMessage(senders: [MockUser] = [], date: Date? = nil, text: String? = nil) -> MockMessage {
         let senders = senders.isEmpty ? [tim, steve, bob] : senders
         let sender = senders.random()!
         let date = date ?? Date()
@@ -40,7 +40,7 @@ final class MockChatData {
             sender: sender,
             createdAt: date,
             status: sender.isCurrentUser ? .read : nil,
-            text: shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : "",
+            text: text != nil ? text! : shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : "",
             images: images,
             videos: [],
             reactions: [],

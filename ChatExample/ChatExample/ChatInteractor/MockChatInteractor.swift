@@ -189,8 +189,8 @@ private extension MockChatInteractor {
 
     func generateNewMessage() {
         let idx = Int.random(min: 1, max: 10)
-        // 30% of the time, lets react to a previous and recent message
         if idx <= 3, messages.count >= idx {
+            // 30% of the time, lets react to a previous and recent message
             let msgIndex = messages.count - idx
             let message = chatData.reactToMessage(messages[msgIndex], senders: otherSenders)
             messages[msgIndex] = message

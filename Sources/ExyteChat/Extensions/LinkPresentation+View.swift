@@ -45,9 +45,6 @@ private struct LinkViewRepresentable: UIViewRepresentable {
 /// Therefore, create a small wrapper around LinkViewRepresentable, which presents the preview in a small "pill" form.
 private struct PlaceholderOrEnrichedLinkPillView: View {
 
-    /// The largest height without the preview image/video becoming visible.
-    private static let pillHeight: CGFloat = 53
-
     private let metadata: LinkPreviewMetadata
 
     init(url: URL) {
@@ -60,7 +57,6 @@ private struct PlaceholderOrEnrichedLinkPillView: View {
 
     var body: some View {
         LinkViewRepresentable(metadata: metadata)
-            .frame(height: Self.pillHeight)
     }
 }
 
@@ -70,7 +66,7 @@ private struct PlaceholderOrEnrichedLinkPillView: View {
 ///
 /// Therefore, this view manages this complexity, hiding the state of whether the enriched metadata is loaded or not.
 /// Since this view is the only view generating link preview metadata, it also manages the cache.
-struct LinkPillView: View {
+struct LinkPreviewView: View {
 
     @State var metadata: LinkPreviewMetadata
     private static let cache = LinkMetadataCache()
@@ -111,5 +107,5 @@ struct LinkPillView: View {
 }
 
 #Preview {
-    LinkPillView(url: URL(string: "https://example.org")!)
+    LinkPreviewView(url: URL(string: "https://example.org")!)
 }

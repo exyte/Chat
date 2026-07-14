@@ -19,7 +19,7 @@ struct MessageTextView: View {
     let userType: UserType
     let params: MessageCustomizationParameters
 
-    var urlsToPreview: [URL] {
+    var previewLinks: [URL] {
         Array(attributedText.urls.filter(params.shouldShowPreviewForLink).prefix(params.linkPreviewLimit))
     }
 
@@ -29,11 +29,11 @@ struct MessageTextView: View {
                 Text(attributedText)
                     .foregroundStyle(theme.colors.messageText(userType))
 
-                // We use .enumerated(), and \.offset as the id, so that a message with duplicate links will show a preview for each.
-                if !urlsToPreview.isEmpty {
-                    VStack {
-                        ForEach(Array(urlsToPreview.enumerated()), id: \.offset) { _, url in
-                            LinkPillView(url: url)
+                if !previewLinks.isEmpty {
+                    VStack(alignment: userType == .current ? .trailing : .leading) {
+                        // We use .enumerated(), and \.offset as the id, so that a message with duplicate links will show a preview for each.
+                        ForEach(Array(previewLinks.enumerated()), id: \.offset) { _, url in
+                            LinkPreviewView(url: url)
                         }
                     }
                     .frame(minWidth: Self.minLinkPreviewWidth)
