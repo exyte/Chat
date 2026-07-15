@@ -90,6 +90,14 @@ public extension ChatView {
         return view
     }
 
+    /// Controls whether the share button is shown in the fullscreen attachment viewer
+    /// - Default is true
+    func showAttachmentShareButton(_ show: Bool) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.showAttachmentShareButton = show
+        return view
+    }
+
     /// Sets the keyboard dismiss mode for the chat list
     /// - Parameter mode: The keyboard dismiss mode (.interactive, .onDrag, or .none)
     /// - Default is .none

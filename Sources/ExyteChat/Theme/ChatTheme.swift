@@ -282,6 +282,7 @@ public struct ChatTheme {
             public var pause: Image
             public var mute: Image
             public var unmute: Image
+            public var share: Image
         }
 
         public struct MediaPicker {
@@ -362,6 +363,7 @@ public struct ChatTheme {
             fullscreenPause: Image? = nil,
             fullscreenMute: Image? = nil,
             fullscreenUnmute: Image? = nil,
+            fullscreenShare: Image? = nil,
             chevronDown: Image? = nil,
             chevronRight: Image? = nil,
             cross: Image? = nil,
@@ -425,7 +427,8 @@ public struct ChatTheme {
                 play: fullscreenPlay ?? Image(systemName: "play.fill"),
                 pause: fullscreenPause ?? Image(systemName: "pause.fill"),
                 mute: fullscreenMute ?? Image(systemName: "speaker.slash.fill"),
-                unmute: fullscreenUnmute ?? Image(systemName: "speaker.fill")
+                unmute: fullscreenUnmute ?? Image(systemName: "speaker.fill"),
+                share: fullscreenShare ?? Image(systemName: "square.and.arrow.up")
             )
 
             self.mediaPicker = MediaPicker(

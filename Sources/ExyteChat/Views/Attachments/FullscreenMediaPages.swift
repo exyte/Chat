@@ -11,7 +11,11 @@ struct FullscreenMediaPages: View {
 
     @StateObject var viewModel: FullscreenMediaPagesViewModel
     var safeAreaInsets: EdgeInsets
+    var showShareButton: Bool = true
     var onClose: () -> Void
+
+    @State private var shareItem: ShareItem?
+    @State private var isPreparingShare = false
 
     var body: some View {
         let closeGesture = DragGesture()
@@ -113,31 +117,75 @@ struct FullscreenMediaPages: View {
             }
         }
         .overlay(alignment: .topTrailing) {
-            if viewModel.showMinis, viewModel.attachments[viewModel.index].type == .video {
+            if viewModel.showMinis {
                 HStack(spacing: 20) {
-                    (viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24, height: 24)
-                        .padding(5)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            viewModel.toggleVideoPlaying()
-                        }
+                    if viewModel.attachments[viewModel.index].type == .video {
+                        (viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .padding(5)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.toggleVideoPlaying()
+                            }
 
-                    (viewModel.videoMuted ? theme.images.fullscreenMedia.unmute : theme.images.fullscreenMedia.mute)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24, height: 24)
-                        .padding(5)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            viewModel.toggleVideoMuted()
+                        (viewModel.videoMuted ? theme.images.fullscreenMedia.unmute : theme.images.fullscreenMedia.mute)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .padding(5)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.toggleVideoMuted()
+                            }
+                    }
+
+                    if showShareButton {
+                        if isPreparingShare {
+                            ProgressView()
+                                .tint(.white)
+                                .frame(width: 24, height: 24)
+                                .padding(5)
+                        } else {
+                            theme.images.fullscreenMedia.share
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .padding(5)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    shareCurrentAttachment()
+                                }
                         }
+                    }
                 }
                 .foregroundColor(.white)
                 .padding(.trailing, 10)
                 .offset(y: safeAreaInsets.top - 5)
+            }
+        }
+        .sheet(item: $shareItem) { item in
+            ShareSheet(activityItems: [item.url])
+        }
+    }
+}
+
+private struct ShareItem: Identifiable {
+    let url: URL
+    var id: URL { url }
+}
+
+private extension FullscreenMediaPages {
+    func shareCurrentAttachment() {
+        guard !isPreparingShare else { return }
+        let attachment = viewModel.attachments[viewModel.index]
+        isPreparingShare = true
+        Task {
+            let url = await AttachmentSharing.prepareForSharing(attachment)
+            await MainActor.run {
+                isPreparingShare = false
+                shareItem = url.map(ShareItem.init)
             }
         }
     }
