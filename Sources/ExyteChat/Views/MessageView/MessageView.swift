@@ -181,6 +181,7 @@ struct MessageView: View {
                         recordingView(recording)
                         messageTimeView()
                             .padding(.trailing, 12)
+                            .padding(.bottom, 8)
                     }
                 }
             }
