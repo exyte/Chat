@@ -144,7 +144,7 @@ struct FullscreenMediaPages: View {
                     if showShareButton {
                         if isPreparingShare {
                             ProgressView()
-                                .tint(.white)
+                                .tint(.primary)
                                 .frame(width: 24, height: 24)
                                 .padding(5)
                         } else {
@@ -160,7 +160,7 @@ struct FullscreenMediaPages: View {
                         }
                     }
                 }
-                .foregroundColor(.white)
+                .foregroundColor(.primary)
                 .padding(.trailing, 10)
                 .offset(y: safeAreaInsets.top - 5)
             }
