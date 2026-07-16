@@ -19,6 +19,7 @@ struct FullscreenMediaPages: View {
 
     var body: some View {
         let currentType = viewModel.attachments[viewModel.index].type
+        let tintColor = theme.colors.mainText
         let closeGesture = DragGesture()
             .onChanged { viewModel.offset = closeSize(from: $0.translation) }
             .onEnded {
@@ -30,124 +31,111 @@ struct FullscreenMediaPages: View {
                 }
             }
 
-        ZStack {
-            theme.colors.mainBG
-                .opacity(max((200.0 - viewModel.offset.height) / 200.0, 0.5))
-            VStack {
+        VStack(spacing: 0) {
+            if viewModel.showMinis {
+                ZStack {
+                    HStack {
+                        Button(action: onClose) {
+                            theme.images.mediaPicker.cross
+                                .imageScale(.large)
+                                .padding(5)
+                        }
+                        .tint(tintColor)
+                        .padding(.leading, 10)
+
+                        Spacer()
+
+                        HStack(spacing: 20) {
+                            if showShareButton {
+                                if isPreparingShare {
+                                    ProgressView()
+                                        .tint(tintColor)
+                                        .frame(width: 24, height: 24)
+                                        .padding(5)
+                                } else {
+                                    controlIcon(theme.images.fullscreenMedia.share) {
+                                        shareCurrentAttachment()
+                                    }
+                                }
+                            }
+                        }
+                        .foregroundColor(tintColor)
+                        .padding(.trailing, 10)
+                    }
+
+                    Text("\(viewModel.index + 1)/\(viewModel.attachments.count)")
+                        .foregroundColor(tintColor)
+                }
+                .padding(.top, safeAreaInsets.top)
+                .padding(.bottom, 8)
+                .background(theme.colors.mainBG)
+            }
+
+            ZStack {
+                theme.colors.mainBG
+                    .opacity(max((200.0 - viewModel.offset.height) / 200.0, 0.5))
+
                 TabView(selection: $viewModel.index) {
                     ForEach(viewModel.attachments.enumerated().map({ $0 }), id: \.offset) { (index, attachment) in
                         AttachmentsPage(attachment: attachment)
                             .tag(index)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .ignoresSafeArea()
                     }
-                    .ignoresSafeArea()
                 }
                 .environmentObject(viewModel)
                 .tabViewStyle(.page(indexDisplayMode: .never))
-            }
-            .offset(viewModel.offset)
-            .gesture(closeGesture)
-            .onTapGesture {
-                withAnimation {
-                    viewModel.showMinis.toggle()
+                .offset(viewModel.offset)
+                .gesture(closeGesture)
+                .onTapGesture {
+                    withAnimation {
+                        viewModel.showMinis.toggle()
+                    }
                 }
-            }
 
-            VStack {
-                Spacer()
-                ScrollViewReader { proxy in
-                    if viewModel.showMinis {
-                        ScrollView(.horizontal) {
-                            HStack(spacing: 2) {
-                                ForEach(viewModel.attachments
-                                    .filter { $0.fullUploadStatus == nil || $0.fullUploadStatus == .complete  }
-                                    .enumerated().map({ $0 }), id: \.offset) { (index, attachment) in
-                                    AttachmentCell(attachment: attachment, size: CGSize(width: 100, height: 100)) { _,_ in
-                                        withAnimation {
-                                            viewModel.index = index
+                VStack {
+                    Spacer()
+                    ScrollViewReader { proxy in
+                        if viewModel.showMinis {
+                            ScrollView(.horizontal) {
+                                HStack(spacing: 2) {
+                                    ForEach(viewModel.attachments
+                                        .filter { $0.fullUploadStatus == nil || $0.fullUploadStatus == .complete }
+                                        .enumerated().map({ $0 }), id: \.offset) { (index, attachment) in
+                                        AttachmentCell(attachment: attachment, size: CGSize(width: 100, height: 100)) { _,_ in
+                                            withAnimation {
+                                                viewModel.index = index
+                                            }
                                         }
-                                    }
-                                    .cornerRadius(4)
-                                    .clipped()
-                                    .id(index)
-                                    .overlay {
-                                        if viewModel.index == index {
-                                            RoundedRectangle(cornerRadius: 4)
-                                                .stroke(theme.colors.sendButtonBackground, lineWidth: 2)
+                                        .cornerRadius(4)
+                                        .clipped()
+                                        .id(index)
+                                        .overlay {
+                                            if viewModel.index == index {
+                                                RoundedRectangle(cornerRadius: 4)
+                                                    .stroke(theme.colors.sendButtonBackground, lineWidth: 2)
+                                            }
                                         }
+                                        .padding(.vertical, 1)
                                     }
-                                    .padding(.vertical, 1)
+                                }
+                            }
+                            .padding([.top, .horizontal], 12)
+                            .background(theme.colors.mainBG)
+                            .onAppear {
+                                proxy.scrollTo(viewModel.index)
+                            }
+                            .onChange(of: viewModel.index) { _, newValue in
+                                withAnimation {
+                                    proxy.scrollTo(newValue, anchor: .center)
                                 }
                             }
                         }
-                        .padding([.top, .horizontal], 12)
-                        .background(theme.colors.mainBG)
-                        .onAppear {
-                            proxy.scrollTo(viewModel.index)
-                        }
-                        .onChange(of: viewModel.index) { _, newValue in
-                            withAnimation {
-                                proxy.scrollTo(newValue, anchor: .center)
-                            }
-                        }
                     }
+                    .offset(y: -safeAreaInsets.bottom)
                 }
-                .offset(y: -safeAreaInsets.bottom)
             }
-            .offset(viewModel.offset)
         }
         .ignoresSafeArea()
-        .overlay(alignment: .top) {
-            if viewModel.showMinis {
-                Text("\(viewModel.index + 1)/\(viewModel.attachments.count)")
-                    .foregroundColor(theme.colors.mainText)
-                    .offset(y: safeAreaInsets.top)
-            }
-        }
-        .overlay(alignment: .topLeading) {
-            if viewModel.showMinis {
-                Button(action: onClose) {
-                    theme.images.mediaPicker.cross
-                        .imageScale(.large)
-                        .padding(5)
-                }
-                .tint(theme.colors.mainText)
-                .padding(.leading, 15)
-                .offset(y: safeAreaInsets.top - 5)
-            }
-        }
-        .overlay(alignment: .topTrailing) {
-            if viewModel.showMinis {
-                HStack(spacing: 20) {
-                    if currentType == .video {
-                        controlIcon(viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play) {
-                            viewModel.toggleVideoPlaying()
-                        }
-
-                        controlIcon(viewModel.videoMuted ? theme.images.fullscreenMedia.unmute : theme.images.fullscreenMedia.mute) {
-                            viewModel.toggleVideoMuted()
-                        }
-                    }
-
-                    if showShareButton {
-                        if isPreparingShare {
-                            ProgressView()
-                                .tint(currentType == .video ? .white : .primary)
-                                .frame(width: 24, height: 24)
-                                .padding(5)
-                        } else {
-                            controlIcon(theme.images.fullscreenMedia.share) {
-                                shareCurrentAttachment()
-                            }
-                        }
-                    }
-                }
-                .foregroundColor(currentType == .video ? .white : .primary)
-                .padding(.trailing, 10)
-                .offset(y: safeAreaInsets.top - 5)
-            }
-        }
         .sheet(item: $shareItem) { item in
             ShareSheet(activityItems: [item.url])
         }
