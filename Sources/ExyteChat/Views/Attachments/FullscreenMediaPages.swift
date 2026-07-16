@@ -18,6 +18,7 @@ struct FullscreenMediaPages: View {
     @State private var isPreparingShare = false
 
     var body: some View {
+        let currentType = viewModel.attachments[viewModel.index].type
         let closeGesture = DragGesture()
             .onChanged { viewModel.offset = closeSize(from: $0.translation) }
             .onEnded {
@@ -119,7 +120,7 @@ struct FullscreenMediaPages: View {
         .overlay(alignment: .topTrailing) {
             if viewModel.showMinis {
                 HStack(spacing: 20) {
-                    if viewModel.attachments[viewModel.index].type == .video {
+                    if currentType == .video {
                         controlIcon(viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play) {
                             viewModel.toggleVideoPlaying()
                         }
@@ -132,7 +133,7 @@ struct FullscreenMediaPages: View {
                     if showShareButton {
                         if isPreparingShare {
                             ProgressView()
-                                .tint(.primary)
+                                .tint(currentType == .video ? .white : .primary)
                                 .frame(width: 24, height: 24)
                                 .padding(5)
                         } else {
@@ -142,7 +143,7 @@ struct FullscreenMediaPages: View {
                         }
                     }
                 }
-                .foregroundColor(.primary)
+                .foregroundColor(currentType == .video ? .white : .primary)
                 .padding(.trailing, 10)
                 .offset(y: safeAreaInsets.top - 5)
             }
