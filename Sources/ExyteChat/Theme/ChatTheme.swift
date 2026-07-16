@@ -53,7 +53,7 @@ extension View {
     }
 }
 
-public struct ChatTheme {
+public struct ChatTheme: Sendable {
     public let colors: ChatTheme.Colors
     public let images: ChatTheme.Images
     public let style: ChatTheme.Style
@@ -103,7 +103,7 @@ public struct ChatTheme {
         )
     }
 
-    public struct Colors {
+    public struct Colors: Sendable {
         public var mainBG: Color
         public var mainTint: Color
         public var mainText: Color
@@ -229,9 +229,9 @@ public struct ChatTheme {
         }
     }
 
-    public struct Images {
+    public struct Images: Sendable {
       
-        public struct Background {
+        public struct Background: Sendable {
             
             let safeAreaRegions: SafeAreaRegions
             let safeAreaEdges: Edge.Set
@@ -257,7 +257,7 @@ public struct ChatTheme {
             }
         }
 
-        public struct AttachMenu {
+        public struct AttachMenu: Sendable {
             public var camera: Image
             public var contact: Image
             public var document: Image
@@ -268,7 +268,7 @@ public struct ChatTheme {
             public var pickPhoto: Image
         }
 
-        public struct InputView {
+        public struct InputView: Sendable {
             public var add: Image
             public var arrowSend: Image
             public var sticker: Image
@@ -277,20 +277,21 @@ public struct ChatTheme {
             public var microphone: Image
         }
 
-        public struct FullscreenMedia {
+        public struct FullscreenMedia: Sendable {
             public var play: Image
             public var pause: Image
             public var mute: Image
             public var unmute: Image
+            public var share: Image
         }
 
-        public struct MediaPicker {
+        public struct MediaPicker: Sendable {
             public var chevronDown: Image
             public var chevronRight: Image
             public var cross: Image
         }
 
-        public struct Message {
+        public struct Message: Sendable {
             public var attachedDocument: Image
             public var cancel: Image
             public var error: Image
@@ -305,7 +306,7 @@ public struct ChatTheme {
             public var sent: Image
         }
 
-        public struct MessageMenu {
+        public struct MessageMenu: Sendable {
             public var delete: Image
             public var edit: Image
             public var forward: Image
@@ -314,7 +315,7 @@ public struct ChatTheme {
             public var select: Image
         }
 
-        public struct RecordAudio {
+        public struct RecordAudio: Sendable {
             public var cancelRecord: Image
             public var deleteRecord: Image
             public var lockRecord: Image
@@ -324,7 +325,7 @@ public struct ChatTheme {
             public var stopRecord: Image
         }
 
-        public struct Reply {
+        public struct Reply: Sendable {
             public var cancelReply: Image
             public var replyToMessage: Image
         }
@@ -362,6 +363,7 @@ public struct ChatTheme {
             fullscreenPause: Image? = nil,
             fullscreenMute: Image? = nil,
             fullscreenUnmute: Image? = nil,
+            fullscreenShare: Image? = nil,
             chevronDown: Image? = nil,
             chevronRight: Image? = nil,
             cross: Image? = nil,
@@ -425,7 +427,8 @@ public struct ChatTheme {
                 play: fullscreenPlay ?? Image(systemName: "play.fill"),
                 pause: fullscreenPause ?? Image(systemName: "pause.fill"),
                 mute: fullscreenMute ?? Image(systemName: "speaker.slash.fill"),
-                unmute: fullscreenUnmute ?? Image(systemName: "speaker.fill")
+                unmute: fullscreenUnmute ?? Image(systemName: "speaker.fill"),
+                share: fullscreenShare ?? Image(systemName: "square.and.arrow.up")
             )
 
             self.mediaPicker = MediaPicker(
@@ -475,7 +478,7 @@ public struct ChatTheme {
         }
     }
     
-    public struct Style {
+    public struct Style: Sendable {
         public var replyOpacity: Double
         
         public init(replyOpacity: Double = 0.8) {

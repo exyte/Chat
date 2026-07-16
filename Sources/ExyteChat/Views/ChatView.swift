@@ -184,11 +184,22 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                             index: index ?? 0
                         ),
                         safeAreaInsets: g.safeAreaInsets,
+                        showShareButton: chatCustomizationParameters.showShareAttachmentButton,
                         onClose: { [weak viewModel] in
                             viewModel?.dismissAttachmentFullScreen()
                         }
                     )
                     .ignoresSafeArea()
+                }
+            }
+            .sheet(item: $viewModel.shareAttachmentsItem) { item in
+                ShareSheet(activityItems: item.urls)
+            }
+            .overlay {
+                if viewModel.isPreparingAttachmentsShare {
+                    ProgressView()
+                        .padding(20)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                 }
             }
     }

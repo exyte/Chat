@@ -90,6 +90,14 @@ public extension ChatView {
         return view
     }
 
+    /// Controls whether the share button is shown in the fullscreen attachment viewer
+    /// - Default is true
+    func showShareAttachmentButton(_ show: Bool) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.showShareAttachmentButton = show
+        return view
+    }
+
     /// Sets the keyboard dismiss mode for the chat list
     /// - Parameter mode: The keyboard dismiss mode (.interactive, .onDrag, or .none)
     /// - Default is .none
@@ -307,7 +315,7 @@ public extension ChatView {
     // MARK: - Built-in input view
 
     /// binding to current text in the default input text field
-    public func inputViewText(_ binding: Binding<String>) -> ChatView {
+    func inputViewText(_ binding: Binding<String>) -> ChatView {
         var view = self
         view.inputViewCustomizationParameters.externalInputText = binding.wrappedValue
         view.inputViewCustomizationParameters.onInputTextChange = { binding.wrappedValue = $0 }

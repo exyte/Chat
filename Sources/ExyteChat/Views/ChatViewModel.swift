@@ -13,6 +13,9 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var fullscreenAttachmentItem: Optional<Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
+    @Published var shareAttachmentsItem: ShareAttachmentsItem? = nil
+    @Published private(set) var isPreparingAttachmentsShare = false
+
     @Published var messageMenuRow: MessageRow?
     
     /// The messages frame that is currently being rendered in the Message Menu
@@ -38,6 +41,19 @@ final class ChatViewModel: ObservableObject {
     func dismissAttachmentFullScreen() {
         fullscreenAttachmentPresented = false
         fullscreenAttachmentItem = nil
+    }
+
+    func shareAttachments(_ attachments: [Attachment]) {
+        guard !attachments.isEmpty, !isPreparingAttachmentsShare else { return }
+        isPreparingAttachmentsShare = true
+        Task { [weak self] in
+            let urls = await AttachmentSharing.prepareForSharing(attachments)
+            guard let self else { return }
+            self.isPreparingAttachmentsShare = false
+            if !urls.isEmpty {
+                self.shareAttachmentsItem = ShareAttachmentsItem(urls: urls)
+            }
+        }
     }
     
     func updateAttachmentStatus(_ uploadUpdate: AttachmentUploadUpdate) {
@@ -71,6 +87,14 @@ final class ChatViewModel: ObservableObject {
             inputViewModel?.text = String(message.attributedText.characters)
             inputViewModel?.edit(saveClosure)
             focusTheInputTextView()
+        case .share:
+            let shareableAttachments = message.attachments.filter { $0.fullUploadStatus == nil || $0.fullUploadStatus == .complete }
+            shareAttachments(shareableAttachments)
         }
     }
+}
+
+struct ShareAttachmentsItem: Identifiable {
+    let id = UUID()
+    let urls: [URL]
 }
