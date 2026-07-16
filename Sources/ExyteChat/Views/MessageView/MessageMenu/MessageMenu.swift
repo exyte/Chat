@@ -62,6 +62,9 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     var onAction: (ActionEnum) -> ()
     /// The current reaction configuration (delegate and callback)
     var reactionHandler: ReactionConfig
+    /// Convenience delete button for users of the default menu who don't define a custom MessageMenuAction enum
+    var deleteClosure: ((Message) -> Void)?
+    var deleteActiveFor: ((Message) -> Bool)?
     /// The main message, rendered as a button
     var mainButton: () -> MainButton
 
@@ -108,6 +111,9 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
     @State private var messageMenuOpacity: CGFloat = 0.0
     @State private var backgroundOpacity: CGFloat = 0.0
     
+    @State private var showDestructiveAlert = false
+    @State private var pendingDestructiveAction: ActionEnum?
+
     /// This flag is used to adjust the dismiss animation
     @State private var didReact: Bool = false
     /// We use this `onReaction` handler in order to set our `didReact` flag and kick off the dismissal sequence
@@ -208,6 +214,20 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         .onChange(of: keyboardState.keyboardFrame) {
             if viewState == .ready, keyboardState.isShown {
                 transitionViewState(to: .keyboard)
+            }
+        }
+        .alert(pendingDestructiveAction?.title() ?? "Delete", isPresented: $showDestructiveAlert) {
+            Button(pendingDestructiveAction?.title() ?? "Delete", role: .destructive) {
+                if let action = pendingDestructiveAction {
+                    onAction(action)
+                } else {
+                    deleteClosure?(message)
+                }
+                pendingDestructiveAction = nil
+                dismissSelf()
+            }
+            Button("Cancel", role: .cancel) {
+                pendingDestructiveAction = nil
             }
         }
     }
@@ -509,14 +529,18 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         let buttons = ActionEnum.menuItems(for: message).enumerated().map { MenuButton(id: $0, action: $1) }
         HStack {
             if alignment == .right { Spacer() }
-            
+
             VStack {
                 ForEach(buttons) { button in
                     menuButton(title: button.action.title(), icon: button.action.icon(), action: button.action)
                 }
+
+                if deleteClosure != nil && (deleteActiveFor?(message) ?? true) {
+                    deleteMenuButton()
+                }
             }
             .menuContainer(menuStyle)
-            
+
             if alignment == .left { Spacer() }
         }
         .padding(alignment == .right ? .trailing : .leading, alignment == .right ? trailingPadding : leadingPadding)
@@ -524,20 +548,22 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         .maxHeightGetter($menuHeight)
         .frame(maxWidth: .infinity)
     }
-    
+
     @ViewBuilder
     func menuButton(title: String, icon: Image, action: ActionEnum) -> some View {
+        let color: Color = action.isDestructive() ? .red : theme.colors.menuText
+
         HStack(spacing: 0) {
             ZStack {
                 theme.colors.messageFriendBG
                     .cornerRadius(12)
                 HStack {
                     Text(title)
-                        .foregroundColor(theme.colors.menuText)
+                        .foregroundColor(color)
                     Spacer()
                     icon
                         .renderingMode(.template)
-                        .foregroundStyle(theme.colors.menuText)
+                        .foregroundStyle(color)
                 }
                 .font(getFont)
                 .padding(.vertical, 11)
@@ -546,8 +572,13 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             .frame(width: 208)
             .fixedSize()
             .onTapGesture {
-                onAction(action)
-                dismissSelf()
+                if action.isDestructive() {
+                    pendingDestructiveAction = action
+                    showDestructiveAlert = true
+                } else {
+                    onAction(action)
+                    dismissSelf()
+                }
             }
 
             if alignment == .right {
@@ -556,7 +587,38 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
         }
     }
-    
+
+    @ViewBuilder
+    func deleteMenuButton() -> some View {
+        HStack(spacing: 0) {
+            ZStack {
+                theme.colors.messageFriendBG
+                    .cornerRadius(12)
+                HStack {
+                    Text("Delete")
+                        .foregroundColor(.red)
+                    Spacer()
+                    Image(systemName: "trash")
+                        .renderingMode(.template)
+                        .foregroundStyle(Color.red)
+                }
+                .font(getFont)
+                .padding(.vertical, 11)
+                .padding(.horizontal, 12)
+            }
+            .frame(width: 208)
+            .fixedSize()
+            .onTapGesture {
+                pendingDestructiveAction = nil
+                showDestructiveAlert = true
+            }
+
+            if alignment == .right {
+                Color.clear.viewWidth(12)
+            }
+        }
+    }
+
     private func dismissSelf(_ rt: ReactionType? = nil) {
         if keyboardState.isShown { keyboardState.resignFirstResponder() }
         transitionViewState(to: .dismiss)

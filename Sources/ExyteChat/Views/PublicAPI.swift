@@ -189,6 +189,16 @@ public extension ChatView {
         return view
     }
 
+    /// Adds a "Delete" button to the default message menu with a confirmation alert. Red-styled, appears at the bottom of the menu.
+    /// Use `activeFor` to restrict which messages show it (e.g. only the current user's own messages).
+    /// If you define your own `MessageMenuAction` enum with a `.delete` case marked `isDestructive()`, use that instead.
+    func deleteMenuActionClosure(activeFor: ((Message) -> Bool)? = nil, _ closure: @escaping (Message) -> Void) -> ChatView {
+        var view = self
+        view.deleteMenuActionClosure = closure
+        view.deleteMenuActionActiveFor = activeFor
+        return view
+    }
+
     /// Sets a delegate for handling and configuring message reactions
     func messageReactionDelegate(_ reactionDelegate: ReactionDelegate) -> ChatView {
         var view = self

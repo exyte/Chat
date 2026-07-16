@@ -8,11 +8,14 @@ import SwiftUI
 public protocol MessageMenuAction: Equatable, CaseIterable {
     func title() -> String
     func icon() -> Image
-    
+    func isDestructive() -> Bool
+
     static func menuItems(for message: Message) -> [Self]
 }
 
 extension MessageMenuAction {
+    public func isDestructive() -> Bool { false }
+
     public static func menuItems(for message: Message) -> [Self] {
         Self.allCases.map { $0 }
     }

@@ -46,7 +46,7 @@
 - Has a built-in photo and video library/camera picker for multiple media asset selection
 - Sticker keyboard that integrates with Giphy
 - Can display a fullscreen menu on long press a message cell (automatically shows scroll for big messages)
-- Supports "reply to message" via message menu or through a closure. Remove and edit are **coming soon**
+- Supports reply, edit, and delete via the message menu
 - This library allows to send the following content in messages in any combination:
     - Arbitrarily styled text with `AttributedString` or markdown
     - Photo/video
@@ -185,7 +185,7 @@ Here `params` is an [`InputViewBuilderParameters`](./Sources/ExyteChat/Views/Cha
 Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callback will be called. Here is a simple example:
 ```swift
 enum Action: MessageMenuAction {
-    case reply, edit
+    case reply, edit, delete
 
     func title() -> String {
         switch self {
@@ -193,6 +193,8 @@ enum Action: MessageMenuAction {
             "Reply"
         case .edit:
             "Edit"
+        case .delete:
+            "Delete"
         }
     }
     
@@ -202,18 +204,21 @@ enum Action: MessageMenuAction {
             Image(systemName: "arrowshape.turn.up.left")
         case .edit:
             Image(systemName: "square.and.pencil")
+        case .delete:
+            Image(systemName: "trash")
         }
     }
-    
+
+    // Optional
+    // Return true to show a confirmation alert before calling your messageMenuAction closure.
+    // The action will be styled in red in the menu.
+    func isDestructive() -> Bool { self == .delete }
+
     // Optional
     // Implement this method to conditionally include menu actions on a per message basis
     // The default behavior is to include all menu action items
     static func menuItems(for message: ExyteChat.Message) -> [Action] {
-        if message.user.isCurrentUser  {
-            return [.edit]
-        } else {
-            return [.reply]
-        }
+        message.user.isCurrentUser ? [.reply, .edit, .delete] : [.reply]
     }
 }
 
@@ -228,6 +233,8 @@ ChatView(messages: viewModel.messages) { draft in
             // update this message's text on your BE
             print(editedText)
         })
+    case .delete:
+        yourViewModel.delete(message: message)
     }
 }
 ```
@@ -273,6 +280,22 @@ available modes are:
 - `none` - no animations
 - `natural` - standard UITableView's animations
 - `keepStable` - no animations + if you insert rows to the "front" of the table - it keeps the current scroll position (normally it would jump because contentSize and contentOffset changed)
+
+### Delete action (default menu)
+If you use the default message menu (no custom `MessageMenuAction` enum), you can add a "Delete" button with a confirmation alert using:
+
+```swift
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+}
+.deleteMenuActionClosure(activeFor: { $0.user.isCurrentUser }) { message in
+    yourViewModel.delete(message: message)
+}
+```
+- `activeFor` - optional predicate; when provided, the Delete button only appears for messages where it returns `true`
+- The closure is called only after the user confirms the alert
+
+If you define your own `MessageMenuAction` enum with a `.delete` case marked `isDestructive()`, use that instead — the confirmation alert is handled automatically there too.
 
 ### Reactions    
 `messageReactionDelegate` - provide a custom reaction delegate for handling and configuring message reactions    

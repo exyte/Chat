@@ -6,6 +6,39 @@ import SwiftUI
 import ExyteChat
 import ActivityIndicatorView
 
+enum ChatExampleMenuAction: MessageMenuAction {
+    case copy, reply, edit, delete
+
+    func title() -> String {
+        switch self {
+        case .copy: "Copy"
+        case .reply: "Reply"
+        case .edit: "Edit"
+        case .delete: "Delete"
+        }
+    }
+
+    func icon() -> Image {
+        switch self {
+        case .copy: Image(systemName: "doc.on.doc")
+        case .reply: Image(systemName: "arrowshape.turn.up.left")
+        case .edit:
+            if #available(iOS 18.0, macCatalyst 18.0, *) {
+                Image(systemName: "bubble.and.pencil")
+            } else {
+                Image(systemName: "square.and.pencil")
+            }
+        case .delete: Image(systemName: "trash")
+        }
+    }
+
+    func isDestructive() -> Bool { self == .delete }
+
+    static func menuItems(for message: Message) -> [ChatExampleMenuAction] {
+        message.user.isCurrentUser ? [.copy, .reply, .edit, .delete] : [.copy, .reply]
+    }
+}
+
 @MainActor
 struct ChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -18,9 +51,28 @@ struct ChatExampleView: View {
     let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
     var body: some View {
-        ChatView(messages: viewModel.messages, chatType: .conversation) { draft in
-            viewModel.send(draft: draft)
-        }
+        ChatView(
+            messages: viewModel.messages,
+            chatType: .conversation,
+            didSendMessage: { draft in
+                viewModel.send(draft: draft)
+            },
+            messageMenuAction: { (action: ChatExampleMenuAction, defaultActionClosure, message) in
+                switch action {
+                case .copy:
+                    defaultActionClosure(message, .copy)
+                case .reply:
+                    defaultActionClosure(message, .reply)
+                case .edit:
+                    defaultActionClosure(message, .edit { editedText in
+                        // update this message in your datasource
+                        print(editedText)
+                    })
+                case .delete:
+                    viewModel.remove(messageID: message.id)
+                }
+            }
+        )
         .enableLoadMoreNewerMessages(triggerType: .pixels(0), hasMoreToLoad: viewModel.newPagesCount < viewModel.maxNewPagesCount) {
             await viewModel.loadNewerMessagesPage()
         } loadingIndicatorBuilder: {

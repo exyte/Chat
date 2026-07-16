@@ -56,6 +56,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     /// message menu customization: create enum complying to MessageMenuAction and pass a closure processing your enum cases
     var messageMenuAction: MessageMenuActionClosure
+    /// convenience delete button for users of the default menu who don't need a custom MessageMenuAction enum
+    var deleteMenuActionClosure: ((Message) -> Void)?
+    var deleteMenuActionActiveFor: ((Message) -> Bool)?
 
     var type: ChatType
     var sections: [MessagesSection]
@@ -410,7 +413,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             reactionHandler: MessageMenu.ReactionConfig(
                 delegate: chatCustomizationParameters.reactionDelegate,
                 didReact: reactionClosure(row.message)
-            )
+            ),
+            deleteClosure: deleteMenuActionClosure,
+            deleteActiveFor: deleteMenuActionActiveFor
         ) {
             ChatMessageView(
                 viewModel: viewModel,
