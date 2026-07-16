@@ -92,9 +92,9 @@ public extension ChatView {
 
     /// Controls whether the share button is shown in the fullscreen attachment viewer
     /// - Default is true
-    func showAttachmentShareButton(_ show: Bool) -> ChatView {
+    func showShareAttachmentButton(_ show: Bool) -> ChatView {
         var view = self
-        view.chatCustomizationParameters.showAttachmentShareButton = show
+        view.chatCustomizationParameters.showShareAttachmentButton = show
         return view
     }
 
@@ -305,7 +305,7 @@ public extension ChatView {
     // MARK: - Built-in input view
 
     /// binding to current text in the default input text field
-    public func inputViewText(_ binding: Binding<String>) -> ChatView {
+    func inputViewText(_ binding: Binding<String>) -> ChatView {
         var view = self
         view.inputViewCustomizationParameters.externalInputText = binding.wrappedValue
         view.inputViewCustomizationParameters.onInputTextChange = { binding.wrappedValue = $0 }

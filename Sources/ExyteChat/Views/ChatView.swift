@@ -181,7 +181,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                             index: index ?? 0
                         ),
                         safeAreaInsets: g.safeAreaInsets,
-                        showShareButton: chatCustomizationParameters.showAttachmentShareButton,
+                        showShareButton: chatCustomizationParameters.showShareAttachmentButton,
                         onClose: { [weak viewModel] in
                             viewModel?.dismissAttachmentFullScreen()
                         }

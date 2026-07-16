@@ -24,8 +24,8 @@ enum AttachmentSharing {
 
         do {
             let (tempURL, response) = try await URLSession.shared.download(from: attachment.full)
-            let fileExtension = nonEmpty(response.suggestedFilename.map { ($0 as NSString).pathExtension })
-                ?? nonEmpty(attachment.full.pathExtension)
+            let fileExtension = response.suggestedFilename.flatMap { ($0 as NSString).pathExtension.nonEmpty }
+                ?? attachment.full.pathExtension.nonEmpty
                 ?? (attachment.type == .video ? "mp4" : "jpg")
 
             let destinationURL = FileManager.default.temporaryDirectory
@@ -54,10 +54,5 @@ enum AttachmentSharing {
             }
             return urlsByIndex.keys.sorted().compactMap { urlsByIndex[$0] }
         }
-    }
-
-    private static func nonEmpty(_ string: String?) -> String? {
-        guard let string, !string.isEmpty else { return nil }
-        return string
     }
 }

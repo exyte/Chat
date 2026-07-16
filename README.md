@@ -253,7 +253,7 @@ These use `AnyView`, so please try to keep them easy enough
 `keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
 `autoFocusTextInputOnChatOpen` - automatically focus the inputTextView when the chat view is opened, default is `false`
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
-`showAttachmentShareButton` - show/hide the share button in the fullscreen attachment viewer, default is `true`    
+`showShareAttachmentButton` - show/hide the share button in the fullscreen attachment viewer, default is `true`    
 `messageMenuAnimationDuration` - control how fast/snappy the message menu animations feel    
 `contentInsets` - set additional content insets for the messages list   
 `onContentOffsetChange` - get table's content offset updates  
@@ -433,7 +433,7 @@ sendToServer(errorUpload)
 
 Users can share attachments out of the chat via the system share sheet. There are two entry points:
 
-- **Fullscreen media viewer** - tapping an image/video attachment opens the fullscreen viewer, which shows a share button that shares the currently displayed attachment. Toggle it with `showAttachmentShareButton` (see Modifiers), default is `true`.
+- **Fullscreen media viewer** - tapping an image/video attachment opens the fullscreen viewer, which shows a share button that shares the currently displayed attachment. Toggle it with `showShareAttachmentButton` (see Modifiers), default is `true`.
 - **Message context menu** - long tap on a message shows a `Share` action (`DefaultMessageMenuAction.share`) whenever the message has at least one attachment that finished uploading. Selecting it shares all of that message's attachments together in a single share sheet. This action is only included for `DefaultMessageMenuAction`; if you supply your own `MessageMenuAction` enum (see Custom message menu) you decide whether to include a share action.
 
 Remote attachments (non-`file://` URLs) are downloaded to a temporary file before sharing so that actions like Save Image/Video and AirDrop work with real file data instead of just a link.

@@ -27,4 +27,8 @@ extension String {
 
         return result
     }
+
+    var nonEmpty: String? {
+        isEmpty ? nil : self
+    }
 }

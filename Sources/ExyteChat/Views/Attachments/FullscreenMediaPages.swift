@@ -120,25 +120,13 @@ struct FullscreenMediaPages: View {
             if viewModel.showMinis {
                 HStack(spacing: 20) {
                     if viewModel.attachments[viewModel.index].type == .video {
-                        (viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .padding(5)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                viewModel.toggleVideoPlaying()
-                            }
+                        controlIcon(viewModel.videoPlaying ? theme.images.fullscreenMedia.pause : theme.images.fullscreenMedia.play) {
+                            viewModel.toggleVideoPlaying()
+                        }
 
-                        (viewModel.videoMuted ? theme.images.fullscreenMedia.unmute : theme.images.fullscreenMedia.mute)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .padding(5)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                viewModel.toggleVideoMuted()
-                            }
+                        controlIcon(viewModel.videoMuted ? theme.images.fullscreenMedia.unmute : theme.images.fullscreenMedia.mute) {
+                            viewModel.toggleVideoMuted()
+                        }
                     }
 
                     if showShareButton {
@@ -148,15 +136,9 @@ struct FullscreenMediaPages: View {
                                 .frame(width: 24, height: 24)
                                 .padding(5)
                         } else {
-                            theme.images.fullscreenMedia.share
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24, height: 24)
-                                .padding(5)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    shareCurrentAttachment()
-                                }
+                            controlIcon(theme.images.fullscreenMedia.share) {
+                                shareCurrentAttachment()
+                            }
                         }
                     }
                 }
@@ -177,6 +159,16 @@ private struct ShareItem: Identifiable {
 }
 
 private extension FullscreenMediaPages {
+    func controlIcon(_ image: Image, onTap: @escaping () -> Void) -> some View {
+        image
+            .resizable()
+            .scaledToFit()
+            .frame(width: 24, height: 24)
+            .padding(5)
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onTap)
+    }
+
     func shareCurrentAttachment() {
         guard !isPreparingShare else { return }
         let attachment = viewModel.attachments[viewModel.index]

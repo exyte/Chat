@@ -1,6 +1,6 @@
 import GiphyUISDK
 
-public struct GiphyConfiguration {
+public struct GiphyConfiguration: Sendable {
     
     public let giphyKey: String?
     public let dimBackground: Bool
