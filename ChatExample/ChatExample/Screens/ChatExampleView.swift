@@ -42,12 +42,13 @@ enum ChatExampleMenuAction: MessageMenuAction {
 @MainActor
 struct ChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     @StateObject var viewModel = ChatExampleViewModel()
 
     @State var text = ""
 
+    private var steve = MockChatData.shared.steve
     let recorderSettings = RecorderSettings(sampleRate: 16000, numberOfChannels: 1, linearPCMBitDepth: 16)
     
     var body: some View {
@@ -100,7 +101,6 @@ struct ChatExampleView: View {
             backToolbarItem
             titleToolbarItem
         }
-        .onAppear(perform: viewModel.onStart)
         .onChange(of: text) { oldValue, newValue in
             print(newValue)
         }
@@ -136,7 +136,7 @@ struct ChatExampleView: View {
     var backToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
             Button {
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             } label: {
                 Image("backArrow", bundle: .current)
                     .renderingMode(.template)
@@ -148,8 +148,7 @@ struct ChatExampleView: View {
     var titleToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .principal) {
             HStack {
-                let steve = MockChatData().steve
-                if let url = steve.avatar {
+                if let url = steve.avatarURL {
                     CachedAsyncImage(url: url) { phase in
                         switch phase {
                         case .success(let image):

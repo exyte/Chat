@@ -267,7 +267,8 @@ public extension Array {
      array is empty.
      */
     func random() -> Element? {
-        return (count > 0) ? self.shuffled()[0] : nil
+        guard !isEmpty else { return nil }
+        return self[Int.random(in: indices)]
     }
     
     /**
@@ -275,9 +276,14 @@ public extension Array {
      - returns: Returns a random subset of `cnt` elements from the array.
      */
     func random(_ count: Int = 1) -> [Element] {
-        let result = shuffled()
-        
-        return (count > result.count) ? result : Array(result[0..<count])
+        guard count > 0, !isEmpty else { return [] }
+        var result = Array(self)
+        let actualCount = Swift.min(count, result.count)
+        for i in 0..<actualCount {
+            let j = Int.random(in: i..<result.count)
+            if i != j { result.swapAt(i, j) }
+        }
+        return Array(result[0..<actualCount])
     }
 }
 

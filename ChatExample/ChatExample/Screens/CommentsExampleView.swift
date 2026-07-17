@@ -112,7 +112,6 @@ struct CommentsExampleView: View {
             ])
         }
         .navigationTitle("Comments example")
-        .onAppear(perform: viewModel.onStart)
     }
 
     @ViewBuilder

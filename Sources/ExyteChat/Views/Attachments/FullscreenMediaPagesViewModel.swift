@@ -9,9 +9,6 @@ final class FullscreenMediaPagesViewModel: ObservableObject {
     var attachments: [Attachment]
     @Published var index: Int
 
-    @Published var showMinis = true
-    @Published var offset: CGSize = .zero
-
     @Published var videoPlaying = false
     @Published var videoMuted = false
 

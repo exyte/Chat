@@ -11,17 +11,13 @@
 		135549382864620B00C9459A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 135549372864620B00C9459A /* Assets.xcassets */; };
 		1355493B2864620B00C9459A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1355493A2864620B00C9459A /* Preview Assets.xcassets */; };
 		135987B82869F369006388CF /* Lorem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987B72869F369006388CF /* Lorem.swift */; };
-		135987BA2869F3AE006388CF /* MockMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987B92869F3AE006388CF /* MockMessage.swift */; };
-		135987BD2869F6F2006388CF /* ChatInteractorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987BC2869F6F2006388CF /* ChatInteractorProtocol.swift */; };
 		135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135987BE2869F704006388CF /* MockChatInteractor.swift */; };
 		1376133E28782F8E00E7CF67 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376133D28782F8E00E7CF67 /* Date+Extensions.swift */; };
 		1376F7BB286472530016CD1B /* ChatError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376F7BA286472530016CD1B /* ChatError.swift */; };
 		13DF042D2864790B0043DBBC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DF042C2864790B0043DBBC /* ContentView.swift */; };
 		13DF043228647C070043DBBC /* ChatExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DF043128647C070043DBBC /* ChatExampleViewModel.swift */; };
-		13E17B6D2869E940004DF140 /* MockUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6C2869E940004DF140 /* MockUser.swift */; };
 		13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E17B6E2869E983004DF140 /* MockChatData.swift */; };
 		13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */; };
-		13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */; };
 		5B03D45F2EE05B5800A09B98 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 5B03D45E2EE05B5800A09B98 /* ExyteChat */; };
 		5B0636D72C2E9F6100E54AEE /* CommentsExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */; };
 		5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */; };
@@ -51,18 +47,14 @@
 		135549372864620B00C9459A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1355493A2864620B00C9459A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		135987B72869F369006388CF /* Lorem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lorem.swift; sourceTree = "<group>"; };
-		135987B92869F3AE006388CF /* MockMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMessage.swift; sourceTree = "<group>"; };
-		135987BC2869F6F2006388CF /* ChatInteractorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInteractorProtocol.swift; sourceTree = "<group>"; };
 		135987BE2869F704006388CF /* MockChatInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatInteractor.swift; sourceTree = "<group>"; };
 		1376133D28782F8E00E7CF67 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		1376F7A3286466460016CD1B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1376F7BA286472530016CD1B /* ChatError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatError.swift; sourceTree = "<group>"; };
 		13DF042C2864790B0043DBBC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		13DF043128647C070043DBBC /* ChatExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleViewModel.swift; sourceTree = "<group>"; };
-		13E17B6C2869E940004DF140 /* MockUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUser.swift; sourceTree = "<group>"; };
 		13E17B6E2869E983004DF140 /* MockChatData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatData.swift; sourceTree = "<group>"; };
 		13F1C0EE286AC86200D25D8A /* ChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatExampleView.swift; sourceTree = "<group>"; };
-		13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAttachment.swift; sourceTree = "<group>"; };
 		5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleView.swift; sourceTree = "<group>"; };
 		5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+asyncMap.swift"; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
@@ -109,7 +101,6 @@
 				13DF042C2864790B0043DBBC /* ContentView.swift */,
 				1376F7B3286471A80016CD1B /* Model */,
 				13F1C0F3286ADE5D00D25D8A /* DataGeneration */,
-				135987BB2869F6C2006388CF /* ChatInteractor */,
 				5B0636D92C2EA0CB00E54AEE /* Screens */,
 				1376133C28782F7C00E7CF67 /* Extensions */,
 				1376F7AE286470B70016CD1B /* Support Files */,
@@ -123,15 +114,6 @@
 				1355493A2864620B00C9459A /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		135987BB2869F6C2006388CF /* ChatInteractor */ = {
-			isa = PBXGroup;
-			children = (
-				135987BC2869F6F2006388CF /* ChatInteractorProtocol.swift */,
-				135987BE2869F704006388CF /* MockChatInteractor.swift */,
-			);
-			path = ChatInteractor;
 			sourceTree = "<group>";
 		};
 		1376133C28782F7C00E7CF67 /* Extensions */ = {
@@ -158,9 +140,6 @@
 			isa = PBXGroup;
 			children = (
 				1376F7BA286472530016CD1B /* ChatError.swift */,
-				13E17B6C2869E940004DF140 /* MockUser.swift */,
-				135987B92869F3AE006388CF /* MockMessage.swift */,
-				13F1C0F1286ADD8900D25D8A /* MockAttachment.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -170,6 +149,7 @@
 			children = (
 				135987B72869F369006388CF /* Lorem.swift */,
 				13E17B6E2869E983004DF140 /* MockChatData.swift */,
+				135987BE2869F704006388CF /* MockChatInteractor.swift */,
 			);
 			path = DataGeneration;
 			sourceTree = "<group>";
@@ -278,18 +258,14 @@
 				13E17B6F2869E983004DF140 /* MockChatData.swift in Sources */,
 				1376F7BB286472530016CD1B /* ChatError.swift in Sources */,
 				135987B82869F369006388CF /* Lorem.swift in Sources */,
-				135987BA2869F3AE006388CF /* MockMessage.swift in Sources */,
 				1376133E28782F8E00E7CF67 /* Date+Extensions.swift in Sources */,
 				13F1C0EF286AC86200D25D8A /* ChatExampleView.swift in Sources */,
 				135987BF2869F704006388CF /* MockChatInteractor.swift in Sources */,
 				5B0636D72C2E9F6100E54AEE /* CommentsExampleView.swift in Sources */,
 				5B0636DB2C2EA21900E54AEE /* Sequence+asyncMap.swift in Sources */,
-				13F1C0F2286ADD8900D25D8A /* MockAttachment.swift in Sources */,
 				135549342864620900C9459A /* ChatExampleApp.swift in Sources */,
 				5BE239EB2FADEB2200B95E5B /* ActiveChatExampleViewModel.swift in Sources */,
-				13E17B6D2869E940004DF140 /* MockUser.swift in Sources */,
 				13DF042D2864790B0043DBBC /* ContentView.swift in Sources */,
-				135987BD2869F6F2006388CF /* ChatInteractorProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

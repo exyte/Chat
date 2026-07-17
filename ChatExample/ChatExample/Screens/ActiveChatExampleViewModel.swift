@@ -21,7 +21,8 @@ final class ActiveChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     init() {
         Task {
-            self.users = await interactor.otherSenders.map { $0.toChatUser() }
+            self.users = await interactor.otherSenders
+            self.messages = await convertMessages()
         }
     }
 
@@ -70,6 +71,6 @@ final class ActiveChatExampleViewModel: ObservableObject, ReactionDelegate {
     }
 
     func convertMessages() async -> [Message] {
-        await interactor.messages.compactMap { $0.toChatMessage() }
+        await interactor.toMessages()
     }
 }

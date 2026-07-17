@@ -11,7 +11,7 @@ import ExyteChat
 @MainActor
 struct ActiveChatExampleView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     @StateObject var viewModel = ActiveChatExampleViewModel()
 
@@ -38,7 +38,7 @@ struct ActiveChatExampleView: View {
     var backToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
             Button {
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             } label: {
                 Image("backArrow", bundle: .current)
                     .renderingMode(.template)

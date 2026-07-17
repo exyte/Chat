@@ -41,7 +41,6 @@ public struct CachedAsyncImage<Content>: View where Content: View {
         }
     }
 
-
     /// Loads and displays a modifiable image with placeholder.
     public init<I, P>(
         url: URL?,
@@ -58,7 +57,6 @@ public struct CachedAsyncImage<Content>: View where Content: View {
             }
         }
     }
-
 
     /// Loads and displays a modifiable image in phases.
     public init(
@@ -83,7 +81,25 @@ public struct CachedAsyncImage<Content>: View where Content: View {
             return
         }
 
-        let resource = KF.ImageResource(downloadURL: url, cacheKey: cacheKey)
+        // Load xcassets images directly — no disk I/O, no Kingfisher overhead
+        if url.scheme == "asset", let name = url.host {
+#if canImport(UIKit)
+            if let uiImage = UIImage(named: name) {
+                withAnimation(transaction.animation) {
+                    phase = .success(Image(uiImage: uiImage))
+                }
+            }
+#elseif canImport(AppKit)
+            if let nsImage = NSImage(named: name) {
+                withAnimation(transaction.animation) {
+                    phase = .success(Image(nsImage: nsImage))
+                }
+            }
+#endif
+            return
+        }
+
+        let resource = ImageResource(downloadURL: url, cacheKey: cacheKey ?? url.absoluteString)
 
         do {
             let image = try await withCheckedThrowingContinuation { continuation in
@@ -96,23 +112,19 @@ public struct CachedAsyncImage<Content>: View where Content: View {
                 ) { result in
                     switch result {
                     case .success(let value):
-                        //print("[CachedAsyncImage] Loaded image from: \(value.cacheType)")
                         continuation.resume(returning: value.image)
                     case .failure(let error):
-                        print("[CachedAsyncImage] Failed to load image: \(error)")
                         continuation.resume(throwing: error)
                     }
                 }
             }
 
             withAnimation(transaction.animation) {
-                #if canImport(UIKit)
+#if canImport(UIKit)
                 phase = .success(Image(uiImage: image))
-                #elseif canImport(AppKit)
+#elseif canImport(AppKit)
                 phase = .success(Image(nsImage: image))
-                #else
-                phase = .success(Image(uiImage: image)) // fallback for iOS-only targets
-                #endif
+#endif
             }
         } catch {
             withAnimation(transaction.animation) {

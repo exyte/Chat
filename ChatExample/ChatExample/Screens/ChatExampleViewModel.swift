@@ -18,17 +18,21 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
 
     private let interactor = MockChatInteractor(isActive: false)
 
+    init() {
+        updateMessages()
+    }
+
     func send(draft: DraftMessage) {
         Task {
             await interactor.send(draftMessage: draft)
-            self.messages = await self.convertMessages()
+            updateMessages()
         }
     }
     
     func remove(messageID: String) {
         Task {
             await interactor.remove(messageID: messageID)
-            self.messages = await self.convertMessages()
+            updateMessages()
         }
     }
 
@@ -38,17 +42,11 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
         }
     }
 
-    func onStart() {
-        Task {
-            self.messages = await self.convertMessages()
-        }
-    }
-
     func loadNewerMessagesPage() async {
         guard let tableTransaction else { return }
         newPagesCount += 1
         await interactor.loadNewerMessagesPage()
-        let messages = await convertMessages()
+        let messages = await interactor.toMessages()
         await tableTransaction(animationMode: .keepStable) {
             self.messages = messages
         }
@@ -57,13 +55,15 @@ final class ChatExampleViewModel: ObservableObject, ReactionDelegate {
     func loadOlderMessagesPage() async {
         guard let tableTransaction else { return }
         await interactor.loadOlderMessagesPage()
-        let messages = await convertMessages()
+        let messages = await interactor.toMessages()
         await tableTransaction(animated: false) {
             self.messages = messages
         }
     }
 
-    func convertMessages() async -> [Message] {
-        await interactor.messages.compactMap { $0.toChatMessage() }
+    func updateMessages() {
+        Task {
+            self.messages = await interactor.toMessages()
+        }
     }
 }

@@ -6,6 +6,11 @@ import SwiftUI
 
 @main
 struct ChatExampleApp: App {
+
+    init() {
+        _ = MockChatData.shared
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

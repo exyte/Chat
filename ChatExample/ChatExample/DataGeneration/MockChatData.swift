@@ -3,118 +3,55 @@
 //
 
 import Foundation
-import UIKit
 import ExyteChat
-import ExyteMediaPicker
 
-final class MockChatData {
+final class MockChatData: @unchecked Sendable {
 
-    // Alternative for avatars `https://ui-avatars.com/api/?name=Tim`
-    let system = MockUser(uid: "0", name: "System")
-    let tim = MockUser(
-        uid: "1",
-        name: "Tim",
-        avatar: AssetExtractor.createLocalUrl(forImageNamed: "tim")!
-    )
-    let steve = MockUser(
-        uid: "2",
-        name: "Steve",
-        avatar: AssetExtractor.createLocalUrl(forImageNamed: "steve")!
-    )
-    let bob = MockUser(
-        uid: "3",
-        name: "Bob",
-        avatar: AssetExtractor.createLocalUrl(forImageNamed: "bob")!
-    )
+    static let shared = MockChatData()
 
-    func randomMessage(senders: [MockUser] = [], date: Date? = nil, text: String? = nil) -> MockMessage {
+    let tim = User(id: "1", name: "Tim", avatarURL: URL(string: "asset://tim"), isCurrentUser: true)
+    let steve = User(id: "2", name: "Steve", avatarURL: URL(string: "asset://steve"), isCurrentUser: false)
+    let bob = User(id: "3", name: "Bob", avatarURL: URL(string: "asset://bob"), isCurrentUser: false)
+
+    func randomMessage(senders: [User] = [], date: Date? = nil, text: String? = nil) -> Message {
         let senders = senders.isEmpty ? [tim, steve, bob] : senders
         let sender = senders.random()!
         let date = date ?? Date()
-        let images = randomImages()
+        let attachments = randomAttachments()
+        let shouldGenerateText = attachments.isEmpty ? true : Bool.random()
 
-        let shouldGenerateText = images.isEmpty ? true : .random()
-
-        return MockMessage(
-            uid: UUID().uuidString,
-            sender: sender,
-            createdAt: date,
+        return Message(
+            id: UUID().uuidString,
+            user: sender,
             status: sender.isCurrentUser ? .read : nil,
-            text: text != nil ? text! : shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : "",
-            images: images,
-            videos: [],
-            reactions: [],
-            recording: nil,
-            replyMessage: nil
+            createdAt: date,
+            text: shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : "",
+            attachments: attachments,
+            reactions: []
         )
     }
 
-    func randomImages() -> [MockImage] {
-        guard Int.random(min: 0, max: 10) == 0 else {
-            return []
-        }
-
+    func randomAttachments() -> [Attachment] {
+        guard Int.random(min: 0, max: 10) == 0 else { return [] }
         let count = Int.random(min: 1, max: 5)
-        return (0...count).map { _ in
-            randomMockImage()
-        }
+        return (0...count).map { _ in randomImageAttachment() }
     }
 
-    func randomMockImage() -> MockImage {
+    func randomImageAttachment() -> Attachment {
         let w = Int.random(in: 200...500)
         let h = Int.random(in: 200...500)
-        let url = "https://picsum.photos/\(w)/\(h)/"
-        return MockImage(
-            id: UUID().uuidString,
-            thumbnail: URL(string: url)!,
-            full: URL(string: url)!
-        )
+        let url = URL(string: "https://picsum.photos/\(w)/\(h)/")!
+        return Attachment(id: UUID().uuidString, thumbnail: url, full: url, type: .image)
     }
-    
-    func randomReaction(senders: [MockUser]) -> Reaction {
-        let sampleEmojis: [String] = ["👍", "👎", "❤️", "🤣", "‼️", "❓", "🥳", "💪", "🔥", "💔", "😭"]
-        return Reaction(
-            user: senders.random()!.toChatUser(),
-            createdAt: Date.now,
-            type: .emoji(sampleEmojis.random()!),
-            status: .sent
-        )
+
+    func randomReaction(senders: [User]) -> Reaction {
+        let sampleEmojis = ["👍", "👎", "❤️", "🤣", "‼️", "❓", "🥳", "💪", "🔥", "💔", "😭"]
+        return Reaction(user: senders.random()!, type: .emoji(sampleEmojis.random()!), status: .sent)
     }
-    
-    func reactToMessage(_ msg: MockMessage, senders: [MockUser]) -> MockMessage {
-        return MockMessage(
-            uid: msg.uid,
-            sender: msg.sender,
-            createdAt: msg.createdAt,
-            status: msg.status,
-            text: msg.text,
-            images: msg.images,
-            videos: msg.videos,
-            reactions: msg.reactions + [randomReaction(senders: senders)],
-            recording: msg.recording,
-            replyMessage: msg.replyMessage
-        )
-    }
-}
 
-class AssetExtractor {
-
-    static func createLocalUrl(forImageNamed name: String) -> URL? {
-
-        let fileManager = FileManager.default
-        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        let url = cacheDirectory.appendingPathComponent("\(name).pdf")
-
-        guard fileManager.fileExists(atPath: url.path) else {
-            guard
-                let image = UIImage(named: name),
-                let data = image.pngData()
-            else { return nil }
-
-            fileManager.createFile(atPath: url.path, contents: data, attributes: nil)
-            return url
-        }
-
-        return url
+    func reactToMessage(_ msg: Message, senders: [User]) -> Message {
+        var msg = msg
+        msg.reactions.append(randomReaction(senders: senders))
+        return msg
     }
 }
