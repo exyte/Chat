@@ -21,6 +21,7 @@ struct MessageView: View {
     let isDisplayingMessageMenu: Bool
 
     @State var giphyAspectRatio: CGFloat = 1
+    @State var width = UIScreen.main.bounds.width
 
     static let widthWithMedia: CGFloat = 204
     static let statusViewWidth: CGFloat = 10
@@ -51,7 +52,7 @@ struct MessageView: View {
         let statusViewWithPaddings = MessageView.statusViewWidth + MessageView.horizontalSpacing
         let textPaddings = MessageView.horizontalTextPadding * 2
         let widthWithoutMedia =
-            UIScreen.main.bounds.width
+            width
             - bubblePaddings
             - (isCurrentUser && params.showAvatar ? 0 : avatarViewWithPaddings)
             - (isCurrentUser ? MessageView.statusViewWidth : 0)
@@ -143,6 +144,11 @@ struct MessageView: View {
             maxWidth: UIScreen.main.bounds.width,
             alignment: message.user.isCurrentUser ? .trailing : .leading
         )
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            self.width = width
+        }
     }
 
     @ViewBuilder
