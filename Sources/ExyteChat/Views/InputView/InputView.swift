@@ -109,8 +109,9 @@ struct InputView: View {
     private var state: InputViewState {
         viewModel.state
     }
-    
-    @State private var overlaySize: CGSize = .zero
+
+    @State private var stopRecordButtonSize: CGSize = .zero
+    @State private var lockRecordButtonSize: CGSize = .zero
     
     @State private var recordButtonFrame: CGRect = .zero
     @State private var lockRecordFrame: CGRect = .zero
@@ -283,15 +284,15 @@ struct InputView: View {
             }
             .compositingGroup()
             .overlay(alignment: .top) {
-                Group {
-                    if state == .isRecordingTap {
-                        stopRecordButton
-                    } else if state == .isRecordingHold {
-                        lockRecordButton
-                    }
+                if state == .isRecordingTap {
+                    stopRecordButton
+                        .sizeGetter($stopRecordButtonSize)
+                        .offset(y: -stopRecordButtonSize.height - stopRecordButtonOffset)
+                } else if state == .isRecordingHold {
+                    lockRecordButton
+                        .sizeGetter($lockRecordButtonSize)
+                        .offset(y: -lockRecordButtonSize.height - stopRecordButtonOffset)
                 }
-                .sizeGetter($overlaySize)
-                .offset(y: -overlaySize.height - stopRecordButtonOffset)
             }
         }
         .viewSize(48)
