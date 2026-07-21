@@ -70,6 +70,12 @@ public enum AvailableInputType: Sendable {
     case giphy
 }
 
+public enum InputViewRightButtonType: Sendable {
+    case camera
+    case giphy
+    case none
+}
+
 public struct InputViewAttachments {
     var medias: [Media] = []
     var recording: Recording?
@@ -91,6 +97,7 @@ struct InputView: View {
     var recorderSettings: RecorderSettings = RecorderSettings()
     var audioRecordingMode: AudioRecordingMode = .holdToRecord
     var photoPickerBackend: PhotoPickerBackend = .custom
+    var inputViewRightButtonType: InputViewRightButtonType = .camera
     var localization: ChatLocalization
 
     @StateObject var recordingPlayer = RecordingPlayer()
@@ -157,7 +164,7 @@ struct InputView: View {
                 if isMediaAvailable() {
                     attachButton
                 }
-                if isGiphyAvailable() {
+                if isGiphyAvailable(), effectiveRightButtonType() != .giphy {
                     giphyButton
                 }
             case .signature:
@@ -198,8 +205,15 @@ struct InputView: View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                if case .message = style, isMediaAvailable() {
-                    cameraButton
+                if case .message = style {
+                    switch effectiveRightButtonType() {
+                    case .camera:
+                        cameraButton
+                    case .giphy:
+                        giphyButton
+                    case .none:
+                        EmptyView()
+                    }
                 }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
@@ -645,6 +659,18 @@ struct InputView: View {
     
     private func isMediaAvailable() -> Bool {
         return availableInputs.contains(AvailableInputType.media)
+    }
+
+    private func effectiveRightButtonType() -> InputViewRightButtonType {
+
+        switch inputViewRightButtonType {
+        case .giphy:
+            return isGiphyAvailable() ? .giphy : .none
+        case .camera:
+            return isMediaAvailable() ? .camera : .none
+        case .none:
+            return .none
+        }
     }
 }
 
