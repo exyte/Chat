@@ -14,17 +14,27 @@ struct AttachmentsPage: View {
     var body: some View {
         if attachment.type == .image {
             ZoomableContainer {
-                CachedAsyncImage(
-                    url: attachment.full,
-                    cacheKey: attachment.fullCacheKey
-                ) { phase in
-                    switch phase {
-                    case let .success(image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    default:
+                if attachment.full.isGIF {
+                    CachedAnimatedImage(
+                        url: attachment.full,
+                        cacheKey: attachment.fullCacheKey,
+                        contentMode: .fit
+                    ) {
                         ActivityIndicator()
+                    }
+                } else {
+                    CachedAsyncImage(
+                        url: attachment.full,
+                        cacheKey: attachment.fullCacheKey
+                    ) { phase in
+                        switch phase {
+                        case let .success(image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        default:
+                            ActivityIndicator()
+                        }
                     }
                 }
             }
