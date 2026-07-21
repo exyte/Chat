@@ -94,6 +94,7 @@ struct ChatExampleView: View {
         .setMediaPickerLiveCameraStyle(.prominant)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
+        .setAvailableInputs([.text, .media, .giphy, .audio])
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [replyAction])
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)

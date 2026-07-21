@@ -382,4 +382,11 @@ public extension ChatView {
         view.inputViewCustomizationParameters.photoPickerBackend = backend
         return view
     }
+
+    /// Which action occupies InputView's dedicated right-side button slot: camera, giphy attachment, or none.
+    func inputViewRightButtonType(_ type: InputViewRightButtonType) -> ChatView {
+        var view = self
+        view.inputViewCustomizationParameters.inputViewRightButtonType = type
+        return view
+    }
 }
