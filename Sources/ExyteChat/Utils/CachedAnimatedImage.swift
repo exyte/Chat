@@ -29,9 +29,3 @@ struct CachedAnimatedImage<Placeholder: View>: View {
             .placeholder(placeholder)
     }
 }
-
-extension URL {
-    var isGIF: Bool {
-        pathExtension.lowercased() == "gif"
-    }
-}

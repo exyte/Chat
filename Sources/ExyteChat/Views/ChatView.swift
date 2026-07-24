@@ -394,7 +394,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     recorderSettings: inputViewCustomizationParameters.recorderSettings,
                     audioRecordingMode: inputViewCustomizationParameters.audioRecordingMode,
                     photoPickerBackend: inputViewCustomizationParameters.photoPickerBackend,
-                    inputViewRightButtonType: inputViewCustomizationParameters.inputViewRightButtonType,
                     localization: chatCustomizationParameters.localization
                 )
             } else {

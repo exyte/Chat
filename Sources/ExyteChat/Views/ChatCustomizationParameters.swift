@@ -79,7 +79,6 @@ struct InputViewCustomizationParameters {
     var audioRecordingMode: AudioRecordingMode = .holdToRecord
     var mediaPickerParameters = MediaPickerParameters()
     var photoPickerBackend: PhotoPickerBackend = .custom
-    var inputViewRightButtonType: InputViewRightButtonType = .camera
 }
 
 public typealias MediaPickerParameters = ExyteMediaPicker.MediaPickerCutomizationParameters

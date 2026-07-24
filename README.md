@@ -362,10 +362,8 @@ ChatView(messages: viewModel.messages) { draft in
 `photoPickerBackend` - choose which photo/video picker is presented when the user taps to attach media:    
     - `.custom` (default) - ExyteMediaPicker fully customizable built-in media picker    
     - `.system` - Apple's native `PhotosPicker` for apps that don't need a customized picker UI. Selected items are shown as a removable thumbnail strip above the input field, and camera capture always uses the ExyteMediaPicker regardless of this setting.    
-`inputViewRightButtonType` - choose which action occupies the input field's dedicated right-side button slot when the composer is empty:    
-    - `.camera` (default) - camera button on the right, giphy button stays on the left next to attach (shown only if that action is actually available via `setAvailableInputs`)    
-    - `.giphy` - giphy button on the right, left side shows only attach    
-    - `.none` - no button on the right side      
+
+The attach button on the left opens a popup menu to choose between Media and GIF when both are available via `setAvailableInputs`. If `photoPickerBackend` is `.system`, a separate Camera entry is also added to the menu, since Apple's native `PhotosPicker` can't capture photos/video itself; with the default `.custom` backend, camera capture is reachable from within the media picker itself, so no separate entry is needed. If there's only one attachment option in total, tapping the button triggers it directly with no popup. The right side of the input field shows a clear ("x") button to quickly clear typed text once the field is non-empty.    
 
 ### Customize default colors and images
 You can use `chatTheme` to customize colors and images of default UI. You can pass all/some colors and images:
