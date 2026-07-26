@@ -121,9 +121,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             .onChange(of: inputViewModel.text) { _ , newValue in
                 inputViewCustomizationParameters.onInputTextChange?(newValue)
             }
-            .onChange(of: inputViewCustomizationParameters.externalInputText) {
-                DispatchQueue.main.async {
-                    inputViewModel.text = inputViewCustomizationParameters.externalInputText ?? ""
+            .onChange(of: inputViewCustomizationParameters.externalInputText) { _, newValue in
+                let newValue = newValue ?? ""
+                if inputViewModel.text != newValue {
+                    inputViewModel.text = newValue
                 }
             }
             .onChange(of: selectedGiphyMedia) {
