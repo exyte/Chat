@@ -120,6 +120,12 @@ struct InputView: View {
     private let attachMenuLeftMargin: CGFloat = 14
     private let attachMenuGap: CGFloat = 16
 
+    private struct AttachMenuItem {
+        let icon: Image
+        let title: String
+        let action: InputViewAction
+    }
+
     var body: some View {
         VStack {
             viewOnTop
@@ -199,12 +205,12 @@ struct InputView: View {
         Group {
             switch state {
             case .empty, .waitingForRecordingPermission:
-                Color.clear.frame(width: 8, height: 1)
+                Color.clear.frame(width: 1, height: 1)
             case .hasTextOrMedia:
                 if case .message = style, !viewModel.text.isEmpty {
                     clearTextButton
                 } else {
-                    Color.clear.frame(width: 8, height: 1)
+                    Color.clear.frame(width: 1, height: 1)
                 }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
@@ -213,7 +219,7 @@ struct InputView: View {
             case .playingRecording, .pausedRecording:
                 recordDurationLeft
             default:
-                Color.clear.frame(width: 8, height: 1)
+                Color.clear.frame(width: 1, height: 1)
             }
         }
         .frame(minHeight: 48)
@@ -383,12 +389,6 @@ struct InputView: View {
         }
     }
 
-    private struct AttachMenuItem {
-        let icon: Image
-        let title: String
-        let action: InputViewAction
-    }
-
     private var attachMenuItems: [AttachMenuItem] {
         var items: [AttachMenuItem] = []
         if isMediaAvailable() {
@@ -411,14 +411,14 @@ struct InputView: View {
             theme.images.inputView.attach
                 .viewSize(24)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-                .useAsPopupAnchor(id: attachMenuPopupId, contentBuilder: {
+                .useAsPopupAnchor(id: attachMenuPopupId) {
                     attachMenuContent(items)
-                }, customize: {
+                } customize: {
                     $0.position(.absolute(.bottomLeading, position: CGPoint(x: attachMenuLeftMargin, y: inputBarFrame.minY - attachMenuGap)))
                         .background(.none)
                         .closeOnTapOutside(true)
                         .animation(.default)
-                })
+                }
         } else if let item = items.first, item.action == .photo {
             Button {
                 onAction(.photo)
@@ -444,27 +444,19 @@ struct InputView: View {
     }
 
     private func attachMenuContent(_ items: [AttachMenuItem]) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    if index > 0 {
-                        Divider()
-                    }
-                    AttachMenuRow(icon: item.icon, title: item.title) {
-                        onAction(item.action)
-                    }
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                AttachMenuRow(icon: item.icon, title: item.title) {
+                    onAction(item.action)
                 }
             }
-            .padding(.vertical, 4)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(theme.colors.inputBG)
-                    .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
-            )
-
-            Spacer()
-                .frame(maxWidth: .infinity)
         }
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(theme.colors.inputBG)
+                .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
+        )
     }
 
     var clearTextButton: some View {
