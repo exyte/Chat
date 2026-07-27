@@ -275,6 +275,7 @@ public struct ChatTheme: Sendable {
             public var attach: Image
             public var attachCamera: Image
             public var microphone: Image
+            public var clearText: Image
         }
 
         public struct FullscreenMedia: Sendable {
@@ -359,6 +360,7 @@ public struct ChatTheme: Sendable {
             attach: Image? = nil,
             attachCamera: Image? = nil,
             microphone: Image? = nil,
+            clearText: Image? = nil,
             fullscreenPlay: Image? = nil,
             fullscreenPause: Image? = nil,
             fullscreenMute: Image? = nil,
@@ -420,7 +422,8 @@ public struct ChatTheme: Sendable {
                 sticker: sticker ?? Image("sticker", bundle: .current),
                 attach: attach ?? Image("attach", bundle: .current),
                 attachCamera: attachCamera ?? Image("attachCamera", bundle: .current),
-                microphone: microphone ?? Image("microphone", bundle: .current)
+                microphone: microphone ?? Image("microphone", bundle: .current),
+                clearText: clearText ?? Image(systemName: "xmark.circle.fill")
             )
 
             self.fullscreenMedia = FullscreenMedia(

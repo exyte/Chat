@@ -15,8 +15,11 @@ public struct ChatLocalization: Hashable {
     public var waitingForNetwork: String
     public var recordingText: String
     public var replyToText: String
+    public var attachMediaText: String
+    public var attachGifText: String
+    public var attachCameraText: String
 
-    public init(inputPlaceholder: String, signatureText: String, cancelButtonText: String, recentToggleText: String, waitingForNetwork: String, recordingText: String, replyToText: String) {
+    public init(inputPlaceholder: String, signatureText: String, cancelButtonText: String, recentToggleText: String, waitingForNetwork: String, recordingText: String, replyToText: String, attachMediaText: String = String(localized: "Media"), attachGifText: String = String(localized: "GIF"), attachCameraText: String = String(localized: "Camera")) {
         self.inputPlaceholder = inputPlaceholder
         self.signatureText = signatureText
         self.cancelButtonText = cancelButtonText
@@ -24,6 +27,9 @@ public struct ChatLocalization: Hashable {
         self.waitingForNetwork = waitingForNetwork
         self.recordingText = recordingText
         self.replyToText = replyToText
+        self.attachMediaText = attachMediaText
+        self.attachGifText = attachGifText
+        self.attachCameraText = attachCameraText
     }
 
    public static var defaultLocalization: ChatLocalization {
@@ -34,7 +40,10 @@ public struct ChatLocalization: Hashable {
             recentToggleText: String(localized: "Recents"),
             waitingForNetwork: String(localized: "Waiting for network"),
             recordingText: String(localized: "Recording..."),
-            replyToText: String(localized: "Reply to")
+            replyToText: String(localized: "Reply to"),
+            attachMediaText: String(localized: "Media"),
+            attachGifText: String(localized: "GIF"),
+            attachCameraText: String(localized: "Camera")
         )
     }
 }

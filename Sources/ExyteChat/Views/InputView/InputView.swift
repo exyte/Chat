@@ -8,6 +8,7 @@
 import SwiftUI
 import ExyteMediaPicker
 import GiphyUISDK
+import AnchoredPopup
 
 public enum InputViewStyle: Sendable {
     case message
@@ -102,18 +103,28 @@ struct InputView: View {
     private var state: InputViewState {
         viewModel.state
     }
-    
-    @State private var overlaySize: CGSize = .zero
+
+    @State private var stopRecordButtonSize: CGSize = .zero
+    @State private var lockRecordButtonSize: CGSize = .zero
     
     @State private var recordButtonFrame: CGRect = .zero
     @State private var lockRecordFrame: CGRect = .zero
     @State private var deleteRecordFrame: CGRect = .zero
-    
+    @State private var inputBarFrame: CGRect = .zero
+
     @State private var dragStart: Date?
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
     private let tapDelay = 0.2
     private let stopRecordButtonOffset: CGFloat = 24
+    private let attachMenuLeftMargin: CGFloat = 14
+    private let attachMenuGap: CGFloat = 16
+
+    private struct AttachMenuItem {
+        let icon: Image
+        let title: String
+        let action: InputViewAction
+    }
 
     var body: some View {
         VStack {
@@ -131,7 +142,8 @@ struct InputView: View {
                     RoundedRectangle(cornerRadius: 18)
                         .fill(style == .message ? theme.colors.inputBG : theme.colors.inputSignatureBG)
                 }
-                
+                .frameGetter($inputBarFrame)
+
                 rightOutsideButton
             }
             .padding(.horizontal, MessageView.horizontalScreenEdgePadding)
@@ -154,12 +166,7 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                if isMediaAvailable() {
-                    attachButton
-                }
-                if isGiphyAvailable() {
-                    giphyButton
-                }
+                leftButton
             case .signature:
                 if viewModel.mediaPickerMode == .cameraSelection {
                     addButton
@@ -197,9 +204,9 @@ struct InputView: View {
     var rightView: some View {
         Group {
             switch state {
-            case .empty, .waitingForRecordingPermission:
-                if case .message = style, isMediaAvailable() {
-                    cameraButton
+            case .hasTextOrMedia:
+                if case .message = style, !viewModel.text.isEmpty {
+                    clearTextButton
                 }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
@@ -208,7 +215,7 @@ struct InputView: View {
             case .playingRecording, .pausedRecording:
                 recordDurationLeft
             default:
-                Color.clear.frame(width: 8, height: 1)
+                EmptyView()
             }
         }
         .frame(minHeight: 48)
@@ -269,15 +276,15 @@ struct InputView: View {
             }
             .compositingGroup()
             .overlay(alignment: .top) {
-                Group {
-                    if state == .isRecordingTap {
-                        stopRecordButton
-                    } else if state == .isRecordingHold {
-                        lockRecordButton
-                    }
+                if state == .isRecordingTap {
+                    stopRecordButton
+                        .sizeGetter($stopRecordButtonSize)
+                        .offset(y: -stopRecordButtonSize.height - stopRecordButtonOffset)
+                } else if state == .isRecordingHold {
+                    lockRecordButton
+                        .sizeGetter($lockRecordButtonSize)
+                        .offset(y: -lockRecordButtonSize.height - stopRecordButtonOffset)
                 }
-                .sizeGetter($overlaySize)
-                .offset(y: -overlaySize.height - stopRecordButtonOffset)
             }
         }
         .viewSize(48)
@@ -378,7 +385,68 @@ struct InputView: View {
         }
     }
 
-    var attachButton: some View {
+    private var attachMenuItems: [AttachMenuItem] {
+        var items: [AttachMenuItem] = []
+        if isMediaAvailable() {
+            items.append(AttachMenuItem(icon: theme.images.inputView.attach, title: localization.attachMediaText, action: .photo))
+            if photoPickerBackend == .system {
+                items.append(AttachMenuItem(icon: theme.images.inputView.attachCamera, title: localization.attachCameraText, action: .camera))
+            }
+        }
+        if isGiphyAvailable() {
+            items.append(AttachMenuItem(icon: theme.images.inputView.sticker, title: localization.attachGifText, action: .giphy))
+        }
+        return items
+    }
+
+    @ViewBuilder
+    var leftButton: some View {
+        let items = attachMenuItems
+
+        if items.count > 1 {
+            attachMenuButton(items: items)
+        } else if let item = items.first, item.action == .photo {
+            mediaButton
+        } else if let item = items.first, item.action == .giphy {
+            giphyButton
+        }
+    }
+
+    private var attachMenuPopupId: String {
+        "exyte-chat-attach-menu-\(inputFieldId)"
+    }
+
+    private func attachMenuContent(_ items: [AttachMenuItem]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                AttachMenuRow(icon: item.icon, title: item.title) {
+                    onAction(item.action)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(theme.colors.inputBG)
+                .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
+        )
+    }
+
+    private func attachMenuButton(items: [AttachMenuItem]) -> some View {
+        theme.images.inputView.attach
+            .viewSize(24)
+            .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+            .useAsPopupAnchor(id: attachMenuPopupId) {
+                attachMenuContent(items)
+            } customize: {
+                $0.position(.absolute(.bottomLeading, position: CGPoint(x: attachMenuLeftMargin, y: inputBarFrame.minY - attachMenuGap)))
+                    .background(.none)
+                    .closeOnTapOutside(true)
+                    .animation(.default)
+            }
+    }
+
+    var mediaButton: some View {
         Button {
             onAction(.photo)
         } label: {
@@ -387,7 +455,7 @@ struct InputView: View {
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
         }
     }
-    
+
     var giphyButton: some View {
         Button {
             onAction(.giphy)
@@ -395,10 +463,23 @@ struct InputView: View {
             theme.images.inputView.sticker
                 .resizable()
                 .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 6, bottom: 12, trailing: 12))
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
         }
     }
-    
+
+    var clearTextButton: some View {
+        Button {
+            viewModel.text = ""
+        } label: {
+            theme.images.inputView.clearText
+                .resizable()
+                .renderingMode(.template)
+                .foregroundColor(theme.colors.mainText.opacity(0.6))
+                .viewSize(18)
+                .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 12))
+        }
+    }
+
     var addButton: some View {
         Button {
             onAction(.add)
@@ -407,16 +488,6 @@ struct InputView: View {
                 .viewSize(24)
                 .circleBackground(theme.colors.sendButtonBackground)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 8))
-        }
-    }
-    
-    var cameraButton: some View {
-        Button {
-            onAction(.camera)
-        } label: {
-            theme.images.inputView.attachCamera
-                .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 12))
         }
     }
     
@@ -645,6 +716,38 @@ struct InputView: View {
     
     private func isMediaAvailable() -> Bool {
         return availableInputs.contains(AvailableInputType.media)
+    }
+}
+
+private struct AttachMenuRow: View {
+    @Environment(\.chatTheme) private var theme
+    @Environment(\.anchoredPopupDismiss) private var dismissPopup
+
+    let icon: Image
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            action()
+            dismissPopup?()
+        } label: {
+            HStack(spacing: 10) {
+                icon
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(theme.colors.mainTint)
+                Text(title)
+                    .font(.callout)
+                    .foregroundColor(theme.colors.mainText)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
 
