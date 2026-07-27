@@ -166,7 +166,7 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                attachButton
+                leftButton
             case .signature:
                 if viewModel.mediaPickerMode == .cameraSelection {
                     addButton
@@ -204,13 +204,9 @@ struct InputView: View {
     var rightView: some View {
         Group {
             switch state {
-            case .empty, .waitingForRecordingPermission:
-                Color.clear.frame(width: 1, height: 1)
             case .hasTextOrMedia:
                 if case .message = style, !viewModel.text.isEmpty {
                     clearTextButton
-                } else {
-                    Color.clear.frame(width: 1, height: 1)
                 }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
@@ -219,7 +215,7 @@ struct InputView: View {
             case .playingRecording, .pausedRecording:
                 recordDurationLeft
             default:
-                Color.clear.frame(width: 1, height: 1)
+                EmptyView()
             }
         }
         .frame(minHeight: 48)
@@ -404,38 +400,15 @@ struct InputView: View {
     }
 
     @ViewBuilder
-    var attachButton: some View {
+    var leftButton: some View {
         let items = attachMenuItems
 
         if items.count > 1 {
-            theme.images.inputView.attach
-                .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-                .useAsPopupAnchor(id: attachMenuPopupId) {
-                    attachMenuContent(items)
-                } customize: {
-                    $0.position(.absolute(.bottomLeading, position: CGPoint(x: attachMenuLeftMargin, y: inputBarFrame.minY - attachMenuGap)))
-                        .background(.none)
-                        .closeOnTapOutside(true)
-                        .animation(.default)
-                }
+            attachMenuButton(items: items)
         } else if let item = items.first, item.action == .photo {
-            Button {
-                onAction(.photo)
-            } label: {
-                theme.images.inputView.attach
-                    .viewSize(24)
-                    .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-            }
+            mediaButton
         } else if let item = items.first, item.action == .giphy {
-            Button {
-                onAction(.giphy)
-            } label: {
-                theme.images.inputView.sticker
-                    .resizable()
-                    .viewSize(24)
-                    .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-            }
+            giphyButton
         }
     }
 
@@ -457,6 +430,41 @@ struct InputView: View {
                 .fill(theme.colors.inputBG)
                 .shadow(color: .black.opacity(0.15), radius: 8, y: 2)
         )
+    }
+
+    private func attachMenuButton(items: [AttachMenuItem]) -> some View {
+        theme.images.inputView.attach
+            .viewSize(24)
+            .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+            .useAsPopupAnchor(id: attachMenuPopupId) {
+                attachMenuContent(items)
+            } customize: {
+                $0.position(.absolute(.bottomLeading, position: CGPoint(x: attachMenuLeftMargin, y: inputBarFrame.minY - attachMenuGap)))
+                    .background(.none)
+                    .closeOnTapOutside(true)
+                    .animation(.default)
+            }
+    }
+
+    var mediaButton: some View {
+        Button {
+            onAction(.photo)
+        } label: {
+            theme.images.inputView.attach
+                .viewSize(24)
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+        }
+    }
+
+    var giphyButton: some View {
+        Button {
+            onAction(.giphy)
+        } label: {
+            theme.images.inputView.sticker
+                .resizable()
+                .viewSize(24)
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+        }
     }
 
     var clearTextButton: some View {
