@@ -90,6 +90,14 @@ public extension ChatView {
         return view
     }
 
+    /// Shows a "New messages" divider between the last read and first unread message.
+    /// Relies on `Message.Status.readBy` to find the boundary. Default is false.
+    func showLastReadIndicator(_ show: Bool) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.showLastReadIndicator = show
+        return view
+    }
+
     /// Controls whether the share button is shown in the fullscreen attachment viewer
     /// - Default is true
     func showShareAttachmentButton(_ show: Bool) -> ChatView {

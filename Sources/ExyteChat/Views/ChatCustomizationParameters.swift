@@ -17,6 +17,7 @@ struct ChatCustomizationParameters {
     var autoFocusTextInputOnChatOpen: Bool = false
     var showMessageMenuOnLongPress: Bool = true
     var showShareAttachmentButton: Bool = true
+    var showLastReadIndicator: Bool = false
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     var messageMenuAnimationDuration: CGFloat = 0.3
     var contentInsets: UIEdgeInsets = .zero

@@ -150,7 +150,7 @@ private extension MockChatInteractor {
             var msg = msg
             switch msg.status {
             case .sending: msg.status = .sent
-            case .sent: msg.status = .read
+            case .sent: msg.status = .readBy([])
             default: break
             }
             return msg

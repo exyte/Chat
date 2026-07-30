@@ -13,7 +13,7 @@ public struct Message: Identifiable, Sendable {
         case sending
         case sent
         case delivered
-        case read
+        case readBy([String]) // user ids
         case error(DraftMessage)
 
         public func hash(into hasher: inout Hasher) {
@@ -24,7 +24,7 @@ public struct Message: Identifiable, Sendable {
                 return hasher.combine("sent")
             case .delivered:
                 return hasher.combine("delivered")
-            case .read:
+            case .readBy:
                 return hasher.combine("read")
             case .error:
                 return hasher.combine("error")
@@ -39,8 +39,8 @@ public struct Message: Identifiable, Sendable {
                 return true
             case (.delivered, .delivered):
                 return true
-            case (.read, .read):
-                return true
+            case (.readBy(let r1), .readBy(let r2)):
+                return r1 == r2
             case ( .error(_), .error(_)):
                 return true
             default:

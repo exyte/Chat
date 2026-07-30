@@ -20,12 +20,28 @@ final class MockChatData: @unchecked Sendable {
         let attachments = randomAttachments()
         let shouldGenerateText = attachments.isEmpty ? true : Bool.random()
 
+        let status: Message.Status? = Bool.random() ? .readBy([]) : (sender.isCurrentUser ? .sent : nil)
+
+        let statusLabel: String
+        switch status {
+        case .readBy: statusLabel = "[readBy]"
+        case .sent: statusLabel = "[sent]"
+        case .delivered: statusLabel = "[delivered]"
+        case .sending: statusLabel = "[sending]"
+        case .error: statusLabel = "[error]"
+        case .none: statusLabel = "[nil]"
+        }
+
+        let baseText = shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : ""
+        let msgText = text ?? baseText
+        let displayText = msgText.isEmpty ? statusLabel : "\(msgText) \(statusLabel)"
+
         return Message(
             id: UUID().uuidString,
             user: sender,
-            status: sender.isCurrentUser ? .read : nil,
+            status: status,
             createdAt: date,
-            text: shouldGenerateText ? Lorem.sentence(nbWords: Int.random(in: 3...10), useMarkdown: true) : "",
+            text: displayText,
             attachments: attachments,
             reactions: []
         )
