@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct MessageView: View {
 
@@ -168,6 +169,10 @@ struct MessageView: View {
                     giphyView(giphyMediaId)
                 }
 
+                if let location = message.location {
+                    locationView(location)
+                }
+
                 if !message.attachments.isEmpty {
                     attachmentsView(message)
                 }
@@ -285,6 +290,25 @@ struct MessageView: View {
     func giphyView(_ giphyMediaId: String) -> some View {
         GiphyMediaView(id: giphyMediaId, aspectRatio: $giphyAspectRatio)
             .frame(width: 200 * giphyAspectRatio, height: 200)
+    }
+
+    @ViewBuilder
+    func locationView(_ location: Location) -> some View {
+        let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+        Map(position: .constant(.region(
+            MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        ))) {
+            Marker(location.title ?? "", coordinate: coordinate)
+        }
+        .allowsHitTesting(false)
+        .frame(width: 200, height: 150)
+        .cornerRadius(12)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
+            mapItem.name = location.title
+            mapItem.openInMaps()
+        }
     }
 
     @ViewBuilder

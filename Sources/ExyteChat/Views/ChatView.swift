@@ -144,6 +144,16 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
+            .onChange(of: inputViewModel.showDocumentPicker) { _ , newValue in
+                if newValue {
+                    globalFocusState.focus = nil
+                }
+            }
+            .onChange(of: inputViewModel.showLocationPicker) { _ , newValue in
+                if newValue {
+                    globalFocusState.focus = nil
+                }
+            }
             .onChange(of: chatCustomizationParameters.scrollToParams) { scrollToParams in
                 self.pendingScrollTo = scrollToParams
             }
@@ -174,6 +184,17 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 selectionParameters: inputViewCustomizationParameters.mediaPickerParameters.selectionParameters
             ) { medias in
                 inputViewModel.attachments.medias = medias
+            }
+            .sheet(isPresented: $inputViewModel.showDocumentPicker) {
+                DocumentPicker { documents in
+                    inputViewModel.attachments.documents.append(contentsOf: documents)
+                }
+                .ignoresSafeArea()
+            }
+            .sheet(isPresented: $inputViewModel.showLocationPicker) {
+                LocationPickerView(localization: chatCustomizationParameters.localization) { location in
+                    inputViewModel.attachments.location = location
+                }
             }
             .windowCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }

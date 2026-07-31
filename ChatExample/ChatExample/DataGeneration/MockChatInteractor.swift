@@ -170,6 +170,8 @@ extension MockChatInteractor {
             createdAt: draftMessage.createdAt,
             text: draftMessage.text,
             attachments: await makeAttachments(draftMessage),
+            giphyMediaId: draftMessage.giphyMedia?.id,
+            location: draftMessage.location,
             reactions: [],
             recording: draftMessage.recording,
             replyMessage: draftMessage.replyMessage
@@ -177,7 +179,7 @@ extension MockChatInteractor {
     }
 
     func makeAttachments(_ draftMessage: DraftMessage) async -> [Attachment] {
-        await draftMessage.medias
+        let mediaAttachments = await draftMessage.medias
             .asyncMap { (media: Media) -> (Media, URL?, URL?) in
                 (media, await media.getThumbnailURL(), await media.getURL())
             }
@@ -190,5 +192,17 @@ extension MockChatInteractor {
                     type: AttachmentType(mediaType: media.type)
                 )
             }
+
+        let documentAttachments = draftMessage.documents.map { document in
+            Attachment(
+                id: document.id,
+                url: document.url,
+                type: .document,
+                fileName: document.fileName,
+                fileSize: document.fileSize
+            )
+        }
+
+        return mediaAttachments + documentAttachments
     }
 }

@@ -79,6 +79,8 @@ public struct AttachmentCell: View {
                         }
                     }
                 }
+            } else if attachment.type == .document {
+                documentContent
             } else {
                 content
                     .overlay {
@@ -89,6 +91,23 @@ public struct AttachmentCell: View {
         .frame(width: size.width, height: size.height)
         .contentShape(Rectangle())
         .simultaneousGesture(attachmentTapGesture)
+    }
+
+    private var documentContent: some View {
+        VStack(spacing: 6) {
+            theme.images.message.attachedDocument
+                .resizable()
+                .scaledToFit()
+                .frame(width: 32, height: 32)
+                .foregroundColor(theme.colors.mainTint)
+            Text(attachment.fileName ?? attachment.full.lastPathComponent)
+                .font(.caption2)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 6)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(theme.colors.messageFriendBG)
     }
 
     @ViewBuilder

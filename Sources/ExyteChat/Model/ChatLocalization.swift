@@ -18,8 +18,11 @@ public struct ChatLocalization: Hashable {
     public var attachMediaText: String
     public var attachGifText: String
     public var attachCameraText: String
+    public var attachDocumentText: String
+    public var attachLocationText: String
+    public var sendLocationText: String
 
-    public init(inputPlaceholder: String, signatureText: String, cancelButtonText: String, recentToggleText: String, waitingForNetwork: String, recordingText: String, replyToText: String, attachMediaText: String = String(localized: "Media"), attachGifText: String = String(localized: "GIF"), attachCameraText: String = String(localized: "Camera")) {
+    public init(inputPlaceholder: String, signatureText: String, cancelButtonText: String, recentToggleText: String, waitingForNetwork: String, recordingText: String, replyToText: String, attachMediaText: String = String(localized: "Media"), attachGifText: String = String(localized: "GIF"), attachCameraText: String = String(localized: "Camera"), attachDocumentText: String = String(localized: "Document"), attachLocationText: String = String(localized: "Location"), sendLocationText: String = String(localized: "Send this location")) {
         self.inputPlaceholder = inputPlaceholder
         self.signatureText = signatureText
         self.cancelButtonText = cancelButtonText
@@ -30,6 +33,9 @@ public struct ChatLocalization: Hashable {
         self.attachMediaText = attachMediaText
         self.attachGifText = attachGifText
         self.attachCameraText = attachCameraText
+        self.attachDocumentText = attachDocumentText
+        self.attachLocationText = attachLocationText
+        self.sendLocationText = sendLocationText
     }
 
    public static var defaultLocalization: ChatLocalization {
@@ -43,7 +49,10 @@ public struct ChatLocalization: Hashable {
             replyToText: String(localized: "Reply to"),
             attachMediaText: String(localized: "Media"),
             attachGifText: String(localized: "GIF"),
-            attachCameraText: String(localized: "Camera")
+            attachCameraText: String(localized: "Camera"),
+            attachDocumentText: String(localized: "Document"),
+            attachLocationText: String(localized: "Location"),
+            sendLocationText: String(localized: "Send this location")
         )
     }
 }

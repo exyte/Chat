@@ -16,7 +16,9 @@ final class InputViewModel: ObservableObject {
 
     @Published var showGiphyPicker = false
     @Published var showPicker = false
-  
+    @Published var showDocumentPicker = false
+    @Published var showLocationPicker = false
+
     @Published var mediaPickerMode = MediaPickerMode.photos
 
     @Published var showActivityIndicator = false
@@ -49,6 +51,8 @@ final class InputViewModel: ObservableObject {
     func reset() {
         showPicker = false
         showGiphyPicker = false
+        showDocumentPicker = false
+        showLocationPicker = false
         text = ""
         saveEditingClosure = nil
         attachments = InputViewAttachments()
@@ -87,6 +91,10 @@ final class InputViewModel: ObservableObject {
         case .camera:
             mediaPickerMode = .camera
             showPicker = true
+        case .document:
+            showDocumentPicker = true
+        case .location:
+            showLocationPicker = true
         case .send:
             send()
         case .recordAudioTap:
@@ -160,10 +168,11 @@ private extension InputViewModel {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard state != .editing else { return } // special case
-            if !self.text.isEmpty || !self.attachments.medias.isEmpty {
+            let hasAttachments = !self.attachments.medias.isEmpty || !self.attachments.documents.isEmpty || self.attachments.location != nil
+            if !self.text.isEmpty || hasAttachments {
                 self.state = .hasTextOrMedia
             } else if self.text.isEmpty,
-                      self.attachments.medias.isEmpty,
+                      !hasAttachments,
                       self.attachments.recording == nil {
                 self.state = .empty
             }
@@ -216,7 +225,9 @@ private extension InputViewModel {
         let draft = DraftMessage(
             text: text,
             medias: attachments.medias,
+            documents: attachments.documents,
             giphyMedia: attachments.giphyMedia,
+            location: attachments.location,
             recording: attachments.recording,
             replyMessage: attachments.replyMessage,
             createdAt: Date()

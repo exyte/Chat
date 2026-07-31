@@ -58,6 +58,7 @@ public struct Message: Identifiable, Sendable {
     public var attachments: [Attachment]
     public var reactions: [Reaction]
     public var giphyMediaId: String?
+    public var location: Location?
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
     public var customData: [String: any Sendable]
@@ -80,6 +81,7 @@ public struct Message: Identifiable, Sendable {
         text: String = "",
         attachments: [Attachment] = [],
         giphyMediaId: String? = nil,
+        location: Location? = nil,
         reactions: [Reaction] = [],
         recording: Recording? = nil,
         replyMessage: ReplyMessage? = nil,
@@ -92,6 +94,7 @@ public struct Message: Identifiable, Sendable {
         self.attributedText = text.applyDefaultAttributes()
         self.attachments = attachments
         self.giphyMediaId = giphyMediaId
+        self.location = location
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
@@ -106,6 +109,7 @@ public struct Message: Identifiable, Sendable {
         attributedText: AttributedString,
         attachments: [Attachment] = [],
         giphyMediaId: String? = nil,
+        location: Location? = nil,
         reactions: [Reaction] = [],
         recording: Recording? = nil,
         replyMessage: ReplyMessage? = nil,
@@ -118,6 +122,7 @@ public struct Message: Identifiable, Sendable {
         self.attributedText = attributedText
         self.attachments = attachments
         self.giphyMediaId = giphyMediaId
+        self.location = location
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
@@ -146,6 +151,10 @@ public struct Message: Identifiable, Sendable {
             }
         }
 
+        let documentAttachments = draft.documents.map { document in
+            Attachment(id: document.id, url: document.url, type: .document, fileName: document.fileName, fileSize: document.fileSize)
+        }
+
         let giphyMediaId = draft.giphyMedia?.id
 
         return Message(
@@ -154,8 +163,9 @@ public struct Message: Identifiable, Sendable {
             status: status,
             createdAt: draft.createdAt,
             text: draft.text,
-            attachments: attachments,
+            attachments: attachments + documentAttachments,
             giphyMediaId: giphyMediaId,
+            location: draft.location,
             recording: draft.recording,
             replyMessage: draft.replyMessage
         )
@@ -176,6 +186,7 @@ extension Message: Equatable {
         lhs.createdAt == rhs.createdAt &&
         lhs.attributedText == rhs.attributedText &&
         lhs.giphyMediaId == rhs.giphyMediaId &&
+        lhs.location == rhs.location &&
         lhs.attachments == rhs.attachments &&
         lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&

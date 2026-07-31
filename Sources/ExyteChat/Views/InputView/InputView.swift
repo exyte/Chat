@@ -36,8 +36,8 @@ public enum InputViewAction: Sendable {
     case deleteRecord
     case playRecord
     case pauseRecord
-    //    case location
-    //    case document
+    case location
+    case document
 
     case saveEdit
     case cancelEdit
@@ -69,12 +69,16 @@ public enum AvailableInputType: Sendable {
     case media
     case audio
     case giphy
+    case document
+    case location
 }
 
 public struct InputViewAttachments {
     var medias: [Media] = []
+    var documents: [DocumentItem] = []
     var recording: Recording?
     var giphyMedia: GPHMedia?
+    var location: Location?
     var replyMessage: ReplyMessage?
 }
 
@@ -318,6 +322,12 @@ struct InputView: View {
         if style == .message, photoPickerBackend == .system, !viewModel.attachments.medias.isEmpty {
             mediaAttachmentsPreview
         }
+        if style == .message, !viewModel.attachments.documents.isEmpty {
+            documentAttachmentsPreview
+        }
+        if style == .message, let location = viewModel.attachments.location {
+            locationAttachmentPreview(location)
+        }
         if let message = viewModel.attachments.replyMessage {
             VStack(spacing: 8) {
                 Rectangle()
@@ -386,6 +396,49 @@ struct InputView: View {
         }
     }
 
+    var documentAttachmentsPreview: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(viewModel.attachments.documents) { document in
+                    DocumentAttachmentThumbnail(document: document) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewModel.attachments.documents.removeAll { $0.id == document.id }
+                        }
+                    }
+                }
+            }
+            .padding(.top, 8)
+            .padding(.horizontal, 26)
+        }
+    }
+
+    func locationAttachmentPreview(_ location: Location) -> some View {
+        HStack(spacing: 8) {
+            theme.images.attachMenu.location
+                .renderingMode(.template)
+                .foregroundColor(theme.colors.mainTint)
+            Text(location.title ?? String(format: "%.4f, %.4f", location.latitude, location.longitude))
+                .font(.caption)
+                .foregroundColor(theme.colors.mainText)
+                .lineLimit(1)
+            Spacer()
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    viewModel.attachments.location = nil
+                }
+            } label: {
+                theme.images.mediaPicker.cross
+                    .resizable()
+                    .frame(width: 10, height: 10)
+                    .padding(4)
+                    .background(Circle().fill(Color.black.opacity(0.6)))
+                    .foregroundColor(.white)
+            }
+        }
+        .padding(.horizontal, 26)
+        .padding(.top, 8)
+    }
+
     private var attachMenuItems: [AttachMenuItem] {
         var items: [AttachMenuItem] = []
         if isMediaAvailable() {
@@ -396,6 +449,12 @@ struct InputView: View {
         }
         if isGiphyAvailable() {
             items.append(AttachMenuItem(icon: theme.images.inputView.sticker, title: localization.attachGifText, action: .giphy))
+        }
+        if isDocumentAvailable() {
+            items.append(AttachMenuItem(icon: theme.images.attachMenu.document, title: localization.attachDocumentText, action: .document))
+        }
+        if isLocationAvailable() {
+            items.append(AttachMenuItem(icon: theme.images.attachMenu.location, title: localization.attachLocationText, action: .location))
         }
         return items
     }
@@ -410,6 +469,10 @@ struct InputView: View {
             mediaButton
         } else if let item = items.first, item.action == .giphy {
             giphyButton
+        } else if let item = items.first, item.action == .document {
+            documentButton
+        } else if let item = items.first, item.action == .location {
+            locationButton
         }
     }
 
@@ -462,6 +525,28 @@ struct InputView: View {
             onAction(.giphy)
         } label: {
             theme.images.inputView.sticker
+                .resizable()
+                .viewSize(24)
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+        }
+    }
+
+    var documentButton: some View {
+        Button {
+            onAction(.document)
+        } label: {
+            theme.images.attachMenu.document
+                .resizable()
+                .viewSize(24)
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+        }
+    }
+
+    var locationButton: some View {
+        Button {
+            onAction(.location)
+        } label: {
+            theme.images.attachMenu.location
                 .resizable()
                 .viewSize(24)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
@@ -718,6 +803,14 @@ struct InputView: View {
     private func isMediaAvailable() -> Bool {
         return availableInputs.contains(AvailableInputType.media)
     }
+
+    private func isDocumentAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.document)
+    }
+
+    private func isLocationAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.location)
+    }
 }
 
 private struct AttachMenuRow: View {
@@ -798,6 +891,48 @@ private struct MediaAttachmentThumbnail: View {
             if let data = await media.getThumbnailData(), let image = UIImage(data: data) {
                 thumbnail = image
             }
+        }
+    }
+}
+
+private struct DocumentAttachmentThumbnail: View {
+    @Environment(\.chatTheme) private var theme
+
+    let document: DocumentItem
+    let onRemove: () -> Void
+
+    private var thumbnailSize: CGFloat {
+        UIScreen.main.bounds.width / 5
+    }
+
+    var body: some View {
+        ZStack {
+            VStack(spacing: 4) {
+                theme.images.message.attachedDocument
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
+                Text(document.fileName)
+                    .font(.caption2)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(theme.colors.mainText)
+                    .padding(.horizontal, 4)
+            }
+        }
+        .frame(width: thumbnailSize, height: thumbnailSize)
+        .background(theme.colors.messageFriendBG)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(alignment: .topTrailing) {
+            Button(action: onRemove) {
+                theme.images.mediaPicker.cross
+                    .resizable()
+                    .frame(width: 10, height: 10)
+                    .padding(4)
+                    .background(Circle().fill(Color.black.opacity(0.6)))
+                    .foregroundColor(.white)
+            }
+            .offset(x: 6, y: -6)
         }
     }
 }

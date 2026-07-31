@@ -95,7 +95,7 @@ struct ChatExampleView: View {
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
         .showLastReadIndicator(true)
-        .setAvailableInputs([.text, .media, .giphy, .audio])
+        .setAvailableInputs([.text, .media, .giphy, .audio, .document, .location])
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [replyAction])
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
