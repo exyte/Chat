@@ -106,6 +106,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     public var body: some View {
         mainView
             .background(chatBackground())
+            .environment(\.chatLocalization, chatCustomizationParameters.localization)
             .environmentObject(keyboardState)
             .onAppear {
                 if isGiphyAvailable() {
@@ -134,23 +135,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     inputViewModel.send()
                 }
             }
-            .onChange(of: inputViewModel.showPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
-                }
-            }
-            .onChange(of: inputViewModel.showGiphyPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
-                }
-            }
-            .onChange(of: inputViewModel.showDocumentPicker) { _ , newValue in
-                if newValue {
-                    globalFocusState.focus = nil
-                }
-            }
-            .onChange(of: inputViewModel.showLocationPicker) { _ , newValue in
-                if newValue {
+            // any attachment picker opening should resign the text field's focus
+            .onChange(of: [inputViewModel.showPicker, inputViewModel.showGiphyPicker, inputViewModel.showDocumentPicker, inputViewModel.showLocationPicker]) { _, newValues in
+                if newValues.contains(true) {
                     globalFocusState.focus = nil
                 }
             }
@@ -192,8 +179,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 .ignoresSafeArea()
             }
             .sheet(isPresented: $inputViewModel.showLocationPicker) {
-                LocationPickerView(localization: chatCustomizationParameters.localization) { location in
-                    inputViewModel.attachments.location = location
+                LocationPickerView(localization: chatCustomizationParameters.localization) { staticLocation in
+                    inputViewModel.attachments.staticLocation = staticLocation
+                } onPickLiveLocation: { liveLocation in
+                    inputViewModel.attachments.liveLocation = liveLocation
                 }
             }
             .windowCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
@@ -213,6 +202,27 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         }
                     )
                     .ignoresSafeArea()
+                }
+            }
+            .fullScreenCover(isPresented: $viewModel.fullscreenLocationPresented) {
+                if let messageId = viewModel.fullscreenLocationMessageId,
+                   let message = sections.flatMap({ $0.rows }).first(where: { $0.message.id == messageId })?.message {
+                    if let liveLocation = message.liveLocation {
+                        FullscreenLocationView(
+                            liveLocation: liveLocation,
+                            isMyLiveLocation: viewModel.liveLocationBroadcaster.activeShare?.messageId == messageId,
+                            onStopSharing: { [weak viewModel] in
+                                viewModel?.stopLiveLocationSharing()
+                            },
+                            onClose: { [weak viewModel] in
+                                viewModel?.dismissFullscreenLocation()
+                            }
+                        )
+                    } else if let location = message.staticLocation {
+                        FullscreenLocationView(staticLocation: location) { [weak viewModel] in
+                            viewModel?.dismissFullscreenLocation()
+                        }
+                    }
                 }
             }
             .sheet(item: $viewModel.shareAttachmentsItem) { item in
@@ -304,7 +314,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                         self.pendingScrollTo = ScrollToParams(.newestMessage) // Cannot assign to property: 'self' is immutable
                     } label: {
                         theme.images.scrollToBottom
-                            .frame(width: 40, height: 40)
+                            .viewSize(40)
                             .circleBackground(theme.colors.messageFriendBG)
                             .foregroundStyle(theme.colors.sendButtonBackground)
                             .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
@@ -382,10 +392,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             if let didUpdateAttachmentStatus {
                 viewModel.didUpdateAttachmentStatus = didUpdateAttachmentStatus
             }
+            viewModel.liveLocationBroadcaster.onEvent = chatCustomizationParameters.onLiveLocationBroadcast
 
             inputViewModel.didSendMessage = { value in
                 Task { @MainActor in
                     didSendMessage(value)
+                }
+                if let id = value.id, let liveLocation = value.liveLocation {
+                    viewModel.startLiveLocationSharing(messageId: id, liveLocation: liveLocation)
                 }
                 if type == .conversation {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

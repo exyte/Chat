@@ -37,8 +37,7 @@ final actor MockChatInteractor {
     }
 
     func send(draftMessage: DraftMessage) async {
-        if draftMessage.id != nil {
-            guard let index = messages.firstIndex(where: { $0.id == draftMessage.id }) else { return }
+        if let id = draftMessage.id, let index = messages.firstIndex(where: { $0.id == id }) {
             messages.remove(at: index)
         }
 
@@ -52,6 +51,12 @@ final actor MockChatInteractor {
 
     func remove(messageID: String) {
         messages.removeAll(where: { $0.id == messageID })
+    }
+
+    /// Passes a fresh location to an already sent live location message
+    func updateLiveLocation(messageId: String, liveLocation: LiveLocation) {
+        guard let index = messages.firstIndex(where: { $0.id == messageId }) else { return }
+        messages[index].liveLocation = liveLocation
     }
 
     func add(draftReaction: DraftReaction, to messageID: String) {
@@ -171,7 +176,8 @@ extension MockChatInteractor {
             text: draftMessage.text,
             attachments: await makeAttachments(draftMessage),
             giphyMediaId: draftMessage.giphyMedia?.id,
-            location: draftMessage.location,
+            staticLocation: draftMessage.staticLocation,
+            liveLocation: draftMessage.liveLocation,
             reactions: [],
             recording: draftMessage.recording,
             replyMessage: draftMessage.replyMessage

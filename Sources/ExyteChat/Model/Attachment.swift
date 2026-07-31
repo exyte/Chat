@@ -63,13 +63,22 @@ public struct Attachment: Codable, Identifiable, Hashable, Sendable {
     public let type: AttachmentType
     public let thumbnailCacheKey: String?
     public let fullCacheKey: String?
-    /// Original file name, used for .document attachments
+    
+    /// Used for .document attachments
     public let fileName: String?
-    /// File size in bytes, used for .document attachments
     public let fileSize: Int?
 
-    public init(id: String, thumbnail: URL, full: URL, type: AttachmentType, thumbnailCacheKey: String? = nil,
-                fullCacheKey: String? = nil, fullUploadStatus: UploadStatus? = nil, fileName: String? = nil, fileSize: Int? = nil) {
+    public init(
+        id: String,
+        thumbnail: URL,
+        full: URL,
+        type: AttachmentType,
+        thumbnailCacheKey: String? = nil,
+        fullCacheKey: String? = nil,
+        fullUploadStatus: UploadStatus? = nil,
+        fileName: String? = nil,
+        fileSize: Int? = nil
+    ) {
         self.id = id
         self.thumbnail = thumbnail
         self.full = full
@@ -81,8 +90,24 @@ public struct Attachment: Codable, Identifiable, Hashable, Sendable {
         self.fileSize = fileSize
     }
 
-    public init(id: String, url: URL, type: AttachmentType, cacheKey: String? = nil, fileName: String? = nil, fileSize: Int? = nil) {
-        self.init(id: id, thumbnail: url, full: url, type: type, thumbnailCacheKey: cacheKey, fullCacheKey: cacheKey, fileName: fileName, fileSize: fileSize)
+    public init(
+        id: String,
+        url: URL,
+        type: AttachmentType,
+        cacheKey: String? = nil,
+        fileName: String? = nil,
+        fileSize: Int? = nil
+    ) {
+        self.init(
+            id: id,
+            thumbnail: url,
+            full: url,
+            type: type,
+            thumbnailCacheKey: cacheKey,
+            fullCacheKey: cacheKey,
+            fileName: fileName,
+            fileSize: fileSize
+        )
     }
 
     public func copy(

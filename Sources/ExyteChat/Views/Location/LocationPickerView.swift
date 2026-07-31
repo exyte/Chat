@@ -5,22 +5,24 @@
 
 import SwiftUI
 import MapKit
+import Combine
 
 struct LocationPickerView: View {
 
-    @Environment(\.chatTheme) private var theme
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.chatTheme) var theme
+    @Environment(\.dismiss) var dismiss
 
     @StateObject private var locationManager = LocationManager()
     @State private var cameraPosition: MapCameraPosition = .region(
-        MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-                            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+        .closeUp(around: CLLocationCoordinate2D(latitude: 0, longitude: 0), delta: 0.05)
     )
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var didCenterOnUser = false
+    @State private var showLiveDurationDialog = false
 
     var localization: ChatLocalization
-    var onPick: (Location) -> Void
+    var onPickStaticLocation: (StaticLocation) -> Void
+    var onPickLiveLocation: (LiveLocation) -> Void
 
     var body: some View {
         NavigationView {
@@ -50,23 +52,37 @@ struct LocationPickerView: View {
                 .padding(.bottom, 60)
             }
             .safeAreaInset(edge: .bottom) {
-                Button {
-                    if let selectedCoordinate {
-                        onPick(Location(latitude: selectedCoordinate.latitude, longitude: selectedCoordinate.longitude))
-                        dismiss()
+                VStack(spacing: 10) {
+                    pickerActionButton(localization.sendLocationText, filled: true) {
+                        if let selectedCoordinate {
+                            onPickStaticLocation(StaticLocation(coordinate: selectedCoordinate))
+                            dismiss()
+                        }
                     }
-                } label: {
-                    Text(localization.sendLocationText)
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(selectedCoordinate == nil ? Color.gray : theme.colors.sendButtonBackground)
-                        .cornerRadius(12)
+
+                    pickerActionButton(localization.shareLiveLocationText, filled: false) {
+                        showLiveDurationDialog = true
+                    }
                 }
-                .disabled(selectedCoordinate == nil)
                 .padding()
                 .background(theme.colors.mainBG)
+            }
+            .confirmationDialog(localization.shareLiveLocationText, isPresented: $showLiveDurationDialog, titleVisibility: .visible) {
+                ForEach(LiveLocationDuration.allCases) { duration in
+                    Button(duration.title) {
+                        if let selectedCoordinate {
+                            let startedAt = Date()
+                            onPickLiveLocation(LiveLocation(
+                                coordinate: selectedCoordinate,
+                                lastUpdateAt: startedAt,
+                                startedAt: startedAt,
+                                expiresAt: startedAt.addingTimeInterval(duration.timeInterval)
+                            ))
+                            dismiss()
+                        }
+                    }
+                }
+                Button(localization.cancelButtonText, role: .cancel) {}
             }
             .navigationTitle(localization.attachLocationText)
             .navigationBarTitleDisplayMode(.inline)
@@ -81,13 +97,33 @@ struct LocationPickerView: View {
         .onAppear {
             locationManager.requestLocation()
         }
-        .onChange(of: locationManager.currentLocation?.latitude) { _, _ in
-            guard let newValue = locationManager.currentLocation, !didCenterOnUser else { return }
+        .onReceive(locationManager.$currentLocation.compactMap { $0 }) { newValue in
+            guard !didCenterOnUser else { return }
             didCenterOnUser = true
             selectedCoordinate = newValue
-            cameraPosition = .region(
-                MKCoordinateRegion(center: newValue, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-            )
+            cameraPosition = .region(.closeUp(around: newValue))
         }
+    }
+
+    private func pickerActionButton(_ title: String, filled: Bool, action: @escaping () -> Void) -> some View {
+        let isDisabled = selectedCoordinate == nil
+        let tint = isDisabled ? Color.gray : (filled ? theme.colors.sendButtonBackground : theme.colors.mainTint)
+
+        return Button(action: action) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(filled ? .white : tint)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background {
+                    if filled {
+                        tint
+                    } else {
+                        RoundedRectangle(cornerRadius: 12).stroke(tint, lineWidth: 1)
+                    }
+                }
+                .cornerRadius(12)
+        }
+        .disabled(isDisabled)
     }
 }

@@ -77,7 +77,7 @@ public struct DefaultActivityIndicator: View {
     public var body: some View {
         ActivityIndicatorView(type: .default())
             .foregroundColor(color != nil ? color! : theme.colors.sendButtonBackground)
-            .frame(width: size, height: size)
+            .viewSize(size)
             .padding(.vertical, 10)
     }
 }

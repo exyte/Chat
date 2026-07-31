@@ -562,8 +562,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                         .foregroundStyle(color)
                 }
                 .font(getFont)
-                .padding(.vertical, 11)
-                .padding(.horizontal, 12)
+                .padding(12, 11)
             }
             .frame(width: 208)
             .fixedSize()
@@ -599,8 +598,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                         .foregroundStyle(Color.red)
                 }
                 .font(getFont)
-                .padding(.vertical, 11)
-                .padding(.horizontal, 12)
+                .padding(12, 11)
             }
             .frame(width: 208)
             .fixedSize()

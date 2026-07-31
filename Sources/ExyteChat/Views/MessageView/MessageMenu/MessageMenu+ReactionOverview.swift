@@ -75,7 +75,7 @@ struct ReactionOverview: View {
                     .fill(.primary)
                 Circle()
                     .fill(.primary)
-                    .frame(width: proxy.size.width / 4, height: proxy.size.width / 4)
+                    .viewSize(proxy.size.width / 4)
                     .offset(y: proxy.size.height / 2)
             }
         }

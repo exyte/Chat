@@ -199,6 +199,17 @@ public extension ChatView {
         return view
     }
 
+    /// Called as this device's own active live location share progresses: `.updated` on every fresh
+    /// coordinate fix, `.ended` when it stops (duration elapsed, the user tapped Stop Sharing, or a newer
+    /// live share superseded it - only one can broadcast at a time). ExyteChat tracks the device's location
+    /// internally; this is only how you find out about it, so you can mirror the change into your own
+    /// message store/backend and propagate it to other participants.
+    func onLiveLocationBroadcast(_ closure: @escaping (LiveLocationBroadcastEvent) -> Void) -> ChatView {
+        var view = self
+        view.chatCustomizationParameters.onLiveLocationBroadcast = closure
+        return view
+    }
+
     func localization(_ localization: ChatLocalization) -> ChatView {
         var view = self
         view.chatCustomizationParameters.localization = localization

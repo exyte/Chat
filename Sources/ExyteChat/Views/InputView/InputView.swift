@@ -67,18 +67,19 @@ public enum InputViewState: Sendable {
 public enum AvailableInputType: Sendable {
     case text
     case media
-    case audio
     case giphy
     case document
     case location
+    case audio
 }
 
 public struct InputViewAttachments {
     var medias: [Media] = []
-    var documents: [DocumentItem] = []
-    var recording: Recording?
     var giphyMedia: GPHMedia?
-    var location: Location?
+    var documents: [DocumentItem] = []
+    var staticLocation: StaticLocation?
+    var liveLocation: LiveLocation?
+    var recording: Recording?
     var replyMessage: ReplyMessage?
 }
 
@@ -151,8 +152,7 @@ struct InputView: View {
 
                 rightOutsideButton
             }
-            .padding(.horizontal, MessageView.horizontalScreenEdgePadding)
-            .padding(.vertical, 8)
+            .padding(MessageView.horizontalScreenEdgePadding, 8)
         }
         .background(backgroundColor)
         .onAppear {
@@ -325,8 +325,11 @@ struct InputView: View {
         if style == .message, !viewModel.attachments.documents.isEmpty {
             documentAttachmentsPreview
         }
-        if style == .message, let location = viewModel.attachments.location {
-            locationAttachmentPreview(location)
+        if style == .message, let staticLocation = viewModel.attachments.staticLocation {
+            staticLocationAttachmentPreview(staticLocation)
+        }
+        if style == .message, let liveLocation = viewModel.attachments.liveLocation {
+            liveLocationAttachmentPreview(liveLocation)
         }
         if let message = viewModel.attachments.replyMessage {
             VStack(spacing: 8) {
@@ -381,55 +384,90 @@ struct InputView: View {
     }
 
     var mediaAttachmentsPreview: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(viewModel.attachments.medias) { media in
-                    MediaAttachmentThumbnail(media: media) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.attachments.medias.removeAll { $0.id == media.id }
-                        }
+        horizontalAttachmentsPreviewScroll {
+            ForEach(viewModel.attachments.medias) { media in
+                MediaAttachmentThumbnail(media: media) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.attachments.medias.removeAll { $0.id == media.id }
                     }
                 }
             }
-            .padding(.top, 8)
-            .padding(.horizontal, 26)
         }
     }
 
     var documentAttachmentsPreview: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(viewModel.attachments.documents) { document in
-                    DocumentAttachmentThumbnail(document: document) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.attachments.documents.removeAll { $0.id == document.id }
-                        }
+        horizontalAttachmentsPreviewScroll {
+            ForEach(viewModel.attachments.documents) { document in
+                DocumentAttachmentThumbnail(document: document) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.attachments.documents.removeAll { $0.id == document.id }
                     }
                 }
+            }
+        }
+    }
+
+    private func horizontalAttachmentsPreviewScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                content()
             }
             .padding(.top, 8)
             .padding(.horizontal, 26)
         }
     }
 
-    func locationAttachmentPreview(_ location: Location) -> some View {
+    func staticLocationAttachmentPreview(_ staticLocation: StaticLocation) -> some View {
         HStack(spacing: 8) {
             theme.images.attachMenu.location
                 .renderingMode(.template)
-                .foregroundColor(theme.colors.mainTint)
-            Text(location.title ?? String(format: "%.4f, %.4f", location.latitude, location.longitude))
+                .foregroundColor(theme.colors.mainText)
+
+            Text(String(format: "%.4f, %.4f", staticLocation.latitude, staticLocation.longitude))
                 .font(.caption)
                 .foregroundColor(theme.colors.mainText)
                 .lineLimit(1)
+
             Spacer()
+
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
-                    viewModel.attachments.location = nil
+                    viewModel.attachments.staticLocation = nil
                 }
             } label: {
                 theme.images.mediaPicker.cross
                     .resizable()
-                    .frame(width: 10, height: 10)
+                    .viewSize(10)
+                    .padding(4)
+                    .background(Circle().fill(Color.black.opacity(0.6)))
+                    .foregroundColor(.white)
+            }
+        }
+        .padding(.horizontal, 26)
+        .padding(.top, 8)
+    }
+
+    func liveLocationAttachmentPreview(_ liveLocation: LiveLocation) -> some View {
+        HStack(spacing: 8) {
+            theme.images.attachMenu.location
+                .renderingMode(.template)
+                .foregroundColor(theme.colors.mainTint)
+
+            Text(localization.liveLocationText)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(theme.colors.mainTint)
+                .lineLimit(1)
+
+            Spacer()
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    viewModel.attachments.liveLocation = nil
+                }
+            } label: {
+                theme.images.mediaPicker.cross
+                    .resizable()
+                    .viewSize(10)
                     .padding(4)
                     .background(Circle().fill(Color.black.opacity(0.6)))
                     .foregroundColor(.white)
@@ -466,13 +504,13 @@ struct InputView: View {
         if items.count > 1 {
             attachMenuButton(items: items)
         } else if let item = items.first, item.action == .photo {
-            mediaButton
+            menuButton(action: .photo, image: theme.images.inputView.attach)
         } else if let item = items.first, item.action == .giphy {
-            giphyButton
+            menuButton(action: .giphy, image: theme.images.inputView.sticker)
         } else if let item = items.first, item.action == .document {
-            documentButton
+            menuButton(action: .document, image: theme.images.attachMenu.document)
         } else if let item = items.first, item.action == .location {
-            locationButton
+            menuButton(action: .location, image: theme.images.attachMenu.location)
         }
     }
 
@@ -510,43 +548,11 @@ struct InputView: View {
             }
     }
 
-    var mediaButton: some View {
+    func menuButton(action: InputViewAction, image: Image) -> some View {
         Button {
-            onAction(.photo)
+            onAction(action)
         } label: {
-            theme.images.inputView.attach
-                .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-        }
-    }
-
-    var giphyButton: some View {
-        Button {
-            onAction(.giphy)
-        } label: {
-            theme.images.inputView.sticker
-                .resizable()
-                .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-        }
-    }
-
-    var documentButton: some View {
-        Button {
-            onAction(.document)
-        } label: {
-            theme.images.attachMenu.document
-                .resizable()
-                .viewSize(24)
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
-        }
-    }
-
-    var locationButton: some View {
-        Button {
-            onAction(.location)
-        } label: {
-            theme.images.attachMenu.location
+            image
                 .resizable()
                 .viewSize(24)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
@@ -831,17 +837,44 @@ private struct AttachMenuRow: View {
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
+                    .viewSize(20)
                     .foregroundColor(theme.colors.mainTint)
                 Text(title)
                     .font(.callout)
                     .foregroundColor(theme.colors.mainText)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
+            .padding(14, 10)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct RemovableAttachmentThumbnail<Content: View>: View {
+    @Environment(\.chatTheme) var theme
+
+    var onRemove: () -> Void
+    @ViewBuilder var content: () -> Content
+
+    private var thumbnailSize: CGFloat {
+        UIScreen.main.bounds.width / 5
+    }
+
+    var body: some View {
+        content()
+            .viewSize(thumbnailSize)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(alignment: .topTrailing) {
+                Button(action: onRemove) {
+                    theme.images.mediaPicker.cross
+                        .resizable()
+                        .viewSize(10)
+                        .padding(4)
+                        .background(Circle().fill(Color.black.opacity(0.6)))
+                        .foregroundColor(.white)
+                }
+                .offset(x: 6, y: -6)
+            }
     }
 }
 
@@ -849,8 +882,8 @@ private struct MediaAttachmentThumbnail: View {
     @Environment(\.chatTheme) private var theme
     @Environment(\.chatSize) private var chatSize
 
-    let media: Media
-    let onRemove: () -> Void
+    var media: Media
+    var onRemove: () -> Void
 
     @State private var thumbnail: UIImage?
 
@@ -859,7 +892,7 @@ private struct MediaAttachmentThumbnail: View {
     }
 
     var body: some View {
-        ZStack {
+        RemovableAttachmentThumbnail(onRemove: onRemove) {
             if let thumbnail {
                 Image(uiImage: thumbnail)
                     .resizable()
@@ -868,24 +901,12 @@ private struct MediaAttachmentThumbnail: View {
                 Rectangle()
                     .fill(theme.colors.messageFriendBG)
             }
+
             if media.type == .video {
                 Image(systemName: "play.circle.fill")
                     .foregroundColor(.white)
                     .font(.system(size: 20))
             }
-        }
-        .frame(width: thumbnailSize, height: thumbnailSize)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(alignment: .topTrailing) {
-            Button(action: onRemove) {
-                theme.images.mediaPicker.cross
-                    .resizable()
-                    .frame(width: 10, height: 10)
-                    .padding(4)
-                    .background(Circle().fill(Color.black.opacity(0.6)))
-                    .foregroundColor(.white)
-            }
-            .offset(x: 6, y: -6)
         }
         .task(id: media.id) {
             if let data = await media.getThumbnailData(), let image = UIImage(data: data) {
@@ -896,22 +917,19 @@ private struct MediaAttachmentThumbnail: View {
 }
 
 private struct DocumentAttachmentThumbnail: View {
-    @Environment(\.chatTheme) private var theme
+    @Environment(\.chatTheme) var theme
 
-    let document: DocumentItem
-    let onRemove: () -> Void
-
-    private var thumbnailSize: CGFloat {
-        UIScreen.main.bounds.width / 5
-    }
+    var document: DocumentItem
+    var onRemove: () -> Void
 
     var body: some View {
-        ZStack {
+        RemovableAttachmentThumbnail(onRemove: onRemove) {
             VStack(spacing: 4) {
                 theme.images.message.attachedDocument
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 28, height: 28)
+                    .viewSize(28)
+
                 Text(document.fileName)
                     .font(.caption2)
                     .lineLimit(2)
@@ -919,20 +937,8 @@ private struct DocumentAttachmentThumbnail: View {
                     .foregroundColor(theme.colors.mainText)
                     .padding(.horizontal, 4)
             }
-        }
-        .frame(width: thumbnailSize, height: thumbnailSize)
-        .background(theme.colors.messageFriendBG)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(alignment: .topTrailing) {
-            Button(action: onRemove) {
-                theme.images.mediaPicker.cross
-                    .resizable()
-                    .frame(width: 10, height: 10)
-                    .padding(4)
-                    .background(Circle().fill(Color.black.opacity(0.6)))
-                    .foregroundColor(.white)
-            }
-            .offset(x: 6, y: -6)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(theme.colors.messageFriendBG)
         }
     }
 }

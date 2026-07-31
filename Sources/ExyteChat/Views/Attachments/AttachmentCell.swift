@@ -60,7 +60,7 @@ public struct AttachmentCell: View {
                                 theme.images.message.playVideo
                                     .resizable()
                                     .foregroundColor(.white)
-                                    .frame(width: 36, height: 36)
+                                    .viewSize(36)
                                 Spacer()
                             }
                         case .cancelled:
@@ -74,7 +74,7 @@ public struct AttachmentCell: View {
                             theme.images.message.playVideo
                                 .resizable()
                                 .foregroundColor(.white)
-                                .frame(width: 36, height: 36)
+                                .viewSize(36)
                             Spacer()
                         }
                     }
@@ -98,8 +98,9 @@ public struct AttachmentCell: View {
             theme.images.message.attachedDocument
                 .resizable()
                 .scaledToFit()
-                .frame(width: 32, height: 32)
+                .viewSize(32)
                 .foregroundColor(theme.colors.mainTint)
+
             Text(attachment.fileName ?? attachment.full.lastPathComponent)
                 .font(.caption2)
                 .lineLimit(2)
@@ -118,7 +119,7 @@ public struct AttachmentCell: View {
                 .resizable()
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(.white, .black.opacity(0.4))
-                .frame(width: 36, height: 36)
+                .viewSize(36)
         }
         VStack {
             HStack {
@@ -145,7 +146,7 @@ public struct AttachmentCell: View {
                     .resizable()
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(.white, .black.opacity(0.4))
-                    .frame(width: 26, height: 26)
+                    .viewSize(26)
                     .padding(4)
             }
             Spacer()
@@ -162,7 +163,7 @@ public struct AttachmentCell: View {
                     .resizable()
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(.white, .black.opacity(0.4))
-                    .frame(width: 26, height: 26)
+                    .viewSize(26)
                     .padding(4)
             }
             Spacer()

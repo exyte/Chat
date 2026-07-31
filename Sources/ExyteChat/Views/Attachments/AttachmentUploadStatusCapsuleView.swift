@@ -18,9 +18,7 @@ struct AttachmentUploadStatusCapsuleView: View {
         .font(.caption)
         .foregroundColor(.white)
         .opacity(0.8)
-        .padding(.top, 4)
-        .padding(.bottom, 4)
-        .padding(.horizontal, 8)
+        .padding(8, 4)
         .background {
             Capsule()
                 .foregroundColor(.black.opacity(0.4))

@@ -60,7 +60,7 @@ struct FullscreenMediaPages: View {
                         if isPreparingShare {
                             ProgressView()
                                 .tint(tintColor)
-                                .frame(width: 24, height: 24)
+                                .viewSize(24)
                                 .padding(5)
                         } else {
                             controlIcon(theme.images.fullscreenMedia.share) {
@@ -145,7 +145,7 @@ private extension FullscreenMediaPages {
         image
             .resizable()
             .scaledToFit()
-            .frame(width: 24, height: 24)
+            .viewSize(24)
             .padding(5)
             .contentShape(Rectangle())
             .onTapGesture(perform: onTap)

@@ -11,6 +11,7 @@ public extension EnvironmentValues {
     #if swift(>=6.0)
     @Entry var chatTheme = ChatTheme()
     @Entry var giphyConfig = GiphyConfiguration()
+    @Entry var chatLocalization = ChatLocalization.defaultLocalization
     #else
     var chatTheme: ChatTheme {
         get { self[ChatThemeKey.self] }
@@ -20,6 +21,11 @@ public extension EnvironmentValues {
     var giphyConfig: GiphyConfiguration {
         get { self[GiphyConfigurationKey.self] }
         set { self[GiphyConfigurationKey.self] = newValue }
+    }
+
+    var chatLocalization: ChatLocalization {
+        get { self[ChatLocalizationKey.self] }
+        set { self[ChatLocalizationKey.self] = newValue }
     }
     #endif
 }
@@ -32,6 +38,10 @@ public extension EnvironmentValues {
 
 public struct GiphyConfigurationKey: EnvironmentKey {
     public static let defaultValue = GiphyConfiguration()
+}
+
+public struct ChatLocalizationKey: EnvironmentKey {
+    public static let defaultValue = ChatLocalization.defaultLocalization
 }
 #endif
 

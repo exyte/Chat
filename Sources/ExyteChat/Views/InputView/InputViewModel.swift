@@ -49,15 +49,15 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
-        showPicker = false
+        text = ""
+        attachments = InputViewAttachments()
+        state = .empty
         showGiphyPicker = false
+        showPicker = false
         showDocumentPicker = false
         showLocationPicker = false
-        text = ""
         saveEditingClosure = nil
-        attachments = InputViewAttachments()
         subscribeValidation()
-        state = .empty
     }
 
     func send() {
@@ -168,7 +168,7 @@ private extension InputViewModel {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard state != .editing else { return } // special case
-            let hasAttachments = !self.attachments.medias.isEmpty || !self.attachments.documents.isEmpty || self.attachments.location != nil
+            let hasAttachments = !self.attachments.medias.isEmpty || !self.attachments.documents.isEmpty || self.attachments.staticLocation != nil || self.attachments.liveLocation != nil
             if !self.text.isEmpty || hasAttachments {
                 self.state = .hasTextOrMedia
             } else if self.text.isEmpty,
@@ -222,12 +222,16 @@ private extension InputViewModel {
 
     func sendMessage() {
         showActivityIndicator = true
+        // live location shares need a stable id upfront so subsequent location updates can find this message again
+        let messageId = (attachments.liveLocation != nil) ? UUID().uuidString : nil
         let draft = DraftMessage(
+            id: messageId,
             text: text,
             medias: attachments.medias,
-            documents: attachments.documents,
             giphyMedia: attachments.giphyMedia,
-            location: attachments.location,
+            documents: attachments.documents,
+            staticLocation: attachments.staticLocation,
+            liveLocation: attachments.liveLocation,
             recording: attachments.recording,
             replyMessage: attachments.replyMessage,
             createdAt: Date()

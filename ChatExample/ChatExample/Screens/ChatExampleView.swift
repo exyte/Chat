@@ -96,6 +96,14 @@ struct ChatExampleView: View {
         .messageReactionDelegate(viewModel)
         .showLastReadIndicator(true)
         .setAvailableInputs([.text, .media, .giphy, .audio, .document, .location])
+        .onLiveLocationBroadcast { event in
+            switch event {
+            case .updated(let messageId, let liveLocation):
+                viewModel.updateLiveLocation(messageId: messageId, liveLocation: liveLocation)
+            case .ended(let messageId):
+                print("Live location sharing ended for message \(messageId)")
+            }
+        }
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [replyAction])
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)

@@ -12,6 +12,7 @@ struct MessageView: View {
 
     @Environment(\.chatTheme) var theme
     @Environment(\.chatSize) var chatSize
+    @Environment(\.chatLocalization) var localization
 
     @ObservedObject var viewModel: ChatViewModel
 
@@ -169,8 +170,12 @@ struct MessageView: View {
                     giphyView(giphyMediaId)
                 }
 
-                if let location = message.location {
-                    locationView(location)
+                if let staticLocation = message.staticLocation {
+                    staticLocationView(staticLocation)
+                }
+
+                if let liveLocation = message.liveLocation {
+                    liveLocationView(liveLocation)
                 }
 
                 if !message.attachments.isEmpty {
@@ -293,22 +298,132 @@ struct MessageView: View {
     }
 
     @ViewBuilder
-    func locationView(_ location: Location) -> some View {
-        let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-        Map(position: .constant(.region(
-            MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        ))) {
-            Marker(location.title ?? "", coordinate: coordinate)
+    func staticLocationView(_ location: StaticLocation) -> some View {
+        let coordinate = location.coordinate
+
+        Map(position: .constant(.region(.closeUp(around: coordinate)))) {
+            Annotation("", coordinate: coordinate) {
+                staticLocationPin
+            }
         }
         .allowsHitTesting(false)
-        .frame(width: 200, height: 150)
+        .viewSize(200)
         .cornerRadius(12)
         .contentShape(Rectangle())
         .onTapGesture {
-            let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
-            mapItem.name = location.title
-            mapItem.openInMaps()
+            viewModel.presentFullscreenLocation(message.id)
         }
+    }
+
+    @ViewBuilder
+    func liveLocationView(_ liveLocation: LiveLocation) -> some View {
+        let coordinate = liveLocation.coordinate
+
+        VStack(spacing: 0) {
+            Map(position: .constant(.region(.closeUp(around: coordinate)))) {
+                Annotation("", coordinate: coordinate) {
+                    liveLocationPin
+                }
+            }
+            .allowsHitTesting(false)
+            .saturation(liveLocation.isEnded ? 0 : 1)
+            .frame(height: 150)
+
+            liveLocationFooter(liveLocation)
+        }
+        .frame(width: 200)
+        .cornerRadius(12)
+        .clipped()
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.presentFullscreenLocation(message.id)
+        }
+    }
+
+    var staticLocationPin: some View {
+        Image(systemName: "mappin.circle.fill")
+            .resizable()
+            .viewSize(30)
+            .foregroundStyle(.white, theme.colors.statusError)
+            .shadow(color: .black.opacity(0.3), radius: 2, y: 1)
+    }
+
+    var liveLocationPin: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .viewSize(44)
+                pinAvatar
+                    .viewSize(38)
+                    .clipShape(Circle())
+            }
+            .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
+
+            PinTailShape()
+                .fill(Color.white)
+                .frame(width: 14, height: 8)
+                .shadow(color: .black.opacity(0.2), radius: 1, y: 1)
+
+            Circle()
+                .fill(theme.colors.mainTint)
+                .viewSize(10)
+                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                .offset(y: -3)
+        }
+    }
+
+    @ViewBuilder
+    var pinAvatar: some View {
+        if let url = message.user.avatarURL {
+            AvatarImageView(url: url, avatarSize: 38, avatarCacheKey: message.user.avatarCacheKey)
+        } else {
+            AvatarNameView(name: message.user.name, avatarSize: 38)
+                .background(theme.colors.mainTint)
+        }
+    }
+
+    @ViewBuilder
+    func liveLocationFooter(_ liveLocation: LiveLocation) -> some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let isActive = liveLocation.isActive
+            HStack(spacing: 10) {
+                LiveLocationStatusText(
+                    isActive: isActive,
+                    subtitle: liveLocation.updatedAgoText(localization: localization)
+                )
+                Spacer(minLength: 4)
+                if isActive {
+                    liveLocationCountdownRing(liveLocation)
+                }
+            }
+            .padding(12, 10)
+            .background(isActive ? theme.colors.mainTint : Color.gray)
+        }
+    }
+
+    func liveLocationCountdownRing(_ liveLocation: LiveLocation) -> some View {
+        let totalMinutes = max(0, Int(ceil(liveLocation.expiresAt.timeIntervalSince(Date()) / 60)))
+        // under an hour left: show the minute count, like "15"; an hour or more: whole hours, like "8h"
+        let label = totalMinutes >= 60 ? "\(totalMinutes / 60)h" : "\(totalMinutes)"
+        let progress = liveLocation.remainingFraction()
+
+        return ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.3), lineWidth: 2)
+
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(.linear(duration: 1), value: progress)
+
+            Text(label)
+                .font(.footnote.weight(.semibold))
+                .monospacedDigit()
+                .foregroundColor(.white)
+        }
+        .viewSize(32)
     }
 
     @ViewBuilder
@@ -379,6 +494,17 @@ struct MessageView: View {
             }
             .font(Font(params.timeFont))
         }
+    }
+}
+
+private struct PinTailShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.closeSubpath()
+        return path
     }
 }
 

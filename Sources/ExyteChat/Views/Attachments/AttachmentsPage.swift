@@ -58,18 +58,19 @@ struct AttachmentsPage: View {
             theme.images.message.attachedDocument
                 .resizable()
                 .scaledToFit()
-                .frame(width: 64, height: 64)
+                .viewSize(64)
                 .foregroundColor(.white)
+
             Text(attachment.fileName ?? attachment.full.lastPathComponent)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
+
             Button {
                 UIApplication.shared.open(attachment.full)
             } label: {
                 Text("Open", bundle: .module)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
+                    .padding(20, 10)
                     .background(Capsule().fill(Color.white.opacity(0.15)))
                     .foregroundColor(.white)
             }
