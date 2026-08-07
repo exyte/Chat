@@ -78,7 +78,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.attachments.medias = []
                 inputViewModel.showPicker = false
             }
-            .currentFullscreenMedia($currentFullscreenMedia)
+            .fullscreenMedia($currentFullscreenMedia)
             .pickerMode($inputViewModel.mediaPickerMode)
             .setMediaPickerParameters(mediaPickerParameters)
             .padding(.top)

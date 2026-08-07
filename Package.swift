@@ -16,11 +16,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/exyte/MediaPicker.git",
-            from: "3.4.2"
-        ),
-        .package(
-            url: "https://github.com/exyte/ActivityIndicatorView",
-            from: "2.0.0"
+            from: "3.4.4"
         ),
         .package(
            url: "https://github.com/Giphy/giphy-ios-sdk",
@@ -40,7 +36,6 @@ let package = Package(
             name: "ExyteChat",
             dependencies: [
                 .product(name: "ExyteMediaPicker", package: "MediaPicker"),
-                .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
                 .product(name: "GiphyUISDK", package: "giphy-ios-sdk"),
                 .product(name: "Kingfisher", package: "Kingfisher"),
                 .product(name: "AnchoredPopup", package: "AnchoredPopup")
