@@ -158,8 +158,13 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         case .newestMessage:
             tableView.setContentOffset(CGPoint(x: 0, y: 0), animated: false)
         case .oldestMessage:
-            let lastSection = max(tableView.numberOfSections - 1, 0)
-            let lastRow = max(tableView.numberOfRows(inSection: lastSection) - 1, 0)
+            // An empty table has no section 0 to ask about: clamping the index
+            // to 0 makes numberOfRows(inSection:) raise
+            // "Requested the number of rows for section (0) which is out of bounds".
+            guard tableView.numberOfSections > 0 else { return }
+
+            let lastSection = tableView.numberOfSections - 1
+            let lastRow = tableView.numberOfRows(inSection: lastSection) - 1
 
             guard lastRow >= 0 else { return }
 
