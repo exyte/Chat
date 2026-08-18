@@ -210,7 +210,7 @@ struct UIList<MessageContent: View>: UIViewRepresentable {
         guard enabled else { return nil }
         for (si, section) in sections.enumerated() {
             for (ri, row) in section.rows.enumerated() {
-                if case .readBy = row.message.status {
+                if case .readBy = row.message.status, si > 0 || ri > 0 {
                     return IndexPath(row: ri, section: si)
                 }
             }
