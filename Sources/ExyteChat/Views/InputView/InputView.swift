@@ -82,6 +82,7 @@ struct InputView: View {
     
     @Environment(\.chatTheme) private var theme
     @Environment(\.mediaPickerTheme) private var pickerTheme
+    @Environment(\.chatSize) private var chatSize
 
     @EnvironmentObject private var keyboardState: KeyboardState
     
@@ -677,7 +678,7 @@ struct InputView: View {
                     onAction(.recordAudioLock)
                 }
                 
-                if value.location.x < UIScreen.main.bounds.width/2,
+                if value.location.x < chatSize.width / 2,
                    value.location.y > recordButtonFrame.minY {
                     cancelGesture = true
                     onAction(.deleteRecord)
@@ -753,6 +754,7 @@ private struct AttachMenuRow: View {
 
 private struct MediaAttachmentThumbnail: View {
     @Environment(\.chatTheme) private var theme
+    @Environment(\.chatSize) private var chatSize
 
     let media: Media
     let onRemove: () -> Void
@@ -760,7 +762,7 @@ private struct MediaAttachmentThumbnail: View {
     @State private var thumbnail: UIImage?
 
     private var thumbnailSize: CGFloat {
-        UIScreen.main.bounds.width / 5
+        chatSize.width / 5
     }
 
     var body: some View {

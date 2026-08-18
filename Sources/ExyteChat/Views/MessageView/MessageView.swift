@@ -10,6 +10,7 @@ import SwiftUI
 struct MessageView: View {
 
     @Environment(\.chatTheme) var theme
+    @Environment(\.chatSize) var chatSize
 
     @ObservedObject var viewModel: ChatViewModel
 
@@ -51,7 +52,7 @@ struct MessageView: View {
         let statusViewWithPaddings = MessageView.statusViewWidth + MessageView.horizontalSpacing
         let textPaddings = MessageView.horizontalTextPadding * 2
         let widthWithoutMedia =
-            UIScreen.main.bounds.width
+            chatSize.width
             - bubblePaddings
             - (isCurrentUser && params.showAvatar ? 0 : avatarViewWithPaddings)
             - (isCurrentUser ? MessageView.statusViewWidth : 0)
@@ -80,7 +81,7 @@ struct MessageView: View {
         struct Cache { static var value: CGFloat? }
         if let value = Cache.value { return value }
 
-        let value = AttributedString("🙃️️️️").width(withConstrainedWidth: UIScreen.main.bounds.width, font: params.font) + ReactionBubble.padding * 2
+        let value = AttributedString("🙃️️️️").width(withConstrainedWidth: chatSize.width, font: params.font) + ReactionBubble.padding * 2
 
         Cache.value = value
         return value
@@ -140,7 +141,7 @@ struct MessageView: View {
             message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding
         )
         .frame(
-            maxWidth: UIScreen.main.bounds.width,
+            maxWidth: chatSize.width,
             alignment: message.user.isCurrentUser ? .trailing : .leading
         )
     }

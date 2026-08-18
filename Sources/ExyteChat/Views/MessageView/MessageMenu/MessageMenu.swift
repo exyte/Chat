@@ -23,15 +23,13 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
 
     @Environment(\.chatTheme) private var theme
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.chatSize) private var chatSize
+
     @StateObject private var keyboardState = KeyboardState()
     @StateObject var viewModel: ChatViewModel
-    
+
     @Binding var isShowingMenu: Bool
-    
-    /// Overall ChatView Frame
-    let chatViewFrame: CGRect = UIScreen.main.bounds
-    
+
     /// The max height for the menu
     /// - Note: menus that exceed this value will be placed in a ScrollView
     let maxMenuHeight: CGFloat = 200
@@ -123,9 +121,10 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
         dismissSelf(rt)
     }
     
-    /// The max height for the entire message menu and surrounding views
+    private var chatViewFrame: CGRect { CGRect(origin: .zero, size: chatSize) }
+
     var maxEntireHeight: CGFloat {
-        self.chatViewFrame.height
+        chatViewFrame.height - UIApplication.safeArea.top - UIApplication.safeArea.bottom
     }
     
     /// Unwraps and returns our optional `UIFont` as a `Font` or `nil`
@@ -251,7 +250,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             reactionOverviewIsVisible = shouldShowReactionOverviewView
             reactionSelectionIsVisible = shouldShowReactionSelectionView
             menuIsVisible = true
-            verticalOffset = UIScreen.main.bounds.height * 2
+            verticalOffset = chatSize.height * 2
             
             /// Kick off the background animation
             withAnimation(.easeInOut(duration: animationDuration)) {
@@ -270,7 +269,7 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             }
             
             /// If we're in landscape mode, adjust the `horizontalOffset` appropriately
-            if UIScreen.main.bounds.width > UIScreen.main.bounds.height {
+            if chatSize.width > chatSize.height {
                 switch alignment {
                 case .left:
                     horizontalOffset = UIApplication.safeArea.leading
@@ -287,17 +286,15 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
             
             messageTopPadding = 4
             
-            /// Calculate our vertical safe area insets
-            let safeArea = UIApplication.safeArea.top + UIApplication.safeArea.bottom
             /// Calculate our ReactionOverview height
             let rOHeight: CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
             /// We calculate the total height here, instead of using messageMenuFrame.height
             /// messageMenuHeight renders the menu buttons in a VStack by default, and we need to account for the clamping of the menu height
             let totalMenuHeight = calculateMessageMenuHeight(including: [.message, .reactionSelection]) + min(menuHeight, maxMenuHeight)
             /// Compare our total menu height with our free screen space to determine if we need to place it in a ScrollView or not
-            if ( totalMenuHeight + rOHeight ) > maxEntireHeight - safeArea {
+            if ( totalMenuHeight + rOHeight ) > maxEntireHeight {
                 /// We need to place our entire view in a ScrollView
-                messageMenuStyle = .scrollView(height: maxEntireHeight - safeArea)
+                messageMenuStyle = .scrollView(height: maxEntireHeight)
             } else if menuHeight > maxMenuHeight {
                 /// We need to place our menu buttons in a ScrollView
                 menuStyle = .scrollView(height: maxMenuHeight)
@@ -359,9 +356,8 @@ struct MessageMenu<MainButton: View, ActionEnum: MessageMenuAction>: View {
                     /// Ensure we still need our scroll view
                     let rOHeight: CGFloat = reactionOverviewIsVisible ? reactionOverviewHeight : 0
                     let contentHeight = calculateMessageMenuHeight(including: [.message, .reactionSelection, .menu]) + rOHeight
-                    let safeArea = UIApplication.safeArea.top + UIApplication.safeArea.bottom
-                    if contentHeight > maxEntireHeight - safeArea {
-                        messageMenuStyle = .scrollView(height: maxEntireHeight - safeArea)
+                    if contentHeight > maxEntireHeight {
+                        messageMenuStyle = .scrollView(height: maxEntireHeight)
                     } else {
                         messageMenuStyle = .vStack
                     }

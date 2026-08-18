@@ -101,6 +101,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     @State private var giphyConfigured = false
     @State private var selectedGiphyMedia: GPHMedia? = nil
+    @State private var chatSize: CGSize = .zero
 
     public var body: some View {
         mainView
@@ -247,6 +248,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         // Used to prevent ChatView movement during Emoji Keyboard invocation
         .ignoresSafeArea(isShowingMenu ? .keyboard : [])
+        .onGeometryChange(for: CGSize.self) { $0.size } action: { chatSize = $0 }
+        .environment(\.chatSize, chatSize)
     }
     
     var waitingForNetwork: some View {
