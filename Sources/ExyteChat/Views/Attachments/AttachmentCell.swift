@@ -60,7 +60,7 @@ public struct AttachmentCell: View {
                                 theme.images.message.playVideo
                                     .resizable()
                                     .foregroundColor(.white)
-                                    .frame(width: 36, height: 36)
+                                    .viewSize(36)
                                 Spacer()
                             }
                         case .cancelled:
@@ -74,11 +74,13 @@ public struct AttachmentCell: View {
                             theme.images.message.playVideo
                                 .resizable()
                                 .foregroundColor(.white)
-                                .frame(width: 36, height: 36)
+                                .viewSize(36)
                             Spacer()
                         }
                     }
                 }
+            } else if attachment.type == .document {
+                documentContent
             } else {
                 content
                     .overlay {
@@ -91,6 +93,24 @@ public struct AttachmentCell: View {
         .simultaneousGesture(attachmentTapGesture)
     }
 
+    private var documentContent: some View {
+        VStack(spacing: 6) {
+            theme.images.message.attachedDocument
+                .resizable()
+                .scaledToFit()
+                .viewSize(32)
+                .foregroundColor(theme.colors.mainTint)
+
+            Text(attachment.fileName ?? attachment.full.lastPathComponent)
+                .font(.caption2)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 6)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(theme.colors.messageFriendBG)
+    }
+
     @ViewBuilder
     private func uploadingOverlay(percent: Int?) -> some View {
         Color.white.opacity(0.8)
@@ -99,7 +119,7 @@ public struct AttachmentCell: View {
                 .resizable()
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(.white, .black.opacity(0.4))
-                .frame(width: 36, height: 36)
+                .viewSize(36)
         }
         VStack {
             HStack {
@@ -126,7 +146,7 @@ public struct AttachmentCell: View {
                     .resizable()
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(.white, .black.opacity(0.4))
-                    .frame(width: 26, height: 26)
+                    .viewSize(26)
                     .padding(4)
             }
             Spacer()
@@ -143,7 +163,7 @@ public struct AttachmentCell: View {
                     .resizable()
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(.white, .black.opacity(0.4))
-                    .frame(width: 26, height: 26)
+                    .viewSize(26)
                     .padding(4)
             }
             Spacer()

@@ -19,13 +19,13 @@ struct ActivityIndicator: View {
         ZStack {
             if showBackground {
                 Color(UIColor.secondarySystemBackground).opacity(0.8)
-                    .frame(width: 100, height: 100)
+                    .viewSize(100)
                     .cornerRadius(8)
             }
 
             ActivityIndicatorView(type: .flickeringDots())
                 .foregroundColor(color != nil ? color! : theme.colors.sendButtonBackground)
-                .frame(width: size, height: size)
+                .viewSize(size)
         }
     }
 }

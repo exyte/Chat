@@ -40,6 +40,13 @@ final class ActiveChatExampleViewModel: ObservableObject, ReactionDelegate {
         }
     }
 
+    func updateLiveLocation(messageId: String, liveLocation: LiveLocation) {
+        Task {
+            await interactor.updateLiveLocation(messageId: messageId, liveLocation: liveLocation)
+            self.messages = await self.convertMessages()
+        }
+    }
+
     nonisolated func didReact(to message: Message, reaction draftReaction: DraftReaction) {
         Task {
             await interactor.add(draftReaction: draftReaction, to: draftReaction.messageID)

@@ -40,6 +40,8 @@ struct AttachmentsPage: View {
             }
         } else if attachment.type == .video {
             VideoView(viewModel: VideoViewModel(attachment: attachment))
+        } else if attachment.type == .document {
+            documentView
         } else {
             Rectangle()
                 .foregroundColor(Color.gray)
@@ -48,6 +50,30 @@ struct AttachmentsPage: View {
                 .overlay {
                     Text("Unknown", bundle: .module)
                 }
+        }
+    }
+
+    private var documentView: some View {
+        VStack(spacing: 16) {
+            theme.images.message.attachedDocument
+                .resizable()
+                .scaledToFit()
+                .viewSize(64)
+                .foregroundColor(.white)
+
+            Text(attachment.fileName ?? attachment.full.lastPathComponent)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            Button {
+                UIApplication.shared.open(attachment.full)
+            } label: {
+                Text("Open", bundle: .module)
+                    .padding(20, 10)
+                    .background(Capsule().fill(Color.white.opacity(0.15)))
+                    .foregroundColor(.white)
+            }
         }
     }
 }

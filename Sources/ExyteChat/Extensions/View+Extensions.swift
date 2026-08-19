@@ -24,6 +24,11 @@ extension View {
         }
     }
 
+    func padding(_ horizontal: CGFloat, _ vertical: CGFloat) -> some View {
+        self.padding(.horizontal, horizontal)
+            .padding(.vertical, vertical)
+    }
+
     @ViewBuilder
     func applyIf<T: View>(_ condition: Bool, apply: (Self) -> T) -> some View {
         if condition {

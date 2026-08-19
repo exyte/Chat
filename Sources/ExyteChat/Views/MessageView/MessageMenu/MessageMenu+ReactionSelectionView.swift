@@ -79,8 +79,7 @@ struct ReactionSelectionView: View {
                             }
                     }
                 }
-                .padding(.vertical, verticalPadding)
-                .padding(.horizontal, (emojiEntryIsFocused || viewState.isPicked) ? bubbleDiameter / 6 : horizontalPadding)
+                .padding((emojiEntryIsFocused || viewState.isPicked) ? bubbleDiameter / 6 : horizontalPadding, verticalPadding)
                 
             }
             .padding(.horizontal, 2)
@@ -148,7 +147,7 @@ struct ReactionSelectionView: View {
                         .foregroundStyle(selectedEmoji.isEmpty ? Color.secondary.opacity(0.35) : Color.clear)
                 }
             )
-            .frame(width: bubbleDiameter, height: bubbleDiameter)
+            .viewSize(bubbleDiameter)
     }
     
     @ViewBuilder

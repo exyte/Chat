@@ -13,6 +13,9 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var fullscreenAttachmentItem: Optional<Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
+    @Published private(set) var fullscreenLocationMessageId: String? = nil
+    @Published var fullscreenLocationPresented = false
+
     @Published var shareAttachmentsItem: ShareAttachmentsItem? = nil
     @Published private(set) var isPreparingAttachmentsShare = false
 
@@ -33,6 +36,24 @@ final class ChatViewModel: ObservableObject {
     var inputViewModel: InputViewModel?
     var globalFocusState: GlobalFocusState?
 
+    let liveLocationBroadcaster = LiveLocationBroadcaster()
+    private var liveLocationCancellable: AnyCancellable?
+
+    init() {
+        // forward the broadcaster's changes so views observing just `ChatViewModel` still refresh
+        // (e.g. the "sharing live location" banner)
+        liveLocationCancellable = liveLocationBroadcaster.objectWillChange
+            .sink { [weak self] in self?.objectWillChange.send() }
+    }
+
+    func startLiveLocationSharing(messageId: String, liveLocation: LiveLocation) {
+        liveLocationBroadcaster.start(messageId: messageId, startedAt: liveLocation.startedAt, expiresAt: liveLocation.expiresAt)
+    }
+
+    func stopLiveLocationSharing() {
+        liveLocationBroadcaster.finish()
+    }
+
     func presentAttachmentFullScreen(_ attachment: Attachment) {
         fullscreenAttachmentItem = attachment
         fullscreenAttachmentPresented = true
@@ -41,6 +62,16 @@ final class ChatViewModel: ObservableObject {
     func dismissAttachmentFullScreen() {
         fullscreenAttachmentPresented = false
         fullscreenAttachmentItem = nil
+    }
+
+    func presentFullscreenLocation(_ messageId: String) {
+        fullscreenLocationMessageId = messageId
+        fullscreenLocationPresented = true
+    }
+
+    func dismissFullscreenLocation() {
+        fullscreenLocationMessageId = nil
+        fullscreenLocationPresented = false
     }
 
     func shareAttachments(_ attachments: [Attachment]) {

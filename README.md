@@ -53,11 +53,9 @@
     - Audio recording
     - Link with preview
     - Gif/Sticker
+    - Documents (any file type, picked via the system document picker)
+    - Location - a static location, or a live location share that keeps updating for 15 minutes, 1 hour, or 8 hours
     - Custom dictionary of any Sendable
-
-    **Coming soon:**
-    - User's location
-    - Documents
 
 ## Migration to version 3
 
@@ -268,6 +266,7 @@ These use `AnyView`, so please try to keep them easy enough
 `onWillDisplayCell` - UITableView's will display cell delegate calls this closure     
 `enableLoadMore(offset: Int = 0, _ handler: @escaping ()->())` - when user scrolls up to `offset`-th message from the end, call the handler   function, so user can load more messages    
 `localization` - can be localized in the Localizable.strings files    
+`onLiveLocationBroadcast` - `(LiveLocationBroadcastEvent) -> Void`, called as this device's own active live location share progresses - `.updated(messageId:liveLocation:)` on every fresh fix, `.ended(messageId:)` when it stops (see Location Attachments below)    
 
 ### Update transactions
 `updateTransaction` - awaitable updates helper similar in usage to `tableView.performBatchUpdates`
@@ -351,6 +350,8 @@ ChatView(messages: viewModel.messages) { draft in
     - `.media`    
     - `.audio`    
     - `.giphy`    
+    - `.document`    
+    - `.location`    
 `setRecorderSettings` - customize audio recorder settings    
 `audioRecordingMode` - choose how audio recording is triggered:    
     - `.holdToRecord` (default) - hold the mic button to record; slide up to lock into hands-free mode    
@@ -463,6 +464,92 @@ Users can share attachments out of the chat via the system share sheet. There ar
 
 Remote attachments (non-`file://` URLs) are downloaded to a temporary file before sharing so that actions like Save Image/Video and AirDrop work with real file data instead of just a link.
 
+## Document Attachments
+
+To let users attach arbitrary files, add `.document` to `setAvailableInputs`:
+
+```swift
+.setAvailableInputs([.text, .media, .document])
+```
+
+Tapping the attach button opens the system `UIDocumentPickerViewController` (multi-selection is enabled). Picked files show up as removable chips above the input field, get sent alongside the rest of the message, and arrive as regular `Attachment`s with `type == .document`:
+
+```swift
+if let document = message.attachments.first(where: { $0.type == .document }) {
+    document.fileName  // original file name
+    document.fileSize  // bytes, if available  
+    document.full      // local file URL right after sending, replace with a remote URL once you've uploaded it (see Large Attachment Support)  
+}  
+```
+
+Tapping a document bubble opens the fullscreen viewer with an "Open" button that calls `UIApplication.shared.open(attachment.full)` - this works well once `full` is a real `https://` URL (opens it in Safari/downloads), but not for local `file://` URLs, so make sure to upload the file and swap in a remote URL before other participants receive the message.
+
+## Location Attachments
+
+To let users attach their location, add `.location` to `setAvailableInputs`:
+
+```swift
+.setAvailableInputs([.text, .media, .location])
+```
+
+Your app's `Info.plist` needs `NSLocationWhenInUseUsageDescription` for the location picker to be able to request permission.
+
+Tapping the attach button opens a map (`LocationPickerView`) where the user can drop a location (tap the map, or tap the location button to center on their current position) and either:
+- **Send this location** - sends a single static location, or
+- **Share Live Location** - opens a dialog to pick a duration (**15 minutes**, **1 hour**, or **8 hours**) and starts a live share
+
+Static locations and live shares are two different, unrelated model types - a static location is just a coordinate, a live share is a whole different concept (it keeps updating, has a duration, can be stopped). `Message`/`DraftMessage` carry them as two independent optional fields, `location: StaticLocation?` and `liveLocation: LiveLocation?`, never both at once for a given message:
+
+```swift
+public struct StaticLocation {
+    public var latitude: Double
+    public var longitude: Double
+}
+
+public struct LiveLocation {
+    public var latitude: Double
+    public var longitude: Double
+    public var lastUpdateAt: Date   // when this coordinate fix was captured
+    public var startedAt: Date    // when this share started
+    public var expiresAt: Date    // when this share ends
+
+    public var isActive: Bool     // Date() < expiresAt
+    public var isEnded: Bool      // !isActive
+}
+```
+
+Both also expose a `coordinate: CLLocationCoordinate2D` computed property and a `StaticLocation(coordinate:)` / `LiveLocation(coordinate:lastUpdateAt:startedAt:expiresAt:)` convenience init, for when you're working with CoreLocation/MapKit types directly.
+
+In the message list, a static location renders as a small map with a simple map marker. A live share renders Telegram-style: the sender's avatar as a pin on the map (with a small accent-colored dot underneath), plus a colored footer bar below the map showing "Live Location", "updated Xm ago"/"updated just now", and a circular badge counting down the minutes left. Once it ends, the map desaturates and the footer switches to "Live location ended". This is exactly what the sender sees too - a live share looks the same in your own outgoing message bubble as it does for everyone else, there's no separate "you are sharing" banner anywhere else in the UI.
+
+Tapping any location bubble (yours or a peer's) opens `FullscreenLocationView`, an interactive fullscreen map with an "Open in Maps" button. If it's a live share, the same live status bar (with countdown) is repeated at the bottom - and if it's a live share **you are currently broadcasting from this device**, that bar also includes a **Stop Sharing** button, so the only place the sender can end their own broadcast is on the message itself (their own bubble, or its fullscreen view), exactly like everyone else's read-only view of it.
+
+### How live location sharing works
+
+The device's location tracking (`CLLocationManager`) is entirely internal to ExyteChat - you never touch CoreLocation yourself. What the library *can't* do is push updates to other participants, since it has no networking layer of its own (same as for regular messages):
+
+1. When the user starts a live share, `InputViewModel` assigns the outgoing `DraftMessage` a stable `id` up front so later updates can find it again.
+2. Once you call your `didSendMessage` closure for that draft, `ChatView` starts a `CLLocationManager` session (`LiveLocationBroadcaster`) that keeps sampling the device's location. Only one share can broadcast at a time - starting a new live share ends whichever one was already active (you'll see its `.ended` event fire before the new share's first `.updated`), the same way Telegram only lets you broadcast one live location at once.
+3. On every fix, `onLiveLocationBroadcast(.updated(messageId, liveLocation))` is called - use it to update that message's `liveLocation` in your own message store/backend (see `MockChatInteractor.updateLiveLocation` in the example project) and propagate it to other participants however your app does that.
+4. When the share ends - duration elapsed, sender tapped **Stop Sharing**, or it got superseded by a new share - one final `.updated` is delivered with `expiresAt` set to "now" (so every viewer's UI flips to "ended" immediately instead of waiting out the original duration), then `.ended(messageId)` fires.
+
+```swift
+ChatView(messages: viewModel.messages) { draft in
+    viewModel.send(draft: draft)
+}
+.setAvailableInputs([.text, .media, .location])
+.onLiveLocationBroadcast { event in
+    switch event {
+    case .updated(let messageId, let liveLocation):
+        yourViewModel.updateLiveLocation(messageId: messageId, liveLocation: liveLocation)
+    case .ended(let messageId):
+        print("Live location sharing ended for \(messageId)")
+    }
+}
+```
+
+**Background limitation:** live updates keep flowing while your app is active or briefly backgrounded, but not indefinitely once the app is fully suspended. To keep broadcasting while backgrounded for longer, your app needs to opt into the `location` `UIBackgroundModes` entry (Info.plist) and the matching background modes capability/entitlement in Xcode - ExyteChat detects this automatically (`allowsBackgroundLocationUpdates` is only set when your app declares that background mode) and otherwise degrades gracefully instead of crashing.
+
 ## Sticker Keyboard
 
 You can pick and send animated gifs via the integrated sticker keyboard. In order to use this functionality a client id must be granted via the [Giphy Developers](https://developers.giphy.com/) site.
@@ -495,6 +582,11 @@ The library uses the following text that can be localized:
 - Waiting for network
 - Recording...
 - Reply to
+- Media
+- GIF
+- Camera
+- Document
+- Location
 
 ## Image Caching with Cache Keys
 

@@ -26,6 +26,7 @@ struct ChatCustomizationParameters {
     var onContentOffsetChange: ((CGFloat) -> Void)? // Internal → External
     var onWillDisplayCell: ((Message) -> Void)?
     var onTransactionReady: ((TableUpdateTransaction) -> Void)?
+    var onLiveLocationBroadcast: ((LiveLocationBroadcastEvent) -> Void)?
 
     var olderMessagesPaginationHandler: PaginationHandler?
     var newerMessagesPaginationHandler: PaginationHandler?
