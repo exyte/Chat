@@ -58,6 +58,7 @@
 		5B0636D52C2E9F6100E54AEE /* CommentsExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsExampleView.swift; sourceTree = "<group>"; };
 		5B0636DA2C2EA21900E54AEE /* Sequence+asyncMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+asyncMap.swift"; sourceTree = "<group>"; };
 		5B6D3A722987D85A00765148 /* Color+hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+hex.swift"; sourceTree = "<group>"; };
+		5B83F95030357B7C0073275B /* MediaPicker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MediaPicker; path = "/Users/f3dm76/Work/!OpenSource/MediaPicker"; sourceTree = "<absolute>"; };
 		5BE239E82FADEA4700B95E5B /* ActiveChatExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveChatExampleView.swift; sourceTree = "<group>"; };
 		5BE239EA2FADEB1F00B95E5B /* ActiveChatExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveChatExampleViewModel.swift; sourceTree = "<group>"; };
 		FF220E5C2DD9F0AF00BE315E /* .editorconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = .editorconfig; sourceTree = "<group>"; };
@@ -79,6 +80,7 @@
 		135549272864620900C9459A = {
 			isa = PBXGroup;
 			children = (
+				5B83F95030357B7C0073275B /* MediaPicker */,
 				135549322864620900C9459A /* ChatExample */,
 				5B4DBAA32D92E2560067A006 /* Frameworks */,
 				135549312864620900C9459A /* Products */,

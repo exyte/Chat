@@ -158,7 +158,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     Text("no giphy key found")
                 }
             }
-            .fullScreenCover(isPresented: customMediaPickerBinding) {
+            .windowCover(isPresented: customMediaPickerBinding) {
                 AttachmentsEditor(
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
@@ -175,7 +175,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ) { medias in
                 inputViewModel.attachments.medias = medias
             }
-            .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
+            .windowCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
 
@@ -248,7 +248,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         }
         // Used to prevent ChatView movement during Emoji Keyboard invocation
         .ignoresSafeArea(isShowingMenu ? .keyboard : [])
-        .onGeometryChange(for: CGSize.self) { $0.size } action: { chatSize = $0 }
+        .sizeGetter($chatSize)
         .environment(\.chatSize, chatSize)
     }
     
