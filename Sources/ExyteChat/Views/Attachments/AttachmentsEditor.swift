@@ -10,7 +10,7 @@ import ExyteMediaPicker
 import ActivityIndicatorView
 
 struct AttachmentsEditor<InputViewContent: View>: View {
-    
+
     typealias InputViewBuilderParamsClosure = ChatView<EmptyView, InputViewContent, DefaultMessageMenuAction>.InputViewBuilderParamsClosure
 
     @Environment(\.chatTheme) var theme
@@ -36,9 +36,46 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            mediaPicker
-            inputView
+        NavigationStack {
+            VStack(spacing: 0) {
+                mediaPicker
+                inputView
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(mediaPickerTheme.main.pickerBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                backToolbarItem
+                titleToolbarItem
+            }
+        }
+    }
+
+    var backToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button {
+                seleсtedMedias = []
+                inputViewModel.attachments.medias = []
+                inputViewModel.showPicker = false
+            } label: {
+                Image("backArrow", bundle: .current)
+            }
+        }
+    }
+
+    var titleToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            Button {
+                withAnimation {
+                    inputViewModel.mediaPickerMode = showingAlbums ? .photos : .albums
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(localization.recentToggleText)
+                    Image(systemName: "chevron.down")
+                        .rotationEffect(Angle(radians: showingAlbums ? .pi : 0))
+                }
+            }
         }
     }
 
@@ -47,12 +84,10 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             seleсtedMedias = $0
             assembleSelectedMedia()
         } albumSelectionBuilder: { _, albumSelectionView, _ in
-            VStack {
-                albumSelectionHeaderView
-                albumSelectionView
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(mediaPickerTheme.main.pickerBackground.ignoresSafeArea())
+            albumSelectionView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(mediaPickerTheme.main.pickerBackground)
+                .tint(mediaPickerTheme.main.pickerText)
         }
         .didPressCancelCamera {
             inputViewModel.attachments.medias = []
@@ -61,7 +96,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         .fullscreenMedia($currentFullscreenMedia)
         .pickerMode($inputViewModel.mediaPickerMode)
         .setMediaPickerParameters(mediaPickerParameters)
-        .padding(.top)
         .background(theme.colors.mainBG)
         .onChange(of: currentFullscreenMedia) {
             assembleSelectedMedia()
@@ -125,37 +159,6 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             customInputView
                 .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
         }
-    }
-
-    var albumSelectionHeaderView: some View {
-        ZStack {
-            HStack {
-                Button {
-                    seleсtedMedias = []
-                    inputViewModel.attachments.medias = []
-                    inputViewModel.showPicker = false
-                } label: {
-                    Text(localization.cancelButtonText)
-                }
-
-                Spacer()
-            }
-
-            HStack {
-                Text(localization.recentToggleText)
-                Image(systemName: "chevron.down")
-                    .rotationEffect(Angle(radians: showingAlbums ? .pi : 0))
-            }
-            .onTapGesture {
-                withAnimation {
-                    inputViewModel.mediaPickerMode = showingAlbums ? .photos : .albums
-                }
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .foregroundColor(mediaPickerTheme.main.pickerText)
-        .padding(.horizontal)
-        .padding(.bottom, 5)
     }
 
     func cameraSelectionHeaderView(cancelClosure: @escaping ()->()) -> some View {

@@ -158,7 +158,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     Text("no giphy key found")
                 }
             }
-            .windowCover(isPresented: customMediaPickerBinding) {
+            .fullScreenCover(isPresented: customMediaPickerBinding) {
                 AttachmentsEditor(
                     inputViewModel: inputViewModel,
                     inputViewBuilder: inputViewBuilder,
@@ -175,24 +175,20 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             ) { medias in
                 inputViewModel.attachments.medias = medias
             }
-            .windowCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
+            .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }
 
-                GeometryReader { g in
-                    FullscreenMediaPages(
-                        viewModel: FullscreenMediaPagesViewModel(
-                            attachments: attachments,
-                            index: index ?? 0
-                        ),
-                        safeAreaInsets: g.safeAreaInsets,
-                        showShareButton: chatCustomizationParameters.showShareAttachmentButton,
-                        onClose: { [weak viewModel] in
-                            viewModel?.dismissAttachmentFullScreen()
-                        }
-                    )
-                    .ignoresSafeArea()
-                }
+                FullscreenMediaPages(
+                    viewModel: FullscreenMediaPagesViewModel(
+                        attachments: attachments,
+                        index: index ?? 0
+                    ),
+                    showShareButton: chatCustomizationParameters.showShareAttachmentButton,
+                    onClose: { [weak viewModel] in
+                        viewModel?.dismissAttachmentFullScreen()
+                    }
+                )
             }
             .sheet(item: $viewModel.shareAttachmentsItem) { item in
                 ShareSheet(activityItems: item.urls)

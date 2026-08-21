@@ -73,6 +73,7 @@ struct ContentView: View {
                         }
                         ColorPicker("", selection: $color)
                     }
+                    .fixedSize()
                 }
             }
         }

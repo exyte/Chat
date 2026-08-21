@@ -175,7 +175,6 @@ struct ChatExampleView: View {
                     }
                 }
             }
-            .padding(.leading, 10)
         }
     }
 
