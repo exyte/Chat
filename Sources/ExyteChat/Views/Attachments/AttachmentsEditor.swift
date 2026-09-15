@@ -58,7 +58,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.attachments.medias = []
                 inputViewModel.showPicker = false
             } label: {
-                Image("backArrow", bundle: .current)
+                theme.images.backButton
             }
         }
     }
