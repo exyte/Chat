@@ -173,12 +173,13 @@ extension InputView {
 
 private struct RemovableAttachmentThumbnail<Content: View>: View {
     @Environment(\.chatTheme) var theme
+    @Environment(\.chatSize) var chatSize
 
     var onRemove: () -> Void
     @ViewBuilder var content: () -> Content
 
     private var thumbnailSize: CGFloat {
-        UIScreen.main.bounds.width / 5
+        chatSize.width / 5
     }
 
     var body: some View {
@@ -201,32 +202,29 @@ private struct RemovableAttachmentThumbnail<Content: View>: View {
 
 private struct MediaAttachmentThumbnail: View {
     @Environment(\.chatTheme) var theme
-    @Environment(\.chatSize) var chatSize
 
     var media: Media
     var onRemove: () -> Void
 
     @State private var thumbnail: UIImage?
 
-    private var thumbnailSize: CGFloat {
-        chatSize.width / 5
-    }
-
     var body: some View {
         RemovableAttachmentThumbnail(onRemove: onRemove) {
-            if let thumbnail {
-                Image(uiImage: thumbnail)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Rectangle()
-                    .fill(theme.colors.messageFriendBG)
-            }
-
-            if media.type == .video {
-                Image(systemName: "play.circle.fill")
-                    .foregroundColor(.white)
-                    .font(.system(size: 20))
+            ZStack {
+                if let thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Rectangle()
+                        .fill(theme.colors.messageFriendBG)
+                }
+                
+                if media.type == .video {
+                    Image(systemName: "play.circle.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 20))
+                }
             }
         }
         .task(id: media.id) {
