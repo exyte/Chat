@@ -103,6 +103,7 @@ public struct AttachmentCell: View {
 
             Text(attachment.fileName ?? attachment.full.lastPathComponent)
                 .font(.caption2)
+                .foregroundColor(theme.colors.messageFriendText)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 6)

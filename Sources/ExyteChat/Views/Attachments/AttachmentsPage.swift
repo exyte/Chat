@@ -59,10 +59,10 @@ struct AttachmentsPage: View {
                 .resizable()
                 .scaledToFit()
                 .viewSize(64)
-                .foregroundColor(.white)
+                .foregroundColor(theme.colors.mainTint)
 
             Text(attachment.fileName ?? attachment.full.lastPathComponent)
-                .foregroundColor(.white)
+                .foregroundColor(theme.colors.mainText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
 
@@ -71,8 +71,8 @@ struct AttachmentsPage: View {
             } label: {
                 Text("Open", bundle: .module)
                     .padding(20, 10)
-                    .background(Capsule().fill(Color.white.opacity(0.15)))
-                    .foregroundColor(.white)
+                    .background(Capsule().fill(theme.colors.mainText.opacity(0.15)))
+                    .foregroundColor(theme.colors.mainText)
             }
         }
     }
