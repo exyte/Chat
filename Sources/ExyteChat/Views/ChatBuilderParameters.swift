@@ -60,36 +60,6 @@ extension ChatView {
         _ defaultActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
         _ message: Message
     ) -> Void
-
-    public init(
-        messages: [Message],
-        chatType: ChatType = .conversation,
-        replyMode: ReplyMode = .quote,
-        didSendMessage: @escaping (DraftMessage) -> Void,
-        @ViewBuilder messageBuilder: @escaping (_ params: MessageBuilderParameters) -> MessageContent = { _ in
-            DummyView()
-        },
-        @ViewBuilder inputViewBuilder: @escaping (_ params: InputViewBuilderParameters) -> InputViewContent = { _ in
-            DummyView()
-        },
-        messageMenuAction: @escaping (
-            _ selectedMenuAction: MenuAction,
-            _ defaultActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
-            _ message: Message
-        ) -> Void = { (selectedMenuAction: DefaultMessageMenuAction, defaultActionClosure, message) in
-            defaultActionClosure(message, selectedMenuAction)
-        },
-        didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil
-    ) {
-        self.type = chatType
-        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
-        self.ids = messages.map { $0.id }
-        self.didSendMessage = didSendMessage
-        self.messageBuilder = messageBuilder
-        self.inputViewBuilder = inputViewBuilder
-        self.messageMenuAction = messageMenuAction
-        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
-    }
 }
 
 public struct DummyView: View {

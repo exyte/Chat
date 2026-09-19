@@ -618,3 +618,43 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 //            text: "That I shall say 'Good night' till it be morrow"),
 //    ]) { draft in }
 //}
+
+// The designated initializer is kept in this file, alongside the `@State` property
+// declarations it doesn't explicitly assign. Xcode 27's Swift 6.4 compiler emits an
+// unresolvable "variable initialization expression" linker symbol for a `@State`
+// property's default value when its type's initializer lives in a different file
+// (https://github.com/swiftlang/swift/issues/91700). This was previously declared in
+// ChatBuilderParameters.swift, which reproduced that bug for every `@State` property
+// on `ChatView`.
+extension ChatView {
+
+    public init(
+        messages: [Message],
+        chatType: ChatType = .conversation,
+        replyMode: ReplyMode = .quote,
+        didSendMessage: @escaping (DraftMessage) -> Void,
+        @ViewBuilder messageBuilder: @escaping (_ params: MessageBuilderParameters) -> MessageContent = { _ in
+            DummyView()
+        },
+        @ViewBuilder inputViewBuilder: @escaping (_ params: InputViewBuilderParameters) -> InputViewContent = { _ in
+            DummyView()
+        },
+        messageMenuAction: @escaping (
+            _ selectedMenuAction: MenuAction,
+            _ defaultActionClosure: @escaping (Message, DefaultMessageMenuAction) -> Void,
+            _ message: Message
+        ) -> Void = { (selectedMenuAction: DefaultMessageMenuAction, defaultActionClosure, message) in
+            defaultActionClosure(message, selectedMenuAction)
+        },
+        didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil
+    ) {
+        self.type = chatType
+        self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
+        self.ids = messages.map { $0.id }
+        self.didSendMessage = didSendMessage
+        self.messageBuilder = messageBuilder
+        self.inputViewBuilder = inputViewBuilder
+        self.messageMenuAction = messageMenuAction
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
+    }
+}
