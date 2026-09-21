@@ -32,7 +32,11 @@ struct MessageStatusView: View {
 
     private func statusImageStyled(image: Image, color: Color) -> some View {
         image
-            .sizeAndColor(40, color)
+            .resizable()
+            .renderingMode(.template)
+            .aspectRatio(contentMode: .fit)
+            .foregroundColor(color)
+            .frame(width: 40)
     }
 }
 
