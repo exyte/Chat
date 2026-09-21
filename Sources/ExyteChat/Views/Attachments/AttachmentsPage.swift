@@ -56,10 +56,7 @@ struct AttachmentsPage: View {
     private var documentView: some View {
         VStack(spacing: 16) {
             theme.images.message.attachedDocument
-                .resizable()
-                .scaledToFit()
-                .viewSize(64)
-                .foregroundColor(theme.colors.mainTint)
+                .sizeAndColor(64, theme.colors.mainTint)
 
             Text(attachment.fileName ?? attachment.full.lastPathComponent)
                 .foregroundColor(theme.colors.mainText)

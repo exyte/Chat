@@ -115,11 +115,7 @@ private struct AttachMenuRow: View {
         } label: {
             HStack(spacing: 10) {
                 icon
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .viewSize(20)
-                    .foregroundColor(theme.colors.mainTint)
+                    .sizeAndColor(20, theme.colors.mainTint)
                 Text(title)
                     .font(.callout)
                     .foregroundColor(theme.colors.mainText)

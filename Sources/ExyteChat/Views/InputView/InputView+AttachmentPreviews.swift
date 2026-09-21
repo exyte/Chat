@@ -127,11 +127,9 @@ extension InputView {
                 }
             } label: {
                 theme.images.mediaPicker.cross
-                    .resizable()
-                    .viewSize(10)
+                    .sizeAndColor(10, .white)
                     .padding(4)
                     .background(Circle().fill(Color.black.opacity(0.6)))
-                    .foregroundColor(.white)
             }
         }
         .padding(.horizontal, 26)
@@ -157,11 +155,9 @@ extension InputView {
                 }
             } label: {
                 theme.images.mediaPicker.cross
-                    .resizable()
-                    .viewSize(10)
+                    .sizeAndColor(10, .white)
                     .padding(4)
                     .background(Circle().fill(Color.black.opacity(0.6)))
-                    .foregroundColor(.white)
             }
         }
         .padding(.horizontal, 26)
@@ -189,11 +185,9 @@ private struct RemovableAttachmentThumbnail<Content: View>: View {
             .overlay(alignment: .topTrailing) {
                 Button(action: onRemove) {
                     theme.images.mediaPicker.cross
-                        .resizable()
-                        .viewSize(10)
+                        .sizeAndColor(10, .white)
                         .padding(4)
                         .background(Circle().fill(Color.black.opacity(0.6)))
-                        .foregroundColor(.white)
                 }
                 .offset(x: 6, y: -6)
             }

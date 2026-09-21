@@ -205,10 +205,7 @@ struct InputView: View {
             viewModel.text = ""
         } label: {
             theme.images.inputView.clearText
-                .resizable()
-                .renderingMode(.template)
-                .foregroundColor(theme.colors.mainText.opacity(0.6))
-                .viewSize(18)
+                .sizeAndColor(18, theme.colors.mainText.opacity(0.6))
                 .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 12))
         }
     }

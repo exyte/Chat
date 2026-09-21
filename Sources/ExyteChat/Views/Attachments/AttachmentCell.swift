@@ -58,9 +58,7 @@ public struct AttachmentCell: View {
                             VStack {
                                 Spacer()
                                 theme.images.message.playVideo
-                                    .resizable()
-                                    .foregroundColor(.white)
-                                    .viewSize(36)
+                                    .sizeAndColor(36, .white)
                                 Spacer()
                             }
                         case .cancelled:
@@ -72,9 +70,7 @@ public struct AttachmentCell: View {
                         VStack {
                             Spacer()
                             theme.images.message.playVideo
-                                .resizable()
-                                .foregroundColor(.white)
-                                .viewSize(36)
+                                .sizeAndColor(36, .white)
                             Spacer()
                         }
                     }
@@ -96,10 +92,7 @@ public struct AttachmentCell: View {
     private var documentContent: some View {
         VStack(spacing: 6) {
             theme.images.message.attachedDocument
-                .resizable()
-                .scaledToFit()
-                .viewSize(32)
-                .foregroundColor(theme.colors.mainTint)
+                .sizeAndColor(32, theme.colors.mainTint)
 
             Text(attachment.fileName ?? attachment.full.lastPathComponent)
                 .font(.caption2)
