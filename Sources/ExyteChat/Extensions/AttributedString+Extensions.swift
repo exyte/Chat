@@ -14,9 +14,13 @@ extension AttributedString {
         return ceil(boundingBox.width)
     }
 
+    /// Applies `font` as the base, but keeps each run's bold/italic/code emphasis so the
+    /// measured size matches what `Text(attributedText)` actually renders.
     func toAttrString(font: UIFont) -> NSAttributedString {
         var str = self
-        str.setAttributes(AttributeContainer([.font: font]))
+        for run in str.runs {
+            str[run.range].setAttributes(AttributeContainer([.font: font.applyingInlinePresentationIntent(run.inlinePresentationIntent)]))
+        }
         return NSAttributedString(str)
     }
 
@@ -61,5 +65,20 @@ public extension AttributedString {
             link?.absoluteURL
         }
         .compactMap { $0 }
+    }
+}
+
+private extension UIFont {
+    /// Mirrors how `Text` renders `inlinePresentationIntent` runs (from markdown) on top of an ambient font.
+    func applyingInlinePresentationIntent(_ intent: InlinePresentationIntent?) -> UIFont {
+        guard let intent else { return self }
+
+        var traits: UIFontDescriptor.SymbolicTraits = []
+        if intent.contains(.stronglyEmphasized) { traits.insert(.traitBold) }
+        if intent.contains(.emphasized) { traits.insert(.traitItalic) }
+        if intent.contains(.code) { traits.insert(.traitMonoSpace) }
+
+        guard !traits.isEmpty, let descriptor = fontDescriptor.withSymbolicTraits(traits) else { return self }
+        return UIFont(descriptor: descriptor, size: pointSize)
     }
 }
