@@ -56,7 +56,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
             Button {
                 seleсtedMedias = []
                 inputViewModel.attachments.medias = []
-                inputViewModel.showPicker = false
+                inputViewModel.showMediaPicker = false
             } label: {
                 theme.images.backButton
             }
@@ -80,7 +80,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
     }
 
     var mediaPicker: some View {
-        MediaPicker(isPresented: $inputViewModel.showPicker) {
+        MediaPicker(isPresented: $inputViewModel.showMediaPicker) {
             seleсtedMedias = $0
             assembleSelectedMedia()
         } albumSelectionBuilder: { _, albumSelectionView, _ in
@@ -91,7 +91,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         }
         .didPressCancelCamera {
             inputViewModel.attachments.medias = []
-            inputViewModel.showPicker = false
+            inputViewModel.showMediaPicker = false
         }
         .fullscreenMedia($currentFullscreenMedia)
         .pickerMode($inputViewModel.mediaPickerMode)
@@ -100,7 +100,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
         .onChange(of: currentFullscreenMedia) {
             assembleSelectedMedia()
         }
-        .onChange(of: inputViewModel.showPicker) {
+        .onChange(of: inputViewModel.showMediaPicker) {
             let showFullscreenPreview = mediaPickerParameters.selectionParameters.showFullscreenPreview
             let selectionLimit = mediaPickerParameters.selectionParameters.selectionLimit ?? 1
 

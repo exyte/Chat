@@ -15,7 +15,7 @@ final class InputViewModel: ObservableObject {
     @Published var state: InputViewState = .empty
 
     @Published var showGiphyPicker = false
-    @Published var showPicker = false
+    @Published var showMediaPicker = false
     @Published var showDocumentPicker = false
     @Published var showLocationPicker = false
 
@@ -53,7 +53,7 @@ final class InputViewModel: ObservableObject {
         attachments = InputViewAttachments()
         state = .empty
         showGiphyPicker = false
-        showPicker = false
+        showMediaPicker = false
         showDocumentPicker = false
         showLocationPicker = false
         saveEditingClosure = nil
@@ -85,12 +85,12 @@ final class InputViewModel: ObservableObject {
             showGiphyPicker = true
         case .photo:
             mediaPickerMode = .photos
-            showPicker = true
+            showMediaPicker = true
         case .add:
             mediaPickerMode = .camera
         case .camera:
             mediaPickerMode = .camera
-            showPicker = true
+            showMediaPicker = true
         case .document:
             showDocumentPicker = true
         case .location:

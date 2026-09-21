@@ -111,15 +111,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 
     private var customMediaPickerBinding: Binding<Bool> {
         Binding(
-            get: { inputViewModel.showPicker && !useSystemPhotoPicker },
-            set: { inputViewModel.showPicker = $0 }
+            get: { inputViewModel.showMediaPicker && !useSystemPhotoPicker },
+            set: { inputViewModel.showMediaPicker = $0 }
         )
     }
 
     private var systemMediaPickerBinding: Binding<Bool> {
         Binding(
-            get: { inputViewModel.showPicker && useSystemPhotoPicker },
-            set: { inputViewModel.showPicker = $0 }
+            get: { inputViewModel.showMediaPicker && useSystemPhotoPicker },
+            set: { inputViewModel.showMediaPicker = $0 }
         )
     }
 
@@ -188,7 +188,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 }
             }
             // any attachment picker opening should resign the text field's focus
-            .onChange(of: [inputViewModel.showPicker, inputViewModel.showGiphyPicker, inputViewModel.showDocumentPicker, inputViewModel.showLocationPicker]) { _, newValues in
+            .onChange(of: [inputViewModel.showMediaPicker, inputViewModel.showGiphyPicker, inputViewModel.showDocumentPicker, inputViewModel.showLocationPicker]) { _, newValues in
                 if newValues.contains(true) {
                     globalFocusState.focus = nil
                 }
@@ -224,10 +224,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             }
             .systemPhotoPicker(
                 isPresented: systemMediaPickerBinding,
+                medias: $inputViewModel.attachments.medias,
                 selectionParameters: inputViewCustomizationParameters.mediaPickerParameters.selectionParameters
-            ) { medias in
-                inputViewModel.attachments.medias = medias
-            }
+            )
             .sheet(isPresented: $inputViewModel.showDocumentPicker) {
                 DocumentPicker { documents in
                     inputViewModel.attachments.documents.append(contentsOf: documents)
