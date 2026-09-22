@@ -11,8 +11,14 @@ final class LocationManager: NSObject, ObservableObject {
     @Published var currentLocation: CLLocationCoordinate2D?
     @Published var authorizationStatus: CLAuthorizationStatus
 
+    private enum LocationType {
+        case staticLocation
+        case liveLocation
+    }
+
     private let manager = CLLocationManager()
-    private var wantsContinuousUpdates = false
+    /// Resumed by `locationManagerDidChangeAuthorization` once the user answers the system prompt.
+    private var authorizationContinuation: CheckedContinuation<Bool, Never>?
 
     override init() {
         authorizationStatus = manager.authorizationStatus
@@ -21,37 +27,53 @@ final class LocationManager: NSObject, ObservableObject {
         manager.desiredAccuracy = kCLLocationAccuracyBest
     }
 
-    func requestLocation() {
-        switch manager.authorizationStatus {
-        case .notDetermined:
-            manager.requestWhenInUseAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways:
-            manager.requestLocation()
-        default:
-            break
+    func requestStaticLocation() {
+        Task {
+            guard await requestPermission() else { return }
+            startUpdatingLocation(.staticLocation)
         }
     }
 
-    /// Keeps publishing `currentLocation` updates as the device moves, until `stopContinuousUpdates()` is called.
-    func startContinuousUpdates() {
-        wantsContinuousUpdates = true
-        switch manager.authorizationStatus {
-        case .notDetermined:
-            manager.requestWhenInUseAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways:
+    /// Keeps publishing `currentLocation` updates as the device moves, until `stopUpdatingLiveLocation()` is called.
+    func startUpdatingLiveLocation() {
+        Task {
+            guard await requestPermission() else { return }
             manager.allowsBackgroundLocationUpdates = manager.authorizationStatus == .authorizedAlways && Self.supportsBackgroundLocationUpdates
-            manager.startUpdatingLocation()
-        default:
-            break
+            startUpdatingLocation(.liveLocation)
         }
     }
 
-    func stopContinuousUpdates() {
-        wantsContinuousUpdates = false
+    func stopUpdatingLiveLocation() {
         if Self.supportsBackgroundLocationUpdates {
             manager.allowsBackgroundLocationUpdates = false
         }
         manager.stopUpdatingLocation()
+    }
+
+    /// Resolves once the user has answered the authorization prompt (or immediately if already
+    /// determined), and returns whether we're now allowed to use location. Knows nothing about
+    /// what the caller intends to do with that location.
+    private func requestPermission() async -> Bool {
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            return true
+        case .notDetermined:
+            return await withCheckedContinuation { continuation in
+                authorizationContinuation = continuation
+                manager.requestWhenInUseAuthorization()
+            }
+        default:
+            return false
+        }
+    }
+
+    private func startUpdatingLocation(_ type: LocationType) {
+        switch type {
+        case .liveLocation:
+            manager.startUpdatingLocation()
+        case .staticLocation:
+            manager.requestLocation()
+        }
     }
 
     /// Background live-location updates only work if the host app opted into the "location" UIBackgroundMode;
@@ -67,13 +89,9 @@ extension LocationManager: CLLocationManagerDelegate {
         let status = manager.authorizationStatus
         Task { @MainActor in
             self.authorizationStatus = status
-            guard status == .authorizedWhenInUse || status == .authorizedAlways else { return }
-            if self.wantsContinuousUpdates {
-                manager.allowsBackgroundLocationUpdates = status == .authorizedAlways && Self.supportsBackgroundLocationUpdates
-                manager.startUpdatingLocation()
-            } else {
-                manager.requestLocation()
-            }
+            guard status != .notDetermined else { return }
+            self.authorizationContinuation?.resume(returning: status == .authorizedWhenInUse || status == .authorizedAlways)
+            self.authorizationContinuation = nil
         }
     }
 

@@ -34,7 +34,7 @@ final class LiveLocationBroadcaster: ObservableObject {
         activeShare = ActiveShare(messageId: messageId, startedAt: startedAt, expiresAt: expiresAt)
         lastCoordinate = nil
 
-        locationManager.startContinuousUpdates()
+        locationManager.startUpdatingLiveLocation()
         cancellable = locationManager.$currentLocation
             .compactMap { $0 }
             .sink { [weak self] coordinate in
@@ -58,7 +58,7 @@ final class LiveLocationBroadcaster: ObservableObject {
 
     func finish() {
         guard let share = activeShare else { return }
-        locationManager.stopContinuousUpdates()
+        locationManager.stopUpdatingLiveLocation()
         cancellable = nil
         expiryTimer?.invalidate()
         expiryTimer = nil

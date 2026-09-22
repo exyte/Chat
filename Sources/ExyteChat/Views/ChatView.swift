@@ -234,7 +234,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 .ignoresSafeArea()
             }
             .sheet(isPresented: $inputViewModel.showLocationPicker) {
-                LocationPickerView(localization: chatCustomizationParameters.localization) { staticLocation in
+                LocationPickerView(
+                    localization: chatCustomizationParameters.localization,
+                    isStaticLocationAvailable: inputViewCustomizationParameters.availableInputs.contains(.staticLocation),
+                    isLiveLocationAvailable: inputViewCustomizationParameters.availableInputs.contains(.liveLocation)
+                ) { staticLocation in
                     inputViewModel.attachments.staticLocation = staticLocation
                 } onPickLiveLocation: { liveLocation in
                     inputViewModel.attachments.liveLocation = liveLocation
