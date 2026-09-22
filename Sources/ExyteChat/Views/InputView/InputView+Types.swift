@@ -66,7 +66,10 @@ public enum AvailableInputType: Sendable {
     case media
     case giphy
     case document
-    case location
+    /// Enables sharing a single, fixed location.
+    case staticLocation
+    /// Enables sharing a live, continuously-updating location.
+    case liveLocation
     case audio
 }
 

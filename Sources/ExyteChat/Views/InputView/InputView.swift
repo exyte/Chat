@@ -236,6 +236,6 @@ struct InputView: View {
     }
 
     func isLocationAvailable() -> Bool {
-        availableInputs.contains(AvailableInputType.location)
+        availableInputs.contains(AvailableInputType.staticLocation) || availableInputs.contains(AvailableInputType.liveLocation)
     }
 }

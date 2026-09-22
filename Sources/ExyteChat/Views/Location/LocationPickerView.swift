@@ -21,6 +21,8 @@ struct LocationPickerView: View {
     @State private var showLiveDurationDialog = false
 
     var localization: ChatLocalization
+    var isStaticLocationAvailable: Bool
+    var isLiveLocationAvailable: Bool
     var onPickStaticLocation: (StaticLocation) -> Void
     var onPickLiveLocation: (LiveLocation) -> Void
 
@@ -41,7 +43,7 @@ struct LocationPickerView: View {
             .ignoresSafeArea(edges: .bottom)
             .overlay(alignment: .bottomTrailing) {
                 Button {
-                    locationManager.requestLocation()
+                    locationManager.requestStaticLocation()
                 } label: {
                     Image(systemName: "location.fill")
                         .padding(12)
@@ -53,15 +55,19 @@ struct LocationPickerView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 10) {
-                    pickerActionButton(localization.sendLocationText, filled: true) {
-                        if let selectedCoordinate {
-                            onPickStaticLocation(StaticLocation(coordinate: selectedCoordinate))
-                            dismiss()
+                    if isStaticLocationAvailable {
+                        pickerActionButton(localization.sendLocationText, filled: true) {
+                            if let selectedCoordinate {
+                                onPickStaticLocation(StaticLocation(coordinate: selectedCoordinate))
+                                dismiss()
+                            }
                         }
                     }
 
-                    pickerActionButton(localization.shareLiveLocationText, filled: false) {
-                        showLiveDurationDialog = true
+                    if isLiveLocationAvailable {
+                        pickerActionButton(localization.shareLiveLocationText, filled: false) {
+                            showLiveDurationDialog = true
+                        }
                     }
                 }
                 .padding()
@@ -95,7 +101,7 @@ struct LocationPickerView: View {
             }
         }
         .onAppear {
-            locationManager.requestLocation()
+            locationManager.requestStaticLocation()
         }
         .onReceive(locationManager.$currentLocation.compactMap { $0 }) { newValue in
             guard !didCenterOnUser else { return }
