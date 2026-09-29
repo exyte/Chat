@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import UIKit
 import AnchoredPopup
 
 private struct AttachMenuItem {
@@ -85,7 +86,29 @@ extension InputView {
                     .background(.none)
                     .closeOnTapOutside(true)
                     .animation(.default)
+                    .openOnTap(false)
             }
+            .onTapGesture {
+                openAttachMenu()
+            }
+    }
+
+    /// the popup's position is derived from `inputBarFrame`, which only settles into its
+    /// post-keyboard layout once the keyboard has fully dismissed, so the growing animation
+    /// is deferred until then to avoid anchoring to the pre-dismiss frame
+    fileprivate func openAttachMenu() {
+        guard keyboardState.isShown else {
+            AnchoredPopup.launchGrowingAnimation(id: attachMenuPopupId)
+            return
+        }
+
+        keyboardState.resignFirstResponder()
+        Task {
+            for await _ in NotificationCenter.default.notifications(named: UIResponder.keyboardDidHideNotification) {
+                break
+            }
+            AnchoredPopup.launchGrowingAnimation(id: attachMenuPopupId)
+        }
     }
 
     func menuButton(action: InputViewAction, image: Image) -> some View {
