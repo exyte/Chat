@@ -116,7 +116,6 @@ extension InputView {
             onAction(action)
         } label: {
             image
-                .resizable()
                 .viewSize(24)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
         }
