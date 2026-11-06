@@ -654,6 +654,7 @@ dependencies: [
 * Xcode 15+
 
 ## Our other open source SwiftUI libraries
+[LazyCustomLayout](https://github.com/exyte/LazyCustomLayout) - A custom layout protocol for SwiftUI, powered by a lazy scroll view   
 [PopupView](https://github.com/exyte/PopupView) - Toasts and popups library    
 [AnchoredPopup](https://github.com/exyte/AnchoredPopup) - Anchored Popup grows "out" of a trigger view (similar to Hero animation)   
 [Grid](https://github.com/exyte/Grid) - The most powerful Grid container    
