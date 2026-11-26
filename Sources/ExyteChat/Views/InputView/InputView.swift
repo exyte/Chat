@@ -187,6 +187,7 @@ struct InputView: View {
                 .viewSize(48)
                 .circleBackground(theme.colors.sendButtonBackground)
         }
+        .accessibilityLabel("Send message")
     }
 
     var addButton: some View {
